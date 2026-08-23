@@ -14,6 +14,11 @@ test-project/
 .gstack/
 .worktrees/
 docs/*
+# InkOS Evolution project documentation
+!docs/PROJECT_VISION.md
+!docs/V1_SPEC.md
+!docs/ARCHITECTURE_AUDIT.md
+!docs/IMPLEMENTATION_PLAN.md
 novel-to-comic-research.docx
 .pnpm-store/
 tmp/
