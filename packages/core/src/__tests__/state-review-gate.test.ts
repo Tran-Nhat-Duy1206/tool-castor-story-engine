@@ -227,6 +227,24 @@ describe("assertCanAdvanceStory", () => {
       await writeRuntimeArtifact(fixture, 30, shellArtifact(30));
       await expect(assertCanAdvanceStory(fixture.bookDir, 26)).resolves.toBeUndefined();
     });
+
+    it("blocks a historical ACTIVE artifact for chapter >= 10000 via canonical wide naming", async () => {
+      // Canonical filename from ACTIVE_REVIEW_RELPATH: chapter-10000.state-review.json.
+      // The old exact-4-digit discovery regex silently missed this file.
+      await writeIndex(fixture, [{ number: 10000, status: "approved" }]);
+      await writeRuntimeArtifact(fixture, 10000, activeArtifact(10000, 10001));
+      await expect(assertCanAdvanceStory(fixture.bookDir, 10001)).rejects.toMatchObject({
+        code: "state_review_conflict",
+      });
+    });
+
+    it("blocks a historical rebuild shell for chapter >= 10000 via canonical wide naming", async () => {
+      await writeIndex(fixture, [{ number: 10000, status: "approved" }]);
+      await writeRuntimeArtifact(fixture, 10000, shellArtifact(10000));
+      await expect(assertCanAdvanceStory(fixture.bookDir, 10001)).rejects.toMatchObject({
+        code: "state_review_conflict",
+      });
+    });
   });
 
   it("resolved receipts ALONE never block advancement", async () => {

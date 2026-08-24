@@ -2,6 +2,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { ChapterMetaSchema, type ChapterMeta } from "../models/chapter.js";
 import { StateReviewArtifactSchema, StateReviewError } from "../models/state-review.js";
+import { ACTIVE_REVIEW_RELPATH } from "./state-review-store.js";
 
 /**
  * Task 5 — THE Core advancement gate (Phase 4).
@@ -33,7 +34,7 @@ import { StateReviewArtifactSchema, StateReviewError } from "../models/state-rev
  * it always surfaces regardless of readiness or other blockers.
  */
 
-const PENDING_ARTIFACT_PATTERN = /^chapter-(\d{4})\.state-review\.json$/;
+const PENDING_ARTIFACT_PATTERN = /^chapter-(\d{4,})\.state-review\.json$/;
 
 async function readChapterIndexEntry(
   bookDir: string,
@@ -106,6 +107,24 @@ export async function assertCanAdvanceStory(
     .filter((match): match is RegExpExecArray => match !== null)
     .map((match) => ({ fileName: match[0], chapter: Number(match[1]) }))
     .sort((left, right) => left.chapter - right.chapter);
+
+  // Canonical-path validation: a file that LOOKS like a pending artifact but
+  // is not the exact name ACTIVE_REVIEW_RELPATH would produce for its parsed
+  // chapter (e.g. padded beyond canonical width) must not silently masquerade
+  // as governance state — fail closed, naming the offending file.
+  for (const candidate of matched) {
+    // ACTIVE_REVIEW_RELPATH is bookDir-relative; discovery sees bare names.
+    const canonicalFileName = ACTIVE_REVIEW_RELPATH(candidate.chapter).split("/").pop()!;
+    if (canonicalFileName !== candidate.fileName) {
+      throw new StateReviewError(
+        "state_review_invalid_change",
+        `State Review artifact ${candidate.fileName} does not use the canonical `
+        + `filename ${ACTIVE_REVIEW_RELPATH(candidate.chapter)} and cannot be trusted. `
+        + "Rename or resolve it before generating further chapters. "
+        + "Open State Review in Studio.",
+      );
+    }
+  }
 
   const blockers: string[] = [];
   for (const { fileName } of matched) {
