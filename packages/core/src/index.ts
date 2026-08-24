@@ -84,6 +84,19 @@ export {
   stateReviewItemId,
 } from "./models/state-review.js";
 export {
+  ACTIVE_REVIEW_RELPATH,
+  RECEIPTS_DIR,
+  loadStateReview,
+  saveStateReviewShell,
+  publishActiveProposal,
+  mutateActiveProposal,
+  findReceiptByReviewId,
+  listReceiptsForChapter,
+  writeResolvedReceipt,
+  supersedeReceiptsForChapter,
+  readLiveRuntimeStateSnapshot,
+} from "./state/state-review-store.js";
+export {
   type PlayActionKind,
   type PlayActionIntentInput,
   type PlayActionIntent,
