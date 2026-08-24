@@ -103,7 +103,7 @@ Binding header (all mandatory):
 |---|---|
 | `reviewId` | stable identity of THIS review generation (fresh on every rebuild) |
 | `sourceChapter` | chapter whose prose produced the proposal |
-| `effectiveChapter` | temporal position the confirmed changes will anchor at (= durable progress + 1 **at proposal time**, revalidated at Final Confirm, §20) |
+| `effectiveChapter` | temporal position the confirmed changes will anchor at; normal chapters: `= sourceChapter` (= durable head + 1 at proposal generation); historical corrections: durable head + 1 at proposal generation — revalidated at Final Confirm per the normative rules in §20 |
 | `proseRevision` | deterministic hash of the exact saved prose the proposal was generated from |
 | `baseCanonRevision` | `computeCanonRevision` fingerprint the proposal was generated against |
 | `reviewRevision` | optimistic-concurrency counter of the ARTIFACT itself (bumps on every decision/add/remove save) |
@@ -117,8 +117,27 @@ Binding header (all mandatory):
 2. `baseCanonRevision` — protects Canon from stale confirmation (§13).
 3. `reviewRevision` — protects concurrent review editing (§12).
 
-Resolved reviews become **receipts** (§23) stored separately and immutably; the pending
-artifact is closed/removed atomically at confirmation (§9).
+**Workflow shell (pre-proposal durability).** The SAME artifact path also acts as a
+durable WORKFLOW SHELL whenever no confirmable proposal currently exists:
+
+- editing/saving a READY or currently-reviewed chapter atomically CREATES OR REPLACES
+  the workflow shell with `status = "rebuild_required"`;
+- a failed auto-rebuild transitions the shell to `status = "rebuild_failed"`;
+- a successful rebuild publishes proposal items and transitions it to
+  `status = "active"`;
+- a shell is NON-CONFIRMABLE by definition and carries only identity/lifecycle fields;
+- proposal-specific mandatory data (the three anchors, items) is required ONLY for an
+  ACTIVE, confirmable proposal — a pre-proposal shell must not be forced to carry
+  impossible proposal data;
+- Retry Audit always operates FROM this durable shell against the latest saved prose +
+  latest current Canon.
+
+Crash after prose save but before/during audit is therefore fully represented by
+durable files at every instant. Still exactly one Canon store and one state engine.
+
+Resolved reviews become **receipts** (§23) stored separately (historical content
+immutable; one system-managed lifecycle transition — §23); the pending artifact /
+shell is closed or replaced atomically at confirmation (§9).
 
 ## 4. Review item model
 
@@ -231,7 +250,9 @@ Final Confirm runs in two conceptual phases.
 1. load active review artifact
 2. re-read current prose; recompute current prose revision
 3. re-read current Canon (`readStoryCanon`)
-4. validate review `status === "active"` (stale/rebuild states ⇒ typed error, §13–§15)
+4. validate the loaded artifact is an ACTIVE, confirmable proposal
+   (`status === "active"`; a pre-proposal workflow shell, `stale` or
+   `rebuild_failed` state ⇒ typed error — §3, §13–§15)
 5. validate `reviewRevision` matches caller's (else `state_review_edit_conflict`)
 6. validate `proseRevision` matches current (else `state_review_stale`)
 7. validate `baseCanonRevision` matches current Canon revision (else `state_review_conflict`)
@@ -260,10 +281,14 @@ transaction includes ALL authoritative files:
 - closure/removal of the pending review artifact
 
 Exact file list follows the existing Writer persistence + P3A/P3B write-set precedents
-and is finalized during implementation. The invariant is absolute:
+and is finalized during implementation. The invariant is:
 
-> Canon changed ⟺ chapter is READY ⟺ resolved receipt is durable ⟺ the active review
-> can no longer be confirmed.
+> A successful review resolution ATOMICALLY guarantees: chapter is READY, the resolved
+> receipt is durable, and the active review is permanently unconfirmable. Any Canon
+> mutation produced by a NON-EMPTY confirmed delta occurs only inside that SAME
+> transaction. A ZERO-EFFECTIVE-CHANGE confirmation (Confirm No Changes; all items
+> rejected) is equally valid, uses the identical authoritative transaction, and simply
+> carries no Canon story-meaning mutation.
 
 Canon-first-then-repair-metadata is forbidden. Crash at any point yields either the
 complete old state or the fully committed new state (acceptance: crash scenario, §32).
@@ -302,8 +327,13 @@ Observer → Settler → PROPOSED RuntimeStateDelta
 Rules:
 
 - No new reducer, no parallel application path, no shadow Canon model.
-- The confirmed delta MUST compile into operations `applyRuntimeStateDelta` supports;
-  compilation failures are design errors caught in tests, not runtime branches.
+- Supported, schema-valid review shapes MUST compile — proven by tests. However,
+  runtime compilation or semantic validation can still fail on real data (corrupted
+  or stale artifacts, future migrations, invalid edited/user-added values). Such a
+  failure is FAIL-CLOSED: typed `state_review_invalid_change` (with the originating
+  `itemId` where attributable), APPLY ZERO, Canon untouched, review left unresolved
+  and still actionable. Never a partial apply; never an unhandled escape that
+  half-applies.
 - Fact-level items may REUSE P3A's semantic-key conventions (`resolveFactPredicateKey`,
   alias resolution) when COMPILING `currentStatePatch` operations — this is vocabulary
   reuse for building the delta, never a second application path. Application remains
@@ -370,9 +400,8 @@ old prose can never become valid again — no path re-binds it to newer prose.
 Chapter `needs-state-review`, user edits + saves prose:
 
 1. Save persists new prose (+ new `proseRevision`) durably.
-2. The old proposal becomes stale/unconfirmable in the SAME durable save
-   (workflow substate → `rebuild_required`; equivalently the pending artifact is
-   marked/frozen so it can never confirm).
+2. In the SAME durable save, the old proposal is replaced by a NON-CONFIRMABLE
+   workflow shell with `status = "rebuild_required"` (§3) — it can never confirm.
 3. Auto re-audit starts (Observer/Settler over the new prose).
 4. A completely NEW review is generated (new `reviewId`, new item ids), 0/N reviewed.
 5. Old decisions are NOT carried forward. Ever.
@@ -388,7 +417,8 @@ The prose Save itself must atomically (one transaction):
 - save the new prose (+ new prose revision)
 - move the chapter out of READY (`ready-for-review`)
 - mark R1 `superseded`
-- set the review workflow to `rebuild_required`
+- create or replace the durable review workflow shell with
+  `status = "rebuild_required"` (non-confirmable; §3)
 
 Only after this durable save may the auto re-audit start → new proposal →
 `needs-state-review`.
@@ -405,16 +435,20 @@ If auto re-audit / proposal generation fails after a prose Save:
 - Canon unchanged
 - old proposal remains unconfirmable
 - chapter must NOT be READY
-- workflow becomes durable `rebuild_failed`
+- the durable workflow shell transitions to `status = "rebuild_failed"` — every
+  intermediate state (prose saved, shell marked, audit pending/failed) is represented
+  by durable files, so a crash anywhere leaves recoverable, non-confirmable state (§3)
 
 Studio actions: **Retry Audit** (→ §18) and **Edit Chapter** (normal editing).
 Never resurrect the old proposal.
 
 ## 18. Retry Audit
 
-Always operates on: latest saved prose + latest current Canon. The new proposal binds
+Retry Audit runs FROM the durable workflow shell (§3) and always against: latest
+saved prose + latest current Canon. The new proposal binds
 to the LATEST `proseRevision` and LATEST `baseCanonRevision` — never retried against
-the old Canon revision. New generation ⇒ 0/N reviewed.
+the old Canon revision. Success publishes the items and flips the shell to
+`status = "active"` as a NEW generation ⇒ 0/N reviewed.
 
 ## 19. Zero-change review
 
@@ -423,7 +457,9 @@ AI proposes zero changes ⇒ chapter STILL `needs-state-review`. Studio shows:
 > *No state changes proposed.* — [Add Missing Change] [Confirm No Changes]
 
 **Confirm No Changes** travels the SAME Final Confirm integrity path (locks, anchor
-checks, prepare, atomic commit) and produces a real resolved receipt + READY.
+checks, prepare, atomic commit): receipt created, chapter READY, active review
+permanently closed — with ZERO Canon story-meaning mutation inside that same
+transaction. A review whose items are ALL rejected resolves identically.
 No auto-READY for zero-change chapters.
 
 ## 20. Historical chapter edits
@@ -445,16 +481,30 @@ Done instead:
   temporal assumption moved, Final Confirm fails the anchor check (APPLY ZERO) rather
   than silently relocating the change
 
+**Temporal-position rules (normative — no single ambiguous global formula):**
+
+| Case | `sourceChapter` | `effectiveChapter` |
+|---|---|---|
+| Normal newly-written chapter | = durable head + 1 **at proposal generation** | same value: `sourceChapter === effectiveChapter` |
+| Historical edit / correction | the edited chapter: `<` durable head | durable head + 1 **at proposal generation** |
+
+Final Confirm REVALIDATES the temporal assumption against the CURRENT durable head.
+If it moved ⇒ APPLY 0 and rebuild; a reviewed change is never silently relocated to a
+different temporal position. Receipts preserve both numbers exactly as resolved.
+
 ## 21. Historical edits and advancement
 
 Historical edits never cascade into existing READY chapters — but an UNRESOLVED
-historical correction blocks the future chapter it affects:
+historical correction blocks the future chapter it affects, and any later chapter
+while it stays unresolved:
 
 - head = 25, pending correction with `effectiveChapter = 26`
   ⇒ Chapter 26 generation is BLOCKED until that review resolves.
 
-"Ch17–25 stay READY" is not permission to write Ch26 from Canon the author is actively
-correcting.
+The gate is `effectiveChapter <= nextChapter` (§22): an unresolved correction whose
+temporal effect is AT OR BEFORE the chapter being generated blocks advancement — this
+also covers stale pending corrections left behind by head movement. "Ch17–25 stay
+READY" is not permission to write Ch26 from Canon the author is actively correcting.
 
 ## 22. Generate Next gate (single Core rule)
 
@@ -465,8 +515,8 @@ call the same rule:
 Block when:
 
 1. previous chapter is not READY (existing refusal semantics, cf. plan T5.3), OR
-2. an unresolved state review's `effectiveChapter === nextChapter` (pending historical
-   correction).
+2. an unresolved state review has `effectiveChapter <= nextChapter` — a pending
+   correction whose temporal effect is at or BEFORE the chapter about to be generated.
 
 No frontend-only enforcement. Acceptance tests must prove CLI/pipeline cannot bypass
 Studio governance (§32).
@@ -490,9 +540,13 @@ implementation). Preserves at minimum:
 - evidence metadata (claims, verification outcomes, quotes)
 - `resolvedAt`, `resolved: true` (later `superseded` per §16)
 
-Receipt is: NOT Canon, NOT Writer context, not editable, viewable in Studio.
-Superseded receipts may link `supersededBy: <new reviewId>` when a successor exists;
-otherwise they remain superseded with no successor yet (§17).
+Receipt is: NOT Canon, NOT Writer context, viewable in Studio. Its HISTORICAL CONTENT
+— proposals, human decisions, effective changes, evidence metadata, revision anchors —
+is immutable and read-only to users. Exactly ONE system-managed lifecycle transition
+is permitted, and it is itself written atomically: `resolved → superseded`, optionally
+setting `supersededBy: <new reviewId>` when a successor exists; if rebuild fails
+before a new review exists, the receipt remains superseded with no successor yet
+(§17). No other field ever mutates after resolution.
 
 ## 24. Final Confirm idempotency
 
@@ -603,7 +657,8 @@ SaaS/publishing/TTS/video/cover work.
 
 1. **Happy path:** write → audit → proposed delta → NEEDS_STATE_REVIEW → review all →
    Final Confirm ⇒ Canon + receipt + READY atomically; next chapter allowed.
-2. **Zero delta:** 0 proposals ⇒ Confirm No Changes ⇒ receipt + READY (still human-gated).
+2. **Zero delta:** 0 proposals ⇒ Confirm No Changes ⇒ receipt + READY, Canon story
+   meaning unchanged (still human-gated).
 3. **Edited AI proposal:** AI 23 → human edits 24 ⇒ Save counts reviewed ⇒ confirm
    applies 24 ⇒ receipt retains proposal 23 AND human 24.
 4. **Explicit reject:** verified-explicit item ⇒ Reject ⇒ strong warning ⇒ Reject
@@ -620,8 +675,9 @@ SaaS/publishing/TTS/video/cover work.
 10. **Rebuild failure:** audit/AI fails ⇒ prose survives, Canon unchanged, Retry Audit
     available, chapter not READY.
 11. **Historical edit:** head 25 ⇒ edit Ch16 ⇒ Ch17–25 untouched/READY ⇒
-    source=16/effective=26 ⇒ pending correction BLOCKS Ch26 ⇒ confirm affects future
-    Canon only.
+    source=16/effective=26 ⇒ pending correction blocks Ch26 (gate
+    `effectiveChapter <= nextChapter`: also any later chapter while unresolved) ⇒
+    confirm affects future Canon only.
 12. **Invalid final batch:** one invalid item among many ⇒ APPLY 0 + structured error
     naming the item.
 13. **Crash during confirm:** outcome is either complete old state or fully committed
@@ -650,7 +706,9 @@ Additionally:
 - test `reviewRevision` concurrent-edit conflict
 - test `proseRevision` and `baseCanonRevision` races (each anchor independently)
 - test idempotent confirmation (double confirm, retry-after-success)
-- test historical-correction temporal behavior (source/effective split; Ch26 gate)
+- test historical-correction temporal behavior (source/effective split; the
+  `effectiveChapter <= nextChapter` gate, including an OLDER unresolved correction
+  still blocking generation)
 - test Generate Next gating across Core, Studio route, and CLI/pipeline routes
   (prove non-bypass)
 - test derived-memory failure AFTER successful authoritative commit
@@ -665,7 +723,10 @@ Additionally:
 5. Review decisions persist immediately but never mutate Canon (until Final Confirm).
 6. A stale proposal can never become valid again (three independent anchors).
 7. Final Confirm is all-or-nothing.
-8. Canon change + chapter READY + durable receipt is ONE atomic transition.
+8. A successful review resolution is ONE atomic transition — chapter READY + durable
+   receipt + permanently unconfirmable active review; Canon mutations from a non-empty
+   confirmed delta happen only inside that same transaction (zero-effective-change
+   resolutions are valid and mutate no story meaning).
 9. Existing Core reducers remain the ONLY Canon application engine.
 10. Studio AND CLI/pipeline are equally subject to the Core advancement gate.
 11. Author prose is never rolled back because AI review generation failed.
@@ -688,7 +749,7 @@ refines them:
 | T5.2 status enum += `needs-state-review` | unchanged |
 | T5.3 generate-next guard | generalized to `assertCanAdvanceStory` covering prev-chapter-not-ready AND pending historical corrections hitting nextChapter (§21–22) |
 | T6.1 confirm deletes artifact after apply | replaced: durable RESOLVED RECEIPT + atomic closure of pending artifact; adds prepare-phase purity, all-or-nothing invalid-item handling, idempotency lookup, three-anchor checks, evidence verification, zero-change confirm path |
-| T6.1 reject-all appends `reviewNote` | still valid; plus receipt-free rejection keeps Canon untouched and chapter non-READY until a subsequent review resolves |
+| T6.1 reject-all resolves the review | SUPERSEDED semantics: "Reject All" (if retained as a UI convenience) ONLY batch-sets every actionable AI proposal item to rejected+reviewed. It does NOT resolve the review, does NOT mutate Canon, and never touches receipts. The author must still run Final Confirm — an all-rejected batch is a valid ZERO-EFFECTIVE-CHANGE resolution: receipt created, chapter READY, Canon story meaning unchanged, identical atomic confirmation path (§8, §19) |
 
 Any further divergence discovered during implementation must be reconciled INTO this
 document (or explicitly amended by the human) — never silently.
