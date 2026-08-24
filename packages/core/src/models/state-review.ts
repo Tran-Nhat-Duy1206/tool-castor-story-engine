@@ -123,6 +123,17 @@ export const ReviewEvidenceSchema = z.object({
 });
 export type ReviewEvidence = z.infer<typeof ReviewEvidenceSchema>;
 
+/**
+ * Item-aligned receipt evidence entry (spec §7/§23): evidence metadata is a
+ * FOURTH durably-preserved layer, separate from proposal/decision/effective
+ * change. Empty arrays are valid for zero-item reviews.
+ */
+export const ReceiptEvidenceEntrySchema = z.object({
+  itemId: z.string().min(1),
+  evidence: ReviewEvidenceSchema,
+});
+export type ReceiptEvidenceEntry = z.infer<typeof ReceiptEvidenceEntrySchema>;
+
 // ---------------------------------------------------------------------------
 // Review item envelope
 // ---------------------------------------------------------------------------
@@ -255,8 +266,15 @@ export const ResolvedReviewReceiptSchema = z.object({
   /** Frozen layer 3: resolved effective changes (resolver outputs), item-aligned. */
   effectiveChanges: z.array(ProposalChangeSchema),
   /**
+   * REQUIRED evidence-metadata layer (spec §7 "retained in the artifact and
+   * the receipt", §23 minimum content). Item-aligned; empty array valid for
+   * zero-item reviews or items without evidence. NEVER folded into
+   * rawProviderDelta, which stays optional audit-only unknown data.
+   */
+  evidence: z.array(ReceiptEvidenceEntrySchema),
+  /**
    * OPTIONAL audit-only provider payload. NOTHING semantic may read this —
-   * the compiler consumes only the three typed layers above.
+   * the compiler consumes only the typed layers above.
    */
   rawProviderDelta: z.unknown().optional(),
   resolvedAt: z.string().datetime(),

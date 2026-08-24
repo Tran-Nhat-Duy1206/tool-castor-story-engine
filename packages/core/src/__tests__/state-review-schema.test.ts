@@ -289,6 +289,28 @@ describe("stable review item ids", () => {
     expect(itemId).not.toBe(REVIEW_ID);
     expect(itemId.startsWith(REVIEW_ID)).toBe(false);
   });
+
+  it("stays deterministic and payload-sensitive for non-ASCII (CJK) payloads", () => {
+    const a = stateReviewItemId("current-state-fact", 0, {
+      subject: "protagonist",
+      predicate: "location",
+      object: "东城公寓",
+    });
+    const b = stateReviewItemId("current-state-fact", 0, {
+      subject: "protagonist",
+      predicate: "location",
+      object: "东城公寓",
+    });
+    const c = stateReviewItemId("current-state-fact", 0, {
+      subject: "protagonist",
+      predicate: "location",
+      object: "西城公寓",
+    });
+    expect(a).toBe(b);
+    expect(a).not.toBe(c);
+    expect(a).toMatch(/^current-state-fact:0:[0-9a-f]{8}$/);
+    expect(c).toMatch(/^current-state-fact:0:[0-9a-f]{8}$/);
+  });
 });
 
 describe("fnv1a8", () => {
@@ -301,11 +323,20 @@ describe("fnv1a8", () => {
   it("differs when a single character changes", () => {
     expect(fnv1a8("state-review")).not.toBe(fnv1a8("state-reviews"));
   });
+
+  it("is deterministic for non-ASCII (CJK) input", () => {
+    expect(fnv1a8("状态审查")).toMatch(/^[0-9a-f]{8}$/);
+    expect(fnv1a8("状态审查")).toBe(fnv1a8("状态审查"));
+  });
+
+  it("distinguishes visually similar non-ASCII strings", () => {
+    expect(fnv1a8("状态审查")).not.toBe(fnv1a8("状态審查"));
+  });
 });
 
 describe("resolved receipts freeze the three typed layers separately", () => {
-  it("accepts typed proposal/decision/effective layers and rejects untyped garbage", () => {
-    const receipt = {
+  function receiptBase() {
+    return {
       schemaVersion: 1,
       reviewId: REVIEW_ID,
       sourceChapter: 13,
@@ -316,9 +347,14 @@ describe("resolved receipts freeze the three typed layers separately", () => {
       proposals: [factProposal("east-city-flat")],
       decisions: [{ itemId: "current-state-fact:0:test", decision: "accepted" }],
       effectiveChanges: [factProposal("east-city-flat")],
+      evidence: [],
       resolvedAt: CREATED_AT,
       resolution: "confirmed-changes",
     };
+  }
+
+  it("accepts typed proposal/decision/effective layers and rejects untyped garbage", () => {
+    const receipt = receiptBase();
     expect(() => ResolvedReviewReceiptSchema.parse(receipt)).not.toThrow();
     expect(() =>
       ResolvedReviewReceiptSchema.parse({
@@ -329,7 +365,18 @@ describe("resolved receipts freeze the three typed layers separately", () => {
   });
 
   it("keeps rawProviderDelta optional and audit-only", () => {
-    const base = {
+    const base = { ...receiptBase(), proposals: [], decisions: [], effectiveChanges: [], resolution: "confirmed-no-changes" };
+    expect(ResolvedReviewReceiptSchema.parse(base).rawProviderDelta).toBeUndefined();
+    expect(
+      ResolvedReviewReceiptSchema.parse({ ...base, rawProviderDelta: { provider: "stub", nested: [1] } })
+        .rawProviderDelta,
+    ).toEqual({ provider: "stub", nested: [1] });
+  });
+});
+
+describe("receipt evidence preservation (spec §7/§23)", () => {
+  function receiptBase() {
+    return {
       schemaVersion: 1,
       reviewId: REVIEW_ID,
       sourceChapter: 13,
@@ -340,14 +387,50 @@ describe("resolved receipts freeze the three typed layers separately", () => {
       proposals: [],
       decisions: [],
       effectiveChanges: [],
+      evidence: [] as Array<{ itemId: string; evidence: Record<string, unknown> }>,
       resolvedAt: CREATED_AT,
-      resolution: "confirmed-no-changes",
+      resolution: "confirmed-no-changes" as const,
     };
-    expect(ResolvedReviewReceiptSchema.parse(base).rawProviderDelta).toBeUndefined();
-    expect(
-      ResolvedReviewReceiptSchema.parse({ ...base, rawProviderDelta: { provider: "stub", nested: [1] } })
-        .rawProviderDelta,
-    ).toEqual({ provider: "stub", nested: [1] });
+  }
+
+  it("retains per-item evidence metadata exactly instead of stripping it", () => {
+    const entry = {
+      itemId: "current-state-fact:0:test",
+      evidence: {
+        claimedLevel: "explicit",
+        verifiedLevel: "explicit",
+        quote: "他推开了临街的木门。",
+      },
+    };
+    const parsed = ResolvedReviewReceiptSchema.parse({ ...receiptBase(), evidence: [entry] });
+    expect(parsed.evidence).toEqual([entry]);
+  });
+
+  it("rejects a receipt missing the required evidence field", () => {
+    const { evidence: _omitted, ...broken } = receiptBase();
+    expect(() => ResolvedReviewReceiptSchema.parse(broken)).toThrow();
+  });
+
+  it("accepts an empty evidence array for zero-change reviews", () => {
+    const parsed = ResolvedReviewReceiptSchema.parse(receiptBase());
+    expect(parsed.evidence).toEqual([]);
+  });
+
+  it("rejects malformed evidence entries through ReviewEvidenceSchema", () => {
+    expect(() =>
+      ResolvedReviewReceiptSchema.parse({
+        ...receiptBase(),
+        evidence: [
+          { itemId: "current-state-fact:0:test", evidence: { claimedLevel: "explicit", verifiedLevel: "obvious" } },
+        ],
+      }),
+    ).toThrow();
+    expect(() =>
+      ResolvedReviewReceiptSchema.parse({
+        ...receiptBase(),
+        evidence: [{ evidence: { claimedLevel: "inferred", verifiedLevel: "inferred" } }],
+      }),
+    ).toThrow();
   });
 });
 
