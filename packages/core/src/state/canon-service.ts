@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -6,7 +7,18 @@ import {
   HooksStateSchema,
   StateManifestSchema,
 } from "../models/runtime-state.js";
-import { validateRuntimeState } from "./state-validator.js";
+import type { CanonEdit, CanonCommitRequest } from "../models/canon-edits.js";
+import { validateRuntimeState, type RuntimeStateValidationIssue } from "./state-validator.js";
+import { applyManualCurrentStateEdits, resolveFactPredicateKey } from "./state-reducer.js";
+import { resolveDurableStoryProgress } from "./state-bootstrap.js";
+import { renderCurrentStateProjection } from "./state-projections.js";
+import { buildSnapshotFileSet, isSnapshotComplete } from "./snapshot-set.js";
+import {
+  invalidateDerivedMemory,
+  rebuildCurrentStateFactHistory,
+  rebuildNarrativeMemoryIndex,
+} from "./memory-sync.js";
+import { commitAtomicFileSet } from "../utils/atomic-file-set.js";
 import type {
   ChapterSummariesState,
   CurrentStateState,
@@ -23,7 +35,7 @@ import type {
  * storage of its own: `story/state/*.json` remains the single Canon store,
  * and markdown projections stay derived views.
  *
- * PURITY CONTRACT — this module performs ZERO filesystem writes:
+ * PURITY CONTRACT — the READ path performs ZERO filesystem writes:
  * - no bootstrap from markdown projections
  * - no repair / regeneration / re-serialization of state files
  * - no mkdir, no file creation
@@ -32,6 +44,12 @@ import type {
  * structured state raises {@link CanonUnavailableError} instead. (The
  * pipeline's `loadRuntimeStateSnapshot` keeps its own bootstrap behavior;
  * this boundary deliberately does not share it.)
+ *
+ * The WRITE path lives in this same module by design (single semantic owner):
+ * {@link commitCanonEdits} is the ONE sanctioned manual-mutation engine. All
+ * preparation before its single `commitAtomicFileSet` call is in-memory —
+ * there is no side-effecting pre-step, and snapshots join the SAME atomic
+ * transaction as live Canon + projections.
  */
 
 export interface StoryCanonView {
@@ -39,6 +57,8 @@ export interface StoryCanonView {
   readonly currentState: CurrentStateState;
   readonly hooks: HooksState;
   readonly chapterSummaries: ChapterSummariesState;
+  /** Deterministic fingerprint of the four documents (additive; computed, never stored). */
+  readonly revision: string;
 }
 
 export const CANON_SECTIONS = ["manifest", "current_state", "hooks", "chapter_summaries"] as const;
@@ -92,6 +112,157 @@ export class CanonUnavailableError extends Error {
     this.name = "CanonUnavailableError";
     this.issues = issues;
   }
+}
+
+/**
+ * Raised when a commit arrives against a stale `expectedRevision`. Thrown
+ * BEFORE any filesystem mutation — a conflicting save never touches disk.
+ */
+export class CanonConflictError extends Error {
+  readonly code = "canon_conflict" as const;
+  readonly currentRevision: string;
+
+  constructor(currentRevision: string) {
+    super(`Canon changed since it was loaded (current revision ${currentRevision}). Reload and re-apply the edit.`);
+    this.name = "CanonConflictError";
+    this.currentRevision = currentRevision;
+  }
+}
+
+// --- P3A revision fingerprint + edit-local validation (T3A.4) ----------------
+
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value !== null && typeof value === "object") {
+    const source = value as Record<string, unknown>;
+    const sorted: Record<string, unknown> = {};
+    for (const key of Object.keys(source).sort()) {
+      sorted[key] = canonicalize(source[key]);
+    }
+    return sorted;
+  }
+  return value;
+}
+
+/**
+ * Deterministic revision of the FOUR validated canonical documents.
+ *
+ * Recursively key-sorted serialization ⇒ independent of on-disk whitespace and
+ * object-key ordering. Pure; no filesystem access. Sixteen hex characters.
+ */
+export function computeCanonRevision(snapshot: {
+  readonly manifest: StateManifest;
+  readonly currentState: CurrentStateState;
+  readonly hooks: HooksState;
+  readonly chapterSummaries: ChapterSummariesState;
+}): string {
+  const canonical = JSON.stringify(
+    canonicalize({
+      manifest: snapshot.manifest,
+      currentState: snapshot.currentState,
+      hooks: snapshot.hooks,
+      chapterSummaries: snapshot.chapterSummaries,
+    }),
+  );
+  return createHash("sha256").update(canonical).digest("hex").slice(0, 16);
+}
+
+function factIdentity(fact: { readonly subject: string; readonly predicate: string }): string {
+  return `${fact.subject}::${fact.predicate}`;
+}
+
+/**
+ * EDIT-LOCAL validation for the manual mutation path ONLY (amended design §5).
+ *
+ * The GLOBAL `validateRuntimeState` stays untouched — legacy/bootstrap books
+ * may legitimately carry structures these stricter invariants would reject,
+ * and shared pipeline acceptance must not change in P3. Runs AFTER
+ * `validateRuntimeState` on the mutated snapshot.
+ */
+export function validateCanonEditedState(
+  before: StoryCanonView,
+  after: {
+    readonly manifest: StateManifest;
+    readonly currentState: CurrentStateState;
+    readonly hooks: HooksState;
+    readonly chapterSummaries: ChapterSummariesState;
+  },
+  effectiveChapter: number,
+): RuntimeStateValidationIssue[] {
+  const issues: RuntimeStateValidationIssue[] = [];
+
+  // Protected documents and position must be structurally untouched.
+  const protectedChecks: Array<[string, unknown, unknown]> = [
+    ["manifest", before.manifest, after.manifest],
+    ["hooks", before.hooks, after.hooks],
+    ["chapterSummaries", before.chapterSummaries, after.chapterSummaries],
+  ];
+  for (const [label, left, right] of protectedChecks) {
+    if (JSON.stringify(canonicalize(left)) !== JSON.stringify(canonicalize(right))) {
+      issues.push({
+        code: "protected_document_mutated",
+        message: `${label} must not change during a manual current-state edit`,
+        path: label,
+      });
+    }
+  }
+  if (after.currentState.chapter !== before.currentState.chapter) {
+    issues.push({
+      code: "protected_document_mutated",
+      message: "currentState.chapter must not change during a manual current-state edit",
+      path: "currentState.chapter",
+    });
+  }
+
+  // Temporal interval ordering.
+  for (const fact of after.currentState.facts) {
+    if (
+      fact.validUntilChapter !== null
+      && fact.validUntilChapter < fact.validFromChapter
+    ) {
+      issues.push({
+        code: "invalid_fact_interval",
+        message: `${factIdentity(fact)}: validUntilChapter ${fact.validUntilChapter} precedes validFromChapter ${fact.validFromChapter}`,
+        path: "currentState.facts",
+      });
+    }
+  }
+
+  // At most one OPEN row per semantic key.
+  const openKeys = new Map<string, string>();
+  for (const fact of after.currentState.facts) {
+    if (fact.validUntilChapter !== null) continue;
+    const identity = factIdentity(fact);
+    const previous = openKeys.get(identity);
+    if (previous !== undefined) {
+      issues.push({
+        code: "duplicate_active_fact",
+        message: `${identity}: more than one open fact after edit (${previous} and ${fact.object})`,
+        path: "currentState.facts",
+      });
+      continue;
+    }
+    openKeys.set(identity, fact.object);
+  }
+
+  // Every NEW or CHANGED open row must be anchored at the effective chapter.
+  const beforeRows = new Set(
+    before.currentState.facts.map((f) => `${factIdentity(f)}|${f.object}|${f.validFromChapter}|${f.validUntilChapter}|${f.sourceChapter}`),
+  );
+  for (const fact of after.currentState.facts) {
+    if (fact.validUntilChapter !== null) continue;
+    const signature = `${factIdentity(fact)}|${fact.object}|${fact.validFromChapter}|${fact.validUntilChapter}|${fact.sourceChapter}`;
+    if (beforeRows.has(signature)) continue;
+    if (fact.validFromChapter !== effectiveChapter || fact.sourceChapter !== effectiveChapter) {
+      issues.push({
+        code: "effective_chapter_mismatch",
+        message: `${factIdentity(fact)}: new/changed open row must anchor at effectiveChapter ${effectiveChapter} (got validFrom=${fact.validFromChapter}, source=${fact.sourceChapter})`,
+        path: "currentState.facts",
+      });
+    }
+  }
+
+  return issues;
 }
 
 const CANON_STATE_SCHEMAS = {
@@ -198,10 +369,202 @@ export async function readStoryCanon(bookDir: string): Promise<StoryCanonView> {
     throw new CanonUnavailableError(issues);
   }
 
-  return {
+  const view: StoryCanonView = {
     manifest: values.get("manifest.json") as StateManifest,
     currentState: values.get("current_state.json") as CurrentStateState,
     hooks: values.get("hooks.json") as HooksState,
     chapterSummaries: values.get("chapter_summaries.json") as ChapterSummariesState,
+    revision: "",
+  };
+  // Computed AFTER assembly so the fingerprint covers exactly the returned view.
+  return { ...view, revision: computeCanonRevision(view) };
+}
+
+// --- P3A manual-edit preview + commit engine (T3A.5) -------------------------
+
+/** Edit-local or global validation rejected the requested edit set. */
+export class CanonInvalidEditsError extends Error {
+  readonly code = "invalid_canon_edits" as const;
+  readonly issues: ReadonlyArray<RuntimeStateValidationIssue>;
+
+  constructor(issues: ReadonlyArray<RuntimeStateValidationIssue>) {
+    super(`Canon edits rejected: ${issues.map((issue) => `${issue.code}: ${issue.message}`).join("; ")}`);
+    this.name = "CanonInvalidEditsError";
+    this.issues = issues;
+  }
+}
+
+export interface CanonCommitDeps {
+  /**
+   * Failure-injection seam for the atomic transaction's rename operations
+   * (tests only). Production leaves this undefined so the real
+   * `commitAtomicFileSet` default (`fs.rename`) is used.
+   */
+  readonly renameFile?: (from: string, to: string) => Promise<void>;
+  readonly rebuildNarrativeMemoryIndex?: (bookDir: string) => Promise<void>;
+  readonly rebuildCurrentStateFactHistory?: (bookDir: string, uptoChapter: number) => Promise<void>;
+  readonly invalidateDerivedMemory?: typeof invalidateDerivedMemory;
+}
+
+export interface CanonEditPreview {
+  /** The validated pre-edit view as read from disk. */
+  readonly before: StoryCanonView;
+  /** The in-memory post-edit documents (never persisted by preview). */
+  readonly after: {
+    readonly manifest: StateManifest;
+    readonly currentState: CurrentStateState;
+    readonly hooks: HooksState;
+    readonly chapterSummaries: ChapterSummariesState;
+  };
+  /** `resolveDurableStoryProgress(bookDir) + 1` — the anchor for new facts. */
+  readonly effectiveChapter: number;
+  /** Empty when the commit would be accepted. */
+  readonly issues: ReadonlyArray<RuntimeStateValidationIssue>;
+  /** Human-readable semantic notes (e.g. how many active rows were replaced). */
+  readonly warnings: ReadonlyArray<string>;
+}
+
+/**
+ * PURE preview of a manual edit set. Reads canon + durable progress; applies
+ * the edits in memory; validates globally AND edit-locally. Performs zero
+ * filesystem mutations.
+ */
+export async function previewCanonEdits(
+  bookDir: string,
+  edits: ReadonlyArray<CanonEdit>,
+): Promise<CanonEditPreview> {
+  const before = await readStoryCanon(bookDir);
+  const durable = await resolveDurableStoryProgress({ bookDir });
+  const effectiveChapter = durable + 1;
+
+  const after = applyManualCurrentStateEdits({
+    snapshot: before,
+    edits,
+    effectiveChapter,
+  });
+
+  const warnings: string[] = [];
+  let replacedCount = 0;
+  for (const edit of edits) {
+    if (edit.kind !== "setFact") continue;
+    const hadActive = before.currentState.facts.some(
+      (fact) =>
+        fact.subject === edit.subject
+        && resolveFactPredicateKey(fact.predicate) === resolveFactPredicateKey(edit.predicate),
+    );
+    if (hadActive) replacedCount += 1;
+  }
+  if (replacedCount > 0) {
+    warnings.push(`${replacedCount} active fact row(s) replaced forward from chapter ${effectiveChapter}`);
+  }
+
+  const issues: RuntimeStateValidationIssue[] = [
+    ...validateRuntimeState(after),
+    ...validateCanonEditedState(before, after, effectiveChapter),
+  ];
+
+  return { before, after, effectiveChapter, issues, warnings };
+}
+
+export interface CanonCommitResult {
+  /** Revision of the four documents AFTER the commit. */
+  readonly revision: string;
+  readonly appliedEdits: ReadonlyArray<CanonEdit>;
+  readonly effectiveChapter: number;
+  /** Non-fatal notes; the exact derived-memory warning string may appear here. */
+  readonly warnings: ReadonlyArray<string>;
+}
+
+/**
+ * Commit a manual edit set as ONE atomic integrity transaction.
+ *
+ * Sequence (all preparation in-memory; ZERO side-effecting steps before the
+ * transaction):
+ *  1. read canon → stale `expectedRevision` ⇒ {@link CanonConflictError}
+ *     BEFORE any filesystem mutation;
+ *  2. preview (durable+1 anchoring, reducer splice, global + edit-local
+ *     validation) ⇒ any issue ⇒ {@link CanonInvalidEditsError};
+ *  3. ONE `commitAtomicFileSet({rootDir: bookDir})` covering:
+ *     - live `story/state/current_state.json` (spliced per reducer convention)
+ *     - regenerated `story/current_state.md` (renderCurrentStateProjection)
+ *     - mirrors `story/snapshots/<N>/state/current_state.json`
+ *       and `story/snapshots/<N>/current_state.md`
+ *     - when the target snapshot is missing/incomplete: full reconstruction
+ *       via `buildSnapshotFileSet`, overlaid INSIDE the same write set;
+ *  4. derived memory rebuilds (extracted memory-sync fns); on failure the db
+ *     is invalidated (deleted/quarantined); only if even invalidation fails
+ *     does the exact honest warning surface — the commit itself still lands.
+ *
+ * LOCK OWNERSHIP: the caller holds `StateManager.acquireBookLock` across the
+ * whole sequence (Studio server in P3B). Core adds no second lock here —
+ * deliberately.
+ */
+export async function commitCanonEdits(
+  bookDir: string,
+  request: CanonCommitRequest,
+  deps: CanonCommitDeps = {},
+): Promise<CanonCommitResult> {
+  // (1) optimistic concurrency — compare BEFORE anything else touches disk.
+  const view = await readStoryCanon(bookDir);
+  if (request.expectedRevision !== view.revision) {
+    throw new CanonConflictError(view.revision);
+  }
+
+  // (2) preview + validation (fresh durable read; caller holds the lock).
+  const preview = await previewCanonEdits(bookDir, request.edits);
+  if (preview.issues.length > 0) {
+    throw new CanonInvalidEditsError(preview.issues);
+  }
+
+  const n = preview.effectiveChapter - 1;
+  const snapshotBase = `story/snapshots/${n}`;
+  const projectionMd = renderCurrentStateProjection(preview.after.currentState, view.manifest.language);
+  const currentJson = JSON.stringify(preview.after.currentState, null, 2);
+
+  const writes = new Map<string, string | Uint8Array>();
+  writes.set("story/state/current_state.json", currentJson);
+  writes.set("story/current_state.md", projectionMd);
+  writes.set(`${snapshotBase}/state/current_state.json`, currentJson);
+  writes.set(`${snapshotBase}/current_state.md`, projectionMd);
+
+  // Missing/incomplete snapshot ⇒ full in-memory reconstruction overlaid in
+  // the SAME transaction (the four explicit writes above win the overlay).
+  if (!(await isSnapshotComplete(bookDir, n))) {
+    for (const write of await buildSnapshotFileSet(bookDir, n)) {
+      if (!writes.has(write.relativePath)) {
+        writes.set(write.relativePath, write.content);
+      }
+    }
+  }
+
+  await commitAtomicFileSet({
+    rootDir: bookDir,
+    writes: [...writes.entries()].map(([relativePath, content]) => ({ relativePath, content })),
+    ...(deps.renameFile ? { renameFile: deps.renameFile } : {}),
+  });
+
+  // (4) derived memory — failures must not roll back the committed truth.
+  const warnings: string[] = [];
+  try {
+    await (deps.rebuildNarrativeMemoryIndex ?? rebuildNarrativeMemoryIndex)(bookDir);
+    await (deps.rebuildCurrentStateFactHistory ?? rebuildCurrentStateFactHistory)(bookDir, n);
+  } catch {
+    const invalidation = await (deps.invalidateDerivedMemory ?? invalidateDerivedMemory)(bookDir);
+    if (!invalidation.invalidated && invalidation.warning) {
+      warnings.push(invalidation.warning);
+    }
+  }
+
+  // The authoritative new revision is read back from DISK after the derived
+  // memory phase: seed bootstrap may normalize the manifest (e.g. an inflated
+  // lastAppliedChapter collapsing to durable progress), and the client must
+  // receive exactly the fingerprint its NEXT save will be checked against.
+  const finalView = await readStoryCanon(bookDir);
+
+  return {
+    revision: finalView.revision,
+    appliedEdits: [...request.edits],
+    effectiveChapter: preview.effectiveChapter,
+    warnings,
   };
 }

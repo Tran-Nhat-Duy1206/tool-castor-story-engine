@@ -106,6 +106,17 @@ export interface CreateCanonBookOptions {
   readonly omitStateJson?: boolean;
   /** Overwrite one canonical state file with non-JSON garbage (implies the state files exist). */
   readonly corruptFile?: "manifest" | "current_state" | "hooks" | "chapter_summaries";
+  /**
+   * P3A fixtures: number of contiguous chapter files AND lastAppliedChapter
+   * (default 12, matching the original fixture constants).
+   */
+  readonly chapterCount?: number;
+  /** Seed snapshots/<n>/state for every chapter 1..n with the fixture facts. */
+  readonly seedSnapshotsThrough?: number;
+  /** Write an inflated manifest.lastAppliedChapter (durable progress must win over it). */
+  readonly inflateManifestTo?: number;
+  /** Additional open facts merged into live current_state.json. */
+  readonly extraFacts?: CurrentStateState["facts"];
 }
 
 export interface FileMetadata {
@@ -136,15 +147,35 @@ export async function captureBookMetadata(root: string): Promise<Record<string, 
   return out;
 }
 
-function stateJsonFiles(options: CreateCanonBookOptions): Record<string, string> {
+interface FixtureDocs {
+  readonly manifest: StateManifest;
+  readonly currentState: CurrentStateState;
+  readonly hooks: HooksState;
+  readonly summaries: ChapterSummariesState;
+}
+
+function buildFixtureDocs(options: CreateCanonBookOptions): FixtureDocs {
+  const chapterCount = options.chapterCount ?? 12;
+  const manifest: StateManifest = {
+    ...CANON_FIXTURE_MANIFEST,
+    lastAppliedChapter: options.inflateManifestTo ?? chapterCount,
+  };
   const currentState: CurrentStateState = options.stateChapterAhead
     ? { ...CANON_FIXTURE_CURRENT_STATE, chapter: 20 }
-    : CANON_FIXTURE_CURRENT_STATE;
+    : {
+        ...CANON_FIXTURE_CURRENT_STATE,
+        chapter: chapterCount,
+        facts: [...CANON_FIXTURE_CURRENT_STATE.facts, ...(options.extraFacts ?? [])],
+      };
+  return { manifest, currentState, hooks: CANON_FIXTURE_HOOKS, summaries: CANON_FIXTURE_SUMMARIES };
+}
+
+function stateJsonFiles(docs: FixtureDocs): Record<string, string> {
   return {
-    "manifest.json": JSON.stringify(CANON_FIXTURE_MANIFEST, null, 2),
-    "current_state.json": JSON.stringify(currentState, null, 2),
-    "hooks.json": JSON.stringify(CANON_FIXTURE_HOOKS, null, 2),
-    "chapter_summaries.json": JSON.stringify(CANON_FIXTURE_SUMMARIES, null, 2),
+    "manifest.json": JSON.stringify(docs.manifest, null, 2),
+    "current_state.json": JSON.stringify(docs.currentState, null, 2),
+    "hooks.json": JSON.stringify(docs.hooks, null, 2),
+    "chapter_summaries.json": JSON.stringify(docs.summaries, null, 2),
   };
 }
 
@@ -158,6 +189,8 @@ export async function createCanonBook(options: CreateCanonBookOptions = {}): Pro
   const root = await mkdtemp(join(tmpdir(), "inkos-canon-"));
   const bookDir = join(root, "books", "demo-canon-book");
   const storyDir = join(bookDir, "story");
+  const chapterCount = options.chapterCount ?? 12;
+  const docs = buildFixtureDocs(options);
 
   await mkdir(join(storyDir, "state"), { recursive: true });
   await mkdir(join(bookDir, "chapters"), { recursive: true });
@@ -177,16 +210,16 @@ export async function createCanonBook(options: CreateCanonBookOptions = {}): Pro
   );
   // Durable artifact authority: bootstrap re-derives manifest
   // lastAppliedChapter from the contiguous chapter-file prefix on every
-  // load, so the fixture must contain chapters 1..12 for lastAppliedChapter
-  // 12 to survive validation.
+  // load, so the fixture must contain chapters 1..chapterCount for
+  // lastAppliedChapter to survive validation.
   const chapterTitles: Record<number, string> = { 11: "夜访东城", 12: "旧档与新伤" };
-  for (let chapter = 1; chapter <= 12; chapter += 1) {
+  for (let chapter = 1; chapter <= chapterCount; chapter += 1) {
     const title = chapterTitles[chapter] ?? `第${chapter}章`;
     await writeFile(join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_${title}.md`), `# 第${chapter}章 ${title}\n\n正文。`, "utf-8");
   }
 
   if (!options.omitStateJson) {
-    for (const [name, content] of Object.entries(stateJsonFiles(options))) {
+    for (const [name, content] of Object.entries(stateJsonFiles(docs))) {
       await writeFile(join(storyDir, "state", name), content, "utf-8");
     }
   }
@@ -197,25 +230,38 @@ export async function createCanonBook(options: CreateCanonBookOptions = {}): Pro
   // Derived projections are always present — they are views over the same data.
   await writeFile(
     join(storyDir, "current_state.md"),
-    renderCurrentStateProjection(CANON_FIXTURE_CURRENT_STATE, "zh"),
+    renderCurrentStateProjection(docs.currentState, "zh"),
     "utf-8",
   );
   await writeFile(
     join(storyDir, "pending_hooks.md"),
-    renderHooksProjection(CANON_FIXTURE_HOOKS, "zh", { currentChapter: 12 }),
+    renderHooksProjection(docs.hooks, "zh", { currentChapter: chapterCount }),
     "utf-8",
   );
   await writeFile(
     join(storyDir, "chapter_summaries.md"),
-    renderChapterSummariesProjection(CANON_FIXTURE_SUMMARIES, "zh"),
+    renderChapterSummariesProjection(docs.summaries, "zh"),
     "utf-8",
   );
 
-  // Chapter snapshot realism: snapshots/<N>/state mirrors live state.
-  const snapshotStateDir = join(storyDir, "snapshots", "12", "state");
-  await mkdir(snapshotStateDir, { recursive: true });
-  for (const [name, content] of Object.entries(stateJsonFiles(options))) {
-    await writeFile(join(snapshotStateDir, name), content, "utf-8");
+  // Chapter snapshot realism: snapshots/<N>/state mirrors live state. By
+  // default only the head snapshot (chapterCount) exists — exactly like the
+  // original fixture; P3A tests may request a full replay chain.
+  if (options.seedSnapshotsThrough !== undefined) {
+    for (let c = 1; c <= options.seedSnapshotsThrough; c += 1) {
+      const dir = join(storyDir, "snapshots", String(c), "state");
+      await mkdir(dir, { recursive: true });
+      const chainDocs = buildFixtureDocs({ ...options, chapterCount: c });
+      for (const [name, content] of Object.entries(stateJsonFiles(chainDocs))) {
+        await writeFile(join(dir, name), content, "utf-8");
+      }
+    }
+  } else {
+    const snapshotStateDir = join(storyDir, "snapshots", String(chapterCount), "state");
+    await mkdir(snapshotStateDir, { recursive: true });
+    for (const [name, content] of Object.entries(stateJsonFiles(docs))) {
+      await writeFile(join(snapshotStateDir, name), content, "utf-8");
+    }
   }
 
   return { root, bookDir };

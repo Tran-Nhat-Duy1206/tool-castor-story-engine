@@ -1,9 +1,10 @@
 import { readFile, writeFile, mkdir, readdir, rm, stat, unlink, open } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
-import { join, resolve } from "node:path";
+import { join, resolve, dirname } from "node:path";
 import type { BookConfig } from "../models/book.js";
 import type { ChapterMeta } from "../models/chapter.js";
 import { bootstrapStructuredStateFromMarkdown, resolveDurableStoryProgress } from "./state-bootstrap.js";
+import { buildSnapshotFileSet } from "./snapshot-set.js";
 
 const BOOK_LOCK_HEARTBEAT_MS = 30_000;
 const BOOK_LOCK_LEASE_MS = 3 * 60_000;
@@ -559,41 +560,21 @@ export class StateManager {
   }
 
   async snapshotStateAt(bookDir: string, chapterNumber: number): Promise<void> {
-    const storyDir = join(bookDir, "story");
-    const snapshotDir = join(storyDir, "snapshots", String(chapterNumber));
+    // Single snapshot contract (T3A.3): the file list and contents come from
+    // the shared pure helper so this method and the Canon commit engine can
+    // never drift apart. Behavior preserved: skip-if-source-missing slots,
+    // full story/state mirror, directories created as needed.
+    const snapshotDir = join(bookDir, "story", "snapshots", String(chapterNumber));
     await mkdir(snapshotDir, { recursive: true });
 
-    const files = [
-      "current_state.md", "particle_ledger.md", "pending_hooks.md",
-      "chapter_summaries.md", "subplot_board.md", "emotional_arcs.md", "character_matrix.md",
-    ];
+    const writes = await buildSnapshotFileSet(bookDir, chapterNumber);
     await Promise.all(
-      files.map(async (f) => {
-        try {
-          const content = await readFile(join(storyDir, f), "utf-8");
-          await writeFile(join(snapshotDir, f), content, "utf-8");
-        } catch {
-          // file doesn't exist yet
-        }
+      writes.map(async (write) => {
+        const target = join(bookDir, write.relativePath);
+        await mkdir(dirname(target), { recursive: true });
+        await writeFile(target, write.content, "utf-8");
       }),
     );
-
-    const stateDir = join(bookDir, "story", "state");
-    const snapshotStateDir = join(snapshotDir, "state");
-    try {
-      const stateFiles = await readdir(stateDir);
-      if (stateFiles.length > 0) {
-        await mkdir(snapshotStateDir, { recursive: true });
-        await Promise.all(
-          stateFiles.map(async (fileName) => {
-            const content = await readFile(join(stateDir, fileName), "utf-8");
-            await writeFile(join(snapshotStateDir, fileName), content, "utf-8");
-          }),
-        );
-      }
-    } catch {
-      // state directory missing — skip
-    }
   }
 
   async isCompleteBookDirectory(bookDir: string): Promise<boolean> {

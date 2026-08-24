@@ -14,12 +14,93 @@ import {
 import { evaluateHookAdmission } from "../utils/hook-governance.js";
 import { resolveHookPayoffTiming } from "../utils/hook-lifecycle.js";
 import { validateRuntimeState } from "./state-validator.js";
+import { CURRENT_STATE_SLOT_DEFS } from "./state-projections.js";
+import type { CanonEdit } from "../models/canon-edits.js";
 
 export interface RuntimeStateSnapshot {
   readonly manifest: StateManifest;
   readonly currentState: CurrentStateState;
   readonly hooks: HooksState;
   readonly chapterSummaries: ChapterSummariesState;
+}
+
+// --- P3A manual-edit support (amended D4) -----------------------------------
+
+// Slot-alias → slot-key index, REUSED from the single alias table in
+// state-projections so manual edits and the pipeline can never disagree about
+// which predicates denote the same semantic slot.
+const SLOT_ALIAS_INDEX: ReadonlyMap<string, string> = (() => {
+  const index = new Map<string, string>();
+  for (const def of CURRENT_STATE_SLOT_DEFS) {
+    for (const alias of def.aliases) {
+      index.set(alias.toLowerCase(), def.key);
+    }
+  }
+  return index;
+})();
+
+/** Semantic identity of a predicate: slot key for known slots, raw text otherwise. */
+export function resolveFactPredicateKey(predicate: string): string {
+  return SLOT_ALIAS_INDEX.get(predicate.trim().toLowerCase()) ?? predicate;
+}
+
+/**
+ * Apply semantic manual edits to the CURRENT-state fact list.
+ *
+ * PURE. Follows the engine's own splice convention (`applyCurrentStatePatch`):
+ * `setFact` removes every ACTIVE row sharing the resolved subject+predicate
+ * identity and appends exactly one open row anchored at `effectiveChapter`
+ * (= durable story progress + 1). Closed rows are NEVER accumulated in live
+ * JSON — history lives in snapshots + derived fact history, not here.
+ * `removeFact` drops matching rows. Manifest, hooks, chapter summaries and
+ * `currentState.chapter` are untouched; the input snapshot is never mutated.
+ */
+export function applyManualCurrentStateEdits(params: {
+  readonly snapshot: RuntimeStateSnapshot;
+  readonly edits: ReadonlyArray<CanonEdit>;
+  readonly effectiveChapter: number;
+}): RuntimeStateSnapshot {
+  const facts = [...params.snapshot.currentState.facts];
+
+  for (const edit of params.edits) {
+    const key = resolveFactPredicateKey(edit.predicate);
+    const matches = (fact: { readonly subject: string; readonly predicate: string }): boolean =>
+      fact.subject === edit.subject && resolveFactPredicateKey(fact.predicate) === key;
+
+    if (edit.kind === "removeFact") {
+      for (let i = facts.length - 1; i >= 0; i -= 1) {
+        if (matches(facts[i]!)) facts.splice(i, 1);
+      }
+      continue;
+    }
+
+    // setFact — keep the REPLACED row's stored predicate so existing book
+    // language conventions (zh/en slot labels) are preserved verbatim.
+    let storedPredicate = edit.predicate;
+    for (let i = facts.length - 1; i >= 0; i -= 1) {
+      if (matches(facts[i]!)) {
+        storedPredicate = facts[i]!.predicate;
+        facts.splice(i, 1);
+      }
+    }
+    facts.push({
+      subject: edit.subject,
+      predicate: storedPredicate,
+      object: edit.object,
+      validFromChapter: params.effectiveChapter,
+      validUntilChapter: null,
+      sourceChapter: params.effectiveChapter,
+    });
+  }
+
+  facts.sort((left, right) =>
+    left.predicate.localeCompare(right.predicate) || left.object.localeCompare(right.object),
+  );
+
+  return {
+    ...params.snapshot,
+    currentState: { ...params.snapshot.currentState, facts },
+  };
 }
 
 export function applyRuntimeStateDelta(params: {
