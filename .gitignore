@@ -19,6 +19,9 @@ docs/*
 !docs/V1_SPEC.md
 !docs/ARCHITECTURE_AUDIT.md
 !docs/IMPLEMENTATION_PLAN.md
+# Approved phase design specs (whitelisted subtree)
+!docs/superpowers/
+!docs/superpowers/specs/
 novel-to-comic-research.docx
 .pnpm-store/
 tmp/
