@@ -233,6 +233,76 @@ describe("state-review-store", () => {
       expect(attempts).toBe(0);
     });
 
+    it("rejects a callback that changes reviewId, leaving the artifact byte-identical", async () => {
+      await publishActiveProposal(fixture.bookDir, activeProposal());
+      const before = await captureBookMetadata(fixture.root);
+      await expect(
+        mutateActiveProposal({
+          bookDir: fixture.bookDir,
+          chapter: 13,
+          expectedReviewRevision: 1,
+          mutate: (active) => ({ ...active, reviewId: "99999999-8888-4777-9666-555555555555" }),
+        }),
+      ).rejects.toMatchObject({ code: "state_review_invalid_change" });
+      expect(await captureBookMetadata(fixture.root)).toEqual(before);
+      const onDisk = await loadStateReview(fixture.bookDir, 13);
+      expect(onDisk).toMatchObject({ reviewId: REVIEW_ID, reviewRevision: 1 });
+    });
+
+    it.each([
+      ["sourceChapter", 99],
+      ["effectiveChapter", 99],
+      ["proseRevision", "ffffffffffffffff"],
+      ["baseCanonRevision", "ffffffffffffffff"],
+      ["createdAt", "2027-01-01T00:00:00.000Z"],
+      ["language", "en"],
+    ] as const)("rejects a callback that changes immutable field %s with zero writes", async (field, value) => {
+      await publishActiveProposal(fixture.bookDir, activeProposal());
+      const before = await captureBookMetadata(fixture.root);
+      await expect(
+        mutateActiveProposal({
+          bookDir: fixture.bookDir,
+          chapter: 13,
+          expectedReviewRevision: 1,
+          mutate: (active) => ({ ...active, [field]: value }) as ActiveStateReviewArtifact,
+        }),
+      ).rejects.toMatchObject({ code: "state_review_invalid_change" });
+      expect(await captureBookMetadata(fixture.root)).toEqual(before);
+    });
+
+    it("rejects a callback that demotes status away from active with zero writes", async () => {
+      await publishActiveProposal(fixture.bookDir, activeProposal());
+      const before = await captureBookMetadata(fixture.root);
+      await expect(
+        mutateActiveProposal({
+          bookDir: fixture.bookDir,
+          chapter: 13,
+          expectedReviewRevision: 1,
+          mutate: (active) => ({ ...active, status: "stale" }),
+        }),
+      ).rejects.toMatchObject({ code: "state_review_invalid_change" });
+      expect(await captureBookMetadata(fixture.root)).toEqual(before);
+    });
+
+    it("keeps reviewRevision store-owned even when the callback supplies its own value", async () => {
+      await publishActiveProposal(fixture.bookDir, activeProposal());
+      const updated = await mutateActiveProposal({
+        bookDir: fixture.bookDir,
+        chapter: 13,
+        expectedReviewRevision: 1,
+        mutate: (active) => ({
+          ...active,
+          reviewRevision: 42,
+          items: active.items.map((item) => ({ ...item, decision: "accepted" as const })),
+        }),
+      });
+      expect(updated.reviewRevision).toBe(2);
+      expect(updated.items[0]?.decision).toBe("accepted");
+      expect(updated.effectiveChapter).toBe(14);
+      const reloaded = await loadStateReview(fixture.bookDir, 13);
+      expect(reloaded).toMatchObject({ reviewRevision: 2 });
+    });
+
     it("survives an injected rename failure with the old artifact intact and no temp litter", async () => {
       await publishActiveProposal(fixture.bookDir, activeProposal());
       const before = await captureBookMetadata(fixture.root);
@@ -241,7 +311,12 @@ describe("state-review-store", () => {
           bookDir: fixture.bookDir,
           chapter: 13,
           expectedReviewRevision: 1,
-          mutate: (active) => ({ ...active, effectiveChapter: 15 }),
+          mutate: (active) => ({
+            ...active,
+            // Identity-preserving content change; the point of this test is
+            // the atomic write seam, not the payload.
+            items: active.items.map((item) => ({ ...item, decision: "accepted" as const })),
+          }),
           deps: {
             renameFile: async () => {
               throw new Error("injected rename failure");
@@ -253,6 +328,29 @@ describe("state-review-store", () => {
       const runtimeDir = join(fixture.bookDir, "story", "runtime");
       const entries = await readdir(runtimeDir);
       expect(entries.filter((name) => name.includes(".tmp-"))).toEqual([]);
+    });
+  });
+
+  describe("write ownership", () => {
+    it("shell saver rejects an active proposal with zero writes", async () => {
+      const before = await captureBookMetadata(fixture.root);
+      await expect(saveStateReviewShell(fixture.bookDir, activeProposal() as never)).rejects.toMatchObject({
+        code: "state_review_invalid_change",
+      });
+      expect(await captureBookMetadata(fixture.root)).toEqual(before);
+      await expect(loadStateReview(fixture.bookDir, 13)).resolves.toBeNull();
+    });
+
+    it.each([
+      ["rebuild_required", shellRequired()],
+      ["rebuild_failed", { ...shellRequired(), status: "rebuild_failed", reason: "analyzer failed" }],
+    ] as const)("active publisher rejects a %s shell with zero writes", async (_label, shell) => {
+      const before = await captureBookMetadata(fixture.root);
+      await expect(publishActiveProposal(fixture.bookDir, shell as never)).rejects.toMatchObject({
+        code: "state_review_invalid_change",
+      });
+      expect(await captureBookMetadata(fixture.root)).toEqual(before);
+      await expect(loadStateReview(fixture.bookDir, 13)).resolves.toBeNull();
     });
   });
 

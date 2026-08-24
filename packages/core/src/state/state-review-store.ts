@@ -129,6 +129,38 @@ export async function publishActiveProposal(
 // ---------------------------------------------------------------------------
 
 /**
+ * Generation identity + concurrency/temporal anchors that a CAS mutation may
+ * NEVER alter (spec §13): reviewId identifies the durable generation (and
+ * later receipt idempotency); source/effective/prose/canon anchors bind the
+ * proposal to its exact chapter, prose bytes and Canon revision. Only
+ * review-workflow content (`items`, decisions) is mutable.
+ */
+const FROZEN_ACTIVE_FIELDS = [
+  "schemaVersion",
+  "reviewId",
+  "sourceChapter",
+  "effectiveChapter",
+  "proseRevision",
+  "baseCanonRevision",
+  "createdAt",
+  "language",
+] as const;
+
+function assertActiveGenerationUnchanged(
+  before: ActiveStateReviewArtifact,
+  after: ActiveStateReviewArtifact,
+): void {
+  for (const field of FROZEN_ACTIVE_FIELDS) {
+    if (before[field] !== after[field]) {
+      throw new StateReviewError(
+        "state_review_invalid_change",
+        `mutation attempted to change immutable field "${field}" of review ${before.reviewId}`,
+      );
+    }
+  }
+}
+
+/**
  * Store-level compare-and-swap over `reviewRevision`.
  *
  * - missing artifact            ⇒ state_review_not_found
@@ -170,6 +202,9 @@ export async function mutateActiveProposal(params: {
   }
 
   const mutated = params.mutate(loaded);
+  // Fail closed BEFORE any filesystem write if the callback touched immutable
+  // generation identity/anchors — never silently restore and continue.
+  assertActiveGenerationUnchanged(loaded, mutated);
   const candidate = StateReviewArtifactSchema.parse({
     ...mutated,
     reviewRevision: params.expectedReviewRevision + 1,
