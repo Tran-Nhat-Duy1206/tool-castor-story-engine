@@ -104,6 +104,7 @@ export {
   buildStateReviewItems,
   type BuildReviewItemsContext,
 } from "./state/state-review-items.js";
+export { assertCanAdvanceStory } from "./state/advancement-gate.js";
 export {
   type PlayActionKind,
   type PlayActionIntentInput,
