@@ -10,6 +10,7 @@ export const ChapterStatusSchema = z.enum([
   "audit-failed",
   "state-degraded",
   "revising",
+  "needs-state-review",
   "ready-for-review",
   "approved",
   "rejected",

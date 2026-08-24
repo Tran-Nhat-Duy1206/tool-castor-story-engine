@@ -36,7 +36,7 @@ import { appendActivatedSkillGuidance, type AgentContext } from "../agents/base.
 import type { AuditResult, AuditIssue } from "../agents/continuity.js";
 import type { RadarResult } from "../agents/radar.js";
 import type { LengthSpec, LengthTelemetry } from "../models/length-governance.js";
-import { HooksStateSchema } from "../models/runtime-state.js";
+import { HooksStateSchema, RuntimeStateDeltaSchema } from "../models/runtime-state.js";
 import type { ChapterMemo, ChapterTrace, ContextPackage, RuleStack } from "../models/input-governance.js";
 import type { ContextCompressionCallback } from "../models/context-compression.js";
 import { buildLengthSpec, countChapterLength, formatLengthCount, isOutsideHardRange, resolveLengthCountingMode, type LengthLanguage } from "../utils/length-metrics.js";
@@ -57,6 +57,14 @@ import {
   retrySettlementAfterValidationFailure,
 } from "./chapter-state-recovery.js";
 import { persistChapterArtifacts } from "./chapter-persistence.js";
+import { assertCanAdvanceStory } from "../state/advancement-gate.js";
+import { resolveDurableStoryProgress } from "../state/state-bootstrap.js";
+import { readStoryCanon } from "../state/canon-service.js";
+import { computeProseRevision } from "../utils/prose-revision.js";
+import { buildStateReviewItems } from "../state/state-review-items.js";
+import { StateReviewArtifactSchema } from "../models/state-review.js";
+import { buildChapterFileContent } from "../agents/writer.js";
+import { randomUUID } from "node:crypto";
 import { runChapterReviewCycle } from "./chapter-review-cycle.js";
 import { validateChapterTruthPersistence } from "./chapter-truth-validation.js";
 import { loadPersistedPlan, relativeToBookDir, savePersistedPlan } from "./persisted-governed-plan.js";
@@ -290,7 +298,7 @@ export interface ChapterPipelineResult {
   readonly wordCount: number;
   readonly auditResult: AuditResult;
   readonly revised: boolean;
-  readonly status: "ready-for-review" | "audit-failed" | "state-degraded";
+  readonly status: "needs-state-review" | "ready-for-review" | "audit-failed" | "state-degraded";
   readonly lengthWarnings?: ReadonlyArray<string>;
   readonly lengthTelemetry?: LengthTelemetry;
   readonly tokenUsage?: TokenUsageSummary;
@@ -2007,6 +2015,9 @@ export class PipelineRunner {
     const bookDir = this.state.bookDir(bookId);
     await this.assertNoPendingStateRepair(bookId);
     const chapterNumber = await this.state.getNextChapterNumber(bookId);
+    // Phase 4 (Task 7): THE advancement gate. Runs after next-chapter
+    // resolution and BEFORE any generation LLM work or authoritative write.
+    await assertCanAdvanceStory(bookDir, chapterNumber);
     const stageLanguage = await this.resolveBookLanguage(book);
     this.logStage(stageLanguage, { zh: "准备章节输入", en: "preparing chapter inputs" });
     const writeInput = await this.prepareWriteInput(
@@ -2309,7 +2320,57 @@ export class PipelineRunner {
       }
     }
 
-    const resolvedStatus = chapterStatus ?? (auditResult.passed ? "ready-for-review" : "audit-failed");
+    // Phase 4 (Task 7): CAPTURE — never apply — the proposed RuntimeStateDelta.
+    // Only a SCHEMA-VALID Settler delta constitutes a Phase 4 proposal; legacy
+    // outputs (absent or intentionally malformed deltas exercising Writer's
+    // own drift repair) keep the untouched legacy publication path.
+    let stateReviewJson: string | undefined;
+    const phase4Gated = chapterStatus === null
+      && auditResult.passed
+      && persistenceOutput.runtimeStateDelta !== undefined
+      && RuntimeStateDeltaSchema.safeParse(persistenceOutput.runtimeStateDelta).success;
+    if (phase4Gated) {
+      const runtimeDelta = persistenceOutput.runtimeStateDelta!;
+      const durableProgress = await resolveDurableStoryProgress({ bookDir });
+      // Temporal binding (plan Part Q): no silent relocation — the proposal's
+      // effective chapter MUST be exactly the chapter being persisted.
+      if (durableProgress + 1 !== chapterNumber) {
+        throw new Error(
+          `Refusing to publish chapter ${chapterNumber}: durable story progress is `
+          + `${durableProgress}, which would relocate this chapter's State Review. `
+          + "Repair chapter artifacts before generating further chapters.",
+        );
+      }
+      const canonBeforePublication = await readStoryCanon(bookDir);
+      const durableChapterContent = buildChapterFileContent(
+        chapterNumber,
+        persistenceOutput.title,
+        persistenceOutput.content,
+        pipelineLang === "en" ? "en" : "zh",
+      );
+      const activeReview = StateReviewArtifactSchema.parse({
+        schemaVersion: 1,
+        status: "active",
+        reviewId: randomUUID(),
+        sourceChapter: chapterNumber,
+        effectiveChapter: durableProgress + 1,
+        language: pipelineLang === "en" ? "en" : "zh",
+        createdAt: new Date().toISOString(),
+        proseRevision: computeProseRevision(durableChapterContent),
+        baseCanonRevision: canonBeforePublication.revision,
+        reviewRevision: 1,
+        items: buildStateReviewItems(runtimeDelta, {
+          chapterContent: durableChapterContent,
+          language: pipelineLang === "en" ? "en" : "zh",
+        }),
+      });
+      stateReviewJson = JSON.stringify(activeReview, null, 2);
+    }
+
+    const resolvedStatus = chapterStatus
+      ?? (auditResult.passed
+        ? (phase4Gated ? "needs-state-review" : "ready-for-review")
+        : "audit-failed");
     await persistChapterArtifacts({
       chapterNumber,
       chapterTitle: persistenceOutput.title,
@@ -2321,7 +2382,24 @@ export class PipelineRunner {
       degradedIssues,
       tokenUsage: totalUsage,
       loadChapterIndex: () => this.state.loadChapterIndex(bookId),
-      saveChapter: () => writer.saveChapter(bookDir, persistenceOutput, gp.numericalSystem, pipelineLang),
+      saveChapter: (extra) => writer.saveChapter(
+        bookDir,
+        persistenceOutput,
+        gp.numericalSystem,
+        pipelineLang,
+        extra !== undefined || stateReviewJson !== undefined
+          ? {
+              // Task 7 caller invariant (Task 6 review m-A): stateReviewJson is
+              // ONLY ever supplied together with deferStateApplication:true.
+              ...(stateReviewJson !== undefined
+                ? { deferStateApplication: true as const, stateReviewJson }
+                : {}),
+              ...(extra?.chapterIndexJson !== undefined
+                ? { updatedChapterIndexJson: extra.chapterIndexJson }
+                : {}),
+            }
+          : undefined,
+      ),
       saveTruthFiles: async () => {
         await this.syncLegacyStructuredStateFromMarkdown(bookDir, chapterNumber, persistenceOutput);
         this.logStage(stageLanguage, { zh: "同步记忆索引", en: "syncing memory indexes" });

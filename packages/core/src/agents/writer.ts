@@ -96,6 +96,27 @@ export interface TokenUsage {
   readonly totalTokens: number;
 }
 
+/**
+ * THE single chapter-file serialization (Task 7): both Writer persistence and
+ * the pipeline's `proseRevision` anchor hash MUST use this exact function so
+ * the reviewed prose revision always describes the durable bytes.
+ */
+export function buildChapterFileContent(
+  chapterNumber: number,
+  title: string,
+  content: string,
+  language: "zh" | "en",
+): string {
+  const heading = language === "en"
+    ? `# Chapter ${chapterNumber}: ${title}`
+    : `# 第${chapterNumber}章 ${title}`;
+  return [
+    heading,
+    "",
+    content,
+  ].join("\n");
+}
+
 export interface WriteChapterOutput {
   readonly chapterNumber: number;
   readonly title: string;
@@ -654,14 +675,12 @@ export class WriterAgent extends BaseAgent {
     const supersededChapterFiles = existingChapterFiles
       .filter((file) => file.startsWith(`${paddedNum}_`) && file.endsWith(".md") && file !== filename);
 
-    const heading = language === "en"
-      ? `# Chapter ${output.chapterNumber}: ${output.title}`
-      : `# 第${output.chapterNumber}章 ${output.title}`;
-    const chapterContent = [
-      heading,
-      "",
+    const chapterContent = buildChapterFileContent(
+      output.chapterNumber,
+      output.title,
       output.content,
-    ].join("\n");
+      language,
+    );
 
     const writes: AtomicFileWrite[] = [
       { relativePath: join("chapters", filename), content: chapterContent },
