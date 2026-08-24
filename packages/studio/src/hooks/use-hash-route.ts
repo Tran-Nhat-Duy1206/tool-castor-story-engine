@@ -12,6 +12,7 @@ export type HashRoute =
   | { page: "chapter"; bookId: string; chapterNumber: number }
   | { page: "analytics"; bookId: string }
   | { page: "truth"; bookId: string }
+  | { page: "story-state"; bookId: string }
   | { page: "daemon" }
   | { page: "logs" }
   | { page: "genres" }
@@ -42,6 +43,9 @@ function parseHash(hash: string): HashRoute {
   const serviceMatch = path.match(/^services\/([^/]+)$/);
   if (serviceMatch) return { page: "service-detail", serviceId: decodeURIComponent(serviceMatch[1]) };
 
+  const storyStateMatch = path.match(/^story-state\/([^/]+)$/);
+  if (storyStateMatch) return { page: "story-state", bookId: decodeURIComponent(storyStateMatch[1]) };
+
   const bookSettingsMatch = path.match(/^book\/([^/]+)\/settings$/);
   if (bookSettingsMatch) return { page: "book-settings", bookId: decodeURIComponent(bookSettingsMatch[1]) };
 
@@ -71,6 +75,7 @@ function routeToHash(route: HashRoute): string {
     case "dashboard": return "#/";
     case "chat": return "#/chat";
     case "book": return `#/book/${encodeURIComponent(route.bookId)}`;
+    case "story-state": return `#/story-state/${encodeURIComponent(route.bookId)}`;
     case "book-settings": return `#/book/${encodeURIComponent(route.bookId)}/settings`;
     case "book-create": return "#/book/new";
     case "services": return "#/services";
@@ -89,7 +94,7 @@ function routeToHash(route: HashRoute): string {
 
 export { parseHash, routeToHash }; // for testing
 
-const HASH_PAGES = new Set(["dashboard", "chat", "book", "book-settings", "book-create", "services", "project-settings", "service-detail", "translation", "import", "play", "film", "flow", "film-author", "film-studio"]);
+const HASH_PAGES = new Set(["dashboard", "chat", "book", "book-settings", "book-create", "services", "project-settings", "service-detail", "translation", "import", "play", "film", "flow", "film-author", "film-studio", "story-state"]);
 
 export function useHashRoute() {
   const [route, setRouteState] = useState<HashRoute>(() => parseHash(window.location.hash));

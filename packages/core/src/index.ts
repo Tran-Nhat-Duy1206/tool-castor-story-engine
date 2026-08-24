@@ -550,6 +550,7 @@ export { ConsolidatorAgent } from "./agents/consolidator.js";
 export { MemoryDB, type Fact, type StoredSummary } from "./state/memory-db.js";
 export { StateValidatorAgent } from "./agents/state-validator.js";
 export { loadRuntimeStateSnapshot, buildRuntimeStateArtifacts, saveRuntimeStateSnapshot, loadNarrativeMemorySeed, loadSnapshotCurrentStateFacts, type RuntimeStateArtifacts, type NarrativeMemorySeed } from "./state/runtime-state-store.js";
+export { readStoryCanon, readCanonSection, isCanonSection, CANON_SECTIONS, CanonUnavailableError, type StoryCanonView, type CanonSection, type CanonSectionValue, type CanonIssue } from "./state/canon-service.js";
 export { splitChapters, type SplitChapter } from "./utils/chapter-splitter.js";
 export * from "./translation/index.js";
 export { countChapterLength, resolveLengthCountingMode, formatLengthCount, buildLengthSpec, defaultChapterLength, DEFAULT_CHAPTER_LENGTH_ZH, DEFAULT_CHAPTER_LENGTH_EN, isOutsideSoftRange, isOutsideHardRange, type LengthLanguage } from "./utils/length-metrics.js";
@@ -601,7 +602,7 @@ export {
 } from "./state/chapter-workspace.js";
 export { loadChaptersFromPath, compareChapterSourceNames } from "./agent/chapter-import-source.js";
 export { bootstrapStructuredStateFromMarkdown } from "./state/state-bootstrap.js";
-export { renderCurrentStateProjection, renderHooksProjection, renderChapterSummariesProjection } from "./state/state-projections.js";
+export { renderCurrentStateProjection, renderHooksProjection, renderChapterSummariesProjection, describeCurrentState, CURRENT_STATE_SLOT_DEFS, type CurrentStateSlotKey, type CurrentStateSlotDef, type CurrentStateSlotView, type CurrentStateDescription } from "./state/state-projections.js";
 export { applyRuntimeStateDelta, type RuntimeStateSnapshot } from "./state/state-reducer.js";
 export { validateRuntimeState, type RuntimeStateValidationIssue } from "./state/state-validator.js";
 

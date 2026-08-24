@@ -11,6 +11,7 @@ import { ServiceListPage } from "./pages/ServiceListPage";
 import { ServiceDetailPage } from "./pages/ServiceDetailPage";
 import { ProjectSettings } from "./pages/ProjectSettings";
 import { TruthFiles } from "./pages/TruthFiles";
+import { StoryStatePage } from "./pages/story-state/StoryStatePage";
 import { DaemonControl } from "./pages/DaemonControl";
 import { LogViewer } from "./pages/LogViewer";
 import { GenreManager } from "./pages/GenreManager";
@@ -102,6 +103,7 @@ export function App() {
     toProjectSettings: () => setRoute({ page: "project-settings" }),
     toServiceDetail: (id: string) => setRoute({ page: "service-detail", serviceId: id }),
     toTruth: (bookId: string) => setRoute({ page: "truth", bookId }),
+    toStoryState: (bookId: string) => setRoute({ page: "story-state", bookId }),
     toDaemon: () => setRoute({ page: "daemon" }),
     toLogs: () => setRoute({ page: "logs" }),
     toGenres: () => setRoute({ page: "genres" }),
@@ -301,6 +303,11 @@ export function App() {
           {route.page === "truth" && (
             <div className="max-w-4xl mx-auto px-6 py-12 md:px-12 lg:py-16 fade-in">
               <TruthFiles bookId={route.bookId} nav={nav} theme={theme} t={t} />
+            </div>
+          )}
+          {route.page === "story-state" && (
+            <div className="mx-auto w-full max-w-[1400px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16 fade-in">
+              <StoryStatePage bookId={route.bookId} />
             </div>
           )}
           {route.page === "daemon" && (

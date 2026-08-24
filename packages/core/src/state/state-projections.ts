@@ -1,5 +1,6 @@
 import type {
   ChapterSummariesState,
+  CurrentStateFact,
   CurrentStateState,
   HooksState,
 } from "../models/runtime-state.js";
@@ -125,6 +126,53 @@ export function renderChapterSummariesProjection(
   return [title, "", ...headers, ...rows, ""].join("\n");
 }
 
+/**
+ * Canonical slot keys for the six fixed current-state patch slots, shared by
+ * the markdown renderer and the structured-state description used by Studio.
+ * The alias lists are the single source of truth for which fact predicates
+ * map to which slot — do not duplicate them elsewhere.
+ */
+export type CurrentStateSlotKey =
+  | "currentLocation"
+  | "protagonistState"
+  | "currentGoal"
+  | "currentConstraint"
+  | "currentAlliances"
+  | "currentConflict";
+
+export interface CurrentStateSlotDef {
+  readonly key: CurrentStateSlotKey;
+  readonly aliases: ReadonlyArray<string>;
+}
+
+export const CURRENT_STATE_SLOT_DEFS: ReadonlyArray<CurrentStateSlotDef> = [
+  { key: "currentLocation", aliases: ["Current Location", "当前位置"] },
+  { key: "protagonistState", aliases: ["Protagonist State", "主角状态"] },
+  { key: "currentGoal", aliases: ["Current Goal", "当前目标"] },
+  { key: "currentConstraint", aliases: ["Current Constraint", "当前限制"] },
+  { key: "currentAlliances", aliases: ["Current Alliances", "Current Relationships", "当前敌我"] },
+  { key: "currentConflict", aliases: ["Current Conflict", "当前冲突"] },
+];
+
+const CURRENT_STATE_SLOT_LABELS: Record<"zh" | "en", Record<CurrentStateSlotKey, string>> = {
+  zh: {
+    currentLocation: "当前位置",
+    protagonistState: "主角状态",
+    currentGoal: "当前目标",
+    currentConstraint: "当前限制",
+    currentAlliances: "当前敌我",
+    currentConflict: "当前冲突",
+  },
+  en: {
+    currentLocation: "Current Location",
+    protagonistState: "Protagonist State",
+    currentGoal: "Current Goal",
+    currentConstraint: "Current Constraint",
+    currentAlliances: "Current Alliances",
+    currentConflict: "Current Conflict",
+  },
+};
+
 export function renderCurrentStateProjection(
   state: CurrentStateState,
   language: "zh" | "en" = "zh",
@@ -135,12 +183,7 @@ export function renderCurrentStateProjection(
       tableHeader: "| Field | Value |",
       labels: {
         chapter: "Current Chapter",
-        location: "Current Location",
-        protagonistState: "Protagonist State",
-        goal: "Current Goal",
-        constraint: "Current Constraint",
-        alliances: "Current Alliances",
-        conflict: "Current Conflict",
+        ...CURRENT_STATE_SLOT_LABELS.en,
       },
       placeholders: "(not set)",
       additionalTitle: "## Additional State",
@@ -150,43 +193,16 @@ export function renderCurrentStateProjection(
       tableHeader: "| 字段 | 值 |",
       labels: {
         chapter: "当前章节",
-        location: "当前位置",
-        protagonistState: "主角状态",
-        goal: "当前目标",
-        constraint: "当前限制",
-        alliances: "当前敌我",
-        conflict: "当前冲突",
+        ...CURRENT_STATE_SLOT_LABELS.zh,
       },
       placeholders: "（未设定）",
       additionalTitle: "## 其他状态",
     };
 
-  const slots = [
-    {
-      label: layout.labels.location,
-      aliases: ["Current Location", "当前位置"],
-    },
-    {
-      label: layout.labels.protagonistState,
-      aliases: ["Protagonist State", "主角状态"],
-    },
-    {
-      label: layout.labels.goal,
-      aliases: ["Current Goal", "当前目标"],
-    },
-    {
-      label: layout.labels.constraint,
-      aliases: ["Current Constraint", "当前限制"],
-    },
-    {
-      label: layout.labels.alliances,
-      aliases: ["Current Alliances", "Current Relationships", "当前敌我"],
-    },
-    {
-      label: layout.labels.conflict,
-      aliases: ["Current Conflict", "当前冲突"],
-    },
-  ] as const;
+  const slots = CURRENT_STATE_SLOT_DEFS.map((def) => ({
+    label: layout.labels[def.key],
+    aliases: def.aliases,
+  }));
 
   const knownPredicates = new Set(
     slots.flatMap((slot) => slot.aliases.map(normalizePredicate)),
@@ -252,4 +268,67 @@ function normalizePredicate(value: string): string {
 
 function escapeTableCell(value: string | number): string {
   return String(value).replace(/\|/g, "\\|").trim();
+}
+
+/**
+ * Structured, display-oriented description of the current state. This is the
+ * read-side companion to {@link renderCurrentStateProjection}: same slot
+ * definitions, same alias matching, same additional-fact filter and ordering —
+ * but it keeps fact identity (subject, validity intervals, source chapter)
+ * instead of collapsing everything into table cells.
+ *
+ * Selection note: when several facts share a slot predicate (e.g. a closed
+ * historical interval plus an open one), this prefers the OPEN interval so
+ * viewers surface live canon, and reports the remaining matches as
+ * `superseded`. The markdown renderer keeps its historical first-match
+ * behavior; that display-only divergence is intentional.
+ */
+export interface CurrentStateSlotView {
+  readonly key: CurrentStateSlotKey;
+  readonly label: string;
+  /** Value of the selected (open-preferred) fact; null when the slot is unset. */
+  readonly value: string | null;
+  readonly selected: CurrentStateFact | null;
+  /** Other facts sharing the slot predicate — closed history is kept visible. */
+  readonly superseded: ReadonlyArray<CurrentStateFact>;
+}
+
+export interface CurrentStateDescription {
+  readonly chapter: number;
+  readonly slots: ReadonlyArray<CurrentStateSlotView>;
+  /** Every non-slot fact, in the renderer's additional-fact order. */
+  readonly additionalFacts: ReadonlyArray<CurrentStateFact>;
+}
+
+export function describeCurrentState(
+  state: CurrentStateState,
+  language: "zh" | "en" = "zh",
+): CurrentStateDescription {
+  const labels = CURRENT_STATE_SLOT_LABELS[language];
+  const knownPredicates = new Set(
+    CURRENT_STATE_SLOT_DEFS.flatMap((def) => def.aliases.map(normalizePredicate)),
+  );
+
+  const slots = CURRENT_STATE_SLOT_DEFS.map((def) => {
+    const aliasSet = new Set(def.aliases.map(normalizePredicate));
+    const matches = state.facts.filter((fact) => aliasSet.has(normalizePredicate(fact.predicate)));
+    const selected = matches.find((fact) => fact.validUntilChapter === null) ?? matches[0] ?? null;
+    return {
+      key: def.key,
+      label: labels[def.key],
+      value: selected?.object ?? null,
+      selected,
+      superseded: matches.filter((fact) => fact !== selected),
+    };
+  });
+
+  const additionalFacts = [...state.facts]
+    .filter((fact) => !knownPredicates.has(normalizePredicate(fact.predicate)))
+    .sort((left, right) => compareAdditionalFacts(left.predicate, right.predicate));
+
+  return {
+    chapter: state.chapter,
+    slots,
+    additionalFacts,
+  };
 }

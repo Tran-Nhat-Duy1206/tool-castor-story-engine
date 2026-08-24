@@ -66,6 +66,11 @@ import {
   normalizeRequestedIntent as normalizeCoreRequestedIntent,
   normalizeSkillIdList as normalizeCoreSkillIdList,
   inferLanguage,
+  readStoryCanon,
+  readCanonSection,
+  isCanonSection,
+  describeCurrentState,
+  CanonUnavailableError,
   ingestMaterial,
   createSkillRegistry,
   loadAvailableAgentSkills,
@@ -2805,6 +2810,52 @@ export function createStudioServer(initialConfig: ProjectConfig, root: string, o
       return c.json({ book, chapters, nextChapter });
     } catch {
       return c.json({ error: `Book "${id}" not found` }, 404);
+    }
+  });
+
+  // --- Canonical Story State (read-only Core boundary) ---
+
+  app.get("/api/v1/books/:id/canon", async (c) => {
+    const id = c.req.param("id");
+    const sectionParam = c.req.query("section");
+
+    if (sectionParam !== undefined && !isCanonSection(sectionParam)) {
+      return c.json(
+        { error: `Invalid canon section "${sectionParam}". Expected one of: manifest, current_state, hooks, chapter_summaries` },
+        400,
+      );
+    }
+
+    // Membership check BEFORE any read so unknown ids can never trigger the
+    // bootstrap side effect or touch the filesystem.
+    const bookIds = await state.listBooks();
+    if (!bookIds.includes(id)) {
+      return c.json({ error: `Book "${id}" not found` }, 404);
+    }
+
+    try {
+      const view = await readStoryCanon(state.bookDir(id));
+      const body: Record<string, unknown> =
+        sectionParam === undefined
+          ? {
+              bookId: id,
+              manifest: view.manifest,
+              currentState: view.currentState,
+              hooks: view.hooks,
+              chapterSummaries: view.chapterSummaries,
+              // Slot/alias semantics are computed by Core so the UI can never
+              // diverge from what the engine itself believes.
+              description: describeCurrentState(view.currentState, view.manifest.language),
+            }
+          : { bookId: id, section: sectionParam, data: readCanonSection(view, sectionParam) };
+      return c.json(body);
+    } catch (e) {
+      // Pure-read contract: missing/invalid canonical state is an explicit
+      // structured error, never healed or bootstrapped by a GET.
+      if (e instanceof CanonUnavailableError) {
+        return c.json({ error: e.message, code: e.code, issues: e.issues }, 409);
+      }
+      return c.json({ error: e instanceof Error ? e.message : String(e) }, 500);
     }
   });
 

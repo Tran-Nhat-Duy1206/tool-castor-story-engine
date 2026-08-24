@@ -12,6 +12,7 @@ import {
   FileText,
   CheckCheck,
   BarChart2,
+  Brain,
   Download,
   Search,
   Wand2,
@@ -60,6 +61,7 @@ interface Nav {
   toChapter: (bookId: string, num: number) => void;
   toAnalytics: (bookId: string) => void;
   toTruth: (bookId: string) => void;
+  toStoryState: (bookId: string) => void;
 }
 
 function translateChapterStatus(status: string, t: TFunction): string {
@@ -554,6 +556,13 @@ export function BookDetail({
           >
             <Database size={14} />
             {t("book.truthFiles")}
+          </button>
+          <button
+            onClick={() => nav.toStoryState(bookId)}
+            className="flex items-center gap-2 px-4 py-2 text-xs font-bold bg-secondary/50 text-muted-foreground rounded-lg hover:text-foreground hover:bg-secondary transition-all border border-border/50"
+          >
+            <Brain size={14} />
+            {t("book.storyState")}
           </button>
           <button
             onClick={() => nav.toAnalytics(bookId)}

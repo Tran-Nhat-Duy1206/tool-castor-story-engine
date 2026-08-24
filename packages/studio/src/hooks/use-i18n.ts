@@ -180,6 +180,7 @@ const strings = {
   "book.statusCompleted": { zh: "已完成", en: "Completed" },
   "book.statusDropped": { zh: "已放弃", en: "Dropped" },
   "book.truthFiles": { zh: "真相文件", en: "Truth Files" },
+  "book.storyState": { zh: "故事状态", en: "Story State" },
   "book.evaluate": { zh: "质量评估", en: "Evaluate" },
   "book.consolidate": { zh: "归并记忆", en: "Consolidate" },
   "book.reviseFoundation": { zh: "重修设定", en: "Revise Foundation" },
