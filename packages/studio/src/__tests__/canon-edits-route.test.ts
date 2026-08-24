@@ -275,20 +275,20 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     expect(before).toBeDefined();
   });
 
-  it("treats removeFact of an absent key as a no-op success (approved reducer semantics)", async () => {
+  it("treats removeFact of an absent key as a pure semantic no-op (P3.1: A→A, appliedEdits=[], zero writes)", async () => {
     const app = makeApp(root);
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
       edits: [{ kind: "removeFact", subject: "不存在的人", predicate: "不存在的事" }],
       expectedRevision: revisionA,
     });
-    // Reducer drops matching rows only; zero matches ⇒ fact rows unchanged.
-    // The commit still lands (the regenerated projection document is part of
-    // the revision fingerprint, so the revision MAY advance even though the
-    // facts array is untouched).
+    // P3.1 sequential no-op filtering: removing an unasserted key changes no
+    // author-facing meaning ⇒ revision UNCHANGED, appliedEdits [], and zero
+    // filesystem mutation (the old "revision MAY advance" behavior was the
+    // array-order churn defect this hardening removed).
     expect(res.status).toBe(200);
     const body = (await res.json()) as { appliedEdits: number; revision: string };
-    expect(body.appliedEdits).toBe(1);
-    expect(body.revision).toMatch(/^[0-9a-f]{16}$/);
+    expect(body.appliedEdits).toBe(0);
+    expect(body.revision).toBe(revisionA);
     const live = JSON.parse(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8")) as {
       facts: Array<{ subject?: string; predicate: string }>;
     };

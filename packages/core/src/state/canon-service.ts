@@ -475,6 +475,100 @@ export interface CanonCommitResult {
   readonly warnings: ReadonlyArray<string>;
 }
 
+// --- P3.1 semantic no-op hardening -------------------------------------------
+//
+// Manual editing modifies AUTHOR-FACING CURRENT STORY MEANING; temporal
+// provenance is not user input. A same-value setFact and a removal of an
+// unasserted key are therefore SEMANTIC NO-OPS: zero filesystem writes,
+// zero derived-memory synchronization, unchanged revision, no re-anchor.
+
+interface ShadowAssertion {
+  /** Active value of the single open row (meaningless when openRowCount > 1). */
+  value: string;
+  openRowCount: number;
+}
+
+function semanticKey(subject: string, predicate: string): string {
+  return `${subject}::${resolveFactPredicateKey(predicate)}`;
+}
+
+/**
+ * SEQUENTIAL no-op classification (P3.1).
+ *
+ * Classifies edits IN REQUEST ORDER against a lightweight shadow model of
+ * OPEN/current facts keyed by `subject + resolveFactPredicateKey(predicate)`
+ * — the reducer's own match semantics. Original-state classification is NOT
+ * safe for ordered batches (`[set24,set23]`, `[remove,set23]`); each edit
+ * must observe the shadow as mutated by preceding edits.
+ *
+ * Closed historical rows are invisible to meaning: a key with only closed
+ * rows removes nothing. Ambiguity is conservative: a same-value setFact is
+ * a no-op ONLY for exactly one open matching row — duplicate/conflicting
+ * OPEN rows route through the normal validation path instead of silently
+ * blessing malformed legacy state.
+ *
+ * Returns the EFFECTIVE edits in original relative order; dropped operations
+ * provably cannot change what the remaining edits mean.
+ */
+function partitionSemanticNoopEdits(
+  view: StoryCanonView,
+  edits: ReadonlyArray<CanonEdit>,
+): { effective: CanonEdit[] } {
+  const shadow = new Map<string, ShadowAssertion>();
+  for (const fact of view.currentState.facts) {
+    if (fact.validUntilChapter !== null) continue;
+    const key = semanticKey(fact.subject, fact.predicate);
+    const prev = shadow.get(key);
+    shadow.set(key, prev
+      ? { value: fact.object, openRowCount: prev.openRowCount + 1 }
+      : { value: fact.object, openRowCount: 1 });
+  }
+
+  const effective: CanonEdit[] = [];
+  for (const edit of edits) {
+    const key = semanticKey(edit.subject, edit.predicate);
+    const entry = shadow.get(key);
+
+    if (edit.kind === "removeFact") {
+      if (!entry) continue; // no active assertion ⇒ semantic no-op
+      effective.push(edit);
+      shadow.delete(key);
+      continue;
+    }
+
+    // setFact: no-op only for ONE unambiguous active assertion equal to the request.
+    if (entry && entry.openRowCount === 1 && entry.value === edit.object) continue;
+    effective.push(edit);
+    shadow.set(key, { value: edit.object, openRowCount: 1 });
+  }
+  return { effective };
+}
+
+/**
+ * Order-insensitive semantic fingerprint over the FOUR structured documents
+ * (defense-in-depth behind sequential classification). Object keys are
+ * canonicalized like the revision fingerprint; `currentState.facts` is
+ * compared as an order-INsensitive multiset of canonical rows because fact
+ * array order is non-semantic for THIS comparison only. Stored arrays are
+ * never reordered by anything in this module.
+ */
+function semanticCanonFingerprint(snapshot: {
+  manifest: StateManifest;
+  currentState: CurrentStateState;
+  hooks: HooksState;
+  chapterSummaries: ChapterSummariesState;
+}): string {
+  return JSON.stringify({
+    manifest: canonicalize(snapshot.manifest),
+    hooks: canonicalize(snapshot.hooks),
+    chapterSummaries: canonicalize(snapshot.chapterSummaries),
+    currentStateChapter: snapshot.currentState.chapter,
+    currentStateFacts: snapshot.currentState.facts
+      .map((fact) => JSON.stringify(canonicalize(fact)))
+      .sort(),
+  });
+}
+
 /**
  * Commit a manual edit set as ONE atomic integrity transaction.
  *
@@ -482,8 +576,15 @@ export interface CanonCommitResult {
  * transaction):
  *  1. read canon → stale `expectedRevision` ⇒ {@link CanonConflictError}
  *     BEFORE any filesystem mutation;
+ *  1.5 P3.1 sequential semantic no-op filtering — same-value setFact /
+ *     unasserted removeFact are author-meaning no-ops; ALL no-op ⇒ existing
+ *     revision, `appliedEdits: []`, zero writes AND zero derived-memory work
+ *     (no re-anchor, no bootstrap side effects); otherwise only EFFECTIVE
+ *     edits (original relative order) continue;
  *  2. preview (durable+1 anchoring, reducer splice, global + edit-local
  *     validation) ⇒ any issue ⇒ {@link CanonInvalidEditsError};
+ *  2.5 P3.1 defense-in-depth semantic fingerprint — meaning-preserving
+ *     array-order-only churn persists nothing;
  *  3. ONE `commitAtomicFileSet({rootDir: bookDir})` covering:
  *     - live `story/state/current_state.json` (spliced per reducer convention)
  *     - regenerated `story/current_state.md` (renderCurrentStateProjection)
@@ -510,10 +611,39 @@ export async function commitCanonEdits(
     throw new CanonConflictError(view.revision);
   }
 
+  // (1.5) P3.1 sequential semantic no-op filtering: operations that cannot
+  // change author-facing current meaning (missing/unasserted removes,
+  // same-value sets on unambiguous active state) are dropped BEFORE the
+  // reducer so they cause zero writes, zero derived-memory work and zero
+  // revision churn. All no-op ⇒ return the existing revision unchanged.
+  const { effective } = partitionSemanticNoopEdits(view, request.edits);
+  if (effective.length === 0) {
+    return {
+      revision: view.revision,
+      appliedEdits: [],
+      effectiveChapter: (await resolveDurableStoryProgress({ bookDir })) + 1,
+      warnings: [],
+    };
+  }
+
   // (2) preview + validation (fresh durable read; caller holds the lock).
-  const preview = await previewCanonEdits(bookDir, request.edits);
+  const preview = await previewCanonEdits(bookDir, effective);
   if (preview.issues.length > 0) {
     throw new CanonInvalidEditsError(preview.issues);
+  }
+
+  // (2.5) P3.1 defense-in-depth: if the validated reduction changed nothing
+  // semantically (meaning-preserving array-order churn only), persist
+  // nothing and report the existing revision.
+  if (
+    semanticCanonFingerprint(preview.before) === semanticCanonFingerprint(preview.after)
+  ) {
+    return {
+      revision: view.revision,
+      appliedEdits: [],
+      effectiveChapter: preview.effectiveChapter,
+      warnings: [],
+    };
   }
 
   const n = preview.effectiveChapter - 1;
@@ -563,7 +693,7 @@ export async function commitCanonEdits(
 
   return {
     revision: finalView.revision,
-    appliedEdits: [...request.edits],
+    appliedEdits: [...effective],
     effectiveChapter: preview.effectiveChapter,
     warnings,
   };

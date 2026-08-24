@@ -301,3 +301,231 @@ describe("commitCanonEdits (single atomic integrity transaction)", () => {
   });
 });
 
+// --- P3.1 — Semantic no-op Canon commit hardening -----------------------------
+//
+// Manual editing modifies AUTHOR-FACING CURRENT STORY MEANING; temporal
+// provenance is not user input. Classification is SEQUENTIAL against a
+// shadow of OPEN facts (closed history invisible; ambiguity conservative).
+// Every no-op case asserts whole-tree sha256+size+mtime equality.
+
+const SAME_VALUE_EDIT = { kind: "setFact", subject: "主角", predicate: "当前位置", object: "东城公寓" } as const;
+const REMOVE_MISSING = { kind: "removeFact", subject: "主角", predicate: "佩剑" } as const;
+const SET_NEW_VALUE = { kind: "setFact", subject: "主角", predicate: "当前位置", object: "北塔" } as const;
+
+async function readLiveFacts(): Promise<Array<{ subject: string; predicate: string; object: string; validFromChapter: number; validUntilChapter: number | null; sourceChapter: number }>> {
+  const raw = JSON.parse(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8"));
+  return raw.facts;
+}
+
+async function writeLiveFacts(facts: unknown[]): Promise<void> {
+  const path = join(bookDir, "story", "state", "current_state.json");
+  const doc = JSON.parse(await readFile(path, "utf-8"));
+  doc.facts = facts;
+  await writeFile(path, JSON.stringify(doc, null, 2), "utf-8");
+}
+
+function openLocationValue(facts: Array<{ subject: string; predicate: string; object: string; validUntilChapter: number | null }>): string | undefined {
+  return facts.find((f) => f.subject === "主角" && f.predicate === "当前位置" && f.validUntilChapter === null)?.object;
+}
+
+describe("P3.1 semantic no-op hardening", () => {
+  it("removeFact(nonexistent): A→A, appliedEdits=[], whole filesystem sha+size+mtime unchanged", async () => {
+    const beforeMeta = await captureBookMetadata(root);
+    const viewBefore = await readStoryCanon(bookDir);
+
+    const result = await commitCanonEdits(bookDir, {
+      edits: [REMOVE_MISSING],
+      expectedRevision: viewBefore.revision,
+    });
+
+    expect(result.appliedEdits).toEqual([]);
+    expect(result.warnings).toEqual([]);
+    expect(result.effectiveChapter).toBe(13);
+    expect(result.revision).toBe(viewBefore.revision);
+    expect(await captureBookMetadata(root)).toEqual(beforeMeta);
+  });
+
+  it("setFact(existing same value): A→A, appliedEdits=[], temporal metadata unchanged, filesystem frozen", async () => {
+    const beforeMeta = await captureBookMetadata(root);
+    const viewBefore = await readStoryCanon(bookDir);
+
+    const result = await commitCanonEdits(bookDir, {
+      edits: [SAME_VALUE_EDIT],
+      expectedRevision: viewBefore.revision,
+    });
+
+    expect(result.appliedEdits).toEqual([]);
+    expect(result.revision).toBe(viewBefore.revision);
+    expect(await captureBookMetadata(root)).toEqual(beforeMeta);
+    const row = (await readLiveFacts()).find(
+      (f) => f.subject === "主角" && f.predicate === "当前位置" && f.validUntilChapter === null,
+    );
+    // No re-anchor: the row keeps its original chapter anchoring.
+    expect(row).toMatchObject({ object: "东城公寓", validFromChapter: 11, sourceChapter: 11 });
+  });
+
+  it("setFact(existing different value): real commit with normal E re-anchor", async () => {
+    const viewBefore = await readStoryCanon(bookDir);
+    const result = await commitCanonEdits(bookDir, {
+      edits: [SET_NEW_VALUE],
+      expectedRevision: viewBefore.revision,
+    });
+    expect(result.revision).not.toBe(viewBefore.revision);
+    const row = (await readLiveFacts()).find(
+      (f) => f.subject === "主角" && f.predicate === "当前位置" && f.validUntilChapter === null,
+    );
+    expect(row).toMatchObject({ object: "北塔", validFromChapter: 13, validUntilChapter: null, sourceChapter: 13 });
+  });
+
+  it("setFact(absent key): real commit anchoring the new fact at E", async () => {
+    const viewBefore = await readStoryCanon(bookDir);
+    const result = await commitCanonEdits(bookDir, {
+      edits: [{ kind: "setFact", subject: "主角", predicate: "佩剑", object: "青霜" }],
+      expectedRevision: viewBefore.revision,
+    });
+    expect(result.appliedEdits).toHaveLength(1);
+    expect(result.revision).not.toBe(viewBefore.revision);
+    expect((await readLiveFacts()).some((f) => f.predicate === "佩剑" && f.validFromChapter === 13)).toBe(true);
+  });
+
+  it("removeFact(existing OPEN key): real commit removing the assertion", async () => {
+    const viewBefore = await readStoryCanon(bookDir);
+    const result = await commitCanonEdits(bookDir, {
+      edits: [{ kind: "removeFact", subject: "林晚", predicate: "身份" }],
+      expectedRevision: viewBefore.revision,
+    });
+    expect(result.appliedEdits).toHaveLength(1);
+    expect(result.revision).not.toBe(viewBefore.revision);
+    expect((await readLiveFacts()).some((f) => f.subject === "林晚")).toBe(false);
+  });
+
+  it("[set24,set23] both effective in order: final value is the LAST requested one", async () => {
+    const viewBefore = await readStoryCanon(bookDir);
+    const result = await commitCanonEdits(bookDir, {
+      edits: [SET_NEW_VALUE, SAME_VALUE_EDIT],
+      expectedRevision: viewBefore.revision,
+    });
+    expect(result.appliedEdits).toEqual([SET_NEW_VALUE, SAME_VALUE_EDIT]);
+    expect(openLocationValue(await readLiveFacts())).toBe("东城公寓");
+    expect(result.revision).not.toBe(viewBefore.revision);
+  });
+
+  it("[remove,set23] both effective in order: final value re-asserted at E", async () => {
+    const viewBefore = await readStoryCanon(bookDir);
+    const result = await commitCanonEdits(bookDir, {
+      edits: [{ kind: "removeFact", subject: "主角", predicate: "当前位置" }, SAME_VALUE_EDIT],
+      expectedRevision: viewBefore.revision,
+    });
+    expect(result.appliedEdits).toHaveLength(2);
+    expect(openLocationValue(await readLiveFacts())).toBe("东城公寓");
+    const row = (await readLiveFacts()).find((f) => f.predicate === "当前位置" && f.validUntilChapter === null);
+    expect(row).toMatchObject({ validFromChapter: 13, sourceChapter: 13 });
+  });
+
+  it("[set23,set24] first edit is a semantic no-op: appliedEdits contains ONLY set24", async () => {
+    const viewBefore = await readStoryCanon(bookDir);
+    const result = await commitCanonEdits(bookDir, {
+      edits: [SAME_VALUE_EDIT, SET_NEW_VALUE],
+      expectedRevision: viewBefore.revision,
+    });
+    expect(result.appliedEdits).toEqual([SET_NEW_VALUE]);
+    expect(openLocationValue(await readLiveFacts())).toBe("北塔");
+    expect(result.revision).not.toBe(viewBefore.revision);
+  });
+
+  it("[set24,remove] both effective: final active location absent", async () => {
+    const viewBefore = await readStoryCanon(bookDir);
+    const result = await commitCanonEdits(bookDir, {
+      edits: [SET_NEW_VALUE, { kind: "removeFact", subject: "主角", predicate: "当前位置" }],
+      expectedRevision: viewBefore.revision,
+    });
+    expect(result.appliedEdits).toHaveLength(2);
+    expect(openLocationValue(await readLiveFacts())).toBeUndefined();
+  });
+
+  it("only-CLOSED historical key + removeFact: pure no-op, zero writes (legacy bookkeeping untouched)", async () => {
+    const fixture = await createCanonBook({
+      seedSnapshotsThrough: 12,
+      extraFacts: [
+        { subject: "配角", predicate: "下落", object: "失踪", validFromChapter: 3, validUntilChapter: 8, sourceChapter: 3 },
+      ],
+    });
+    try {
+      const beforeMeta = await captureBookMetadata(fixture.root);
+      const viewBefore = await readStoryCanon(fixture.bookDir);
+
+      const result = await commitCanonEdits(fixture.bookDir, {
+        edits: [{ kind: "removeFact", subject: "配角", predicate: "下落" }],
+        expectedRevision: viewBefore.revision,
+      });
+
+      expect(result.appliedEdits).toEqual([]);
+      expect(result.revision).toBe(viewBefore.revision);
+      expect(await captureBookMetadata(fixture.root)).toEqual(beforeMeta);
+      // Closed bookkeeping row byte-preserved.
+      const live = JSON.parse(await readFile(join(fixture.bookDir, "story", "state", "current_state.json"), "utf-8"));
+      expect(live.facts.some((f: { subject: string }) => f.subject === "配角")).toBe(true);
+    } finally {
+      await rm(fixture.root, { recursive: true, force: true });
+    }
+  });
+
+  it("duplicate/conflicting OPEN rows + same-value setFact: NOT prematurely skipped (conservative)", async () => {
+    // Hand-seed a malformed legacy state: two open rows for one semantic key.
+    const facts = await readLiveFacts();
+    await writeLiveFacts([...facts, { ...facts.find((f) => f.predicate === "当前位置" && f.validUntilChapter === null)!, validFromChapter: 12 }]);
+    const viewBefore = await readStoryCanon(bookDir);
+
+    const result = await commitCanonEdits(bookDir, {
+      edits: [SAME_VALUE_EDIT],
+      expectedRevision: viewBefore.revision,
+    });
+
+    // Ambiguous active state ⇒ the edit must flow through the normal path.
+    expect(result.appliedEdits).toHaveLength(1);
+    expect(result.revision).not.toBe(viewBefore.revision);
+    const openRows = (await readLiveFacts()).filter(
+      (f) => f.subject === "主角" && f.predicate === "当前位置" && f.validUntilChapter === null,
+    );
+    expect(openRows).toHaveLength(1); // reducer collapses duplicates on effective application
+  });
+
+  it("deliberately UNSORTED live facts + pure no-op: zero reorder, zero writes, revision unchanged", async () => {
+    // Reverse the seeded array order so disk order ≠ reducer-sorted order —
+    // exactly the churn window the P3B review exposed.
+    const facts = await readLiveFacts();
+    await writeLiveFacts([...facts].reverse());
+    const beforeMeta = await captureBookMetadata(root);
+    const viewBefore = await readStoryCanon(bookDir);
+
+    const result = await commitCanonEdits(bookDir, {
+      edits: [REMOVE_MISSING],
+      expectedRevision: viewBefore.revision,
+    });
+
+    expect(result.appliedEdits).toEqual([]);
+    expect(result.revision).toBe(viewBefore.revision);
+    expect(await captureBookMetadata(root)).toEqual(beforeMeta);
+  });
+
+  it("pure no-op performs ZERO derived-memory synchronization and ZERO bootstrap normalization", async () => {
+    const beforeMeta = await captureBookMetadata(root);
+    const viewBefore = await readStoryCanon(bookDir);
+    const rebuildNarrativeMemoryIndex = vi.fn();
+    const rebuildCurrentStateFactHistory = vi.fn();
+    const invalidateDerivedMemory = vi.fn();
+
+    const result = await commitCanonEdits(
+      bookDir,
+      { edits: [REMOVE_MISSING], expectedRevision: viewBefore.revision },
+      { rebuildNarrativeMemoryIndex, rebuildCurrentStateFactHistory, invalidateDerivedMemory },
+    );
+
+    expect(result.revision).toBe(viewBefore.revision);
+    expect(rebuildNarrativeMemoryIndex).not.toHaveBeenCalled();
+    expect(rebuildCurrentStateFactHistory).not.toHaveBeenCalled();
+    expect(invalidateDerivedMemory).not.toHaveBeenCalled();
+    expect(await captureBookMetadata(root)).toEqual(beforeMeta);
+  });
+});
+
