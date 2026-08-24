@@ -14,7 +14,11 @@ import {
 import { evaluateHookAdmission } from "../utils/hook-governance.js";
 import { resolveHookPayoffTiming } from "../utils/hook-lifecycle.js";
 import { validateRuntimeState } from "./state-validator.js";
-import { CURRENT_STATE_SLOT_DEFS } from "./state-projections.js";
+import {
+  CURRENT_STATE_SLOT_DEFS,
+  currentStateSlotAliases,
+  describeCurrentStateSlot,
+} from "./state-projections.js";
 import type { CanonEdit } from "../models/canon-edits.js";
 
 export interface RuntimeStateSnapshot {
@@ -273,29 +277,13 @@ function applyCurrentStatePatch(
   }
 
   const nextFacts = [...currentState.facts];
-  const labels = language === "en"
-    ? {
-      currentLocation: ["Current Location", "当前位置"],
-      protagonistState: ["Protagonist State", "主角状态"],
-      currentGoal: ["Current Goal", "当前目标"],
-      currentConstraint: ["Current Constraint", "当前限制"],
-      currentAlliances: ["Current Alliances", "Current Relationships", "当前敌我"],
-      currentConflict: ["Current Conflict", "当前冲突"],
-    }
-    : {
-      currentLocation: ["当前位置", "Current Location"],
-      protagonistState: ["主角状态", "Protagonist State"],
-      currentGoal: ["当前目标", "Current Goal"],
-      currentConstraint: ["当前限制", "Current Constraint"],
-      currentAlliances: ["当前敌我", "Current Alliances", "Current Relationships"],
-      currentConflict: ["当前冲突", "Current Conflict"],
-    };
 
-  for (const [patchKey, aliases] of Object.entries(labels) as Array<[
-    keyof typeof labels,
-    string[],
-  ]>) {
-    const value = delta.currentStatePatch[patchKey];
+  // Phase 4 blocker-7: consume the ONE shared slot vocabulary from
+  // state-projections (language-ordered aliases; first alias = persisted
+  // predicate). Behavior-identical to the previous private duplicate table.
+  for (const def of CURRENT_STATE_SLOT_DEFS) {
+    const aliases = currentStateSlotAliases(def.key, language);
+    const value = delta.currentStatePatch[def.key];
     if (value === undefined) continue;
 
     for (let index = nextFacts.length - 1; index >= 0; index -= 1) {
@@ -305,9 +293,10 @@ function applyCurrentStatePatch(
       }
     }
 
+    const described = describeCurrentStateSlot(def.key, language);
     nextFacts.push({
-      subject: "protagonist",
-      predicate: aliases[0]!,
+      subject: described.subject,
+      predicate: described.predicate,
       object: value,
       validFromChapter: delta.chapter,
       validUntilChapter: null,

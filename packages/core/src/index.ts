@@ -97,6 +97,14 @@ export {
   readLiveRuntimeStateSnapshot,
 } from "./state/state-review-store.js";
 export {
+  describeCurrentStateSlot,
+  currentStateSlotAliases,
+} from "./state/state-projections.js";
+export {
+  buildStateReviewItems,
+  type BuildReviewItemsContext,
+} from "./state/state-review-items.js";
+export {
   type PlayActionKind,
   type PlayActionIntentInput,
   type PlayActionIntent,

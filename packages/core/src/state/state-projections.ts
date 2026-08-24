@@ -3,6 +3,7 @@ import type {
   CurrentStateFact,
   CurrentStateState,
   HooksState,
+  RuntimeStateLanguage,
 } from "../models/runtime-state.js";
 import {
   localizeHookPayoffTiming,
@@ -127,10 +128,60 @@ export function renderChapterSummariesProjection(
 }
 
 /**
+ * THE single alias table for the six fixed current-state slots (Phase 4
+ * blocker-7): language-ordered lists whose FIRST entry is the canonical
+ * predicate the reducer persists and the State Review converter proposes.
+ * Every other vocabulary (slot defs below, display labels, reducer patch
+ * application, review items) is derived from or routed through this table —
+ * no duplicate slot→predicate mapping may exist elsewhere.
+ */
+const CURRENT_STATE_SLOT_ALIASES: Readonly<Record<
+  RuntimeStateLanguage,
+  Readonly<Record<CurrentStateSlotKey, ReadonlyArray<string>>>
+>> = {
+  zh: {
+    currentLocation: ["当前位置", "Current Location"],
+    protagonistState: ["主角状态", "Protagonist State"],
+    currentGoal: ["当前目标", "Current Goal"],
+    currentConstraint: ["当前限制", "Current Constraint"],
+    currentAlliances: ["当前敌我", "Current Alliances", "Current Relationships"],
+    currentConflict: ["当前冲突", "Current Conflict"],
+  },
+  en: {
+    currentLocation: ["Current Location", "当前位置"],
+    protagonistState: ["Protagonist State", "主角状态"],
+    currentGoal: ["Current Goal", "当前目标"],
+    currentConstraint: ["Current Constraint", "当前限制"],
+    currentAlliances: ["Current Alliances", "Current Relationships", "当前敌我"],
+    currentConflict: ["Current Conflict", "当前冲突"],
+  },
+};
+
+/** Ordered aliases for one slot under one book language (first = canonical predicate). */
+export function currentStateSlotAliases(
+  slot: CurrentStateSlotKey,
+  language: RuntimeStateLanguage,
+): ReadonlyArray<string> {
+  return CURRENT_STATE_SLOT_ALIASES[language][slot];
+}
+
+/**
+ * Phase 4 shared semantic description of a patch slot: the exact subject and
+ * predicate `applyCurrentStatePatch` persists for it, consumed verbatim by the
+ * RuntimeStateDelta → ReviewItem converter so review cards can never disagree
+ * with what the engine would write.
+ */
+export function describeCurrentStateSlot(
+  slot: CurrentStateSlotKey,
+  language: RuntimeStateLanguage,
+): { readonly subject: "protagonist"; readonly predicate: string } {
+  return { subject: "protagonist", predicate: CURRENT_STATE_SLOT_ALIASES[language][slot][0]! };
+}
+
+/**
  * Canonical slot keys for the six fixed current-state patch slots, shared by
  * the markdown renderer and the structured-state description used by Studio.
- * The alias lists are the single source of truth for which fact predicates
- * map to which slot — do not duplicate them elsewhere.
+ * Derived from the single alias table above; do not duplicate them elsewhere.
  */
 export type CurrentStateSlotKey =
   | "currentLocation"
@@ -145,32 +196,25 @@ export interface CurrentStateSlotDef {
   readonly aliases: ReadonlyArray<string>;
 }
 
-export const CURRENT_STATE_SLOT_DEFS: ReadonlyArray<CurrentStateSlotDef> = [
-  { key: "currentLocation", aliases: ["Current Location", "当前位置"] },
-  { key: "protagonistState", aliases: ["Protagonist State", "主角状态"] },
-  { key: "currentGoal", aliases: ["Current Goal", "当前目标"] },
-  { key: "currentConstraint", aliases: ["Current Constraint", "当前限制"] },
-  { key: "currentAlliances", aliases: ["Current Alliances", "Current Relationships", "当前敌我"] },
-  { key: "currentConflict", aliases: ["Current Conflict", "当前冲突"] },
-];
+export const CURRENT_STATE_SLOT_DEFS: ReadonlyArray<CurrentStateSlotDef> =
+  (Object.keys(CURRENT_STATE_SLOT_ALIASES.en) as CurrentStateSlotKey[]).map((key) => ({
+    key,
+    aliases: CURRENT_STATE_SLOT_ALIASES.en[key]!,
+  }));
 
 const CURRENT_STATE_SLOT_LABELS: Record<"zh" | "en", Record<CurrentStateSlotKey, string>> = {
-  zh: {
-    currentLocation: "当前位置",
-    protagonistState: "主角状态",
-    currentGoal: "当前目标",
-    currentConstraint: "当前限制",
-    currentAlliances: "当前敌我",
-    currentConflict: "当前冲突",
-  },
-  en: {
-    currentLocation: "Current Location",
-    protagonistState: "Protagonist State",
-    currentGoal: "Current Goal",
-    currentConstraint: "Current Constraint",
-    currentAlliances: "Current Alliances",
-    currentConflict: "Current Conflict",
-  },
+  zh: Object.fromEntries(
+    (Object.keys(CURRENT_STATE_SLOT_ALIASES.zh) as CurrentStateSlotKey[]).map((key) => [
+      key,
+      CURRENT_STATE_SLOT_ALIASES.zh[key]![0],
+    ]),
+  ) as Record<CurrentStateSlotKey, string>,
+  en: Object.fromEntries(
+    (Object.keys(CURRENT_STATE_SLOT_ALIASES.en) as CurrentStateSlotKey[]).map((key) => [
+      key,
+      CURRENT_STATE_SLOT_ALIASES.en[key]![0],
+    ]),
+  ) as Record<CurrentStateSlotKey, string>,
 };
 
 export function renderCurrentStateProjection(
