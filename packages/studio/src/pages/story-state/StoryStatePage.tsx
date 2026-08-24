@@ -1,13 +1,20 @@
 import { useMemo, useState } from "react";
-import { AlertTriangle, Brain, BookLock, FileText, RefreshCw } from "lucide-react";
+import { AlertTriangle, Brain, BookLock, CheckCircle2, FileText, Pencil, Plus, RefreshCw, Save, Trash2, X } from "lucide-react";
 import { useApi } from "../../hooks/use-api";
-import type { StoryCanonViewDto } from "../../lib/canon-api";
+import type { CanonCommitOutcome, StoryCanonViewDto } from "../../lib/canon-api";
+import { postCanonCommit } from "../../lib/canon-api";
 import {
   additionalFactRows,
+  buildCommitRequest,
+  buildRemoveFactEdit,
+  buildSetFactEdit,
   hookRows,
   manifestSummary,
   resolveCanonRequestUrl,
+  saveOutcomeToUi,
   slotRows,
+  validateFactDraft,
+  type SaveOutcomeView,
   type UiLanguage,
 } from "./story-state-model";
 
@@ -18,11 +25,12 @@ interface StoryStatePageProps {
 type TabKey = "current-state" | "hooks" | "summaries";
 
 /**
- * Read-only inspector for the canonical structured runtime state
- * (`story/state/*.json`). All data arrives through the Core read boundary
- * (`GET /api/v1/books/:id/canon`) — never from markdown parsing, never
- * mutated here. This page intentionally has NO edit controls: canon editing
- * and the post-chapter review flow belong to later phases.
+ * Canonical structured runtime state surface (`story/state/*.json`).
+ * Data arrives through the Core read boundary (`GET /api/v1/books/:id/canon`)
+ * and mutations go through the lock-owning Studio commit route — never raw
+ * JSON editing. The Current State tab offers ONE-confirmation manual editing
+ * (T3B.2): Save posts the commit directly; there is no preview dialog and no
+ * second Confirm step. Hooks and chapter summaries stay read-only here.
  */
 export function StoryStatePage({ bookId }: StoryStatePageProps) {
   const [lang, setLang] = useState<UiLanguage>("zh");
@@ -49,7 +57,7 @@ export function StoryStatePage({ bookId }: StoryStatePageProps) {
               故事状态 · Story State
               <span className="ml-3 inline-flex items-center gap-1 rounded-full border border-border/60 bg-secondary/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                 <BookLock size={11} />
-                只读 Canon · Read-only
+                手动编辑 · Manual editing
               </span>
             </h1>
             <p className="mt-0.5 text-xs text-muted-foreground">
@@ -85,7 +93,7 @@ export function StoryStatePage({ bookId }: StoryStatePageProps) {
         <div className="py-16 text-center text-sm text-muted-foreground">加载故事状态… · Loading story state…</div>
       )}
       {error && <ErrorCard message={error} lang={lang} />}
-      {data && <CanonBody data={data} tab={tab} setTab={setTab} lang={lang} />}
+      {data && <CanonBody data={data} tab={tab} setTab={setTab} lang={lang} bookId={bookId} refetch={() => void refetch()} />}
     </div>
   );
 }
@@ -107,11 +115,15 @@ function CanonBody({
   tab,
   setTab,
   lang,
+  bookId,
+  refetch,
 }: {
   data: StoryCanonViewDto;
   tab: TabKey;
   setTab: (tab: TabKey) => void;
   lang: UiLanguage;
+  bookId: string;
+  refetch: () => void;
 }) {
   const summary = manifestSummary(data);
   const tabs: Array<{ key: TabKey; zh: string; en: string }> = [
@@ -149,29 +161,283 @@ function CanonBody({
         ))}
       </nav>
 
-      {tab === "current-state" && <CurrentStateTab data={data} lang={lang} />}
+      {tab === "current-state" && <CurrentStateTab data={data} lang={lang} bookId={bookId} refetch={refetch} />}
       {tab === "hooks" && <HooksTab data={data} lang={lang} />}
       {tab === "summaries" && <SummariesTab data={data} lang={lang} />}
     </>
   );
 }
 
-function ManifestCell({ label, value }: { label: string; value: string }) {
+// --- T3B.2: one-confirmation current-state editor ---
+
+interface EditBuffer {
+  readonly mode: "edit-fact" | "add-fact";
+  subject: string;
+  predicate: string;
+  object: string;
+}
+
+function OutcomeBanner({
+  outcome,
+  lang,
+  onRefetch,
+  onDismiss,
+}: {
+  outcome: SaveOutcomeView;
+  lang: UiLanguage;
+  onRefetch: () => void;
+  onDismiss: () => void;
+}) {
+  const toneClass =
+    outcome.tone === "success"
+      ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-700"
+      : outcome.tone === "warning"
+        ? "border-amber-500/40 bg-amber-500/5 text-amber-600"
+        : outcome.tone === "conflict"
+          ? "border-orange-500/40 bg-orange-500/5 text-orange-600"
+          : outcome.tone === "locked"
+            ? "border-sky-500/30 bg-sky-500/5 text-sky-700"
+            : "border-destructive/30 bg-destructive/5 text-destructive";
   return (
-    <div className="rounded-xl bg-secondary/30 p-3">
-      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="mt-1 font-mono text-sm font-semibold text-foreground">{value}</div>
+    <div className={`rounded-xl border p-4 text-sm ${toneClass}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 font-medium">
+          {outcome.tone === "success" || outcome.tone === "warning" ? <CheckCircle2 size={15} /> : <AlertTriangle size={15} />}
+          {outcome.title}
+        </div>
+        <div className="flex items-center gap-2">
+          {outcome.showRefetch && (
+            <button
+              onClick={onRefetch}
+              className="inline-flex items-center gap-1 rounded-lg border border-current/30 px-2.5 py-1 text-xs font-medium hover:bg-background/60"
+            >
+              <RefreshCw size={12} />
+              {lang === "zh" ? "刷新最新状态（需重新应用修改）" : "Refetch latest (re-apply your edit)"}
+            </button>
+          )}
+          <button
+            onClick={onDismiss}
+            aria-label={lang === "zh" ? "关闭提示" : "Dismiss"}
+            className="rounded-lg px-1.5 py-1 text-xs hover:bg-background/60"
+          >
+            <X size={13} />
+          </button>
+        </div>
+      </div>
+      <p className="mt-1.5 break-all text-xs opacity-90">{outcome.detail}</p>
+      {outcome.currentRevision && (
+        <p className="mt-1 font-mono text-[11px] opacity-80">
+          {lang === "zh" ? "服务器当前版本：" : "Server revision: "}
+          {outcome.currentRevision}
+        </p>
+      )}
+      {outcome.warnings.length > 0 && (
+        <ul className="mt-2 list-inside list-disc space-y-0.5 text-xs">
+          {outcome.warnings.map((warning, index) => (
+            <li key={index} className="break-all">{warning}</li>
+          ))}
+        </ul>
+      )}
+      {outcome.issues.length > 0 && (
+        <ul className="mt-2 list-inside list-disc space-y-0.5 text-xs">
+          {outcome.issues.map((issue, index) => (
+            <li key={index} className="break-all">{issue}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
 
-function CurrentStateTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLanguage }) {
+function CurrentStateTab({
+  data,
+  lang,
+  bookId,
+  refetch,
+}: {
+  data: StoryCanonViewDto;
+  lang: UiLanguage;
+  bookId: string;
+  refetch: () => void;
+}) {
   const slots = slotRows(data.description.slots, lang);
   const additional = additionalFactRows(data.description.additionalFacts, lang);
   const supersededLabel = lang === "zh" ? "历史区间" : "superseded";
 
+  const [buffer, setBuffer] = useState<EditBuffer | null>(null);
+  const [draftIssues, setDraftIssues] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [outcomeView, setOutcomeView] = useState<SaveOutcomeView | null>(null);
+
+  // Editing requires the retained revision fingerprint (T3B stale-revision UX).
+  const editable = typeof data.revision === "string" && data.revision.length > 0;
+
+  const handleOutcome = (outcome: CanonCommitOutcome): void => {
+    const view = saveOutcomeToUi(outcome, lang);
+    if (view.saved) {
+      // Server-authoritative replace: drop any edit buffer, refetch fresh
+      // canon (new revision), keep the banner as feedback.
+      setBuffer(null);
+      setDraftIssues([]);
+      setOutcomeView(view);
+      refetch();
+    } else if (!view.keepBuffer) {
+      // Conflict: discard the buffer — the user must re-apply after refetch.
+      setBuffer(null);
+      setDraftIssues([]);
+      setOutcomeView(view);
+    } else {
+      setOutcomeView(view);
+    }
+  };
+
+  const commit = async (edits: Parameters<typeof buildCommitRequest>[0]): Promise<void> => {
+    if (saving || !editable) return;
+    setSaving(true);
+    try {
+      const outcome = await postCanonCommit(bookId, buildCommitRequest(edits, data.revision!));
+      handleOutcome(outcome);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const startEditFact = (subject: string, predicate: string, object: string): void => {
+    setOutcomeView(null);
+    setDraftIssues([]);
+    setBuffer({ mode: "edit-fact", subject, predicate, object });
+  };
+  const startAddFact = (): void => {
+    setOutcomeView(null);
+    setDraftIssues([]);
+    setBuffer({ mode: "add-fact", subject: "", predicate: "", object: "" });
+  };
+  const cancelEdit = (): void => {
+    setBuffer(null);
+    setDraftIssues([]);
+  };
+
+  const saveBuffer = async (): Promise<void> => {
+    if (!buffer) return;
+    const issues = validateFactDraft(buffer);
+    setDraftIssues(issues);
+    if (issues.length > 0) return; // inline validation only — never a second confirmation gate
+    await commit([buildSetFactEdit(buffer.subject, buffer.predicate, buffer.object)]);
+  };
+
+  const removeFact = async (subject: string, predicate: string): Promise<void> => {
+    await commit([buildRemoveFactEdit(subject, predicate)]);
+  };
+
+  const actionButtonClass =
+    "inline-flex items-center gap-1 rounded-md border border-border/50 px-1.5 py-0.5 text-[11px] text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40";
+
   return (
     <div className="space-y-6">
+      {!editable && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-600">
+          {lang === "zh"
+            ? "当前视图缺少版本指纹，编辑已禁用。请刷新页面获取最新状态。"
+            : "This view lacks a revision fingerprint; editing is disabled. Refresh to load the latest state."}
+        </div>
+      )}
+
+      {outcomeView && (
+        <OutcomeBanner
+          outcome={outcomeView}
+          lang={lang}
+          onRefetch={() => {
+            setOutcomeView(null);
+            refetch();
+          }}
+          onDismiss={() => setOutcomeView(null)}
+        />
+      )}
+
+      {buffer && (
+        <section className="rounded-xl border border-border/50 bg-card/60 p-4">
+          <h3 className="mb-3 text-sm font-semibold text-foreground">
+            {buffer.mode === "add-fact"
+              ? lang === "zh" ? "新增状态事实" : "Add fact"
+              : lang === "zh" ? `编辑事实：${buffer.subject} · ${buffer.predicate}` : `Edit fact: ${buffer.subject} · ${buffer.predicate}`}
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {buffer.mode === "add-fact" ? (
+              <>
+                <label className="text-xs text-muted-foreground">
+                  {lang === "zh" ? "主体 · Subject" : "Subject"}
+                  <input
+                    value={buffer.subject}
+                    onChange={(e) => setBuffer({ ...buffer, subject: e.target.value })}
+                    disabled={saving}
+                    className="mt-1 w-full rounded-lg border border-border/50 bg-background px-2 py-1.5 text-sm text-foreground"
+                  />
+                </label>
+                <label className="text-xs text-muted-foreground">
+                  {lang === "zh" ? "谓词 · Predicate" : "Predicate"}
+                  <input
+                    value={buffer.predicate}
+                    onChange={(e) => setBuffer({ ...buffer, predicate: e.target.value })}
+                    disabled={saving}
+                    className="mt-1 w-full rounded-lg border border-border/50 bg-background px-2 py-1.5 text-sm text-foreground"
+                  />
+                </label>
+              </>
+            ) : (
+              <>
+                <div className="text-xs text-muted-foreground">
+                  {lang === "zh" ? "主体 · Subject" : "Subject"}
+                  <div className="mt-1 rounded-lg bg-secondary/30 px-2 py-1.5 text-sm text-foreground">{buffer.subject}</div>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {lang === "zh" ? "谓词 · Predicate" : "Predicate"}
+                  <div className="mt-1 rounded-lg bg-secondary/30 px-2 py-1.5 text-sm text-foreground">{buffer.predicate}</div>
+                </div>
+              </>
+            )}
+            <label className="text-xs text-muted-foreground">
+              {lang === "zh" ? "值 · Value" : "Value"}
+              <input
+                value={buffer.object}
+                onChange={(e) => setBuffer({ ...buffer, object: e.target.value })}
+                disabled={saving}
+                className="mt-1 w-full rounded-lg border border-border/50 bg-background px-2 py-1.5 text-sm text-foreground"
+              />
+            </label>
+          </div>
+          {draftIssues.length > 0 && (
+            <ul className="mt-2 list-inside list-disc text-xs text-destructive">
+              {draftIssues.map((issue, index) => (
+                <li key={index}>{issue}</li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-3 flex items-center gap-2">
+            {/* Save IS the one and only user confirmation (T3B.2 BINDING). */}
+            <button
+              onClick={() => void saveBuffer()}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
+            >
+              <Save size={12} />
+              {saving
+                ? lang === "zh" ? "保存中…" : "Saving…"
+                : lang === "zh" ? "保存" : "Save"}
+            </button>
+            <button
+              onClick={cancelEdit}
+              disabled={saving}
+              className="rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              {lang === "zh" ? "取消" : "Cancel"}
+            </button>
+            <span className="text-[11px] text-muted-foreground">
+              {lang === "zh" ? "点击「保存」即直接提交，无二次确认。" : "Save submits directly — no second confirmation."}
+            </span>
+          </div>
+        </section>
+      )}
+
       <table className="w-full border-collapse overflow-hidden rounded-xl text-sm">
         <thead>
           <tr className="bg-secondary/40 text-left text-xs text-muted-foreground">
@@ -179,6 +445,7 @@ function CurrentStateTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLang
             <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "值" : "Value"}</th>
             <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "主体" : "Subject"}</th>
             <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "生效范围" : "Validity"}</th>
+            <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "操作" : "Actions"}</th>
           </tr>
         </thead>
         <tbody>
@@ -197,16 +464,38 @@ function CurrentStateTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLang
               </td>
               <td className="px-4 py-2.5 text-muted-foreground">{slot.selectedSubject ?? "—"}</td>
               <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs text-muted-foreground">{slot.validity ?? "—"}</td>
+              <td className="px-4 py-2.5">
+                {slot.selectedSubject && slot.value != null && (
+                  <button
+                    onClick={() => startEditFact(slot.selectedSubject!, slot.label, slot.value!)}
+                    disabled={!editable || saving}
+                    className={actionButtonClass}
+                  >
+                    <Pencil size={11} />
+                    {lang === "zh" ? "编辑" : "Edit"}
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
       <section>
-        <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-foreground">
-          <FileText size={14} />
-          {lang === "zh" ? `其他状态事实（${additional.length}）` : `Additional facts (${additional.length})`}
-        </h3>
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+            <FileText size={14} />
+            {lang === "zh" ? `其他状态事实（${additional.length}）` : `Additional facts (${additional.length})`}
+          </h3>
+          <button
+            onClick={startAddFact}
+            disabled={!editable || saving}
+            className={actionButtonClass}
+          >
+            <Plus size={11} />
+            {lang === "zh" ? "新增事实" : "Add fact"}
+          </button>
+        </div>
         {additional.length === 0 ? (
           <p className="rounded-xl bg-card/40 p-4 text-xs text-muted-foreground">
             {lang === "zh" ? "暂无其他状态事实。" : "No additional facts recorded."}
@@ -220,6 +509,7 @@ function CurrentStateTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLang
                 <th className="px-4 py-2 font-medium">{lang === "zh" ? "值" : "Object"}</th>
                 <th className="px-4 py-2 font-medium">{lang === "zh" ? "生效" : "Valid"}</th>
                 <th className="px-4 py-2 font-medium">{lang === "zh" ? "来源章" : "Src ch."}</th>
+                <th className="px-4 py-2 font-medium">{lang === "zh" ? "操作" : "Actions"}</th>
               </tr>
             </thead>
             <tbody>
@@ -237,6 +527,27 @@ function CurrentStateTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLang
                     )}
                   </td>
                   <td className="px-4 py-2 font-mono text-xs text-muted-foreground">#{fact.sourceChapter}</td>
+                  <td className="px-4 py-2">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => startEditFact(fact.subject, fact.predicate, fact.object)}
+                        disabled={!editable || saving}
+                        className={actionButtonClass}
+                      >
+                        <Pencil size={11} />
+                        {lang === "zh" ? "编辑" : "Edit"}
+                      </button>
+                      <button
+                        onClick={() => void removeFact(fact.subject, fact.predicate)}
+                        disabled={!editable || saving}
+                        title={lang === "zh" ? "删除该事实（立即提交）" : "Remove fact (commits immediately)"}
+                        className={actionButtonClass}
+                      >
+                        <Trash2 size={11} />
+                        {lang === "zh" ? "删除" : "Remove"}
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -246,6 +557,16 @@ function CurrentStateTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLang
     </div>
   );
 }
+
+function ManifestCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl bg-secondary/30 p-3">
+      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="mt-1 font-mono text-sm font-semibold text-foreground">{value}</div>
+    </div>
+  );
+}
+
 
 function HooksTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLanguage }) {
   const rows = hookRows(data.hooks.hooks);

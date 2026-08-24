@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
 import { streamSSE } from "hono/streaming";
 import { serve } from "@hono/node-server";
@@ -71,6 +71,14 @@ import {
   isCanonSection,
   describeCurrentState,
   CanonUnavailableError,
+  CanonConflictError,
+  CanonInvalidEditsError,
+  CanonCommitRequestSchema,
+  previewCanonEdits,
+  commitCanonEdits,
+  BookWriteLockError,
+  type CanonCommitDeps,
+  type CanonCommitRequest,
   ingestMaterial,
   createSkillRegistry,
   loadAvailableAgentSkills,
@@ -2556,7 +2564,41 @@ async function probeServiceCapabilities(args: {
 
 // --- Server factory ---
 
-export function createStudioServer(initialConfig: ProjectConfig, root: string, overrides: { readonly nodeImageGenerator?: NodeImageDeps } = {}) {
+/**
+ * Deterministic error mapping for the canon mutation boundary (T3B.1).
+ * Never leaks absolute filesystem paths or stack traces: every message comes
+ * from Core's own typed errors, which are path-free by contract.
+ */
+function mapCanonMutationError(e: unknown): { status: 400 | 404 | 409 | 500; body: Record<string, unknown> } {
+  if (e instanceof CanonUnavailableError) {
+    return { status: 409, body: { error: e.message, code: e.code, issues: e.issues } };
+  }
+  if (e instanceof CanonConflictError) {
+    return { status: 409, body: { error: e.message, code: e.code, currentRevision: e.currentRevision } };
+  }
+  if (e instanceof CanonInvalidEditsError) {
+    return { status: 400, body: { error: e.message, code: e.code, issues: e.issues } };
+  }
+  if (e instanceof BookWriteLockError) {
+    // Message carries book id + owner pid/timestamp only — no paths.
+    return { status: 409, body: { error: e.message, code: "book_write_locked" } };
+  }
+  console.error("[inkos] canon mutation failed:", e);
+  return { status: 500, body: { error: "Internal error while applying canon edits." } };
+}
+
+export function createStudioServer(
+  initialConfig: ProjectConfig,
+  root: string,
+  overrides: {
+    readonly nodeImageGenerator?: NodeImageDeps;
+    /**
+     * DI seam for Core's derived-memory rebuild/invalidation steps (tests
+     * only). Production leaves this undefined so the real defaults run.
+     */
+    readonly canonCommitDeps?: CanonCommitDeps;
+  } = {},
+) {
   const app = new Hono();
   const state = new StateManager(root);
   let cachedConfig = initialConfig;
@@ -2843,11 +2885,13 @@ export function createStudioServer(initialConfig: ProjectConfig, root: string, o
               currentState: view.currentState,
               hooks: view.hooks,
               chapterSummaries: view.chapterSummaries,
+              // Additive (T3B.1): clients retain this to send expectedRevision.
+              revision: view.revision,
               // Slot/alias semantics are computed by Core so the UI can never
               // diverge from what the engine itself believes.
               description: describeCurrentState(view.currentState, view.manifest.language),
             }
-          : { bookId: id, section: sectionParam, data: readCanonSection(view, sectionParam) };
+          : { bookId: id, section: sectionParam, revision: view.revision, data: readCanonSection(view, sectionParam) };
       return c.json(body);
     } catch (e) {
       // Pure-read contract: missing/invalid canonical state is an explicit
@@ -2856,6 +2900,114 @@ export function createStudioServer(initialConfig: ProjectConfig, root: string, o
         return c.json({ error: e.message, code: e.code, issues: e.issues }, 409);
       }
       return c.json({ error: e instanceof Error ? e.message : String(e) }, 500);
+    }
+  });
+
+  // --- Canon manual editing (T3B.1 lock-owning mutation boundary) ---
+
+  // Shared request handling: membership check → CORE-owned runtime schema
+  // validation (single semantic source; no Studio-local Zod duplicate).
+  // NOTE: Hono's c.json() does not return a global `Response` instance, so
+  // the failure branch is a discriminated result instead of instanceof.
+  async function parseCanonCommitTarget(
+    c: Context,
+  ): Promise<
+    | { ok: true; bookId: string; edits: CanonCommitRequest["edits"]; expectedRevision: string }
+    | { ok: false; response: Response }
+  > {
+    const id = c.req.param("id");
+    const bookIds = await state.listBooks();
+    if (!bookIds.includes(id ?? "")) {
+      return { ok: false, response: c.json({ error: `Book "${id}" not found`, code: "book_not_found" }, 404) };
+    }
+    let raw: unknown;
+    try {
+      raw = await c.req.json();
+    } catch {
+      return { ok: false as const, response: c.json({ error: "Request body must be JSON.", issues: [] }, 400) };
+    }
+    const parsed = CanonCommitRequestSchema.safeParse(raw);
+    if (!parsed.success) {
+      return {
+        ok: false as const,
+        response: c.json(
+          {
+            error: "Invalid canon edit request.",
+            code: "invalid_request",
+            issues: parsed.error.issues.map((issue) => ({
+              scope: issue.path.join("."),
+              message: issue.message,
+            })),
+          },
+          400,
+        ),
+      };
+    }
+    return {
+      ok: true as const,
+      bookId: id!,
+      edits: parsed.data.edits as CanonCommitRequest["edits"],
+      expectedRevision: parsed.data.expectedRevision,
+    };
+  }
+
+  // PURE preview — zero filesystem mutation, no lock required (read-only).
+  app.post("/api/v1/books/:id/canon/current-state/preview", async (c) => {
+    const target = await parseCanonCommitTarget(c);
+    if (!target.ok) return target.response;
+    try {
+      const preview = await previewCanonEdits(state.bookDir(target.bookId), target.edits);
+      return c.json({
+        bookId: target.bookId,
+        effectiveChapter: preview.effectiveChapter,
+        revision: preview.before.revision,
+        issues: preview.issues,
+        warnings: preview.warnings,
+      });
+    } catch (e) {
+      const mapped = mapCanonMutationError(e);
+      return c.json(mapped.body, mapped.status);
+    }
+  });
+
+  /**
+   * Commit route. LOCK OWNERSHIP LIVES HERE (P3A review discharge): the
+   * SAME `state.acquireBookLock` used by write-next/revise/rollback wraps
+   * the ENTIRE protected sequence (revision check → commit → memory sync),
+   * and the lock is released in `finally` even on failure. Core adds no
+   * second lock inside commitCanonEdits — by design.
+   */
+  app.post("/api/v1/books/:id/canon/current-state/commit", async (c) => {
+    const target = await parseCanonCommitTarget(c);
+    if (!target.ok) return target.response;
+
+    let release: (() => Promise<void>) | undefined;
+    try {
+      release = await state.acquireBookLock(target.bookId);
+      const result = await commitCanonEdits(
+        state.bookDir(target.bookId),
+        { edits: target.edits, expectedRevision: target.expectedRevision },
+        overrides?.canonCommitDeps ?? {},
+      );
+      return c.json({
+        bookId: target.bookId,
+        ok: true,
+        revision: result.revision,
+        appliedEdits: result.appliedEdits.length,
+        effectiveChapter: result.effectiveChapter,
+        warnings: result.warnings,
+      });
+    } catch (e) {
+      const mapped = mapCanonMutationError(e);
+      return c.json(mapped.body, mapped.status);
+    } finally {
+      if (release) {
+        try {
+          await release();
+        } catch (releaseError) {
+          console.warn("[inkos] failed to release book lock after canon commit:", releaseError);
+        }
+      }
     }
   });
 

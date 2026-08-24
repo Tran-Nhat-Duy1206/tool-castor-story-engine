@@ -2,11 +2,17 @@ import { describe, expect, it } from "vitest";
 import type { CurrentStateFactDto, HookRecordDto, StoryCanonViewDto } from "../../lib/canon-api";
 import {
   additionalFactRows,
+  buildCommitRequest,
+  buildRemoveFactEdit,
+  buildSetFactEdit,
+  DERIVED_MEMORY_WARNING_TEXT,
   formatValidityInterval,
   hookRows,
   manifestSummary,
   resolveCanonRequestUrl,
+  saveOutcomeToUi,
   slotRows,
+  validateFactDraft,
 } from "./story-state-model";
 
 const fact = (overrides: Partial<CurrentStateFactDto> = {}): CurrentStateFactDto => ({
@@ -159,3 +165,90 @@ describe("manifestSummary", () => {
     });
   });
 });
+
+// --- T3B: manual-edit model layer ---
+
+describe("canon edit builders", () => {
+  it("buildSetFactEdit trims inputs and emits the exact Core wire shape", () => {
+    expect(buildSetFactEdit(" Elara ", " age ", "  23 ")).toEqual({
+      kind: "setFact",
+      subject: "Elara",
+      predicate: "age",
+      object: "23",
+    });
+  });
+
+  it("buildRemoveFactEdit trims and omits any object field", () => {
+    expect(buildRemoveFactEdit(" Elara ", "age")).toEqual({
+      kind: "removeFact",
+      subject: "Elara",
+      predicate: "age",
+    });
+    expect("object" in buildRemoveFactEdit("a", "b")).toBe(false);
+  });
+
+  it("buildCommitRequest wraps edits with the retained expectedRevision", () => {
+    const request = buildCommitRequest([buildSetFactEdit("a", "b", "c")], "0123456789abcdef");
+    expect(request).toEqual({
+      edits: [{ kind: "setFact", subject: "a", predicate: "b", object: "c" }],
+      expectedRevision: "0123456789abcdef",
+    });
+  });
+});
+
+describe("validateFactDraft", () => {
+  it("accepts a complete draft and rejects whitespace-only fields with messages", () => {
+    expect(validateFactDraft({ subject: "Elara", predicate: "age", object: "23" })).toEqual([]);
+    const issues = validateFactDraft({ subject: "  ", predicate: "", object: " " });
+    expect(issues.length).toBe(3);
+  });
+});
+
+describe("saveOutcomeToUi", () => {
+  it("maps a clean success to a success banner without refetch demand", () => {
+    const view = saveOutcomeToUi(
+      { status: "success", bookId: "demo", revision: "r2", appliedEdits: 1, effectiveChapter: 13, warnings: [] },
+      "zh",
+    );
+    expect(view.tone).toBe("success");
+    expect(view.showRefetch).toBe(false);
+    expect(view.warnings).toEqual([]);
+  });
+
+  it("surfaces the exact derived-memory warning without turning success into failure", () => {
+    const view = saveOutcomeToUi(
+      {
+        status: "success",
+        bookId: "demo",
+        revision: "r2",
+        appliedEdits: 1,
+        effectiveChapter: 13,
+        warnings: [DERIVED_MEMORY_WARNING_TEXT],
+      },
+      "zh",
+    );
+    expect(view.tone).toBe("warning");
+    expect(view.saved).toBe(true);
+    expect(view.warnings).toContain(DERIVED_MEMORY_WARNING_TEXT);
+  });
+
+  it("maps canon_conflict to a stale-state banner that demands refetch and re-apply", () => {
+    const view = saveOutcomeToUi(
+      { status: "canon_conflict", currentRevision: "aaaabbbbccccdddd", message: "Canon changed" },
+      "zh",
+    );
+    expect(view.tone).toBe("conflict");
+    expect(view.showRefetch).toBe(true);
+    expect(view.currentRevision).toBe("aaaabbbbccccdddd");
+    // The user's edit buffer must be discarded — no silent retry.
+    expect(view.keepBuffer).toBe(false);
+  });
+
+  it("maps lock, unavailable, invalid and unexpected outcomes to non-success tones", () => {
+    expect(saveOutcomeToUi({ status: "book_write_locked", message: "busy" }, "zh").tone).toBe("locked");
+    expect(saveOutcomeToUi({ status: "canon_unavailable", issues: [], message: "x" }, "zh").tone).toBe("error");
+    expect(saveOutcomeToUi({ status: "invalid_request", issues: [{ scope: "edits.0.subject", message: "required" }], message: "bad" }, "zh").issues[0]).toContain("required");
+    expect(saveOutcomeToUi({ status: "unexpected", message: "boom" }, "zh").tone).toBe("error");
+  });
+});
+

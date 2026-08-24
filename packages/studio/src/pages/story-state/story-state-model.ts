@@ -1,4 +1,7 @@
 import type {
+  CanonCommitOutcome,
+  CanonCommitRequestPayload,
+  CanonEditPayload,
   ChapterSummariesStateDto,
   CurrentStateFactDto,
   CurrentStateSlotViewDto,
@@ -128,4 +131,157 @@ export function manifestSummary(view: StoryCanonViewDto): ManifestSummaryDto {
     warningCount: view.manifest.migrationWarnings.length,
     warnings: [...view.manifest.migrationWarnings],
   };
+}
+
+// --- T3B: manual-edit model layer (pure, UI-framework-free) ---
+
+/**
+ * The exact honest Core warning for a failed derived-memory invalidation.
+ * The UI must NEVER hide this string when the server reports it.
+ */
+export const DERIVED_MEMORY_WARNING_TEXT =
+  "derived memory invalidation failed; memory.db may be stale";
+
+const trim = (value: string | undefined): string => (value ?? "").trim();
+
+/** Author-facing semantic edit — temporal fields are server-owned, never sent. */
+export function buildSetFactEdit(subject: string, predicate: string, object: string): CanonEditPayload {
+  return { kind: "setFact", subject: trim(subject), predicate: trim(predicate), object: trim(object) };
+}
+
+export function buildRemoveFactEdit(subject: string, predicate: string): CanonEditPayload {
+  const edit: { kind: "removeFact"; subject: string; predicate: string } = {
+    kind: "removeFact",
+    subject: trim(subject),
+    predicate: trim(predicate),
+  };
+  return edit;
+}
+
+export function buildCommitRequest(
+  edits: readonly CanonEditPayload[],
+  expectedRevision: string,
+): CanonCommitRequestPayload {
+  return { edits: [...edits], expectedRevision };
+}
+
+/** Bilingual draft validation; empty list ⇒ ready to save. */
+export function validateFactDraft(input: {
+  readonly subject?: string;
+  readonly predicate?: string;
+  readonly object?: string;
+}): string[] {
+  const issues: string[] = [];
+  if (!trim(input.subject)) issues.push("主体不能为空 · Subject is required");
+  if (!trim(input.predicate)) issues.push("谓词不能为空 · Predicate is required");
+  if (!trim(input.object)) issues.push("值不能为空 · Value is required");
+  return issues;
+}
+
+export interface SaveOutcomeView {
+  tone: "success" | "warning" | "conflict" | "locked" | "error";
+  /** True when the canon save itself landed (success and success-with-warnings). */
+  saved: boolean;
+  title: string;
+  detail: string;
+  issues: string[];
+  warnings: string[];
+  /** Conflict UX: surface a refetch button; the buffer is discarded. */
+  showRefetch: boolean;
+  keepBuffer: boolean;
+  currentRevision?: string;
+}
+
+function issueTexts(issues: ReadonlyArray<{ scope?: string; code?: string; message: string }>): string[] {
+  return issues.map((issue) =>
+    [issue.scope, issue.message].filter(Boolean).join(": "),
+  );
+}
+
+/**
+ * Pure presentation shaping for a mutation outcome (T3B conflict/warning UX).
+ * A successful save with warnings stays SAVED — warnings render visibly but
+ * never masquerade as failure; a conflict demands refetch + re-apply with no
+ * silent retry.
+ */
+export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): SaveOutcomeView {
+  const zh = lang === "zh";
+  switch (outcome.status) {
+    case "success": {
+      const hasWarnings = outcome.warnings.length > 0;
+      return {
+        tone: hasWarnings ? "warning" : "success",
+        saved: true,
+        title: hasWarnings
+          ? zh ? "已保存（附警告）" : "Saved (with warnings)"
+          : zh ? "已保存" : "Saved",
+        detail: hasWarnings
+          ? zh ? "规范状态已更新，但派生数据需要关注。" : "Canonical state updated, but derived data needs attention."
+          : zh ? "规范状态已更新。" : "Canonical state updated.",
+        issues: [],
+        warnings: [...outcome.warnings],
+        showRefetch: false,
+        keepBuffer: false,
+      };
+    }
+    case "canon_conflict":
+      return {
+        tone: "conflict",
+        saved: false,
+        title: zh ? "保存被拒绝：状态已过期" : "Save rejected: state is stale",
+        detail:
+          zh
+            ? "故事状态已被其他操作更新。请刷新最新状态后重新应用你的修改。"
+            : "The story state changed elsewhere. Refetch the latest state and re-apply your edit.",
+        issues: [],
+        warnings: [],
+        showRefetch: true,
+        keepBuffer: false,
+        currentRevision: outcome.currentRevision,
+      };
+    case "book_write_locked":
+      return {
+        tone: "locked",
+        saved: false,
+        title: zh ? "书籍正被写入任务锁定" : "Book is locked by a write task",
+        detail: outcome.message,
+        issues: [],
+        warnings: [],
+        showRefetch: false,
+        keepBuffer: true,
+      };
+    case "canon_unavailable":
+      return {
+        tone: "error",
+        saved: false,
+        title: zh ? "规范状态不可用" : "Canonical state unavailable",
+        detail: outcome.message,
+        issues: issueTexts(outcome.issues),
+        warnings: [],
+        showRefetch: false,
+        keepBuffer: true,
+      };
+    case "invalid_request":
+      return {
+        tone: "error",
+        saved: false,
+        title: zh ? "编辑未通过校验" : "Edit failed validation",
+        detail: outcome.message,
+        issues: issueTexts(outcome.issues),
+        warnings: [],
+        showRefetch: false,
+        keepBuffer: true,
+      };
+    case "unexpected":
+      return {
+        tone: "error",
+        saved: false,
+        title: zh ? "保存失败" : "Save failed",
+        detail: outcome.message,
+        issues: [],
+        warnings: [],
+        showRefetch: false,
+        keepBuffer: true,
+      };
+  }
 }
