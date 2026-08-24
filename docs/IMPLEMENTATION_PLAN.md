@@ -45,8 +45,9 @@ Writer prose → Observer → Settler(RuntimeStateDelta) → existing validation
 → confirmChapterState: arbitrate → reduce → validate → ONE atomic set
    {state JSONs + projections} → index=approved(READY) → snapshot(N)
    → memory/fact-history sync → delete proposal artifact                  ← NEW (I)
-→ Manual current-state editor (any time): preview → validated atomic commit
-   → projections/snapshot/memory synchronized; forward-only semantics     ← NEW (C/D/K)
+→ Manual current-state editor (any time): Edit → Save (the ONE confirmation)
+   → validated atomic commit {canon + projections + snapshot N mirrors};
+   forward-only semantics                                                 ← NEW (C/D/K)
 → Vietnamese native generation (vi|en only; zh migration path)            ← NEW (L–P)
 ```
 
@@ -64,9 +65,9 @@ Each decision below was derived from named audit findings; these bind all later 
 
 **D3 — Lifecycle statuses (F).** Verified current enum: `ChapterStatusSchema = ["card-generated","drafting","drafted","auditing","audit-passed","audit-failed","state-degraded","revising","ready-for-review","approved","rejected","published","imported"]` (`models/chapter.ts:4-18`), and review-approve writes `status:"approved"` (`cli/commands/review.ts:127/:165`; identical logic in the Studio approve endpoint). Therefore: add exactly ONE new member `"needs-state-review"`; **READY = the existing `"approved"`** — no overloaded or ambiguous reuse. `production/harness.ts` `ProductionRunStatus` gains the same new member (additive). Existing meanings of `ready-for-review`, `audit-failed`, `needs-revision`, `state-degraded` unchanged.
 
-**D4 — Current/history semantics (D).** A manual correction of an active fact at current position N (N = `manifest.lastAppliedChapter`) is implemented as: close the old fact (`validUntilChapter = N`) and insert `{subject, predicate, object: newValue, validFromChapter: N, validUntilChapter: null, sourceChapter: N, origin: "manual"}`. This uses the existing temporal fields (`CurrentStateFactSchema`, `models/runtime-state.ts:78-87`) exactly as `rebuildCurrentStateFactHistory` already interprets them. Old chapters are never rewritten (V1_SPEC §11). Because the latest snapshot `snapshots/N/state/*` is refreshed on every confirmed mutation, the existing replay-based fact-history rebuild reproduces manual facts without new storage.
+**D4 — Current/history semantics (D) — AMENDED.** A manual correction takes effect from **E = durable contiguous story progress + 1** (`resolveDurableStoryProgress`; the durable chapter-file chain wins over an inflated `manifest.lastAppliedChapter`). `setFact` REPLACES the active rows for `subject::predicate` in live `current_state.json` following the existing reducer splice convention (`applyCurrentStatePatch` never leaves closed rows behind); the new row is `{subject, predicate, object, validFromChapter: E, validUntilChapter: null, sourceChapter: E}`. Historical intervals are reconstructed exclusively from snapshots + derived fact-history replay plus the live-truth reconciliation pass (T3A.7) — closed rows are NEVER accumulated in live JSON. Old chapters are never rewritten (V1_SPEC §11).
 
-**D5 — Manual-edit provenance marker.** Add ONE optional field to `CurrentStateFactSchema`: `origin: z.enum(["story","manual"]).optional()` (absent ≡ `"story"`). Purely additive — every existing fixture/file validates unchanged. This gives the overwrite-safety work (J) a deterministic rule: manual-origin facts survive history rebuilds and are never silently overwritten by derived data.
+**D5 — No provenance marker in P3 — AMENDED.** `CurrentStateFactSchema` is NOT modified; there is no `origin` field anywhere in P3. Overwrite/history safety is achieved structurally: live OPEN rows are authoritative for the present and are reconciled into rebuilt history by their own `validFromChapter` (T3A.7), so no manual-vs-story distinction is required for correctness. If a later V1 phase needs provenance, adding an optional enum then remains purely additive.
 
 **D6 — Gate scope.** Per V1_SPEC §14 the review gate is mandatory for the normal pipeline. Resolution helper `resolveChapterStateReviewMode(book, projectWriting)` mirrors the existing `resolveChapterReviewMode` pattern (`models/book.ts:83-88`): book override > project setting > default `"gate"`; value `"off"` exists so unattended operators can consciously opt out (daemon/auto then behave exactly as today). Default is `"gate"` — including for daemon/auto, which surface an explicit pause event instead of silently stalling (consistent with the existing consecutive-failure pause machinery, `pipeline/scheduler.ts`).
 
@@ -129,59 +130,112 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 
 **T2.2 Story State page (read-only).**
 - Files: CREATE `packages/studio/src/pages/story-state/StoryStatePage.tsx` (+ small presentational subcomponents in same folder); MODIFY `App.tsx` (route `/story-state?book=`), sidebar navigation entry.
-- Content strictly mirrors existing schemas — three tabs: **Current State** (slot table from the 6 patch slots via alias matching + "Additional facts" list showing subject/predicate/object + validity chapters + origin badge), **Hooks** (FULL 13-column table incl. `dependsOn/payoffTiming/coreHook/halfLife/promoted` — deliberately unlike the lossy client-side `lib/truth-display.ts#parsePendingHooks` cards), **Chapter Summaries** (8-column table). Technical fields displayed but marked system-managed (per V1_SPEC §43).
+- Content strictly mirrors existing schemas — three tabs: **Current State** (slot table from the 6 patch slots via alias matching + "Additional facts" list showing subject/predicate/object + validity chapters), **Hooks** (FULL 13-column table incl. `dependsOn/payoffTiming/coreHook/halfLife/promoted` — deliberately unlike the lossy client-side `lib/truth-display.ts#parsePendingHooks` cards), **Chapter Summaries** (8-column table). Technical fields displayed but marked system-managed (per V1_SPEC §43).
 - Do NOT invent timeline/relationship/clue/secret models (audit §3.9: none exist).
 - Tests-first: `pages/story-state/StoryStatePage.test.tsx` — renders mocked canon; hooks table shows promoted column; empty-state for missing sections.
 - Verify: STUDIO-F(StoryStatePage) + `pnpm --filter @actalk/inkos-studio build`.
 
-### Phase 3 — Safe manual current-state editing (C, D, K) (risk: MEDIUM; T3.5/T3.6 elevated)
+### Phase 3 — Safe manual current-state editing (C, D, K) — FINAL AMENDED DESIGN (risk: MEDIUM; P3A persistence/reconciliation elevated)
 
-**T3.1 Additive provenance field.**
-- Files: MODIFY `packages/core/src/models/runtime-state.ts` (`CurrentStateFactSchema` += `origin: z.enum(["story","manual"]).optional()`).
-- Tests-first: extend `src/__tests__/runtime-state-store.test.ts` — legacy fact object without `origin` still parses; `origin:"manual"` round-trips through `saveRuntimeStateSnapshot`/load.
-- Verify: CORE-F(runtime-state-store).
+> **AMENDMENT NOTE (final approved design; supersedes original T3.1–T3.7 after independent design review + source inspection):** origin/provenance field dropped entirely · effective position = **durable contiguous progress + 1**, never manifest alone · live fact replacement follows the existing reducer splice convention (closed rows are NEVER accumulated in live `current_state.json`) · global `validateRuntimeState` unchanged; an **edit-local** validator protects only the mutation path · deterministic **revision fingerprint** + optimistic concurrency (`canon_conflict`) added · existing `acquireBookLock` reused — no second locking mechanism · snapshots join the **same atomic integrity transaction** as Canon/projections · single shared pure snapshot contract (`state/snapshot-set.ts`) with `snapshotStateAt` delegating to it · the side-effecting snapshot pre-step was REMOVED (all preparation is in-memory) · memory sync extracted (`state/memory-sync.ts`) · origin-based history merge replaced by live-current-truth reconciliation · derived-memory failure invalidation added · Phase split into **P3A (Core engine)** → **P3B (Studio experience)**, reviewed separately · Save is the ONE and ONLY user confirmation · chapter-summary and hook editing excluded from P3 scope (deferred V1 work).
 
-**T3.2 Manual-edit reducer function.**
-- Files: MODIFY `packages/core/src/state/state-reducer.ts`; CREATE `src/__tests__/state-reducer.manual-edit.test.ts`.
-- Interface: `applyManualCurrentStateEdits(snapshot: RuntimeStateSnapshot, edits: ManualCurrentStateEdit[], opts: {chapter: number}): RuntimeStateSnapshot` where `ManualCurrentStateEdit = {kind:"set", subject, predicate, object} | {kind:"remove", subject, predicate}`.
-- Semantics (D4/D5): `set` closes every currently-active fact with same normalized subject::predicate (`validUntilChapter = opts.chapter`), appends the new fact with `validFromChapter = opts.chapter`, `sourceChapter = opts.chapter`, `origin:"manual"`; `remove` closes without replacement. Pure function; runs `validateRuntimeState` before returning; does NOT touch `lastAppliedChapter`.
-- Tests-first (all fail before impl): time-skip scenario — age 22 active from ch.1; set age 23 at ch.15 ⇒ old row closed at 15, new row open, `origin:"manual"`; remove; duplicate set idempotence; invalid edits (empty subject) ⇒ validator error; snapshot immutability (input not mutated).
-- Reuse: `normalizePredicate` logic already in reducer; `validateRuntimeState` (`state/state-validator.ts`).
-- Verify: CORE-F(state-reducer.manual-edit).
+#### P3A — Core Canon Mutation Engine
 
-**T3.3 Preview + atomic commit service.**
-- Files: MODIFY `packages/core/src/state/canon-service.ts`; CREATE `src/__tests__/canon-edits.test.ts`.
-- Interfaces:
-  - `previewCanonEdits(bookDir, edits): Promise<{before: CurrentStateState; after: CurrentStateState; warnings: string[]}>` (pure compute; `after` = `applyManualCurrentStateEdits` result; warnings e.g. "closes 1 active fact", "unknown slot alias").
-  - `commitCanonEdits(bookDir, edits, deps: {snapshotState: () => Promise<void>; language: "zh"|"en"}): Promise<CommitResult>` — steps: load → apply → validate → render `current_state.md` via `renderCurrentStateProjection(after.currentState, language)` → **ONE `commitAtomicFileSet`** writing the 4 state JSONs + regenerated `current_state.md` → caller-supplied `snapshotState()` refresh (StateManager.snapshotStateAt bound to lastAppliedChapter) → return `{appliedEdits, closedFacts}`.
-- Reuse: `commitAtomicFileSet`, `renderCurrentStateProjection`, `validateRuntimeState`, `saveRuntimeStateSnapshot` NOT used here (superseded by the atomic set — note why in code comment).
-- Tests-first: happy path asserts file contents + projection equality with renderer output; failing-validation edit writes NOTHING (fs unchanged); injected `commitAtomicFileSet` failure (non-writable staging via mock) leaves prior files intact; snapshot refreshed (fixture spy).
+**T3A.1 Core edit contract.**
+- Files: CREATE `packages/core/src/models/canon-edits.ts`; MODIFY `packages/core/src/index.ts` (exports).
+- Interface (Core owns the runtime Zod schemas AND TypeScript types):
+  ```ts
+  CanonEditSchema = z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("setFact"), subject: z.string().trim().min(1),
+               predicate: z.string().trim().min(1), object: z.string().trim().min(1) }),
+    z.object({ kind: z.literal("removeFact"), subject: z.string().trim().min(1),
+               predicate: z.string().trim().min(1) }),
+  ]);
+  CanonCommitRequestSchema = z.object({
+    edits: z.array(CanonEditSchema).min(1),
+    expectedRevision: z.string().min(8),
+  });
+  ```
+  No raw whole-state replacement, filesystem paths, hook operations, chapter-summary operations, or origin/provenance fields. Studio server later imports these schemas AT RUNTIME; the browser client uses TYPE-ONLY imports where package constraints require (the exports map keeps the core main entry out of browser bundles).
+- Tests-first: CREATE `src/__tests__/canon-edits.test.ts` §contract — parses both kinds; rejects unknown kind, empty/whitespace fields, extra keys; envelope rejects empty edits and short revision. RED reason: module does not exist.
 - Verify: CORE-F(canon-edits).
 
-**T3.4 Server routes for preview/commit.**
-- Files: MODIFY `packages/studio/src/api/server.ts`; CREATE `src/__tests__/canon-edits-route.test.ts`.
-- Routes: `POST /api/v1/books/:id/canon/current-state/preview` and `/commit`; bodies zod-validated (`edits[]`); commit resolves `language` from project config (existing `currentProjectLanguage` helper :2716 area) and binds `deps.snapshotState` to `state.snapshotStateAt(id, manifest.lastAppliedChapter)`.
-- Error mapping: ZodError / `validateRuntimeState` issues → `{error, issues: string[]}` with human-readable messages (V1_SPEC §42); HTTP 200-with-error-object pattern consistent with neighboring routes.
-- Tests-first: preview returns diff summary; commit persists + refreshes snapshot (fixture book); invalid edit ⇒ no file mtime changes + issues list; unknown book ⇒ 404.
-- Verify: STUDIO-F(canon-edits-route).
+**T3A.2 Manual-edit reducer (E = durable progress + 1).**
+- Files: MODIFY `packages/core/src/state/state-reducer.ts`; CREATE `src/__tests__/state-reducer.manual-edit.test.ts`.
+- Interface: `applyManualCurrentStateEdits(params: { snapshot: RuntimeStateSnapshot; edits: CanonEdit[]; effectiveChapter: number }): RuntimeStateSnapshot` — PURE.
+- Semantics (amended D4): semantic identity = `subject::predicate` with slot-alias normalization REUSED from `state-projections.ts#CURRENT_STATE_SLOT_DEFS` aliases (case-insensitive match; canonical stored form kept). `setFact` SPLICES every ACTIVE row matching the key (existing reducer splice convention — no historical closed rows accumulate in live JSON) and appends `{subject, predicate, object, validFromChapter: E, validUntilChapter: null, sourceChapter: E}`; `removeFact` splices matching active rows only. Never mutates manifest/hooks/chapterSummaries/`currentState.chapter`. Idempotent on repeated identical `setFact`.
+- Effective-chapter rule (authoritative): `N = resolveDurableStoryProgress(bookDir)`; `E = N + 1`. Example pinned by tests: durable progress 15, Elara age 22 → setFact 23 ⇒ new live row `validFromChapter = 16, validUntilChapter = null, sourceChapter = 16`; previous prose chapters 1–15 remain byte-identical. An inflated manifest must NOT move E.
+- Tests-first: chapters-1..15 fixture: setFact age 23 at E=16 ⇒ live contains exactly one age row (open, from 16) and NO closed row; removeFact drops rows; double-set idempotent; alias predicate ("Current Location" vs canonical slot form) resolves to the same key; deep-frozen input not mutated; unrelated additional facts untouched. RED reason: function missing.
+- Verify: CORE-F(state-reducer.manual-edit).
 
-**T3.5 Extract memory/fact-history sync (D7).**
-- Files: CREATE `packages/core/src/state/memory-sync.ts`; MODIFY `packages/core/src/pipeline/runner.ts` (delete internal fns `rebuildNarrativeMemoryIndex`/`rebuildCurrentStateFactHistory` bodies → re-export/delegate wrappers kept private); CREATE `src/__tests__/memory-sync.test.ts` (port relevant cases from `pipeline-runner-memory-sync.test.ts` fixtures).
-- Behavior-neutral refactor; enables T3.6/T6.1 reuse. Runner keeps calling sites unchanged (`persistChapterArtifacts` callers).
-- Verify: CORE-F(memory-sync) + CORE-F(pipeline-runner-memory-sync) must stay green byte-for-byte in expectations.
+**T3A.3 Single snapshot contract (pure helper + snapshotStateAt delegation).**
+- Files: CREATE `packages/core/src/state/snapshot-set.ts`; MODIFY `packages/core/src/state/manager.ts#snapshotStateAt` (delegation only — behavior-preserving refactor).
+- Interface: `SNAPSHOT_STORY_FILE_NAMES` (the existing fixed 7 story markdown slots), `buildSnapshotFileSet(bookDir, chapterNumber): Promise<Array<{relativePath, content}>>` (READS ONLY — returns intended writes; skip-if-source-missing parity with today's behavior; mirrors EVERY file under `story/state/`), `isSnapshotComplete(bookDir, chapterNumber)` (set-equality against the derivable contract).
+- Drift rule: `snapshotStateAt` writes exactly the helper's returned files (per-file mkdir preserved). There must NOT be one independently maintained 7-file list inside `manager.ts` and another inside `snapshot-set.ts`.
+- Tests-first: CREATE `src/__tests__/snapshot-set.test.ts` — golden parity: helper-intended set ≡ tree produced by `snapshotStateAt` (file names + bytes) on fixtures including an absent source slot and an extra unexpected `story/state` file; completeness flags. RED reason: module missing. After delegation, `state-manager.test.ts` must stay green unchanged (behavior-preservation proof).
+- Verify: CORE-F(snapshot-set) + CORE-F(state-manager).
 
-**T3.6 Fact-history preserves manual facts (J part 1).**
-- Files: MODIFY `packages/core/src/state/memory-sync.ts` (`rebuildCurrentStateFactHistory`): after replaying `snapshots/0..N`, merge manual-origin facts from LIVE `current_state.json` (upsert by subject::predicate; close any replayed interval conflicting with `validFromChapter ≥ manual.validFromChapter`).
-- Tests-first: CREATE `src/__tests__/fact-history-manual.test.ts` — (a) manual age edit at ch.15 survives full replay; (b) story fact re-established later (settled at ch.20) correctly supersedes; (c) replay WITHOUT manual facts unchanged vs old behavior (golden compare on fixture).
+**T3A.4 Revision fingerprint, edit-local validation, conflict error.**
+- Files: MODIFY `packages/core/src/state/canon-service.ts`; MODIFY `packages/core/src/index.ts` exports.
+- Interface:
+  - `computeCanonRevision(snapshot): string` — SHA-256 (16 hex) over a recursively KEY-SORTED canonical serialization of all FOUR validated documents; deterministic; independent of JSON whitespace and object-key ordering; pure; zero filesystem writes.
+  - `validateCanonEditedState(before, after, effectiveChapter): RuntimeStateValidationIssue[]` — EDIT-LOCAL ONLY (global `validateRuntimeState` untouched): ≤1 OPEN row per `subject::predicate`; temporal ordering (`validUntilChapter ≥ validFromChapter` when closed); every edited open row has `validFromChapter === effectiveChapter`; manifest/hooks/chapterSummaries/`currentState.chapter` deep-unchanged vs before. Rationale: legacy/bootstrap books can legitimately carry structures a stricter GLOBAL validator would reject (tolerant-parse precedent) — shared pipeline acceptance must not change in P3.
+  - `class CanonConflictError extends Error { readonly code = "canon_conflict" }`.
+  - `readStoryCanon` views gain an additive computed `revision` field (no writes).
+- Tests-first (canon-edits.test.ts §revision/§validation): same semantics with reformatted/reordered JSON files ⇒ EQUAL revision; semantic change ⇒ DIFFERENT revision; each invariant violation produces a named issue; regression guard — a legacy book carrying duplicate open rows still passes the GLOBAL `validateRuntimeState` (proves shared acceptance unchanged).
+- Verify: CORE-F(canon-edits).
+
+**T3A.5 Preview + atomic commit engine (zero side-effect preparation; one integrity transaction).**
+- Files: MODIFY `packages/core/src/state/canon-service.ts`; extend `src/__tests__/canon-edits.test.ts`.
+- Interfaces:
+  - `previewCanonEdits(bookDir, edits): Promise<{before, after, effectiveChapter, closedFacts, warnings, revision}>` — pure compute over the pure read; ZERO filesystem effects.
+  - `commitCanonEdits(bookDir, request: CanonCommitRequest, deps?): Promise<CommitResult>`; injectable `deps` = `{renameFile?, rebuildNarrativeMemoryIndex?, rebuildCurrentStateFactHistory?, invalidateDerivedMemory?}` (test seams only).
+- LOCK OWNERSHIP (explicit, not ambiguous): the CALLER must hold `StateManager.acquireBookLock(bookId)` for the ENTIRE sequence — the Studio server owns lock orchestration in P3B; pipeline callers hold their own. TSDoc states this requirement; Core introduces no second locking mechanism.
+- Sequence: pure read (`readStoryCanon` — never bootstraps; missing/corrupt ⇒ `CanonUnavailableError`) → `computeCanonRevision(current)` ≠ `request.expectedRevision` ⇒ throw `CanonConflictError` (ZERO writes) → `E = resolveDurableStoryProgress(bookDir) + 1` → apply edits → `validateRuntimeState(after)` + `validateCanonEditedState(...)` → render `current_state.md` via `renderCurrentStateProjection(after.currentState, manifest.language)` → assemble the write list IN MEMORY: live `story/state/current_state.json` + regenerated `story/current_state.md` + snapshot mirrors `story/snapshots/N/state/current_state.json` + `story/snapshots/N/current_state.md`; if `isSnapshotComplete(bookDir, N)` is false, overlay those two entries onto the COMPLETE `buildSnapshotFileSet(bookDir, N)` reconstruction (still in memory) → **ONE `commitAtomicFileSet({ rootDir: bookDir, writes, renameFile? })`** covering every integrity-boundary target. `saveRuntimeStateSnapshot` is deliberately NOT used (four independent writes = partial-write risk). There is NO `snapshotStateAt` call, NO writeFile/mkdir materialization, NO bootstrap, and NO projection write before the transaction. → extracted memory fns (T3A.6) with failure handling (T3A.8) → return `{appliedEdits, closedFacts, effectiveChapter, previousRevision, revision: computeCanonRevision(after), warnings}`.
+- Tests-first (canon-edits.test.ts §preview/§commit): preview purity via sha+len+mtime metadata capture; happy path asserts exact bytes of live JSON, projection equality with renderer output, and BOTH snapshot mirrors; inflated-manifest fixture (durable 15, manifest claims 20) ⇒ E = 16; missing/incomplete snapshot N ⇒ complete reconstruction created inside the transaction; stale `expectedRevision` ⇒ `CanonConflictError` and ALL project files hash+len+mtime identical; missing/corrupt canon ⇒ `CanonUnavailableError`, nothing written; injected `renameFile` failure at the LIVE-target stage AND at the SNAPSHOT-target stage ⇒ every touched path in BOTH trees unchanged, no `.inkos-file-txn-*` residue, no partial snapshot remains; spy/module assertions prove NO `snapshotStateAt` or other mutating preparatory call precedes the transaction.
+- Verify: CORE-F(canon-edits).
+
+**T3A.6 Memory/fact-history sync extraction (behavior-preserving).**
+- Files: CREATE `packages/core/src/state/memory-sync.ts`; MODIFY `packages/core/src/pipeline/runner.ts` (private bodies → delegating wrappers; call sites unchanged).
+- Exports: `rebuildCurrentStateFactHistory(bookDir, uptoChapter)`, `rebuildNarrativeMemoryIndex(bookDir)` — moved verbatim, including the SQLITE_BUSY retry ladder and the `subject::predicate` factKey convention.
+- Tests-first: `src/__tests__/memory-sync.test.ts` ports representative cases from `pipeline-runner-memory-sync.test.ts` against the MODULE (RED: module missing); after extraction `pipeline-runner-memory-sync.test.ts` expectations must remain byte-for-byte green (extraction altered nothing).
+- Verify: CORE-F(memory-sync) + CORE-F(pipeline-runner-memory-sync).
+
+**T3A.7 Live-truth reconciliation (manual facts in derived history).**
+- Files: MODIFY `packages/core/src/state/memory-sync.ts#rebuildCurrentStateFactHistory`.
+- Behavior (no origin field; no second history store; memory.db stays derived): after replaying snapshots 0..N, reconcile every OPEN row of LIVE `current_state.json` — force its interval to `[row.validFromChapter, null]`, closing any conflicting replayed interval at `row.validFromChapter` (the exclusive-`valid_until_chapter` convention of `memory-db.ts`). Live open truth is authoritative for the present; replay owns the past; healthy books reconcile to a no-op.
+- Tests-first: `src/__tests__/fact-history-manual.test.ts` — (a) chapters 1–15 age 22 + manual edit after 15 ⇒ derived lookup at chapter 15 yields 22, at 16 yields 23; (b) a later story-settled value correctly supersedes; (c) GOLDEN: replay WITHOUT manual edits produces output identical to pre-change behavior. RED reason: reconciliation pass absent ⇒ (a) misattributes intervals, (c) exposes divergence.
 - Verify: CORE-F(fact-history-manual) + CORE-F(pipeline-runner-memory-sync).
 
-**T3.7 Studio current-state editor UI (K).**
-- Files: MODIFY `packages/studio/src/pages/story-state/StoryStatePage.tsx` (edit affordances on slot fields + additional facts: inline edit, add, remove; Save flow = preview dialog showing before/after diff + warnings → Confirm → commit; success toast + refetch). Hook editing intentionally deferred to T6.5.
-- System-managed fields (validity integers, origin, manifest) shown read-only (V1_SPEC §43).
-- Tests-first: `StoryStatePage.edit.test.tsx` — mocked API: edit→preview payload correct; validation error renders issue list; successful commit triggers refetch; past-chapter validity rows never editable.
-- Verify: STUDIO-F(StoryStatePage.edit).
+**T3A.8 Derived-memory failure safety.**
+- Files: MODIFY `packages/core/src/state/memory-sync.ts` (`invalidateDerivedMemory(bookDir, io?)`) + commit wiring in T3A.5.
+- Behavior: memory sync succeeds ⇒ rebuilt DB is used normally. Sync FAILS ⇒ canonical persistence is NEVER rolled back; attempt invalidation of `memory.db`, `memory.db-shm`, `memory.db-wal` using the existing deletion precedent (`rollbackToChapter`); if deletion fails (e.g., open handle), quarantine-rename where possible; if BOTH mechanisms fail, push the EXACT warning `"derived memory invalidation failed; memory.db may be stale"` into `CommitResult.warnings` and claim NOTHING about guaranteed inaccessibility. Impact nuance (verified): P3 current-fact retrieval for future writer context reads LIVE structured `current_state.json` directly (`utils/memory-retrieval.ts`), so residual stale derived memory cannot contradict the saved fact leg.
+- Tests-first: forced sync rejection ⇒ DB trio actually removed; injected io failures ⇒ quarantine engaged / exact warning emitted; Canon + projection + snapshot untouched throughout.
+- Verify: CORE-F(canon-edits).
 
-**▶ CHECKPOINT C1 (after Phase 3):** on a real book — edit a fact in Studio, observe updated `current_state.md`, refreshed `snapshots/<N>/state`, and that the NEXT `write next` prompt/context uses the new value; verify old chapters untouched; kill a commit mid-save (dev harness) and confirm prior canon intact.
+**T3A.9 Deterministic future-writer integration proof.**
+- Files: CREATE `src/__tests__/canon-edit-writer-context.integration.test.ts`.
+- Fixture: durable progress 15, Elara age 22 (real chapter files 0001..0015 + snapshot chain + memory.db). Commit `setFact Elara/age/23` with the correct `expectedRevision`. Assert — NO external LLM/API call: (1) live `current_state.json` contains 23; (2) live `current_state.md` contains 23; (3) `snapshots/15/state/current_state.json` mirrors corrected Canon with `validFromChapter = 16`; (4) rebuilt historical lookup at chapter 15 ⇒ 22; (5) next-chapter/current selection at 16 ⇒ 23; (6) `buildGovernedMemoryEvidenceBlocks` over a composer-shaped fact entry contains `age | 23`; (7) chapters 0001..0015 byte-identical; (8) Canon revision changed.
+- Verify: CORE-F(canon-edit-writer-context.integration).
+
+**▶ CHECKPOINT P3A:** Core Canon mutation engine complete and independently reviewed. STOP. No Studio mutation surface may exist yet (the read-only viewer stays untouched).
+
+#### P3B — Studio Canon Editing Experience (NOT begun until P3A review passes)
+
+**T3B.1 Server mutation routes.**
+- Files: MODIFY `packages/studio/src/api/server.ts`; CREATE `src/__tests__/canon-edits-route.test.ts`.
+- Routes: `POST /api/v1/books/:id/canon/current-state/preview` and `POST /api/v1/books/:id/canon/commit`. Bodies validated with CORE's `CanonCommitRequestSchema` imported at runtime (single semantic source; browser client uses type-only imports). Lock-owning orchestration lives HERE: `state.acquireBookLock(id)` wraps pure read → revision check → commit → memory sync. Error mapping: Zod/edit issues ⇒ 400 `{error, issues}` (human-readable, V1_SPEC §42); `CanonConflictError` ⇒ 409 `{code: "canon_conflict", currentRevision}`; `CanonUnavailableError` ⇒ 409 `{code: "canon_unavailable"}` (P2 semantics); lock held ⇒ 409 `{code: "book_write_locked"}`; unknown book ⇒ 404. GET `/canon` responses gain the additive `revision` field.
+- Tests-first: preview payload; commit round-trip on fixture book incl. refreshed snapshot; second commit with stale revision ⇒ conflict + zero mtime changes; invalid edit ⇒ issues list + zero mtime changes; unknown book ⇒ 404. RED reason: routes absent.
+- Verify: STUDIO-F(canon-edits-route).
+
+**T3B.2 One-confirmation Story State editing UI.**
+- Files: MODIFY `packages/studio/src/pages/story-state/StoryStatePage.tsx`, `pages/story-state/story-state-model.ts`, `lib/canon-api.ts`; type-only Core imports for edit types.
+- UX (BINDING): inline edit/add/remove on slot fields + additional facts → **Save posts the commit request directly; Save is the ONE and ONLY user confirmation.** NO preview dialog and NO second Confirm action; automatic/debounced validation MAY surface warnings inline but must never gate Save behind another click. Validity integers, manifest, and system-managed fields render READ-ONLY (V1_SPEC §43). Errors/conflicts render inline issue lists; success refetches (fresh revision).
+- Explicitly out of scope: chapter-summary editing, hook editing (hooks arrive with T6.5), any post-chapter review workflow.
+- Tests-first: model-layer edit-collection→payload specs + route-level coverage (jsdom/.tsx test harness unavailable in this repo — standing disclosed deviation from plan-default UI testing).
+- Verify: STUDIO-F(canon-edits-model) + `pnpm --filter @actalk/inkos-studio build`.
+
+**▶ CHECKPOINT P3B:** Studio API + editing UI complete and independently reviewed. STOP. Only then does Phase 4 consume this commit engine (T6.1 `confirmChapterState` reuses the same atomic live+snapshot pattern).
 
 ### Phase 4 — Post-chapter state-review domain model (E, G, H) (risk: HIGH — touches saveChapter/persist path)
 
@@ -256,9 +310,9 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 
 **T6.1 Confirm/reject core commands (I).**
 - Files: MODIFY `packages/core/src/pipeline/runner.ts` (+ `confirmChapterState(bookId, chapter, decisions)` and `rejectChapterState(bookId, chapter, reason?)`); CREATE `src/__tests__/state-review-confirm.test.ts`.
-- Confirm steps: load artifact → apply decisions onto a COPY of `originalDelta` (reject ⇒ drop op; edit ⇒ replace payload value; accepted ⇒ keep; addMissing ⇒ append user-authored op with `origin:"manual"` on generated facts) → `arbitrateRuntimeStateDeltaHooks` (same allowNewHooks posture as today's write path) → base = `loadRuntimeStateSnapshot` (== pre-chapter state per D1) → `applyRuntimeStateDelta` → `validateRuntimeState` → safety-net `StateValidatorAgent.validate` (failure ⇒ abort, artifact retained, nothing written) → **ONE `commitAtomicFileSet`** {4 state JSONs + 3 freshly rendered projections} → index status `"approved"` (D3) → `snapshotStateAt(N)` → extracted `memory-sync` fns (T3.5) → delete artifact → webhook `state-committed`.
+- Confirm steps: load artifact → apply decisions onto a COPY of `originalDelta` (reject ⇒ drop op; edit ⇒ replace payload value; accepted ⇒ keep; addMissing ⇒ append user-authored op — no provenance marker, per amended D5) → `arbitrateRuntimeStateDeltaHooks` (same allowNewHooks posture as today's write path) → base = `loadRuntimeStateSnapshot` (== pre-chapter state per D1) → `applyRuntimeStateDelta` → `validateRuntimeState` → safety-net `StateValidatorAgent.validate` (failure ⇒ abort, artifact retained, nothing written) → **ONE `commitAtomicFileSet`** {4 state JSONs + 3 freshly rendered projections} → index status `"approved"` (D3) → `snapshotStateAt(N)` → extracted `memory-sync` fns (T3A.6) → delete artifact → webhook `state-committed`.
 - Reject-all: zero canon writes; status `"approved"`; artifact deleted; reason appended to chapter `reviewNote`.
-- Tests-first: happy path asserts canon advanced exactly per accepted set; edited value lands VERBATIM; rejected hookUpsert absent from `hooks.json`; addMissing fact present with `origin:"manual"`; projections byte-equal renderer output; snapshot N contains new state; fact-history intervals correct; artifact gone; validator-abort writes nothing; crash simulation (throw between validate and commit) leaves everything intact.
+- Tests-first: happy path asserts canon advanced exactly per accepted set; edited value lands VERBATIM; rejected hookUpsert absent from `hooks.json`; addMissing fact present verbatim; projections byte-equal renderer output; snapshot N contains new state; fact-history intervals correct; artifact gone; validator-abort writes nothing; crash simulation (throw between validate and commit) leaves everything intact.
 - Reuse: everything listed; NO new persistence primitives.
 - Verify: CORE-F(state-review-confirm) + CORE-F(runtime-state-store) + CORE-F(pipeline-runner).
 
@@ -279,7 +333,7 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 - Verify: CLI-F(review-state-command).
 
 **T6.5 Manual hook adjustments (completes C for hooks).**
-- Files: MODIFY `packages/core/src/state/canon-service.ts` (+ `previewHookEdits`/`commitHookEdits(bookDir, hookOps)` reusing `arbitrateRuntimeStateDeltaHooks` + `renderHooksProjection` + the T3.3 commit pattern); MODIFY `StoryStatePage.tsx` hooks tab (status change, notes edit, add hook — system fields like `startChapter` auto-filled, `hookId` auto-generated via existing ledger-validator charset).
+- Files: MODIFY `packages/core/src/state/canon-service.ts` (+ `previewHookEdits`/`commitHookEdits(bookDir, hookOps)` reusing `arbitrateRuntimeStateDeltaHooks` + `renderHooksProjection` + the T3A.5 commit pattern); MODIFY `StoryStatePage.tsx` hooks tab (status change, notes edit, add hook — system fields like `startChapter` auto-filled, `hookId` auto-generated via existing ledger-validator charset).
 - Tests-first: `canon-hook-edits.test.ts` (core) + `StoryStatePage.hooks.test.tsx` (UI).
 - Verify: CORE-F(canon-hook-edits) + STUDIO-F(StoryStatePage.hooks).
 
@@ -408,7 +462,7 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 | P0 scaffolding | LOW | Additive test helpers only |
 | P1 read boundary | LOW | New pure-read facade + one route; no writes |
 | P2 viewer | LOW | Additive UI; no engine contact |
-| P3 manual editing | **MEDIUM** (T3.5/T3.6 elevated) | Touches reducer family + persistence + fact-history rebuild; mitigated by additive schema field, pure functions, atomic commits, behavior-neutral extraction with ported tests |
+| P3 manual editing | **MEDIUM** (P3A persistence/reconciliation elevated) | Touches reducer family + atomic persistence incl. snapshot mirrors + fact-history rebuild; mitigated by no-schema-change design, pure helpers, ONE atomic integrity transaction (live + snapshot), optimistic revision conflicts under the existing book lock, behavior-neutral extraction with ported goldens |
 | P4 review domain model | **HIGH** | Modifies `WriterAgent.saveChapter` and the persist path — the most load-bearing write site (AUDIT §6); mitigated by option-flag design, byte-identity tests, and keeping ungated path untouched |
 | P5 lifecycle gate | **HIGH** | New status + refusal semantics span CLI/Studio/daemon/auto/revise/resync/repair; ambiguity here blocks all writing; mitigated by reusing `approved` as READY (verified) and the `assertNoPendingStateRepair` guard pattern |
 | P6 review ops + commit | **HIGH** core / MEDIUM UI | Confirm must synchronize canon+projections+snapshot+memory in one correct transaction; mitigated by reusing arbitrate→reduce→validate→atomic-set exactly as the write path does |
@@ -420,7 +474,7 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 
 - **Per task:** named failing test → minimal implementation → focused vitest filter (commands inline above).
 - **Per phase boundary:** `pnpm --filter @actalk/inkos-core test` (+ cli/studio when touched), `pnpm typecheck`, `pnpm build`.
-- **Milestones (after C1/C2/C3/C4):** full `pnpm test -r`; baseline discipline — 1856 passing + new tests; ONLY the 2 known `skill-agent-tool.test.ts` symlink EPERM failures excluded.
+- **Milestones (after P3A/P3B/C2/C3/C4):** full `pnpm test -r`; baseline discipline — 1856 passing + new tests; ONLY the 2 known `skill-agent-tool.test.ts` symlink EPERM failures excluded.
 - **Regression anchors reused constantly:** `pipeline-runner.test.ts`, `writer.test.ts`, `reviser.test.ts`, `runtime-state-store.test.ts`, `state-manager.test.ts`, `chapter-delete.test.ts`, `atomic-file-set.test.ts`, `production-harness.test.ts`, `short-fiction-en.test.ts` (pattern source for leak tests), `localization.test.ts`.
 - Offline determinism: LLM-dependent tests use the existing `agent/llm-stub.ts` harness; no network in CI tasks.
 
@@ -428,7 +482,8 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 
 | Checkpoint | After | Inspect |
 |---|---|---|
-| **C1** | Phase 3 | Canonical editing end-to-end: Studio edit → projections/snapshot/memory updated → next generation uses new value → old chapters untouched → failed-save atomicity (kill test) |
+| **P3A** | Core Canon mutation engine (T3A.1–T3A.9) | Engine-level review: contract · E=N+1 temporal semantics · revision/conflict · ONE atomic live+snapshot transaction with failure injections at both stages · snapshot-contract parity (`snapshotStateAt` delegation) · memory-sync goldens · reconciliation ch15→16 · memory-failure invalidation · deterministic writer proof. STOP before P3B |
+| **P3B** | Studio API + editing UI (T3B.1–T3B.2) | End-to-end on a real book: one-confirmation Save → projections/snapshot/memory updated → next generation uses the new value → old chapters untouched; lock-owned routes; error/conflict UX. STOP before Phase 4 |
 | **C2** | Phase 6 | First complete gated chapter loop incl. restart-mid-review survival and post-confirm generation correctness |
 | **C3** | T8.10 | Real-model Vietnamese generation: foundation→plan→write→review in Vietnamese, word-based gates, zero leakage |
 | **C4** | T9.6 | Chinese migration prototype: fidelity of translated story content, ID stability, continued pipeline operation, rollback rehearsal |
@@ -436,10 +491,10 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 ## 7. Dependency Graph
 
 ```
-P0 ─► P1 ─► P2 ─► P3 ─┬─► P4 ─► P5 ─► P6 ─► P7
+P0 ─► P1 ─► P2 ─► P3A ─► P3B ─┬─► P4 ─► P5 ─► P6 ─► P7
        (A)   (B)      │    (E,G,H)(F)  (G,I)  (J,R)
                       │     ▲         ▲
-                      │     └─P3(T3.3 commit infra, T3.5 extraction)
+                      │     └─P3A(commit engine, memory-sync extraction)
                       │
 P8 ───────────────────┴── independent branch after P0 (schemas→utils→prompts→
 (L,M,N,O,Q)              projections→wiring→surfaces); intersects P4/P5 only via
@@ -448,7 +503,7 @@ P9 ── depends on P8 (vi target must exist) + translation subsystem (exists)
 Q (English regression) ── embedded in P8 tasks + re-run at every milestone
 ```
 
-Blocking notes: P4 requires T3.3/T3.5 (commit infra + memory-sync extraction). P6 requires P4+P5+P3. P7 requires P3–P6. P9 requires T8.4 (slug fn) and vi language stack. Nothing in P8 requires P3–P7, so the language track can proceed in parallel after P0 if desired.
+Blocking notes: P4 requires P3A (commit infra + memory-sync extraction). P6 requires P4+P5+P3B. P7 requires P3–P6. P9 requires T8.4 (slug fn) and vi language stack. Nothing in P8 requires P3–P7, so the language track can proceed in parallel after P0 if desired.
 
 ## 8. Recommended First Implementation Slice
 
@@ -458,9 +513,9 @@ Why this slice:
 - **Real user value immediately:** the vision's core complaint is opacity; this makes canonical facts, the full hook ledger (incl. columns Studio drops today), and chapter summaries visible — closing the audit's biggest exposure gap (Studio has ZERO access to `story/state/*.json` today) without touching a single write path.
 - **Least risky architecture:** purely additive — one Core facade over `loadRuntimeStateSnapshot`, one GET route, one page; no schema changes, no pipeline contact, no lifecycle effects; trivially revertible.
 - **Independently mergeable/testable:** new tests only + existing suites green; ships behind nothing (it reads what the engine already wrote).
-- **Foundation for everything else:** T3.3/T3.4/P6/P9 all consume the same facade and route patterns established here.
+- **Foundation for everything else:** P3A/P3B/P6/P9 all consume the same facade and route patterns established here.
 
-Explicitly NOT in the first slice: editing, the review gate, language work — each carries the higher risks ranked above and deserves its own reviewed merge after C1-style inspection.
+Explicitly NOT in the first slice: editing, the review gate, language work — each carries the higher risks ranked above and deserves its own reviewed merge after checkpoint-style inspection (now P3A/P3B).
 
 ---
 
@@ -473,13 +528,14 @@ Explicitly NOT in the first slice: editing, the review gate, language work — e
 | Validate state | `state/state-validator.ts#validateRuntimeState`; LLM safety net `agents/state-validator.ts#StateValidatorAgent.validate` |
 | Render projections | `state/state-projections.ts#renderCurrentStateProjection/renderHooksProjection/renderChapterSummariesProjection` |
 | Atomic writes | `utils/atomic-file-set.ts#commitAtomicFileSet` |
-| Snapshots/restore/rollback/index | `state/manager.ts#snapshotStateAt/restoreState/rollbackToChapter/loadChapterIndex/saveChapterIndex/acquireBookLock` |
+| Snapshots/restore/rollback/index | `state/manager.ts#snapshotStateAt/restoreState/rollbackToChapter/loadChapterIndex/saveChapterIndex/acquireBookLock`; SINGLE snapshot contract: `state/snapshot-set.ts#buildSnapshotFileSet/isSnapshotComplete` — `snapshotStateAt` delegates to it (T3A.3) |
+| Canon edit/revision/concurrency | `models/canon-edits.ts#CanonEditSchema/CanonCommitRequestSchema`; `state/canon-service.ts#computeCanonRevision/validateCanonEditedState/previewCanonEdits/commitCanonEdits` (P3A) |
 | Persistence order | `pipeline/chapter-persistence.ts#persistChapterArtifacts` |
 | Delta parsing | `agents/settler-delta-parser.ts#parseSettlerDeltaOutput`; legacy `agents/settler-parser.ts#parseSettlementOutput` |
 | Re-extraction for recovery | `agents/chapter-analyzer.ts#ChapterAnalyzerAgent.analyzeChapter` |
 | Guards pattern | `pipeline/runner.ts#assertNoPendingStateRepair` :3244 (pattern for T5.3) |
 | Config-resolution pattern | `models/book.ts#resolveChapterReviewMode/resolveRevisionGate` |
-| Memory/fact-history sync | `pipeline/runner.ts` internals → extracted to `state/memory-sync.ts` (T3.5) |
+| Memory/fact-history sync | `pipeline/runner.ts` internals → extracted to `state/memory-sync.ts` (T3A.6; reconciliation pass T3A.7) |
 | Language resolution | `pipeline/runner.ts#resolveBookLanguage` :478-500; `utils/language.ts#inferLanguage` |
 | Slugs | `utils/book-id.ts#deriveBookIdFromTitle/assertSafeBookId` |
 | Length | `models/length-governance.ts#LengthCountingModeSchema`; `utils/length-metrics.ts` |
@@ -490,8 +546,8 @@ Explicitly NOT in the first slice: editing, the review gate, language work — e
 
 ## Appendix B — File Manifest
 
-CREATE: `core/src/state/canon-service.ts` · `core/src/state/memory-sync.ts` · `core/src/models/state-review.ts` · `core/src/models/language.ts` · `core/src/pipeline/state-review.ts` · `core/src/agents/settler-legacy-adapter.ts` · `core/src/migration/{detect,journal,translate,finalize}.ts` · `core/src/agents/vi-prompt-sections.ts` · `studio/src/lib/canon-api.ts` · `studio/src/pages/story-state/{StoryStatePage.tsx,…}` · `studio/src/pages/story-state/ChapterStateReview.tsx` · `studio/src/pages/MigrationWizard.tsx` · `cli/src/commands/migrate-language.ts` · ~20 new test files as named per task.
-MODIFY: `core/src/models/{runtime-state,chapter,project,book,length-governance}.ts` · `core/src/state/{state-reducer,state-projections,runtime-state-store(canonical-service extraction only),manager(rebuild count fix),bootstrap(alias exports)}.ts` · `core/src/agents/{writer,architect,planner-prompts(observer/settler/reviser/polisher/continuity/foundation-reviewer/state-validator)…}.ts` · `core/src/utils/{language,book-id,length-metrics,writing-methodology,long-span-fatigue,story-markdown}.ts` · `core/src/pipeline/{runner,pipeline(chapter-persistence flag),scheduler}.ts` · `core/src/production/harness.ts` · `core/src/index.ts` (exports) · `studio/src/api/server.ts` (routes only) · Studio pages listed · `cli/src/commands/{init,config,book,auto,review,short-fiction}.ts` · `cli/src/localization.ts`.
+CREATE: `core/src/state/canon-service.ts` · `core/src/models/canon-edits.ts` (P3A edit contract) · `core/src/state/snapshot-set.ts` (single snapshot contract) · `core/src/state/memory-sync.ts` · `core/src/models/state-review.ts` · `core/src/models/language.ts` · `core/src/pipeline/state-review.ts` · `core/src/agents/settler-legacy-adapter.ts` · `core/src/migration/{detect,journal,translate,finalize}.ts` · `core/src/agents/vi-prompt-sections.ts` · `studio/src/lib/canon-api.ts` · `studio/src/pages/story-state/{StoryStatePage.tsx,…}` · `studio/src/pages/story-state/ChapterStateReview.tsx` · `studio/src/pages/MigrationWizard.tsx` · `cli/src/commands/migrate-language.ts` · ~20 new test files as named per task.
+MODIFY: `core/src/models/{runtime-state,chapter,project,book,length-governance}.ts` · `core/src/state/{state-reducer,state-projections,runtime-state-store(canonical-service extraction only),manager(rebuild count fix; snapshotStateAt delegates to snapshot-set per T3A.3),bootstrap(alias exports)}.ts` · `core/src/agents/{writer,architect,planner-prompts(observer/settler/reviser/polisher/continuity/foundation-reviewer/state-validator)…}.ts` · `core/src/utils/{language,book-id,length-metrics,writing-methodology,long-span-fatigue,story-markdown}.ts` · `core/src/pipeline/{runner(memory-sync delegates per T3A.6),pipeline(chapter-persistence flag),scheduler}.ts` · `core/src/production/harness.ts` · `core/src/index.ts` (exports) · `studio/src/api/server.ts` (routes only) · Studio pages listed · `cli/src/commands/{init,config,book,auto,review,short-fiction}.ts` · `cli/src/localization.ts`.
 UNTOUCHED by explicit decision: providers/endpoints catalog, retrieval kernel, notify, play/interactive-film engines (except their language enums), skills loader, vestigial systems (AUDIT §12).
 
 ---
