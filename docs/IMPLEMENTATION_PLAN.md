@@ -265,6 +265,16 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 
 **▶ CHECKPOINT P3.1:** Semantic no-op hardening complete. STOP. Independent review required before Phase 4.
 
+> **⚠️ SUPERSEDED (2026-08-24):** Phases 4–6 task sketches below (T4.1–T6.x) are
+> SUPERSEDED by the approved design spec
+> `docs/superpowers/specs/2026-08-24-human-governed-post-chapter-state-review-design.md`
+> and its implementation plan
+> `docs/superpowers/plans/2026-08-24-human-governed-post-chapter-state-review.md`.
+> They remain as historical context only — reconcile EVERYTHING against the spec
+> (three concurrency anchors, workflow shells, resolved receipts, evidence
+> verification, idempotent confirm, advancement gate ≤). Do not implement T4/T5/T6
+> as written.
+
 ### Phase 4 — Post-chapter state-review domain model (E, G, H) (risk: HIGH — touches saveChapter/persist path)
 
 **T4.1 Proposal artifact schema.**
