@@ -238,6 +238,33 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 
 **▶ CHECKPOINT P3B:** Studio API + editing UI complete and independently reviewed. STOP. Only then does Phase 4 consume this commit engine (T6.1 `confirmChapterState` reuses the same atomic live+snapshot pattern).
 
+#### P3.1 — Semantic No-op Canon Commit Hardening (bounded Core patch; design APPROVED, NOT begun)
+
+**Root cause.** `applyManualCurrentStateEdits` (`state-reducer.ts`) sorts the fact array unconditionally at the end of every manual-edit application. A semantic no-op — e.g. `removeFact(nonexistent)` — can therefore reorder `current_state.json` and advance the Canon revision although no author-facing state changed. The revision hashes the FOUR structured Canon documents; the markdown projection is NOT part of the revision, and manifest normalization is not involved.
+
+**P3.1 semantics.** Manual editing modifies AUTHOR-FACING CURRENT STORY MEANING; temporal provenance is not user input. Same-value `setFact` is therefore a semantic no-op: existing `age=23` + `setFact age 23` ⇒ no-op, no temporal re-anchor, revision unchanged, zero filesystem writes, zero memory sync. `removeFact` on a missing / currently-unasserted key ⇒ no-op.
+
+**Sequential classification (MANDATORY — original-state classification is UNSAFE for ordered batches).** Classify edits IN REQUEST ORDER against a lightweight shadow model containing OPEN/current semantic facts only; key = `subject + resolveFactPredicateKey(predicate)`.
+- `setFact(key,value)`: if the shadow holds exactly one unambiguous active assertion whose value equals the requested value ⇒ NO-OP (shadow unchanged); otherwise EFFECTIVE (`shadow[key] = requested value`).
+- `removeFact(key)`: if no active assertion ⇒ NO-OP (shadow unchanged); otherwise EFFECTIVE (`shadow.delete(key)`).
+- Preserve the original relative order of effective edits; pass ONLY effective edits through the existing reducer.
+- Regression examples (initial `age=23`): `[set24,set23]` ⇒ both effective, final 23 · `[remove,set23]` ⇒ both effective, final 23 · `[set23,set24]` ⇒ first no-op/second effective, final 24 · `[set24,remove]` ⇒ both effective, final absent.
+
+**Legacy / ambiguous state.** Closed historical rows are invisible to the current-meaning shadow: only-closed key + `removeFact` ⇒ semantic no-op, historical bookkeeping unchanged. Same-value `setFact` is a no-op ONLY when the active state is unambiguous (exactly one open row matching). Multiple OPEN rows per key — duplicate same-value OR conflicting — must NOT be classified no-op; route through the effective/normal validation path. No-op detection must not silently bless malformed legacy state; global repair behavior is not redesigned.
+
+**Secondary semantic comparator.** After reducer preview and before write assembly, retain an order-insensitive semantic comparator as defense-in-depth over all four structured documents: object keys canonicalized as existing revision logic does; `currentState.facts` treated as an order-insensitive multiset of canonical rows; everything else strict. Fact-array order is non-semantic for this comparison ONLY — do NOT globally sort or rewrite stored fact arrays.
+
+**Pure no-op result.** Every edit a semantic no-op ⇒ `revision` = existing revision unchanged · `appliedEdits = []` · `effectiveChapter` = normal durable-progress+1 · `warnings = []`; structurally ZERO Canon / projection / snapshot writes, ZERO derived-memory synchronization, ZERO bootstrap/manifest-normalization side effects.
+
+**Mixed result.** Discard no-op operations, pass effective edits (original order) to the existing reducer, ONE normal atomic commit, `appliedEdits` contains effective edits only. No new API response variant; NO Studio changes required.
+
+**RED-first test matrix** (`canon-commit.test.ts`; whole-filesystem sha256+size+mtime equality asserted on every no-op case):
+1. removeFact(nonexistent) → A→A, appliedEdits=[] ; 2. setFact(existing same value) → A→A, validFrom/source unchanged ; 3. setFact(existing different value) → A→B with normal E re-anchor ; 4. setFact(absent key) → real commit ; 5. removeFact(existing OPEN key) → real commit ; 6. [set24,set23] both effective, final 23 ; 7. [remove,set23] both effective, final 23 ; 8. [set23,set24] only set24 applied ; 9. [set24,remove] both applied, final absent ; 10. only-CLOSED key + remove ⇒ pure no-op/zero writes ; 11. duplicate/conflicting OPEN rows + same-value set ⇒ NOT prematurely skipped ; 12. deliberately unsorted facts + pure no-op ⇒ zero reorder, zero writes ; 13. pure no-op: `rebuildNarrativeMemoryIndex`, `rebuildCurrentStateFactHistory`, `invalidateDerivedMemory` are NOT called.
+
+**Files/scope.** Touch ONLY `packages/core/src/state/canon-service.ts` + `packages/core/src/__tests__/canon-commit.test.ts` (additional test helper only if source inspection proves strictly required). Do NOT change reducer behavior, schemas, revision format, effectiveChapter semantics, lock ownership, Studio, language/migration, Phase 4, or global fact ordering.
+
+**▶ CHECKPOINT P3.1:** Semantic no-op hardening complete. STOP. Independent review required before Phase 4.
+
 ### Phase 4 — Post-chapter state-review domain model (E, G, H) (risk: HIGH — touches saveChapter/persist path)
 
 **T4.1 Proposal artifact schema.**
