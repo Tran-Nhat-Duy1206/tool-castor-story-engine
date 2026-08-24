@@ -97,7 +97,18 @@ already hosts derived runtime data such as `memory.db`) and the plan's T4.3 sket
 ownership and semantics below are normative even if the final layout shifts slightly
 during implementation.
 
-Binding header (all mandatory):
+The schema contract has TWO requirement tiers on ONE artifact path (the same file is
+workflow shell AND active proposal — never a duplicate store). The exact low-level
+shell schema remains an implementation-planning detail; what is frozen here is WHICH
+fields are mandatory in which tier.
+
+**A. Durable workflow-shell fields** — mandatory whenever the artifact represents
+non-confirmable workflow state (`rebuild_required`, `rebuild_failed`): a chapter-scoped
+review-workflow identity, `status`, lifecycle timestamps and language — the minimum
+needed to render Studio state, drive Retry Audit, and survive crashes. A shell MUST
+NOT be required to carry proposal data it cannot have yet.
+
+**B. Additional fields mandatory when `status = "active"`** (a confirmable proposal):
 
 | Field | Meaning |
 |---|---|
@@ -107,11 +118,12 @@ Binding header (all mandatory):
 | `proseRevision` | deterministic hash of the exact saved prose the proposal was generated from |
 | `baseCanonRevision` | `computeCanonRevision` fingerprint the proposal was generated against |
 | `reviewRevision` | optimistic-concurrency counter of the ARTIFACT itself (bumps on every decision/add/remove save) |
-| `status` | workflow substate: `active \| stale \| rebuild_required \| rebuild_failed` |
 | `items[]` | review items (§4) |
-| `createdAt`, `language` | bookkeeping |
 
-**Three independent concurrency anchors are required:**
+plus bookkeeping (`createdAt`, `language`) and the shared `status` field.
+
+**Three independent concurrency anchors are required on every ACTIVE proposal** (none
+of them exists on a pre-proposal shell):
 
 1. `proseRevision` — protects against confirming a proposal generated from old prose (§14).
 2. `baseCanonRevision` — protects Canon from stale confirmation (§13).
@@ -415,13 +427,25 @@ Chapter READY with resolved receipt R1; user edits + saves prose.
 The prose Save itself must atomically (one transaction):
 
 - save the new prose (+ new prose revision)
-- move the chapter out of READY (`ready-for-review`)
+- move the chapter to `needs-state-review` (the Phase 4 rebuild path NEVER routes
+  through `ready-for-review`)
 - mark R1 `superseded`
 - create or replace the durable review workflow shell with
   `status = "rebuild_required"` (non-confirmable; §3)
 
-Only after this durable save may the auto re-audit start → new proposal →
-`needs-state-review`.
+Phase 4 lifecycle from there:
+
+```
+READY / approved
+  → Edit + Save            ⇒ chapter = needs-state-review, shell = rebuild_required
+  → rebuild succeeds       ⇒ chapter STAYS needs-state-review, shell = active
+                             (confirmable proposal)
+  → rebuild fails          ⇒ chapter STAYS needs-state-review, shell = rebuild_failed
+  → Final Confirm succeeds ⇒ approved / READY
+```
+
+Only after the durable save may the auto re-audit start; on success the shell becomes
+an ACTIVE, confirmable proposal (new generation, 0/N reviewed).
 
 **No automatic rollback of the Canon changes R1 introduced.** R1 remains historical
 audit evidence (superseded, optionally linking to its successor once one exists; if
