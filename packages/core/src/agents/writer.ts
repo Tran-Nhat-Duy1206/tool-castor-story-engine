@@ -52,6 +52,7 @@ import {
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { commitAtomicFileSet, type AtomicFileWrite } from "../utils/atomic-file-set.js";
+import { ACTIVE_REVIEW_RELPATH } from "../state/state-review-store.js";
 
 import {
   readVolumeMap,
@@ -630,7 +631,20 @@ export class WriterAgent extends BaseAgent {
     output: WriteChapterOutput,
     numericalSystem: boolean = true,
     language: "zh" | "en" = "zh",
+    options?: {
+      readonly deferStateApplication?: boolean;
+      readonly stateReviewJson?: string;
+      readonly updatedChapterIndexJson?: string;
+    },
   ): Promise<void> {
+    // Task 6 (Phase 4): `deferStateApplication` publishes durable prose while
+    // OMITTING every story/** write — the proposed RuntimeStateDelta stays a
+    // proposal and never becomes authoritative through any projection or
+    // structured JSON. The caller-supplied chapter index JSON and State
+    // Review artifact join the SAME commitAtomicFileSet so publication is
+    // all-or-nothing. Options undefined ⇒ byte-identical legacy behavior.
+    const deferStateApplication = options?.deferStateApplication === true;
+
     const chaptersDir = join(bookDir, "chapters");
     await mkdir(chaptersDir, { recursive: true });
 
@@ -648,71 +662,91 @@ export class WriterAgent extends BaseAgent {
       "",
       output.content,
     ].join("\n");
-    const runtimeStateArtifacts = await this.resolveRuntimeStateArtifactsForOutput(
-      bookDir,
-      output,
-      language,
-    );
-    const chapterSummariesMarkdown = runtimeStateArtifacts?.chapterSummariesMarkdown
-      ?? (!output.runtimeStateDelta && output.updatedChapterSummaries
-        ? output.updatedChapterSummaries
-        : !output.runtimeStateDelta && output.chapterSummary
-          ? await this.renderAppendedChapterSummary(bookDir, output.chapterSummary, language)
-          : undefined);
 
     const writes: AtomicFileWrite[] = [
       { relativePath: join("chapters", filename), content: chapterContent },
-      {
-        relativePath: join("story", "current_state.md"),
-        content: runtimeStateArtifacts?.currentStateMarkdown ?? output.updatedState,
-      },
-      {
-        relativePath: join("story", "pending_hooks.md"),
-        content: runtimeStateArtifacts?.hooksMarkdown ?? output.updatedHooks,
-      },
     ];
 
-    if (chapterSummariesMarkdown) {
-      writes.push({
-        relativePath: join("story", "chapter_summaries.md"),
-        content: chapterSummariesMarkdown,
-      });
-    }
+    if (!deferStateApplication) {
+      const runtimeStateArtifacts = await this.resolveRuntimeStateArtifactsForOutput(
+        bookDir,
+        output,
+        language,
+      );
+      const chapterSummariesMarkdown = runtimeStateArtifacts?.chapterSummariesMarkdown
+        ?? (!output.runtimeStateDelta && output.updatedChapterSummaries
+          ? output.updatedChapterSummaries
+          : !output.runtimeStateDelta && output.chapterSummary
+            ? await this.renderAppendedChapterSummary(bookDir, output.chapterSummary, language)
+            : undefined);
 
-    if (output.updatedSubplots) {
-      writes.push({ relativePath: join("story", "subplot_board.md"), content: output.updatedSubplots });
-    }
-    if (output.updatedEmotionalArcs) {
-      writes.push({ relativePath: join("story", "emotional_arcs.md"), content: output.updatedEmotionalArcs });
-    }
-    if (output.updatedCharacterMatrix) {
-      writes.push({ relativePath: join("story", "character_matrix.md"), content: output.updatedCharacterMatrix });
-    }
-
-    const runtimeStateSnapshot = runtimeStateArtifacts?.snapshot ?? output.runtimeStateSnapshot;
-    if (runtimeStateSnapshot) {
       writes.push(
         {
-          relativePath: join("story", "state", "manifest.json"),
-          content: JSON.stringify(runtimeStateSnapshot.manifest, null, 2),
+          relativePath: join("story", "current_state.md"),
+          content: runtimeStateArtifacts?.currentStateMarkdown ?? output.updatedState,
         },
         {
-          relativePath: join("story", "state", "current_state.json"),
-          content: JSON.stringify(runtimeStateSnapshot.currentState, null, 2),
-        },
-        {
-          relativePath: join("story", "state", "hooks.json"),
-          content: JSON.stringify(runtimeStateSnapshot.hooks, null, 2),
-        },
-        {
-          relativePath: join("story", "state", "chapter_summaries.json"),
-          content: JSON.stringify(runtimeStateSnapshot.chapterSummaries, null, 2),
+          relativePath: join("story", "pending_hooks.md"),
+          content: runtimeStateArtifacts?.hooksMarkdown ?? output.updatedHooks,
         },
       );
+
+      if (chapterSummariesMarkdown) {
+        writes.push({
+          relativePath: join("story", "chapter_summaries.md"),
+          content: chapterSummariesMarkdown,
+        });
+      }
+
+      if (output.updatedSubplots) {
+        writes.push({ relativePath: join("story", "subplot_board.md"), content: output.updatedSubplots });
+      }
+      if (output.updatedEmotionalArcs) {
+        writes.push({ relativePath: join("story", "emotional_arcs.md"), content: output.updatedEmotionalArcs });
+      }
+      if (output.updatedCharacterMatrix) {
+        writes.push({ relativePath: join("story", "character_matrix.md"), content: output.updatedCharacterMatrix });
+      }
+
+      const runtimeStateSnapshot = runtimeStateArtifacts?.snapshot ?? output.runtimeStateSnapshot;
+      if (runtimeStateSnapshot) {
+        writes.push(
+          {
+            relativePath: join("story", "state", "manifest.json"),
+            content: JSON.stringify(runtimeStateSnapshot.manifest, null, 2),
+          },
+          {
+            relativePath: join("story", "state", "current_state.json"),
+            content: JSON.stringify(runtimeStateSnapshot.currentState, null, 2),
+          },
+          {
+            relativePath: join("story", "state", "hooks.json"),
+            content: JSON.stringify(runtimeStateSnapshot.hooks, null, 2),
+          },
+          {
+            relativePath: join("story", "state", "chapter_summaries.json"),
+            content: JSON.stringify(runtimeStateSnapshot.chapterSummaries, null, 2),
+          },
+        );
+      }
+
+      if (numericalSystem) {
+        writes.push({ relativePath: join("story", "particle_ledger.md"), content: output.updatedLedger });
+      }
     }
 
-    if (numericalSystem) {
-      writes.push({ relativePath: join("story", "particle_ledger.md"), content: output.updatedLedger });
+    // Caller-prepared authoritative extras ride the SAME atomic set.
+    if (options?.updatedChapterIndexJson !== undefined) {
+      writes.push({
+        relativePath: join("chapters", "index.json"),
+        content: options.updatedChapterIndexJson,
+      });
+    }
+    if (options?.stateReviewJson !== undefined) {
+      writes.push({
+        relativePath: ACTIVE_REVIEW_RELPATH(output.chapterNumber),
+        content: options.stateReviewJson,
+      });
     }
 
     await commitAtomicFileSet({
