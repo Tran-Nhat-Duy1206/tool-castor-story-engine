@@ -94,17 +94,30 @@ export async function bootstrapStructuredStateFromMarkdown(params: {
   // currentState.chapter comes from markdown which can contain
   // hallucinated numbers (e.g. year 1988 parsed as chapter 1988).
   const derivedProgress = markdownState.durableStoryProgress;
-  if ((existingManifest?.lastAppliedChapter ?? 0) > derivedProgress) {
+  // Phase 4 forward-governed corrections (Task 13 glue): Final Confirm may
+  // apply a historical correction at confirmedHead + 1 BEFORE any chapter
+  // prose exists for that slot, so the CONFIRMED structured documents can
+  // legitimately lead the chapter-file prefix. Honor such a lead only when
+  // the structured documents AGREE on it (`current_state.chapter` equals the
+  // recorded head — exactly the post-Final-Confirm shape produced by the
+  // Task 12 atomic transaction); hallucinated markdown numbers alone can
+  // never manufacture one, preserving the original anti-hallucination rule.
+  const structuredHead = existingManifest?.lastAppliedChapter ?? 0;
+  const effectiveProgress =
+    structuredHead > derivedProgress && currentState.chapter === structuredHead
+      ? structuredHead
+      : derivedProgress;
+  if ((existingManifest?.lastAppliedChapter ?? 0) > effectiveProgress) {
     appendWarning(
       warnings,
-      `manifest lastAppliedChapter normalized from ${existingManifest?.lastAppliedChapter ?? 0} to ${derivedProgress}`,
+      `manifest lastAppliedChapter normalized from ${existingManifest?.lastAppliedChapter ?? 0} to ${effectiveProgress}`,
     );
   }
 
   const manifest = StateManifestSchema.parse({
     schemaVersion: 2,
     language,
-    lastAppliedChapter: derivedProgress,
+    lastAppliedChapter: effectiveProgress,
     projectionVersion: existingManifest?.projectionVersion ?? 1,
     migrationWarnings: uniqueStrings([
       ...(existingManifest?.migrationWarnings ?? []),
