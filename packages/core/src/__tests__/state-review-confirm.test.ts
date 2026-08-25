@@ -158,11 +158,11 @@ describe("state-review-confirm PREPARE (pure)", () => {
           id: "item-summary",
           kind: "chapter-summary",
           origin: "ai",
-          title: "Chapter summary: ch 26 反转",
+          title: "Chapter summary: ch 16 反转",
           proposal: {
             type: "chapter-summary",
             row: {
-              chapter: 26,
+              chapter: 16,
               title: "反转",
               characters: "主角；林秋",
               events: "林秋在北岸灯塔烧毁了账本",
@@ -334,7 +334,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
     });
   });
 
-  it("(T7/AC/AD) undecided NOTE does not block; zero-effective confirmation is valid with EMPTY canon/projection writes", async () => {
+  it("(T7/AC/AD) undecided NOTE does not block; zero-effective confirmation still ADVANCES bookkeeping to the effective slot", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16,
       effectiveChapter: 26,
@@ -349,27 +349,56 @@ describe("state-review-confirm PREPARE (pure)", () => {
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
     });
 
+    // Semantic classification is unchanged…
     expect(prepared.zeroEffectiveChange).toBe(true);
-    expect(prepared.canonWrites).toEqual([]);
-    expect(prepared.projectionWrites).toEqual([]);
-    expect(prepared.resultingCanonRevision).toBe(baseRevision);
-    expect(prepared.snapshotWrites.length).toBeGreaterThan(0);
     const receipt = ResolvedReviewReceiptSchema.parse(JSON.parse(prepared.receiptWrite.content));
     expect(receipt.resolution).toBe("confirmed-no-changes");
+    // …but the confirmed temporal slot 26 is CONSUMED by system bookkeeping.
+    expect(prepared.canonWrites).toHaveLength(4);
+    expect(prepared.projectionWrites).toHaveLength(3);
+    const manifest = StateManifestSchema.parse(JSON.parse(
+      prepared.canonWrites.find((w) => w.relativePath === "story/state/manifest.json")!.content,
+    ));
+    expect(manifest.lastAppliedChapter).toBe(26);
+    const candidateState = CurrentStateStateSchema.parse(JSON.parse(
+      prepared.canonWrites.find((w) => w.relativePath === "story/state/current_state.json")!.content,
+    ));
+    expect(candidateState.chapter).toBe(26);
+    expect(candidateState.facts.some((fact) => fact.object === "北岸灯塔")).toBe(false);
+    const currentStateProjection = prepared.projectionWrites.find((w) => w.relativePath === "story/current_state.md")!;
+    expect(currentStateProjection.content).toContain("26");
+    const snapshotManifest = StateManifestSchema.parse(JSON.parse(
+      prepared.snapshotWrites.find((w) => w.relativePath === "story/snapshots/26/state/manifest.json")!.content,
+    ));
+    expect(snapshotManifest.lastAppliedChapter).toBe(26);
+    expect(prepared.resultingCanonRevision).not.toBe(baseRevision);
     expect(prepared.indexWrite.content).toContain("\"approved\"");
+    // Still absolute zero-write.
     expect(await captureBookMetadata(fixture.root)).toEqual(before);
   });
 
-  it("(T8/T9) zero-item and all-rejected reviews PREPARE as zero-effective confirmations", async () => {
+  it("(T8/T9/J) zero-item AND all-rejected reviews advance the applied head with no semantic mutation", async () => {
     await publishActiveReview(fixture, {
-      sourceChapter: 16, effectiveChapter: 26, items: [],
+      sourceChapter: 26, effectiveChapter: 26,
+      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
+      items: [],
     });
     const empty = await prepareStateReviewConfirm({
-      bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
+      bookDir: fixture.bookDir, chapter: 26, expectedReviewRevision: 1, durableHead: 25,
     });
     expect(empty.zeroEffectiveChange).toBe(true);
-    expect(empty.canonWrites).toEqual([]);
+    expect(empty.canonWrites).toHaveLength(4);
+    expect(empty.projectionWrites).toHaveLength(3);
+    const emptyManifest = StateManifestSchema.parse(JSON.parse(
+      empty.canonWrites.find((w) => w.relativePath === "story/state/manifest.json")!.content,
+    ));
+    expect(emptyManifest.lastAppliedChapter).toBe(26);
     expect(empty.receiptWrite.content).toContain("confirmed-no-changes");
+    // Snapshot mirror represents POST-confirm state at slot 26.
+    const snapManifest = StateManifestSchema.parse(JSON.parse(
+      empty.snapshotWrites.find((w) => w.relativePath === "story/snapshots/26/state/manifest.json")!.content,
+    ));
+    expect(snapManifest.lastAppliedChapter).toBe(26);
 
     await publishActiveReview(fixture, {
       sourceChapter: 16,
@@ -377,11 +406,25 @@ describe("state-review-confirm PREPARE (pure)", () => {
       reviewId: "3f2504e0-4f89-41d3-9a0c-0305e82c3303",
       items: [factItem("item-rej", "当前位置", "北岸灯塔", { decision: "rejected" })],
     });
+    const before = await captureBookMetadata(fixture.root);
     const allRejected = await prepareStateReviewConfirm({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
     });
     expect(allRejected.zeroEffectiveChange).toBe(true);
-    expect(allRejected.canonWrites).toEqual([]);
+    expect(allRejected.canonWrites).toHaveLength(4);
+    const candidate = CurrentStateStateSchema.parse(JSON.parse(
+      allRejected.canonWrites.find((w) => w.relativePath === "story/state/current_state.json")!.content,
+    ));
+    // The rejected proposal NEVER enters semantics; only bookkeeping advances.
+    expect(candidate.facts.some((fact) => fact.object === "北岸灯塔")).toBe(false);
+    const rejectedManifest = StateManifestSchema.parse(JSON.parse(
+      allRejected.canonWrites.find((w) => w.relativePath === "story/state/manifest.json")!.content,
+    ));
+    expect(rejectedManifest.lastAppliedChapter).toBe(26);
+    const rejectedReceipt = ResolvedReviewReceiptSchema.parse(JSON.parse(allRejected.receiptWrite.content));
+    expect(rejectedReceipt.effectiveChanges).toEqual([{ type: "none" }]);
+    expect(rejectedReceipt.resolution).toBe("confirmed-no-changes");
+    expect(await captureBookMetadata(fixture.root)).toEqual(before);
   });
 
   it("(T10/E) missing artifact and non-active shells fail closed with zero writes", async () => {
@@ -571,7 +614,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       return true;
     });
 
-    // Summary row targeting a chapter other than the effective chapter.
+    // Summary row belonging to NEITHER the source nor the effective chapter.
     await publishActiveReview(fixture, {
       sourceChapter: 16,
       effectiveChapter: 26,
@@ -584,7 +627,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
         proposal: {
           type: "chapter-summary",
           row: {
-            chapter: 16,
+            chapter: 17,
             title: "反转",
             characters: "主角",
             events: "事件",
@@ -700,6 +743,83 @@ describe("state-review-confirm PREPARE (pure)", () => {
     expect(untouched?.auditIssues).toEqual(["遗留问题"]);
     expect(untouched?.wordCount).toBe(99);
     expect(entries.filter((entry) => entry.status === "ready-for-review")).toEqual([]);
+  });
+
+  it("(I-11.1/L-N/O/P) historical source-chaptered summary retargets to the effective slot for application; proposal history stays at 16", async () => {
+    const reviewId = await publishActiveReview(fixture, {
+      sourceChapter: 16,
+      effectiveChapter: 26,
+      items: [{
+        id: "item-summary",
+        kind: "chapter-summary",
+        origin: "ai",
+        title: "Chapter summary: ch 16 反转",
+        proposal: {
+          type: "chapter-summary",
+          row: {
+            chapter: 16,
+            title: "反转",
+            characters: "主角；林秋",
+            events: "林秋在北岸灯塔烧毁了账本",
+            stateChanges: "当前位置→北岸灯塔",
+            hookActivity: "",
+            mood: "紧张",
+            chapterType: "调查",
+          },
+        },
+        decision: "accepted",
+      }],
+    });
+    const before = await captureBookMetadata(fixture.root);
+    const artifactBefore = await readFile(join(fixture.bookDir, ACTIVE_REVIEW_RELPATH(16)), "utf-8");
+
+    const prepared = await prepareStateReviewConfirm({
+      bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
+    });
+
+    // Applied delta/bookkeeping lives at effective 26.
+    expect(prepared.effectiveChapter).toBe(26);
+    const summaries = ChapterSummariesStateSchema.parse(JSON.parse(
+      prepared.canonWrites.find((w) => w.relativePath === "story/state/chapter_summaries.json")!.content,
+    ));
+    const applied = summaries.rows.find((row) => row.title === "反转");
+    expect(applied?.chapter).toBe(26);
+    expect(applied?.events).toBe("林秋在北岸灯塔烧毁了账本");
+    const manifest = StateManifestSchema.parse(JSON.parse(
+      prepared.canonWrites.find((w) => w.relativePath === "story/state/manifest.json")!.content,
+    ));
+    expect(manifest.lastAppliedChapter).toBe(26);
+
+    // Receipt keeps BOTH layers: original proposal row16, applied change row26.
+    const receipt = ResolvedReviewReceiptSchema.parse(JSON.parse(prepared.receiptWrite.content));
+    expect(receipt.reviewId).toBe(reviewId);
+    expect(receipt.sourceChapter).toBe(16);
+    expect(receipt.effectiveChapter).toBe(26);
+    const proposalRow = (receipt.proposals[0] as { type: "chapter-summary"; row: { chapter: number } }).row;
+    expect(proposalRow.chapter).toBe(16);
+    const appliedChange = receipt.effectiveChanges[0] as { type: "chapter-summary"; row: { chapter: number } };
+    expect(appliedChange.row.chapter).toBe(26);
+
+    // Original ReviewItem/proposal object untouched on disk.
+    expect(await readFile(join(fixture.bookDir, ACTIVE_REVIEW_RELPATH(16)), "utf-8")).toBe(artifactBefore);
+    expect(await captureBookMetadata(fixture.root)).toEqual(before);
+  });
+
+  it("(m-11.1/V) caller durableHead that contradicts the live confirmed head fails closed", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 26,
+      effectiveChapter: 26,
+      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
+      items: [],
+    });
+    // Live manifest says 25; a stale caller reporting 24 must NOT slip the
+    // pending-source temporal derivation through.
+    await expect(expectZeroWrites(() => prepareStateReviewConfirm({
+      bookDir: fixture.bookDir, chapter: 26, expectedReviewRevision: 1, durableHead: 24,
+    }))).rejects.toSatisfy((error: unknown) => {
+      expectStateReviewError(error, "state_review_conflict");
+      return true;
+    });
   });
 
   it("(Purity) PREPARE module imports no mutating primitive or banned loader", async () => {

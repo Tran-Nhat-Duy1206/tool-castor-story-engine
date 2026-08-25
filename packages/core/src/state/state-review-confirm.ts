@@ -30,9 +30,6 @@ import { computeProseRevision } from "../utils/prose-revision.js";
 import {
   CURRENT_STATE_SLOT_DEFS,
   currentStateSlotAliases,
-  renderChapterSummariesProjection,
-  renderCurrentStateProjection,
-  renderHooksProjection,
   type CurrentStateSlotKey,
 } from "./state-projections.js";
 import { SNAPSHOT_STORY_FILE_NAMES } from "./snapshot-set.js";
@@ -60,9 +57,27 @@ import { SNAPSHOT_STORY_FILE_NAMES } from "./snapshot-set.js";
  * TEMPORAL CONTRACT: `params.durableHead` is the caller-resolved CURRENT
  * CONFIRMED Canon head — the `manifest.lastAppliedChapter` semantics fixed by
  * the Task 10 fix-up ("semantics applied through chapter N"), NEVER a raw
- * durable-file count. A pending current chapter N over confirmed N-1 stays
- * effective N; historical sources anchor at confirmedHead + 1; a head that
- * reached the proposal's effectiveChapter is an APPLY-ZERO conflict.
+ * durable-file count. PREPARE cross-checks it against the live validated
+ * snapshot and rejects any disagreement. A pending current chapter N over
+ * confirmed N-1 stays effective N; historical sources anchor at confirmedHead
+ * + 1; a head that reached the proposal's effectiveChapter is an APPLY-ZERO
+ * conflict.
+ *
+ * ZERO-EFFECTIVE CONFIRMATIONS (fix-up): when every actionable item is
+ * decided without story-meaning changes, PREPARE still compiles an op-less
+ * RuntimeStateDelta at `active.effectiveChapter` and runs it through the same
+ * reducer path — confirmation CONSUMES the effective temporal slot, so
+ * manifest/current-state bookkeeping advances. Candidate canon, projections,
+ * and snapshots are built from that advanced state; `zeroEffectiveChange` and
+ * receipt resolution `confirmed-no-changes` remain SEMANTIC classifications.
+ *
+ * HISTORICAL SUMMARIES: summary proposals are SOURCE-chaptered (the row
+ * describes the prose of `sourceChapter`). PREPARE validates source ownership,
+ * then retargets ONLY the application-time row to `effectiveChapter`; the
+ * original ReviewItem/proposal history is never mutated, and the applied
+ * representation is what enters both the compiled delta and
+ * `receipt.effectiveChanges` (design §23 "what actually entered the confirmed
+ * delta").
  */
 
 export interface PreparedStateReviewConfirm {
@@ -116,6 +131,7 @@ function resolveSlotKey(
  */
 function compileConfirmedDelta(params: {
   readonly items: ReadonlyArray<Parameters<typeof resolveReviewItemEffectiveChange>[0]>;
+  readonly sourceChapter: number;
   readonly effectiveChapter: number;
   readonly language: RuntimeStateLanguage;
 }): CompiledConfirmation {
@@ -214,21 +230,31 @@ function compileConfirmedDelta(params: {
         break;
       }
       case "chapter-summary": {
-        if (effective.row.chapter !== params.effectiveChapter) {
+        // Historical rule (I-11.1): proposals are SOURCE-chaptered — the
+        // summary describes the prose of `sourceChapter`. Validate source
+        // ownership, then retarget ONLY the application-time row to the
+        // effective slot the reducer requires. The original ReviewItem and
+        // receipt proposal layer keep chapter = sourceChapter.
+        if (effective.row.chapter !== params.sourceChapter) {
           throw new StateReviewError(
             "state_review_invalid_change",
-            `review item ${item.id} summarizes chapter ${effective.row.chapter} but confirmation applies at effective chapter ${params.effectiveChapter}`,
+            `review item ${item.id} summarizes chapter ${effective.row.chapter} but the reviewed source chapter is ${params.sourceChapter}`,
             item.id,
           );
         }
-        if (summaryRow && JSON.stringify(summaryRow) !== JSON.stringify(effective.row)) {
+        const appliedRow: ChapterSummaryRow = { ...effective.row, chapter: params.effectiveChapter };
+        if (summaryRow && JSON.stringify(summaryRow) !== JSON.stringify(appliedRow)) {
           throw new StateReviewError(
             "state_review_invalid_change",
             `review item ${item.id} conflicts with another confirmed chapter summary`,
             item.id,
           );
         }
-        summaryRow = effective.row;
+        summaryRow = appliedRow;
+        // Single-interpretation invariant: receipt.effectiveChanges records
+        // what ACTUALLY entered the confirmed delta (design §23) — the
+        // retargeted applied representation, not the raw source row.
+        effectiveChanges[effectiveChanges.length - 1] = { type: "chapter-summary", row: appliedRow };
         break;
       }
       default:
@@ -446,7 +472,17 @@ export async function prepareStateReviewConfirm(params: {
     );
   }
 
-  // ---- 5. Temporal rules §20 against the caller-resolved confirmed head --
+  // ---- 5. Temporal rules §20 against the CURRENT live confirmed head -----
+  // The live validated snapshot is the authority; the caller-supplied
+  // durableHead must AGREE with it (m-11.1 hardening), so a stale caller
+  // number can never steer the temporal derivation.
+  const liveSnapshot = await readLiveRuntimeStateSnapshot(params.bookDir);
+  if (params.durableHead !== liveSnapshot.manifest.lastAppliedChapter) {
+    throw new StateReviewError(
+      "state_review_conflict",
+      `caller durableHead ${params.durableHead} does not match the live confirmed head ${liveSnapshot.manifest.lastAppliedChapter}`,
+    );
+  }
   if (params.durableHead >= active.effectiveChapter) {
     throw new StateReviewError(
       "state_review_conflict",
@@ -464,82 +500,70 @@ export async function prepareStateReviewConfirm(params: {
   }
 
   // ---- 6+7. Completeness → compile ONE RuntimeStateDelta ------------------
+  // Zero semantic effective changes STILL compile an op-less delta at the
+  // effective chapter: confirming a review consumes that temporal slot, so
+  // runtime bookkeeping (manifest/current-state progression) must advance.
   const compiled = compileConfirmedDelta({
     items: active.items,
+    sourceChapter: active.sourceChapter,
     effectiveChapter: active.effectiveChapter,
     language: active.language,
   });
 
   // ---- 8. In-memory application over a PURE live snapshot ---------------
-  const liveSnapshot = await readLiveRuntimeStateSnapshot(params.bookDir);
+  // ALWAYS through the existing reducer path — including op-less deltas for
+  // zero-effective confirmations, whose confirmation consumes the effective
+  // temporal slot and must advance runtime bookkeeping.
   const resolvedAt = new Date().toISOString();
 
-  let candidateSnapshot = liveSnapshot;
-  let projectionTriple = {
-    currentStateMarkdown: renderCurrentStateProjection(liveSnapshot.currentState, active.language),
-    hooksMarkdown: renderHooksProjection(liveSnapshot.hooks, active.language, {
-      currentChapter: active.effectiveChapter,
-    }),
-    chapterSummariesMarkdown: renderChapterSummariesProjection(
-      liveSnapshot.chapterSummaries,
-      active.language,
-    ),
-  };
-
-  if (!compiled.zeroEffectiveChange) {
-    try {
-      const artifacts = buildRuntimeStateArtifactsFromSnapshot({
-        snapshot: liveSnapshot,
-        delta: compiled.delta,
-        language: active.language,
-      });
-      const issues = validateRuntimeState(artifacts.snapshot);
-      if (issues.length > 0) {
-        throw new Error(
-          issues.map((issue) => `${issue.code}: ${issue.message}`).join("; "),
-        );
-      }
-      candidateSnapshot = artifacts.snapshot;
-      projectionTriple = {
-        currentStateMarkdown: artifacts.currentStateMarkdown,
-        hooksMarkdown: artifacts.hooksMarkdown,
-        chapterSummariesMarkdown: artifacts.chapterSummariesMarkdown,
-      };
-    } catch (error) {
-      throw new StateReviewError(
-        "state_review_invalid_change",
-        `confirmed changes were rejected by the runtime engine: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
+  let artifacts: ReturnType<typeof buildRuntimeStateArtifactsFromSnapshot>;
+  try {
+    artifacts = buildRuntimeStateArtifactsFromSnapshot({
+      snapshot: liveSnapshot,
+      delta: compiled.delta,
+      language: active.language,
+    });
+    const issues = validateRuntimeState(artifacts.snapshot);
+    if (issues.length > 0) {
+      throw new Error(
+        issues.map((issue) => `${issue.code}: ${issue.message}`).join("; "),
       );
     }
+  } catch (error) {
+    throw new StateReviewError(
+      "state_review_invalid_change",
+      `confirmed changes were rejected by the runtime engine: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
   }
 
+  const candidateSnapshot = artifacts.snapshot;
   const resultingCanonRevision = computeCanonRevision(candidateSnapshot);
 
   // ---- 9. Candidate authoritative material (ALL IN MEMORY) --------------
-  const canonWrites = compiled.zeroEffectiveChange
-    ? []
-    : [
-        { relativePath: "story/state/manifest.json", content: JSON.stringify(candidateSnapshot.manifest, null, 2) },
-        { relativePath: "story/state/current_state.json", content: JSON.stringify(candidateSnapshot.currentState, null, 2) },
-        { relativePath: "story/state/hooks.json", content: JSON.stringify(candidateSnapshot.hooks, null, 2) },
-        { relativePath: "story/state/chapter_summaries.json", content: JSON.stringify(candidateSnapshot.chapterSummaries, null, 2) },
-      ];
+  const canonWrites = [
+    { relativePath: "story/state/manifest.json", content: JSON.stringify(candidateSnapshot.manifest, null, 2) },
+    { relativePath: "story/state/current_state.json", content: JSON.stringify(candidateSnapshot.currentState, null, 2) },
+    { relativePath: "story/state/hooks.json", content: JSON.stringify(candidateSnapshot.hooks, null, 2) },
+    { relativePath: "story/state/chapter_summaries.json", content: JSON.stringify(candidateSnapshot.chapterSummaries, null, 2) },
+  ];
 
-  const projectionWrites = compiled.zeroEffectiveChange
-    ? []
-    : [
-        { relativePath: "story/current_state.md", content: projectionTriple.currentStateMarkdown },
-        { relativePath: "story/pending_hooks.md", content: projectionTriple.hooksMarkdown },
-        { relativePath: "story/chapter_summaries.md", content: projectionTriple.chapterSummariesMarkdown },
-      ];
+  const projectionWrites = [
+    { relativePath: "story/current_state.md", content: artifacts.currentStateMarkdown },
+    { relativePath: "story/pending_hooks.md", content: artifacts.hooksMarkdown },
+    { relativePath: "story/chapter_summaries.md", content: artifacts.chapterSummariesMarkdown },
+  ];
 
   const snapshotWrites = await composeSnapshotWrites({
     bookDir: params.bookDir,
     effectiveChapter: active.effectiveChapter,
     snapshot: candidateSnapshot,
-    projections: projectionTriple,
+    projections: {
+      currentStateMarkdown: artifacts.currentStateMarkdown,
+      hooksMarkdown: artifacts.hooksMarkdown,
+      chapterSummariesMarkdown: artifacts.chapterSummariesMarkdown,
+    },
   });
 
   const indexEntries = await readCandidateIndexEntries(params.bookDir, params.chapter);
