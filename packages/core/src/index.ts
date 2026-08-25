@@ -104,6 +104,14 @@ export {
   buildStateReviewItems,
   type BuildReviewItemsContext,
 } from "./state/state-review-items.js";
+export {
+  addUserStateReviewItem,
+  decideStateReviewItem,
+  editStateReviewItem,
+  rejectAllAiItems,
+  removeUserStateReviewItem,
+  type StateReviewMutationDeps,
+} from "./state/state-review-service.js";
 export { assertCanAdvanceStory } from "./state/advancement-gate.js";
 export {
   type PlayActionKind,
