@@ -11,7 +11,7 @@ import {
   publishActiveProposal,
   writeResolvedReceipt,
 } from "../state/state-review-store.js";
-import { ResolvedReviewReceiptSchema } from "../models/state-review.js";
+import { ResolvedReviewReceiptSchema, StateReviewArtifactSchema } from "../models/state-review.js";
 import {
   addUserStateReviewItem,
   decideStateReviewItem,
@@ -415,6 +415,103 @@ describe("state-review-invalidation", () => {
     const secondShell = await loadStateReview(fixture.bookDir, 16);
     expect(secondShell?.status).toBe("rebuild_required");
     expect(firstShell?.status).toBe("rebuild_required");
+  });
+
+  it("(i-9.1A) approved chapter WITHOUT a resolved receipt still leaves READY via the legacy-compatibility rule", async () => {
+    // Pre-Phase-4 book shape: approved lifecycle, valid Canon/projections from
+    // the fixture, but NO state-review receipt has ever existed for ch16.
+    await seedChapters(fixture, [{ number: 16, status: "approved" }]);
+    const before = await captureBookMetadata(fixture.root);
+
+    await executeEditTransaction(replaceDeps(fixture), {
+      kind: "chapter-replace", bookId: "demo-canon-book", chapterNumber: 16, fullText: NEW_PROSE,
+    });
+
+    const after = await captureBookMetadata(fixture.root);
+    expectOnlyPathsChanged(before, after, [
+      "chapters/0016_旧.md",
+      SHELL_RELPATH,
+      "chapters/index.json",
+    ]);
+    await expect(readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8"))
+      .resolves.toBe(`${NEW_PROSE}\n`);
+    const indexOnDisk = JSON.parse(await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8"));
+    expect(indexOnDisk[0].status).toBe("needs-state-review");
+    const reloaded = await loadStateReview(fixture.bookDir, 16);
+    expect(reloaded?.status).toBe("rebuild_required");
+    if (reloaded?.status === "rebuild_required") {
+      expect(reloaded.sourceChapter).toBe(16);
+      expect("reviewId" in reloaded).toBe(false);
+    }
+    // No receipt fabricated and none superseded — the receipts directory for
+    // this chapter must not exist after the edit.
+    await expect(readFile(join(fixture.bookDir, RECEIPTS_DIR(16), "anything.json"), "utf-8"))
+      .rejects.toMatchObject({ code: "ENOENT" });
+    expect((await readdir(join(fixture.bookDir, "story", "runtime"), { recursive: true }))
+      .map((entry) => entry.replace(/\\/g, "/"))
+      .filter((entry) => entry.includes("state-review-receipts")))
+      .toEqual([]);
+    // Canon byte-identical (story/state/** is outside the allow-list above).
+  });
+
+  it("(i-9.1B) prose edit over a STALE artifact replaces it with a non-confirmable rebuild_required shell", async () => {
+    await seedChapters(fixture, [{ number: 16, status: "needs-state-review" }]);
+    // Exact Task 1 stale variant: active-shaped anchors, non-confirmable status.
+    const staleArtifact = StateReviewArtifactSchema.parse({
+      schemaVersion: 1,
+      status: "stale",
+      sourceChapter: 16,
+      createdAt: CREATED_AT,
+      language: "zh",
+      reviewId: REVIEW_ID,
+      effectiveChapter: 17,
+      proseRevision: "0123456789abcdef",
+      baseCanonRevision: "fedcba9876543210",
+      reviewRevision: 4,
+      items: [{
+        id: "current-state-fact:0:a",
+        kind: "current-state-fact",
+        origin: "ai",
+        title: "stale proposal item",
+        proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "旧宅" } },
+        decision: "accepted",
+      }],
+    });
+    await mkdir(join(fixture.bookDir, "story", "runtime"), { recursive: true });
+    await writeFile(join(fixture.bookDir, SHELL_RELPATH), JSON.stringify(staleArtifact, null, 2), "utf-8");
+    const before = await captureBookMetadata(fixture.root);
+
+    await executeEditTransaction(replaceDeps(fixture), {
+      kind: "chapter-replace", bookId: "demo-canon-book", chapterNumber: 16, fullText: NEW_PROSE,
+    });
+
+    const after = await captureBookMetadata(fixture.root);
+    expectOnlyPathsChanged(before, after, [
+      "chapters/0016_旧.md",
+      SHELL_RELPATH,
+      "chapters/index.json",
+    ]);
+    await expect(readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8"))
+      .resolves.toBe(`${NEW_PROSE}\n`);
+    // Stale identity/items/decisions are NOT carried into the shell.
+    const reloaded = await loadStateReview(fixture.bookDir, 16);
+    expect(reloaded?.status).toBe("rebuild_required");
+    if (reloaded?.status === "rebuild_required") {
+      expect(reloaded.sourceChapter).toBe(16);
+      expect("reviewId" in reloaded).toBe(false);
+      expect("items" in reloaded).toBe(false);
+    }
+    const indexOnDisk = JSON.parse(await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8"));
+    expect(indexOnDisk[0].status).toBe("needs-state-review");
+    // Real Task 8 mutation against the resulting shell must refuse with ZERO write.
+    await expect(decideStateReviewItem({
+      bookDir: fixture.bookDir,
+      chapter: 16,
+      itemId: "current-state-fact:0:a",
+      decision: "accept",
+      expectedReviewRevision: 5,
+    })).rejects.toMatchObject({ code: "state_review_stale" });
+    expect(await captureBookMetadata(fixture.root)).toEqual(after);
   });
 });
 
