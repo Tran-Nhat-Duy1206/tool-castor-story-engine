@@ -43,6 +43,7 @@ import {
 } from "../state/state-review-service.js";
 import { readStoryCanon } from "../state/canon-service.js";
 import { resolveEffectiveChapter } from "../state/state-review-temporal.js";
+import { computeProseRevision } from "../utils/prose-revision.js";
 import { StateManifestSchema } from "../models/runtime-state.js";
 import { ChapterMetaSchema } from "../models/chapter.js";
 import type { BookConfig } from "../models/book.js";
@@ -363,6 +364,7 @@ describe("future progression after a historical correction (Task 13 follow-up)",
       const canonBefore = await readStoryCanon(fixture.bookDir);
       const slot26Before = await captureSlot26(fixture.bookDir);
       const tailBefore = await captureTailProse(fixture.bookDir);
+      const capturedWriteInputs: Array<Parameters<WriterAgent["writeChapter"]>[0]> = [];
 
       const runner = new PipelineRunner({
         client: CLIENT,
@@ -397,8 +399,11 @@ describe("future progression after a historical correction (Task 13 follow-up)",
       vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockResolvedValue({
         passed: true, issues: [], summary: "clean", overallScore: 95, tokenUsage: ZERO_USAGE,
       });
-      const writerSpy = vi.spyOn(WriterAgent.prototype, "writeChapter").mockResolvedValue(
-        stubWriterOutput26({ runtimeStateDelta: sourceDelta26() }),
+      const writerSpy = vi.spyOn(WriterAgent.prototype, "writeChapter").mockImplementation(
+        async (input) => {
+          capturedWriteInputs.push(input);
+          return stubWriterOutput26({ runtimeStateDelta: sourceDelta26() });
+        },
       );
 
       const result = await runner.writeNextChapter(fixture.bookId, BODY_26.length);
@@ -406,6 +411,9 @@ describe("future progression after a historical correction (Task 13 follow-up)",
       // ---- Governed publication ------------------------------------------
       expect(result.status).toBe("needs-state-review");
       expect(writerSpy).toHaveBeenCalledTimes(1);
+      // Part C (coverage pin): the REAL runner → writer.writeChapter governed
+      // call carries the deferred contract — proposal material only.
+      expect(capturedWriteInputs[0]?.deferStateApplication).toBe(true);
 
       // Part J: prose numbering does NOT skip — the durable chapter IS 26.
       const proseName = (await readdir(join(fixture.bookDir, "chapters")))
@@ -492,6 +500,241 @@ describe("future progression after a historical correction (Task 13 follow-up)",
         await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8"),
       ));
       expect(finalIndex.find((meta) => meta.number === SLOT)?.status).toBe("approved");
+    } finally {
+      await rm(fixture.root, { recursive: true, force: true }).catch(() => undefined);
+    }
+  });
+
+  it("(Task13 closure A) audit-REVISED prose re-settles DEFERRED and still publishes source26/effective27", async () => {
+    // head26/prefix25. The audit cycle rewrites the draft, which strips the
+    // initial settlement payload — the pipeline MUST re-settle the FINAL
+    // revised prose through the DEFERRED contract (no live application of the
+    // source delta against confirmed head 26) and still publish
+    // source26/effective27 bound to the final prose.
+    const fixture = await seedPostCorrectionBook();
+    try {
+      const canonBefore = await readStoryCanon(fixture.bookDir);
+      const slot26Before = await captureSlot26(fixture.bookDir);
+      const runner = new PipelineRunner({
+        client: CLIENT,
+        model: "test-model",
+        projectRoot: fixture.root,
+      } as unknown as ConstructorParameters<typeof PipelineRunner>[0]);
+
+      vi.spyOn(PlannerAgent.prototype, "planChapter").mockImplementation(async (input) => ({
+        intent: { chapter: input.chapterNumber, goal: "test goal", mustKeep: [], mustAvoid: [], styleEmphasis: [] },
+        memo: {
+          chapter: input.chapterNumber, goal: "test goal",
+          isGoldenOpening: false, body: "", threadRefs: [] as string[],
+        },
+        intentMarkdown: "# Chapter Intent\n\n## Goal\ntest goal\n",
+        plannerInputs: [],
+        runtimePath: "",
+      }));
+      vi.spyOn(FoundationReviewerAgent.prototype, "review").mockResolvedValue({
+        passed: true, totalScore: 85, dimensions: [], overallFeedback: "auto-pass",
+      });
+      vi.spyOn(StateValidatorAgent.prototype, "validate").mockResolvedValue({
+        warnings: [], passed: true,
+      });
+
+      // Draft vs revised final prose — same byte length so the length budget
+      // never interferes with the pass/fail branching under test.
+      const DRAFT_26 = "林秋在雨夜翻看了账本灰烬留下的每条线索";
+      const REVISED_26 = "林秋在雨夜复盘了账本灰烬留下的铅盒秘密";
+      expect(DRAFT_26.length).toBe(REVISED_26.length);
+
+      vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockImplementation(
+        async (_bookDir, content) => (content as string) === REVISED_26
+          ? { passed: true, issues: [], summary: "revised-clean", overallScore: 92, tokenUsage: ZERO_USAGE }
+          : {
+              passed: false,
+              issues: [{ severity: "warning", category: "style", description: "初稿平淡", suggestion: "深化复盘细节" }],
+              summary: "needs polish", overallScore: 40, tokenUsage: ZERO_USAGE,
+            },
+      );
+      vi.spyOn(ReviserAgent.prototype, "reviseChapter").mockImplementation(
+        async (_bookDir, _chapterContent) => ({
+          revisedContent: REVISED_26,
+          wordCount: REVISED_26.length,
+          fixedIssues: [],
+          tokenUsage: ZERO_USAGE,
+        }),
+      );
+      // Prose rewrite strips the settlement payload in production
+      // (buildPersistenceOutput re-analyzes); mirror that here.
+      vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter").mockImplementation(
+        async (input) => stubWriterOutput26({
+          title: "雨夜复盘",
+          content: input.chapterContent,
+          wordCount: input.chapterContent.length,
+        }),
+      );
+
+      // Initial governed draft carries NO proposal delta at all.
+      const capturedWriteInputs: Array<Parameters<WriterAgent["writeChapter"]>[0]> = [];
+      const writerSpy = vi.spyOn(WriterAgent.prototype, "writeChapter").mockImplementation(
+        async (input) => {
+          capturedWriteInputs.push(input);
+          return stubWriterOutput26({ content: DRAFT_26, wordCount: DRAFT_26.length });
+        },
+      );
+      // The REAL production Settler seam behind settleChapterState: emits the
+      // source-oriented proposal for whatever FINAL prose it is handed.
+      const settleInputs: Array<string> = [];
+      const settleTarget = WriterAgent.prototype as unknown as {
+        settle: (params: unknown) => Promise<unknown>;
+      };
+      const settleSpy = vi.spyOn(settleTarget, "settle").mockImplementation(async (params) => {
+        const p = params as { content?: string };
+        settleInputs.push(p.content ?? "");
+        return {
+          settlement: {
+            runtimeStateDelta: sourceDelta26(),
+            updatedState: "# 当前状态\n\n- 追查灰烬的下落\n",
+            updatedHooks: "# 伏笔池\n",
+          },
+          usage: ZERO_USAGE,
+        };
+      });
+
+      const result = await runner.writeNextChapter(fixture.bookId, DRAFT_26.length);
+
+      // Final-prose re-settlement ran exactly once over the REVISED bytes…
+      expect(settleInputs).toEqual([REVISED_26]);
+      expect(result.status).toBe("needs-state-review");
+      expect(writerSpy).toHaveBeenCalledTimes(1);
+      expect(capturedWriteInputs[0]?.deferStateApplication).toBe(true);
+      expect(settleSpy).toHaveBeenCalledTimes(1);
+
+      // …and stayed DEFERRED: live Canon untouched before human review.
+      const canonAfterPublish = await readStoryCanon(fixture.bookDir);
+      expect(canonAfterPublish.revision).toBe(canonBefore.revision);
+      expect(canonAfterPublish.manifest.lastAppliedChapter).toBe(SLOT);
+      await expect(readFile(join(
+        fixture.bookDir, "story", "snapshots", String(NEXT_SLOT), "state", "manifest.json",
+      ), "utf-8")).rejects.toMatchObject({ code: "ENOENT" });
+
+      // ACTIVE review anchors source26/effective27 and binds the FINAL
+      // DURABLE prose bytes (file content as persisted).
+      const rawArtifact = JSON.parse(await readFile(
+        join(fixture.bookDir, ACTIVE_REVIEW_RELPATH(SLOT)), "utf-8",
+      ));
+      expect(rawArtifact.status).toBe("active");
+      expect(rawArtifact.sourceChapter).toBe(SLOT);
+      expect(rawArtifact.effectiveChapter).toBe(NEXT_SLOT); // literal 27
+      expect(rawArtifact.baseCanonRevision).toBe(canonBefore.revision);
+      const durableProseName = (await readdir(join(fixture.bookDir, "chapters")))
+        .find((name) => name.startsWith("0026_"))!;
+      const durableProse = await readFile(join(fixture.bookDir, "chapters", durableProseName), "utf-8");
+      expect(durableProse).toContain(REVISED_26);
+      expect(rawArtifact.proseRevision).toBe(computeProseRevision(durableProse));
+
+      // Human review then DIRECT confirm lands slot 27 — no rebuild detour.
+      let revision = rawArtifact.reviewRevision as number;
+      for (const item of rawArtifact.items) {
+        await decideStateReviewItem({
+          bookDir: fixture.bookDir, chapter: SLOT, itemId: item.id,
+          decision: "accept", expectedReviewRevision: revision,
+        });
+        revision += 1;
+      }
+      const result12 = await confirmStateReview({
+        bookDir: fixture.bookDir, chapter: SLOT, reviewId: rawArtifact.reviewId,
+        expectedReviewRevision: revision,
+      });
+      expect(result12.status).toBe("resolved");
+      expect(result12.warnings).toEqual([]);
+      const canonFinal = await readStoryCanon(fixture.bookDir);
+      expect(canonFinal.manifest.lastAppliedChapter).toBe(NEXT_SLOT);
+      expect(canonFinal.currentState.chapter).toBe(NEXT_SLOT);
+      expect(result12.resultingCanonRevision).toBe(canonFinal.revision);
+      const snap27 = StateManifestSchema.parse(JSON.parse(await readFile(
+        join(fixture.bookDir, "story", "snapshots", String(NEXT_SLOT), "state", "manifest.json"),
+        "utf-8",
+      )));
+      expect(snap27.lastAppliedChapter).toBe(NEXT_SLOT);
+      expect(await captureSlot26(fixture.bookDir)).toEqual(slot26Before);
+    } finally {
+      await rm(fixture.root, { recursive: true, force: true }).catch(() => undefined);
+    }
+  });
+
+  it("(Task13 closure B) audit-FAILED governed persistence keeps the proposal unapplied", async () => {
+    // head26/prefix25, governed write emits a source delta26, audit fails ⇒
+    // non-publishable persistence must NOT rebuild/apply the delta against
+    // live head 26 ("delta chapter 26 goes backwards") and must not publish
+    // any State Review artifact or advance any semantic snapshot.
+    const fixture = await seedPostCorrectionBook();
+    try {
+      const canonBefore = await readStoryCanon(fixture.bookDir);
+      const slot26Before = await captureSlot26(fixture.bookDir);
+      const tailBefore = await captureTailProse(fixture.bookDir);
+      const runner = new PipelineRunner({
+        client: CLIENT,
+        model: "test-model",
+        projectRoot: fixture.root,
+      } as unknown as ConstructorParameters<typeof PipelineRunner>[0]);
+
+      vi.spyOn(PlannerAgent.prototype, "planChapter").mockImplementation(async (input) => ({
+        intent: { chapter: input.chapterNumber, goal: "test goal", mustKeep: [], mustAvoid: [], styleEmphasis: [] },
+        memo: {
+          chapter: input.chapterNumber, goal: "test goal",
+          isGoldenOpening: false, body: "", threadRefs: [] as string[],
+        },
+        intentMarkdown: "# Chapter Intent\n\n## Goal\ntest goal\n",
+        plannerInputs: [],
+        runtimePath: "",
+      }));
+      vi.spyOn(FoundationReviewerAgent.prototype, "review").mockResolvedValue({
+        passed: true, totalScore: 85, dimensions: [], overallFeedback: "auto-pass",
+      });
+      vi.spyOn(StateValidatorAgent.prototype, "validate").mockResolvedValue({
+        warnings: [], passed: true,
+      });
+      vi.spyOn(ReviserAgent.prototype, "reviseChapter").mockImplementation(
+        async (_bookDir, chapterContent) => ({
+          revisedContent: chapterContent,
+          wordCount: chapterContent.length,
+          fixedIssues: [],
+          tokenUsage: ZERO_USAGE,
+        }),
+      );
+      vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockResolvedValue({
+        passed: false,
+        issues: [{ severity: "critical", category: "continuity", description: "时间线断裂", suggestion: "重排场景顺序" }],
+        summary: "broken timeline", overallScore: 30, tokenUsage: ZERO_USAGE,
+      });
+      const capturedWriteInputs: Array<Parameters<WriterAgent["writeChapter"]>[0]> = [];
+      vi.spyOn(WriterAgent.prototype, "writeChapter").mockImplementation(async (input) => {
+        capturedWriteInputs.push(input);
+        return stubWriterOutput26({ runtimeStateDelta: sourceDelta26() });
+      });
+
+      const result = await runner.writeNextChapter(fixture.bookId, BODY_26.length);
+
+      // Existing Task7 policy preserved: failed audit stays non-publishable…
+      expect(capturedWriteInputs[0]?.deferStateApplication).toBe(true);
+      expect(result.status).toBe("audit-failed");
+      // …the prose itself IS durable…
+      const proseName = (await readdir(join(fixture.bookDir, "chapters")))
+        .find((name) => name.startsWith("0026_"))!;
+      expect(await readFile(join(fixture.bookDir, "chapters", proseName), "utf-8"))
+        .toContain(BODY_26);
+      const index = ChapterMetaSchema.array().parse(JSON.parse(
+        await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8"),
+      ));
+      expect(index.find((meta) => meta.number === SLOT)?.status).toBe("audit-failed");
+      // …but NO semantic mutation happened anywhere:
+      const canonAfter = await readStoryCanon(fixture.bookDir);
+      expect(canonAfter.revision).toBe(canonBefore.revision);
+      expect(canonAfter.manifest.lastAppliedChapter).toBe(SLOT);
+      expect(await loadStateReview(fixture.bookDir, SLOT)).toBeNull();
+      await expect(readFile(join(
+        fixture.bookDir, "story", "snapshots", String(NEXT_SLOT), "state", "manifest.json",
+      ), "utf-8")).rejects.toMatchObject({ code: "ENOENT" });
+      expect(await captureSlot26(fixture.bookDir)).toEqual(slot26Before);
+      expect(await captureTailProse(fixture.bookDir)).toEqual(tailBefore);
     } finally {
       await rm(fixture.root, { recursive: true, force: true }).catch(() => undefined);
     }

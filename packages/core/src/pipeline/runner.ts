@@ -2357,6 +2357,9 @@ export class PipelineRunner {
         chapterSummaries: authorityChapterSummaries,
       },
       reducedControlInput,
+      // Governed generation (Task 13 closure): validation-recovery re-settlement
+      // must stay DEFERRED — proposal material only, never live application.
+      deferStateApplication: true,
       language: pipelineLang,
       logWarn: (message) => this.logWarn(pipelineLang, message),
       logger: this.config.logger,
@@ -2414,12 +2417,17 @@ export class PipelineRunner {
         // described stale content. Re-settle the FINAL publishable prose
         // through THE existing delta-producing settlement path (Writer Settler)
         // so the proposal is anchored to what will actually be published.
+        // Governed contract (Task 6/7): this re-settlement stays DEFERRED —
+        // it produces proposal material only and must never apply the source
+        // delta against the LIVE semantic head (critical after historical
+        // corrections put the confirmed head ahead of the prose prefix).
         const resettledFinal = await writer.settleChapterState({
           book,
           bookDir,
           chapterNumber,
           title: persistenceOutput.title,
           content: persistenceOutput.content,
+          deferStateApplication: true,
           ...(reducedControlInput ? {
             chapterIntent: reducedControlInput.chapterIntent,
             contextPackage: reducedControlInput.contextPackage,
@@ -2520,7 +2528,15 @@ export class PipelineRunner {
                 ? { updatedChapterIndexJson: extra.chapterIndexJson }
                 : {}),
             }
-          : undefined,
+          // Task 13 closure (review blocker B): this pipeline's writer output is
+          // ALWAYS governed/deferred, so a proposal-bearing output that persists
+          // through a NON-publishable outcome (audit-failed / retry paths)
+          // must stay proposal-only too — the legacy rebuild in saveChapter
+          // would live-apply the source delta against the confirmed semantic
+          // head and crash ("goes backwards") on post-correction books.
+          : persistenceOutput.runtimeStateDelta !== undefined
+            ? { deferStateApplication: true as const }
+            : undefined,
       ),
       saveTruthFiles: async () => {
         await this.syncLegacyStructuredStateFromMarkdown(bookDir, chapterNumber, persistenceOutput);

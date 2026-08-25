@@ -31,6 +31,13 @@ export async function validateChapterTruthPersistence(params: {
     contextPackage: ContextPackage;
     ruleStack: RuleStack;
   };
+  /**
+   * Task 13 closure (review blocker B2): the governed generation flow passes
+   * `true` so its validation-recovery re-settlement stays proposal-only
+   * (deferred) instead of live-applying against the confirmed semantic head.
+   * Omitted ⇒ legacy recovery semantics (unchanged).
+   */
+  readonly deferStateApplication?: boolean;
   readonly language: LengthLanguage;
   readonly logWarn: (message: { zh: string; en: string }) => void;
   readonly logger?: Pick<Logger, "warn">;
@@ -108,6 +115,7 @@ export async function validateChapterTruthPersistence(params: {
       title: params.title,
       content: params.content,
       reducedControlInput: params.reducedControlInput,
+      deferStateApplication: params.deferStateApplication === true ? true : undefined,
       oldState: params.previousTruth.oldState,
       oldHooks: params.previousTruth.oldHooks,
       originalValidation: validation,

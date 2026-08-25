@@ -284,4 +284,74 @@ describe("validateChapterTruthPersistence", () => {
       }),
     ]);
   });
+
+  it("threads deferStateApplication into the settlement retry when governed", async () => {
+    // Task 13 closure B2: the governed generation flow must keep its
+    // validation-recovery re-settlement DEFERRED — proposal material only.
+    const validator = {
+      validate: vi.fn()
+        .mockResolvedValueOnce(createValidationResult({
+          passed: false,
+          repairRequired: true,
+          warnings: [{ category: "missing_state_update", description: "位置尚未更新。" }],
+        }))
+        .mockResolvedValueOnce(createValidationResult()),
+    };
+    const writer = {
+      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "码头" })),
+    };
+
+    await validateChapterTruthPersistence({
+      writer,
+      validator,
+      book: BOOK,
+      bookDir: "/tmp/book",
+      chapterNumber: 5,
+      title: "抵达码头",
+      content: "林舟抵达码头。",
+      persistenceOutput: createWriterOutput({ updatedState: "车站" }),
+      auditResult: createAuditResult(),
+      previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
+      language: "zh",
+      logWarn: vi.fn(),
+      deferStateApplication: true,
+    });
+
+    expect(writer.settleChapterState).toHaveBeenCalledWith(
+      expect.objectContaining({ deferStateApplication: true }),
+    );
+  });
+
+  it("keeps legacy retry semantics (no defer flag) when not governed", async () => {
+    const validator = {
+      validate: vi.fn()
+        .mockResolvedValueOnce(createValidationResult({
+          passed: false,
+          repairRequired: true,
+          warnings: [{ category: "missing_state_update", description: "位置尚未更新。" }],
+        }))
+        .mockResolvedValueOnce(createValidationResult()),
+    };
+    const writer = {
+      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "码头" })),
+    };
+
+    await validateChapterTruthPersistence({
+      writer,
+      validator,
+      book: BOOK,
+      bookDir: "/tmp/book",
+      chapterNumber: 6,
+      title: "抵达码头",
+      content: "林舟抵达码头。",
+      persistenceOutput: createWriterOutput({ updatedState: "车站" }),
+      auditResult: createAuditResult(),
+      previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
+      language: "zh",
+      logWarn: vi.fn(),
+    });
+
+    const call = writer.settleChapterState.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(call.deferStateApplication).toBeUndefined();
+  });
 });

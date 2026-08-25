@@ -2409,14 +2409,15 @@ describe("PipelineRunner", () => {
     await rm(root, { recursive: true, force: true });
   });
 
-  it("persists structured runtime state and rendered projections from writer delta output", async () => {
+  it("publishes writer delta output as a governed proposal WITHOUT live state application", async () => {
     const { root, runner, state, bookId } = await createRunnerFixture({
     });
 
+    const bodyText = "Lin Yue follows the debt into the river-port ledger.";
     vi.spyOn(WriterAgent.prototype, "writeChapter").mockResolvedValue(
       createWriterOutput({
-        content: "Lin Yue follows the debt into the river-port ledger.",
-        wordCount: countChapterLength("Lin Yue follows the debt into the river-port ledger.", "en_words"),
+        content: bodyText,
+        wordCount: countChapterLength(bodyText, "en_words"),
         postWriteErrors: [],
         postWriteWarnings: [],
         runtimeStateDelta: {
@@ -2467,24 +2468,28 @@ describe("PipelineRunner", () => {
       }),
     );
 
-    await runner.writeNextChapter(bookId);
+    // In-range length keeps the audit genuinely passed, so this run takes the
+    // GOVERNED publication path (Task 7/13): the delta becomes proposal
+    // material only — no structured runtime state may be applied or written
+    // before human Final Confirm.
+    const result = await runner.writeNextChapter(bookId, bodyText.length);
+    expect(result.status).toBe("needs-state-review");
 
     const storyDir = join(state.bookDir(bookId), "story");
-    const currentState = await readFile(join(storyDir, "current_state.md"), "utf-8");
-    const hooks = await readFile(join(storyDir, "pending_hooks.md"), "utf-8");
-    const summaries = await readFile(join(storyDir, "chapter_summaries.md"), "utf-8");
+    // NO semantic mutation, NO projections: proposal-only persistence. Any
+    // state files present are the loader's initial head-0 bootstrap output.
     const manifest = JSON.parse(await readFile(join(storyDir, "state", "manifest.json"), "utf-8"));
-    const stateCurrent = JSON.parse(await readFile(join(storyDir, "state", "current_state.json"), "utf-8"));
-    const stateHooks = JSON.parse(await readFile(join(storyDir, "state", "hooks.json"), "utf-8"));
-    const stateSummaries = JSON.parse(await readFile(join(storyDir, "state", "chapter_summaries.json"), "utf-8"));
+    expect(manifest.lastAppliedChapter).toBe(0);
+    // The proposal itself IS durable and source-oriented.
+    const artifact = JSON.parse(await readFile(
+      join(storyDir, "runtime", "chapter-0001.state-review.json"), "utf-8",
+    ));
+    expect(artifact.status).toBe("active");
+    expect(artifact.sourceChapter).toBe(1);
+    expect(artifact.effectiveChapter).toBe(1); // healthy book: head0 ⇒ slot 1
 
-    expect(currentState).toContain("Follow the debt through the river-port ledger.");
-    expect(hooks).toContain("mentor-debt");
-    expect(summaries).toContain("River Ledger");
-    expect(manifest.lastAppliedChapter).toBe(1);
-    expect(stateCurrent.chapter).toBe(1);
-    expect(stateHooks.hooks[0]?.hookId).toBe("mentor-debt");
-    expect(stateSummaries.rows[0]?.title).toBe("River Ledger");
+    const index = await state.loadChapterIndex(bookId);
+    expect(index[0]?.status).toBe("needs-state-review");
 
     await rm(root, { recursive: true, force: true });
   });
@@ -2568,8 +2573,7 @@ describe("PipelineRunner", () => {
     });
     const storyDir = join(state.bookDir(bookId), "story");
     await mkdir(join(storyDir, "state"), { recursive: true });
-    await Promise.all([
-      writeFile(join(storyDir, "current_state.md"), createStateCard({
+    await Promise.all([      writeFile(join(storyDir, "current_state.md"), createStateCard({
         chapter: 0,
         location: "Ashen ferry crossing",
         protagonistState: "Lin Yue still hides the oath token.",
@@ -2635,7 +2639,12 @@ describe("PipelineRunner", () => {
       }),
     );
 
-    await expect(runner.writeNextChapter(bookId)).rejects.toThrow();
+    // In-range length keeps the audit genuinely passed, so the schema-invalid
+    // delta hits the GOVERNED fail-closed boundary (Task 7/13): no legacy
+    // repair-and-apply, no authoritative writes.
+    await expect(
+      runner.writeNextChapter(bookId, "Broken chapter body.".length),
+    ).rejects.toThrow(/state review proposal invalid/i);
 
     await expect(readFile(join(storyDir, "current_state.md"), "utf-8")).resolves.toBe(beforeState);
     await expect(readFile(join(storyDir, "state", "manifest.json"), "utf-8")).resolves.toBe(beforeManifest);

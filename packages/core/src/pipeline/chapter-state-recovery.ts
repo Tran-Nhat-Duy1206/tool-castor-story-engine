@@ -20,6 +20,13 @@ export interface SettlementRetryParams {
   readonly chapterNumber: number;
   readonly baselineChapter?: number;
   readonly allowNewHooks?: boolean;
+  /**
+   * Task 13 closure (review blocker B2): governed generation flows MUST keep
+   * their validation-recovery re-settlement DEFERRED (Task 6/7 contract) so
+   * the retried settlement stays proposal-only. Omitted ⇒ legacy behavior
+   * (baseline-snapshot application for repair/sync flows) is preserved.
+   */
+  readonly deferStateApplication?: boolean;
   readonly title: string;
   readonly content: string;
   readonly reducedControlInput?: {
@@ -63,6 +70,7 @@ export async function retrySettlementAfterValidationFailure(
     allowReapply: true,
     baselineChapter: params.baselineChapter,
     allowNewHooks: params.allowNewHooks,
+    ...(params.deferStateApplication === true ? { deferStateApplication: true } : {}),
     chapterIntent: params.reducedControlInput?.chapterIntent,
     contextPackage: params.reducedControlInput?.contextPackage,
     ruleStack: params.reducedControlInput?.ruleStack,
