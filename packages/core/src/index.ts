@@ -118,6 +118,11 @@ export {
   prepareStateReviewConfirm,
   type PreparedStateReviewConfirm,
 } from "./state/state-review-confirm.js";
+export {
+  confirmStateReview,
+  type ConfirmStateReviewParams,
+  type ConfirmStateReviewResult,
+} from "./state/state-review-finalize.js";
 export { assertCanAdvanceStory } from "./state/advancement-gate.js";
 export {
   type PlayActionKind,

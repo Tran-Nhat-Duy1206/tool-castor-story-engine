@@ -1,10 +1,13 @@
-import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { statSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { captureBookMetadata, createCanonBook, type CanonBookFixture } from "./helpers/canon-fixture.js";
 import {
   ACTIVE_REVIEW_RELPATH,
+  findReceiptByReviewId,
+  loadStateReview,
   publishActiveProposal,
   readLiveRuntimeStateSnapshot,
 } from "../state/state-review-store.js";
@@ -24,9 +27,74 @@ import { computeProseRevision } from "../utils/prose-revision.js";
 import { readStoryCanon } from "../state/canon-service.js";
 import { prepareStateReviewConfirm } from "../state/state-review-confirm.js";
 
+const t12 = vi.hoisted(() => ({
+  commits: 0,
+  lockAcquisitions: 0,
+  lockReleases: 0,
+  syncCalls: { rebuildIndex: 0, rebuildHistory: 0, invalidate: 0 },
+  failDerivedRebuild: false,
+  failDerivedInvalidation: false,
+}));
+
+vi.mock("../utils/atomic-file-set.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../utils/atomic-file-set.js")>();
+  return {
+    ...actual,
+    commitAtomicFileSet: async (input: Parameters<typeof actual.commitAtomicFileSet>[0]) => {
+      t12.commits += 1;
+      await actual.commitAtomicFileSet(input);
+    },
+  };
+});
+
+vi.mock("../state/manager.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../state/manager.js")>();
+  class CountingStateManager extends actual.StateManager {
+    override async acquireBookLock(bookId: string): Promise<() => Promise<void>> {
+      const release = await super.acquireBookLock(bookId);
+      t12.lockAcquisitions += 1;
+      return async () => {
+        t12.lockReleases += 1;
+        await release();
+      };
+    }
+  }
+  return { ...actual, StateManager: CountingStateManager };
+});
+
+vi.mock("../state/memory-sync.js", () => ({
+  rebuildNarrativeMemoryIndex: async () => {
+    t12.syncCalls.rebuildIndex += 1;
+    if (t12.failDerivedRebuild) throw new Error("derived rebuild exploded");
+  },
+  rebuildCurrentStateFactHistory: async () => {
+    t12.syncCalls.rebuildHistory += 1;
+    if (t12.failDerivedRebuild) throw new Error("derived rebuild exploded");
+  },
+  invalidateDerivedMemory: async () => {
+    t12.syncCalls.invalidate += 1;
+    return t12.failDerivedInvalidation
+      ? ({ invalidated: false, strategy: "failed", warning: "derived memory invalidation failed; memory.db may be stale" } as const)
+      : ({ invalidated: true, strategy: "deleted" } as const);
+  },
+}));
+
+// eslint-disable-next-line import/order -- mocked modules must resolve through the hoisted factory
+import { StateManager } from "../state/manager.js";
+import { confirmStateReview } from "../state/state-review-finalize.js";
+
 const CREATED_AT = "2026-08-24T00:00:00.000Z";
 const REVIEW_ID = "3f2504e0-4f89-41d3-9a0c-0305e82c3302";
 const PROSE_16 = "# 第16章 反转\n\n林秋在北岸灯塔烧毁了账本。";
+
+/** Module-scope mirror so the Task 12 describe can assert typed errors too. */
+function expectStateReviewError(error: unknown, code: string, itemId?: string): void {
+  expect(error).toBeInstanceOf(StateReviewError);
+  expect((error as StateReviewError).code).toBe(code);
+  if (itemId !== undefined) {
+    expect((error as StateReviewError).itemId).toBe(itemId);
+  }
+}
 
 function factProposal(predicate: string, object: string) {
   return {
@@ -90,6 +158,7 @@ async function publishActiveReview(
     readonly items: ReadonlyArray<ReviewItem>;
     readonly reviewId?: string;
     readonly proseText?: string;
+    readonly extraStatuses?: Record<number, string>;
   },
 ): Promise<string> {
   const proseText = options.proseText ?? PROSE_16;
@@ -101,6 +170,9 @@ async function publishActiveReview(
       [
         ...(options.sourceChapter > 1 ? [[1, "approved"] as const] : []),
         [options.sourceChapter, "needs-state-review"] as const,
+        ...Object.entries(options.extraStatuses ?? {}).map(
+          ([number, status]) => [Number(number), status] as const,
+        ),
       ],
     ),
   );
@@ -845,3 +917,469 @@ describe("state-review-confirm PREPARE (pure)", () => {
     }
   });
 });
+
+describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
+  let fixture: CanonBookFixture;
+
+  const FACT_ITEM = (id = "item-fact") =>
+    factItem(id, "当前位置", "北岸灯塔");
+
+  const SUMMARY_ITEM = (id = "item-summary"): ReviewItem => ({
+    id,
+    kind: "chapter-summary",
+    origin: "ai",
+    title: "Chapter summary: ch 16 反转",
+    proposal: {
+      type: "chapter-summary",
+      row: {
+        chapter: 16,
+        title: "反转",
+        characters: "主角；林秋",
+        events: "林秋在北岸灯塔烧毁了账本",
+        stateChanges: "当前位置→北岸灯塔",
+        hookActivity: "",
+        mood: "紧张",
+        chapterType: "调查",
+      },
+    },
+    decision: "accepted",
+  });
+
+  async function confirmTx(
+    chapter: number,
+    reviewId: string,
+    overrides?: {
+      readonly expectedReviewRevision?: number;
+      readonly renameFile?: (from: string, to: string) => Promise<void>;
+    },
+  ) {
+    return confirmStateReview({
+      bookDir: fixture.bookDir,
+      chapter,
+      reviewId,
+      expectedReviewRevision: overrides?.expectedReviewRevision ?? 1,
+      ...(overrides?.renameFile ? { deps: { renameFile: overrides.renameFile } } : {}),
+    });
+  }
+
+  async function expectLockFree(): Promise<void> {
+    const manager = new StateManager(dirname(fixture.bookDir));
+    const release = await manager.acquireBookLock(basename(fixture.bookDir));
+    await release();
+  }
+
+  function countersBefore() {
+    return {
+      commits: t12.commits,
+      rebuildIndex: t12.syncCalls.rebuildIndex,
+      rebuildHistory: t12.syncCalls.rebuildHistory,
+      invalidate: t12.syncCalls.invalidate,
+      lockAcquisitions: t12.lockAcquisitions,
+      lockReleases: t12.lockReleases,
+    };
+  }
+
+  beforeEach(async () => {
+    t12.commits = 0;
+    t12.lockAcquisitions = 0;
+    t12.lockReleases = 0;
+    t12.syncCalls.rebuildIndex = 0;
+    t12.syncCalls.rebuildHistory = 0;
+    t12.syncCalls.invalidate = 0;
+    t12.failDerivedRebuild = false;
+    t12.failDerivedInvalidation = false;
+    fixture = await createCanonBook({ chapterCount: 25 });
+  });
+
+  it("(a/1-7,16,20-25) normal confirm commits ONE atomic set; active deleted; receipt/index/canon/projections/snapshot durable", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16,
+      effectiveChapter: 26,
+      items: [FACT_ITEM(), SUMMARY_ITEM()],
+    });
+    // Pure PREPARE once for candidate comparison (does not mutate anything).
+    const prepared = await prepareStateReviewConfirm({
+      bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
+    });
+    const before = countersBefore();
+
+    const result = await confirmTx(16, REVIEW_ID);
+
+    expect(result.status).toBe("resolved");
+    expect(result.warnings).toEqual([]);
+    expect(result.resultingCanonRevision).toBe(prepared.resultingCanonRevision);
+    expect(t12.commits - before.commits).toBe(1);
+    expect(t12.lockAcquisitions - before.lockAcquisitions).toBe(1);
+
+    // Authoritative disk state.
+    expect(await loadStateReview(fixture.bookDir, 16)).toBeNull();
+    const diskReceiptRaw = await readFile(
+      join(fixture.bookDir, "story/runtime/state-review-receipts/chapter-0016", `${REVIEW_ID}.json`),
+      "utf-8",
+    );
+    const diskReceipt = ResolvedReviewReceiptSchema.parse(JSON.parse(diskReceiptRaw));
+    // PART T: Task 12 persists prepared.receiptWrite EXACTLY — disk and result
+    // come from the SAME prepare run, so they must match byte-for-byte.
+    expect(diskReceipt).toEqual(result.receipt);
+    // Cross-run identity (separate pure prepare): semantic fields identical;
+    // resolvedAt naturally differs per run.
+    expect(prepared.receipt.reviewId).toEqual(result.receipt.reviewId);
+    expect(prepared.receipt.effectiveChanges).toEqual(result.receipt.effectiveChanges);
+    expect(prepared.receipt.proposals).toEqual(result.receipt.proposals);
+
+    const index = ChapterMetaSchema.array().parse(
+      JSON.parse(await readFile(join(fixture.bookDir, "chapters/index.json"), "utf-8")),
+    );
+    expect(index.find((meta) => meta.number === 16)?.status).toBe("approved");
+    // Unrelated-entry preservation is proven exhaustively by the PREPARE (Z)
+    // test against the full 25-chapter index; this helper-written minimal
+    // index only carries the reviewed chapter.
+
+    for (const write of prepared.canonWrites) {
+      expect(await readFile(join(fixture.bookDir, write.relativePath), "utf-8")).toBe(write.content);
+    }
+    for (const write of prepared.projectionWrites) {
+      expect(await readFile(join(fixture.bookDir, write.relativePath), "utf-8")).toBe(write.content);
+    }
+    for (const write of prepared.snapshotWrites) {
+      expect(await readFile(join(fixture.bookDir, write.relativePath), "utf-8")).toBe(write.content);
+    }
+    const manifest = StateManifestSchema.parse(
+      JSON.parse(await readFile(join(fixture.bookDir, "story/state/manifest.json"), "utf-8")),
+    );
+    expect(manifest.lastAppliedChapter).toBe(26);
+    expect(existsSync(join(fixture.bookDir, ACTIVE_REVIEW_RELPATH(16)))).toBe(false);
+
+    // Post-commit derived sync ran exactly once per duty.
+    expect(t12.syncCalls.rebuildIndex - before.rebuildIndex).toBe(1);
+    expect(t12.syncCalls.rebuildHistory - before.rebuildHistory).toBe(1);
+    expect(t12.syncCalls.invalidate - before.invalidate).toBe(0);
+  });
+
+  it("(b/c/AD/X/AJ) lost-response retry with SAME reviewId is already_resolved: zero writes, stale revision ignored, no PREPARE/commit/sync", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [FACT_ITEM()],
+    });
+    const first = await confirmTx(16, REVIEW_ID);
+    expect(first.status).toBe("resolved");
+    const stable = await captureBookMetadata(fixture.root);
+    const before = countersBefore();
+    // Tamper prose + bump nothing: if PREPARE ran it would throw stale —
+    // receipt-first lookup must return BEFORE any validation.
+    await writeFile(
+      join(fixture.bookDir, "chapters/0016_第16章.md"),
+      "# 第16章 反转\n\n被篡改的内容。",
+      "utf-8",
+    );
+    const tampered = await captureBookMetadata(fixture.root);
+
+    const retry = await confirmTx(16, REVIEW_ID, { expectedReviewRevision: 999 });
+
+    expect(retry.status).toBe("already_resolved");
+    expect(retry.warnings).toEqual([]);
+    expect(retry.receipt.reviewId).toBe(REVIEW_ID);
+    expect(retry.resultingCanonRevision).toBe(first.resultingCanonRevision);
+    expect(await captureBookMetadata(fixture.root)).toEqual(tampered);
+    expect(tampered).not.toEqual(stable); // prose tamper itself visible, nothing else changed
+    expect(t12.commits - before.commits).toBe(0);
+    expect(t12.syncCalls.rebuildIndex - before.rebuildIndex).toBe(0);
+    expect(t12.syncCalls.rebuildHistory - before.rebuildHistory).toBe(0);
+    expect(t12.lockAcquisitions - before.lockAcquisitions).toBe(1);
+    await expectLockFree();
+  });
+
+  it("(d/e/AB) wrong reviewId never confirms the current active generation; post-resolution foreign id also fails closed", async () => {
+    const activeId = await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [FACT_ITEM()],
+    });
+    expect(activeId).not.toBe(`${REVIEW_ID}-old`);
+    const before = await captureBookMetadata(fixture.root);
+    const counters = countersBefore();
+
+    await expect(confirmTx(16, `${REVIEW_ID}-old`)).rejects.toSatisfy((error: unknown) => {
+      expectStateReviewError(error, "state_review_not_found");
+      expect(String(error)).toContain(activeId); // names the superseding generation
+      return true;
+    });
+
+    expect(await captureBookMetadata(fixture.root)).toEqual(before);
+    expect(t12.commits - counters.commits).toBe(0);
+    expect(t12.syncCalls.rebuildIndex - counters.rebuildIndex).toBe(0);
+    await expectLockFree();
+
+    // Resolve the real generation, then a foreign id must still fail closed.
+    await confirmTx(16, activeId);
+    const afterResolve = await captureBookMetadata(fixture.root);
+    const counters2 = countersBefore();
+    await expect(confirmTx(16, `${REVIEW_ID}-other`)).rejects.toSatisfy((error: unknown) => {
+      expectStateReviewError(error, "state_review_not_found");
+      return true;
+    });
+    expect(await captureBookMetadata(fixture.root)).toEqual(afterResolve);
+    expect(t12.commits - counters2.commits).toBe(0);
+  });
+
+  it("(f/h/AC) Task 11 anchor failures propagate through CONFIRM as typed zero-write errors", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [FACT_ITEM()],
+    });
+    const baseline = await captureBookMetadata(fixture.root);
+    const counters = countersBefore();
+
+    // Stale expectedReviewRevision ⇒ edit_conflict.
+    await expect(confirmTx(16, REVIEW_ID, { expectedReviewRevision: 42 })).rejects.toSatisfy(
+      (error: unknown) => {
+        expectStateReviewError(error, "state_review_edit_conflict");
+        return true;
+      },
+    );
+    expect(await captureBookMetadata(fixture.root)).toEqual(baseline);
+
+    // Prose drift ⇒ state_review_stale (Task 11 anchor, not reinterpreted).
+    await writeFile(
+      join(fixture.bookDir, "chapters/0016_第16章.md"),
+      "# 第16章 反转\n\n林秋在北岸灯塔烧毁了账本。额外段落。",
+      "utf-8",
+    );
+    const drifted = await captureBookMetadata(fixture.root);
+    await expect(confirmTx(16, REVIEW_ID)).rejects.toSatisfy((error: unknown) => {
+      expectStateReviewError(error, "state_review_stale");
+      return true;
+    });
+    expect(await captureBookMetadata(fixture.root)).toEqual(drifted);
+    expect(t12.commits - counters.commits).toBe(0);
+    expect(t12.syncCalls.rebuildIndex - counters.rebuildIndex).toBe(0);
+  });
+
+  it("(i/P/14-15) zero-effective confirmation commits bookkeeping advancement with confirmed-no-changes", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 26,
+      effectiveChapter: 26,
+      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
+      items: [],
+    });
+    const result = await confirmTx(26, REVIEW_ID);
+
+    expect(result.status).toBe("resolved");
+    expect(result.receipt.resolution).toBe("confirmed-no-changes");
+    // Literally zero items ⇒ no per-item effective entries at all.
+    expect(result.receipt.effectiveChanges).toEqual([]);
+    const manifest = StateManifestSchema.parse(
+      JSON.parse(await readFile(join(fixture.bookDir, "story/state/manifest.json"), "utf-8")),
+    );
+    expect(manifest.lastAppliedChapter).toBe(26);
+    const currentState = CurrentStateStateSchema.parse(
+      JSON.parse(await readFile(join(fixture.bookDir, "story/state/current_state.json"), "utf-8")),
+    );
+    expect(currentState.facts.some((fact) => fact.object === "北岸灯塔")).toBe(false);
+    expect(StateManifestSchema.parse(JSON.parse(
+      await readFile(join(fixture.bookDir, "story/snapshots/26/state/manifest.json"), "utf-8"),
+    )).lastAppliedChapter).toBe(26);
+    const index = ChapterMetaSchema.array().parse(
+      JSON.parse(await readFile(join(fixture.bookDir, "chapters/index.json"), "utf-8")),
+    );
+    expect(index.find((meta) => meta.number === 26)?.status).toBe("approved");
+    expect(await loadStateReview(fixture.bookDir, 26)).toBeNull();
+    expect(t12.commits).toBeGreaterThanOrEqual(1); // exactly ONE confirm transaction (publish path is store-internal)
+  });
+
+  it("(g/R/S/17-19) injected mid-set rename failure rolls back EVERYTHING; active stays confirmable; no residue; retry succeeds", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [FACT_ITEM()],
+    });
+    const pristine = await captureBookMetadata(fixture.root);
+    let renames = 0;
+
+    await expect(confirmTx(16, REVIEW_ID, {
+      renameFile: async (from, to) => {
+        renames += 1;
+        if (to.replaceAll("\\", "/").endsWith("story/current_state.md")) {
+          throw new Error("injected disk failure");
+        }
+        await rename(from, to);
+      },
+    })).rejects.toThrow(/injected disk failure/);
+    expect(renames).toBeGreaterThan(5); // failure landed AFTER staging/backups
+
+    expect(await captureBookMetadata(fixture.root)).toEqual(pristine);
+    const stillActive = await loadStateReview(fixture.bookDir, 16);
+    expect(stillActive?.status).toBe("active");
+    expect((stillActive as { reviewId?: string } | null)?.reviewId).toBe(REVIEW_ID);
+    await expect(findReceiptByReviewId(fixture.bookDir, 16, REVIEW_ID)).resolves.toBeNull();
+    expect(existsSync(join(fixture.bookDir, "story/snapshots/26"))).toBe(false);
+    const rootEntries = await readdir(fixture.bookDir);
+    expect(rootEntries.some((name) => name.startsWith(".inkos-file-txn-"))).toBe(false);
+    expect(t12.syncCalls.rebuildIndex).toBe(0);
+    expect(t12.syncCalls.rebuildHistory).toBe(0);
+
+    // Same generation remains confirmable (S), then resolves cleanly.
+    const retry = await confirmTx(16, REVIEW_ID);
+    expect(retry.status).toBe("resolved");
+    expect(await loadStateReview(fixture.bookDir, 16)).toBeNull();
+    await expect(findReceiptByReviewId(fixture.bookDir, 16, REVIEW_ID)).resolves.not.toBeNull();
+  });
+
+  it("(j/W/X/Y/Z/21-23) derived-sync failure AFTER commit keeps the authoritative state and warns; retry does no second commit/sync", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [FACT_ITEM()],
+    });
+    t12.failDerivedRebuild = true;
+    t12.failDerivedInvalidation = true; // force strategy==="failed" ⇒ exact P3 warning
+
+    const result = await confirmTx(16, REVIEW_ID);
+
+    expect(result.status).toBe("resolved"); // authoritative commit stands
+    expect(result.warnings).toEqual([
+      "derived memory invalidation failed; memory.db may be stale",
+    ]);
+    // First rebuild duty failed ⇒ the pair aborts into invalidation (plan
+    // step 7 order): index attempt counted once, history never reached.
+    expect(t12.syncCalls.rebuildIndex).toBe(1);
+    expect(t12.syncCalls.rebuildHistory).toBe(0);
+    expect(t12.syncCalls.invalidate).toBe(1);
+    expect(await loadStateReview(fixture.bookDir, 16)).toBeNull();
+    await expect(findReceiptByReviewId(fixture.bookDir, 16, REVIEW_ID)).resolves.not.toBeNull();
+    const index = ChapterMetaSchema.array().parse(
+      JSON.parse(await readFile(join(fixture.bookDir, "chapters/index.json"), "utf-8")),
+    );
+    expect(index.find((meta) => meta.number === 16)?.status).toBe("approved");
+    expect(StateManifestSchema.parse(JSON.parse(
+      await readFile(join(fixture.bookDir, "story/state/manifest.json"), "utf-8"),
+    )).lastAppliedChapter).toBe(26);
+
+    // Retry after derived failure: receipt-first idempotency, NO duplicate work.
+    const before = countersBefore();
+    const retry = await confirmTx(16, REVIEW_ID);
+    expect(retry.status).toBe("already_resolved");
+    expect(t12.commits - before.commits).toBe(0);
+    expect(t12.syncCalls.rebuildIndex - before.rebuildIndex).toBe(0);
+    expect(t12.syncCalls.rebuildHistory - before.rebuildHistory).toBe(0);
+    expect(t12.syncCalls.invalidate - before.invalidate).toBe(0);
+  });
+
+  it("(AH/I-11.2-B/25) COMPLETE pre-existing snapshot target fails closed with ZERO writes", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [FACT_ITEM()],
+    });
+    const prepared = await prepareStateReviewConfirm({
+      bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
+    });
+    for (const write of prepared.snapshotWrites) {
+      await mkdir(dirname(join(fixture.bookDir, write.relativePath)), { recursive: true });
+      await writeFile(join(fixture.bookDir, write.relativePath), "stale-material", "utf-8");
+    }
+    const seeded = await captureBookMetadata(fixture.root);
+    const counters = countersBefore();
+
+    await expect(confirmTx(16, REVIEW_ID)).rejects.toSatisfy((error: unknown) => {
+      expectStateReviewError(error, "state_review_conflict");
+      expect(String(error)).toContain("story/snapshots/");
+      return true;
+    });
+
+    expect(await captureBookMetadata(fixture.root)).toEqual(seeded);
+    expect(t12.commits - counters.commits).toBe(0);
+    await expect(loadStateReview(fixture.bookDir, 16)).resolves.not.toBeNull();
+    await expect(findReceiptByReviewId(fixture.bookDir, 16, REVIEW_ID)).resolves.toBeNull();
+  });
+
+  it("(AI/26) PARTIAL pre-existing snapshot target also fails closed without overwriting", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [FACT_ITEM()],
+    });
+    const prepared = await prepareStateReviewConfirm({
+      bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
+    });
+    const partialTarget = prepared.snapshotWrites[0]!;
+    await mkdir(dirname(join(fixture.bookDir, partialTarget.relativePath)), { recursive: true });
+    await writeFile(join(fixture.bookDir, partialTarget.relativePath), "orphan-history", "utf-8");
+    const seeded = await captureBookMetadata(fixture.root);
+    const counters = countersBefore();
+
+    await expect(confirmTx(16, REVIEW_ID)).rejects.toSatisfy((error: unknown) => {
+      expectStateReviewError(error, "state_review_conflict");
+      return true;
+    });
+
+    expect(await captureBookMetadata(fixture.root)).toEqual(seeded);
+    expect(t12.commits - counters.commits).toBe(0);
+    expect(
+      await readFile(join(fixture.bookDir, partialTarget.relativePath), "utf-8"),
+    ).toBe("orphan-history");
+  });
+
+  it("(AG/28) two active reviews targeting the SAME effective slot cannot overwrite each other", async () => {
+    await publishActiveReview(fixture, {
+      sourceChapter: 16, effectiveChapter: 26, items: [SUMMARY_ITEM()],
+    }); // A: artifact under chapter-16, targets snapshots/26
+    await publishActiveReview(fixture, {
+      sourceChapter: 26,
+      effectiveChapter: 26,
+      reviewId: "3f2504e0-4f89-41d3-9a0c-0305e82c3303",
+      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
+      items: [factItem("item-b", "当前位置", "北岸灯塔")],
+      extraStatuses: { 16: "needs-state-review" }, // A and B active in parallel
+    }); // B: artifact under chapter-26, same slot
+
+    const resultA = await confirmTx(16, REVIEW_ID);
+    expect(resultA.status).toBe("resolved");
+    const slotAfterA = await captureBookMetadata(fixture.root);
+    const receiptFilesAfterA = await collectReceiptRelativePaths();
+
+    // B must NOT overwrite the committed effective slot. Canon/head anchors
+    // reject it during PREPARE (head reached 26) — either way: fail CLOSED.
+    await expect(confirmTx(26, "3f2504e0-4f89-41d3-9a0c-0305e82c3303")).rejects.toSatisfy(
+      (error: unknown) => {
+        expect(error).toBeInstanceOf(StateReviewError);
+        return true;
+      },
+    );
+
+    const slotAfterB = await captureBookMetadata(fixture.root);
+    expect(slotAfterB).toEqual(slotAfterA); // snapshots/26 byte-identical
+    expect(await collectReceiptRelativePaths()).toEqual(receiptFilesAfterA);
+    await expect(loadStateReview(fixture.bookDir, 26)).resolves.not.toBeNull(); // B intact for rebuild
+  });
+
+  it("(AM) transaction module stays semantically dumb — no resolver/compiler/AI imports", async () => {
+    const source = await readFile(
+      fileURLToPath(new URL("../state/state-review-finalize.ts", import.meta.url)),
+      "utf-8",
+    );
+    for (const banned of [
+      "resolveReviewItemEffectiveChange",
+      "buildStateReviewItems",
+      "applyRuntimeStateDelta",
+      "WriterAgent",
+      "ChapterAnalyzerAgent",
+      "settleChapterState",
+      "writeResolvedReceipt",
+      "saveChapterIndex",
+      "publishActiveProposal",
+      "mutateActiveProposal",
+    ]) {
+      expect(source.includes(banned), `banned token in finalize module: ${banned}`).toBe(false);
+    }
+  });
+
+  async function collectReceiptRelativePaths(): Promise<string[]> {
+    const runtimeDir = join(fixture.bookDir, "story/runtime");
+    const chapters = await readdir(runtimeDir).catch(() => [] as string[]);
+    const paths: string[] = [];
+    for (const entry of chapters.filter((name) => name.startsWith("state-review-receipts"))) {
+      for (const file of await readdir(join(runtimeDir, entry))) {
+        paths.push(`${entry}/${file}`);
+      }
+    }
+    return paths.sort();
+  }
+});
+
+function existsSync(path: string): boolean {
+  try {
+    statSync(path);
+    return true;
+  } catch {
+    return false;
+  }
+}

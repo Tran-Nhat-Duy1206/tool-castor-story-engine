@@ -561,6 +561,7 @@ Steps:
 ### Task 12 — confirmStateReview with reviewId-keyed idempotency
 
 **Files:** MODIFY `packages/core/src/state/state-review-confirm.ts` (add confirm); MODIFY `packages/core/src/pipeline/runner.ts` (gate wiring done in Task 7 — no further change needed here); barrel exports.
+Amendment (implementation): `confirmStateReview` lives in NEW `state/state-review-finalize.ts` — the Task 11 module's static purity guard bans transaction tokens (`commitAtomicFileSet` etc.), so the finalize module is separate and the confirm export is added via the barrel; re-export from `state-review-confirm.ts` was skipped to avoid an import cycle.
 
 Exact signature + flow:
 
@@ -570,7 +571,7 @@ export async function confirmStateReview(params: {
   chapter: number;
   reviewId: string;                 // REQUIRED — keys idempotency AND identity
   expectedReviewRevision: number;
-  durableHead?: number;             // optional override; default resolveDurableStoryProgress({bookDir}) under caller lock
+  durableHead?: number;             // optional override; default = live confirmed head derived under the caller lock
   deps?: { renameFile?: (from: string, to: string) => Promise<void> };
 }): Promise<{
   status: "resolved" | "already_resolved";
@@ -578,7 +579,10 @@ export async function confirmStateReview(params: {
   resultingCanonRevision: string;
   warnings: ReadonlyArray<string>;
 }>;
-// CALLER HOLDS BOOK LOCK. Inside the lock, EXACTLY this order:
+// PUBLIC FUNCTION OWNS THE BOOK MUTATION LOCK EXACTLY ONCE (Task 10 wrapper
+// pattern; amendment — an earlier draft said "caller holds book lock", which
+// would nest with Task 14 route locks and deadlock the non-reentrant lock).
+// Inside the lock, EXACTLY this order:
 // 1. receipt = await findReceiptByReviewId(bookDir, chapter, params.reviewId)   ← FIRST, pure read
 // 2. if (receipt) return { status: "already_resolved", receipt, resultingCanonRevision:
 //        receipt.resultingCanonRevision, warnings: [] };                        ← ZERO writes.
@@ -588,7 +592,18 @@ export async function confirmStateReview(params: {
 // 4. active.reviewId !== params.reviewId ⇒ StateReviewError("state_review_not_found",
 //    message names the superseding generation)                                  ← identity binding
 // 5. prepared = await prepareStateReviewConfirm({ bookDir, chapter,
-//        expectedReviewRevision, durableHead: params.durableHead ?? await resolveDurableStoryProgress({ bookDir }) })
+//        expectedReviewRevision, durableHead: params.durableHead ??
+//        (await readLiveRuntimeStateSnapshot({ bookDir })).manifest.lastAppliedChapter })
+//    Amendment: the confirmed-head derivation replaces the earlier
+//    resolveDurableStoryProgress shorthand — that counts pending files and
+//    would contradict Task 11's pinned caller/live equality defense.
+// 5b. I-11.2 EFFECTIVE-SLOT/SNAPSHOT COLLISION GUARD (mandatory): EVERY
+//     prepared.snapshotWrites output target must be ABSENT on disk while the
+//     lock is held. Any pre-existing material at the target not explained by
+//     the SAME resolved reviewId — complete set, partial set, or corrupt
+//     leftovers — is a hard StateReviewError("state_review_conflict"); no
+//     overwrite, no merge, no repair. Same-review retries never reach this
+//     check because step 2 returns first (receipt-first ordering).
 // 6. ONE commitAtomicFileSet({ rootDir: bookDir,
 //      writes: [...prepared.canonWrites, ...prepared.projectionWrites,
 //               ...prepared.snapshotWrites, prepared.receiptWrite, prepared.indexWrite],

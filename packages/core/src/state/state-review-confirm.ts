@@ -86,9 +86,9 @@ export interface PreparedStateReviewConfirm {
   readonly receiptWrite: { relativePath: string; content: string };
   /** Complete candidate chapters/index.json with the reviewed chapter approved. */
   readonly indexWrite: { relativePath: string; content: string };
-  /** Four structured Canon documents; EMPTY for zero-effective confirmations. */
+  /** Four structured Canon documents built from the ADVANCED candidate state. */
   readonly canonWrites: ReadonlyArray<{ relativePath: string; content: string }>;
-  /** Three truth-projection Markdown docs; EMPTY for zero-effective confirms. */
+  /** Three truth-projection Markdown docs rendered from the advanced candidate. */
   readonly projectionWrites: ReadonlyArray<{ relativePath: string; content: string }>;
   /** Candidate `story/snapshots/<effectiveChapter>/` mirror; never on disk yet. */
   readonly snapshotWrites: ReadonlyArray<{ relativePath: string; content: string }>;
