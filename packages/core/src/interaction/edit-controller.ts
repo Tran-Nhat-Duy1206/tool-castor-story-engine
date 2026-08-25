@@ -1,10 +1,13 @@
 import { access, readdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import type { ChapterMeta } from "../models/chapter.js";
+import { StateManifestSchema } from "../models/runtime-state.js";
 import {
   archiveChapterVersion,
   type ChapterVersionSource,
 } from "../state/chapter-workspace.js";
+import { handleStateRelevantProseSave } from "../state/state-review-service.js";
+import { commitAtomicFileSet } from "../utils/atomic-file-set.js";
 import { classifyTruthAuthority, normalizeTruthFileName, type TruthAuthority } from "./truth-authority.js";
 
 export type EditRequest =
@@ -62,6 +65,11 @@ export interface EditExecutionDeps {
   readonly bookDir: (bookId: string) => string;
   readonly loadChapterIndex: (bookId: string) => Promise<ReadonlyArray<ChapterMeta>>;
   readonly saveChapterIndex: (bookId: string, index: ReadonlyArray<ChapterMeta>) => Promise<void>;
+  /**
+   * Optional injection seam forwarded to `commitAtomicFileSet` (Task 9
+   * chapter-replace path only) so tests can exercise mid-set failure rollback.
+   */
+  readonly renameFile?: (from: string, to: string) => Promise<void>;
 }
 
 export interface ExecutedEditTransaction {
@@ -318,6 +326,13 @@ function roughChapterLength(content: string): number {
     .length;
 }
 
+/**
+ * Task 9 — the chapter-replace arm is STATE-RELEVANT: durable prose changes
+ * under a caller-owned book lock, so new prose, lifecycle
+ * needs-state-review, the rebuild_required shell, and any resolved-receipt
+ * supersession commit in ONE authoritative `commitAtomicFileSet`. There is no
+ * post-transaction `deps.saveChapterIndex` on this path.
+ */
 async function executeChapterReplace(
   deps: EditExecutionDeps,
   request: Extract<EditRequest, { kind: "chapter-replace" }>,
@@ -329,22 +344,49 @@ async function executeChapterReplace(
   }
   const { chapterPath } = await findChapterPath(root, request.chapterNumber);
   const previousContent = await readFile(chapterPath, "utf-8");
+
+  // Pure invalidation inputs FIRST (fail-closed reads; NO writes yet — even
+  // the legacy version archive below only runs once inputs are valid).
+  const invalidation = await handleStateRelevantProseSave({
+    bookDir: root,
+    chapter: request.chapterNumber,
+    language: await resolveBookLanguage(root),
+  });
+  const baseIndex = await deps.loadChapterIndex(request.bookId);
+  if (!baseIndex.some((chapter) => chapter.number === request.chapterNumber)) {
+    throw new Error(`Chapter ${request.chapterNumber} not found in chapter index.`);
+  }
+  const removedRuntimeFiles = await listStaleRuntimeFiles(root, request.chapterNumber);
+
   await archiveChapterVersion(
     root,
     request.chapterNumber,
     previousContent,
     request.versionSource ?? "agent",
   );
-  await writeFile(chapterPath, fullText.endsWith("\n") ? fullText : `${fullText}\n`, "utf-8");
-  const removedRuntimeFiles = await clearChapterRuntimeFiles(root, request.chapterNumber);
 
-  const updatedIndex = markChapterForManualReview(
-    await deps.loadChapterIndex(request.bookId),
-    request.chapterNumber,
-    "Manual chapter replacement requires review before continuation.",
-    roughChapterLength(fullText),
-  );
-  await deps.saveChapterIndex(request.bookId, updatedIndex);
+  const updatedIndex = baseIndex.map((chapter) => invalidation.indexEntryUpdate(chapter));
+
+  await commitAtomicFileSet({
+    rootDir: root,
+    renameFile: deps.renameFile,
+    writes: [
+      {
+        relativePath: relative(root, chapterPath),
+        content: fullText.endsWith("\n") ? fullText : `${fullText}\n`,
+      },
+      invalidation.shellWrite,
+      ...invalidation.receiptWrites.map((entry) => ({
+        relativePath: entry.relativePath,
+        content: entry.content,
+      })),
+      {
+        relativePath: join("chapters", "index.json"),
+        content: JSON.stringify(updatedIndex, null, 2),
+      },
+    ],
+    deletes: removedRuntimeFiles,
+  });
 
   return {
     transactionType: request.kind,
@@ -353,11 +395,49 @@ async function executeChapterReplace(
     touchedFiles: [
       relative(root, chapterPath),
       ...removedRuntimeFiles,
+      invalidation.shellWrite.relativePath,
+      ...invalidation.receiptWrites.map((entry) => entry.relativePath),
       "chapters/index.json",
     ],
     reviewRequired: true,
-    summary: `Replaced chapter ${request.chapterNumber} and marked it for review.`,
+    summary: `Replaced chapter ${request.chapterNumber} and invalidated its state review for rebuild.`,
   };
+}
+
+/** Pure listing counterpart of clearChapterRuntimeFiles (no unlink). The
+ * active review artifact is NOT deletable here — Task 9 replaces it with the
+ * shell inside the same transaction. */
+async function listStaleRuntimeFiles(root: string, chapterNumber: number): Promise<string[]> {
+  const paddedChapter = String(chapterNumber).padStart(4, "0");
+  const runtimeDir = join(root, "story", "runtime");
+  const runtimeFiles = (await readdir(runtimeDir).catch((error) => {
+    if (isMissingDirectoryError(error)) {
+      return [];
+    }
+    throw error;
+  }))
+    .filter((file) => (
+      file.startsWith(`chapter-${paddedChapter}.`)
+      && file !== `chapter-${paddedChapter}.user-brief.md`
+      && file !== `chapter-${paddedChapter}.state-review.json`
+    ));
+  return runtimeFiles.map((file) => relative(root, join(runtimeDir, file)));
+}
+
+/** Resolve the review language from the book manifest. Missing manifest ⇒
+ * legacy default "en"; corrupt manifest fails closed. */
+async function resolveBookLanguage(bookDir: string): Promise<"zh" | "en"> {
+  let raw: string;
+  try {
+    raw = await readFile(join(bookDir, "story", "state", "manifest.json"), "utf-8");
+  } catch (error) {
+    if (isMissingDirectoryError(error)
+      || ((error as NodeJS.ErrnoException).code === "ENOENT")) {
+      return "en";
+    }
+    throw error;
+  }
+  return StateManifestSchema.parse(JSON.parse(raw)).language;
 }
 
 async function executeChapterLocalEdit(

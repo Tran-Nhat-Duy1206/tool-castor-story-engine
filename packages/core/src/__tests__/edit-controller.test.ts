@@ -390,7 +390,7 @@ describe("edit controller", () => {
     expect(result.reviewRequired).toBe(true);
   });
 
-  it("executes whole-chapter replacement and marks the chapter for review", async () => {
+  it("executes whole-chapter replacement as one atomic state-relevant save", async () => {
     const bookDir = join(projectRoot, "books", "replacebook");
     await mkdir(join(bookDir, "chapters"), { recursive: true });
     await mkdir(join(bookDir, "story", "runtime"), { recursive: true });
@@ -412,13 +412,13 @@ describe("edit controller", () => {
       lengthWarnings: [],
     }];
 
-    let savedIndex: ChapterMeta[] = [...chapterIndex];
+    const savedIndex: ChapterMeta[][] = [];
     const result = await executeEditTransaction(
       {
         bookDir: (bookId) => join(projectRoot, "books", bookId),
         loadChapterIndex: async () => chapterIndex,
         saveChapterIndex: async (_bookId, index) => {
-          savedIndex = [...index];
+          savedIndex.push([...index]);
         },
       },
       {
@@ -438,9 +438,18 @@ describe("edit controller", () => {
       .resolves.toBe(false);
     await expect(readFile(join(bookDir, "story", "runtime", "chapter-0002.user-brief.md"), "utf-8"))
       .resolves.toBe("保留雨夜证词。\n");
-    expect(savedIndex[0]?.status).toBe("audit-failed");
-    expect(savedIndex[0]?.wordCount).toBeGreaterThan(0);
-    expect(savedIndex[0]?.auditIssues.at(-1)).toContain("Manual chapter replacement requires review");
+    // Task 9: index is written INSIDE the atomic set — saveChapterIndex is NOT
+    // called and the lifecycle lands on needs-state-review on disk.
+    expect(savedIndex).toEqual([]);
+    const indexOnDisk = JSON.parse(await readFile(join(bookDir, "chapters", "index.json"), "utf-8"));
+    expect(indexOnDisk[0].status).toBe("needs-state-review");
+    expect(indexOnDisk[0].auditIssues).toEqual([]);
+    // The review artifact becomes a non-confirmable rebuild_required shell.
+    const shell = JSON.parse(
+      await readFile(join(bookDir, "story", "runtime", "chapter-0002.state-review.json"), "utf-8"),
+    );
+    expect(shell.status).toBe("rebuild_required");
+    expect(shell.sourceChapter).toBe(2);
     expect(result.reviewRequired).toBe(true);
     expect(result.summary).toContain("Replaced chapter 2");
   });

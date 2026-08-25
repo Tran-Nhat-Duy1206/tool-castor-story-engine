@@ -1,12 +1,21 @@
 import {
   ProposalChangeSchema,
+  StateReviewArtifactSchema,
   StateReviewError,
   stateReviewItemId,
   type ActiveStateReviewArtifact,
   type ProposalChange,
   type ReviewItem,
   type ReviewItemKind,
+  type StateReviewShellArtifact,
 } from "../models/state-review.js";
+import type { ChapterMeta } from "../models/chapter.js";
+import type { RuntimeStateLanguage } from "../models/runtime-state.js";
+import {
+  ACTIVE_REVIEW_RELPATH,
+  loadStateReview,
+  supersedeReceiptsForChapter,
+} from "./state-review-store.js";
 import { mutateActiveProposal } from "./state-review-store.js";
 
 /**
@@ -301,4 +310,74 @@ export async function rejectAllAiItems(params: {
     mutate: casMutation,
     deps: casDeps(params.deps),
   });
+}
+
+/**
+ * Task 9 — state-relevant prose-save invalidation (PURE orchestration input).
+ *
+ * Durable chapter prose is about to change, so the old State Review meaning is
+ * no longer confirmable. This function performs ONLY reads + pure string
+ * assembly and hands the caller the exact entries to commit in ONE
+ * `commitAtomicFileSet` together with the new prose and the updated chapter
+ * index:
+ *
+ * - `shellWrite` replaces (create-or-replace) the chapter's review artifact
+ *   with a NON-CONFIRMABLE `rebuild_required` shell carrying only the shell
+ *   schema fields — no reviewId, no reviewRevision, no items, no active-only
+ *   anchors. All prior AI/user decisions die with the old proposal; Task 3
+ *   refuses shell mutation, so nothing stale stays confirmable.
+ * - `receiptWrites` are the PURE Task 3 supersession entries flipping this
+ *   chapter's currently resolved receipts to `resolution:"superseded"`
+ *   (already-superseded history untouched). No fresh reviewId exists here, so
+ *   `supersededBy` is deliberately NOT set.
+ * - `indexEntryUpdate` flips the edited chapter's lifecycle status to
+ *   needs-state-review (+updatedAt) and nothing else.
+ *
+ * Fail-closed: a corrupt existing ACTIVE artifact or corrupt receipt history
+ * throws before any transaction inputs exist. Canon, projections, snapshots,
+ * later chapters and receipt semantic payloads are never touched by design.
+ */
+export async function handleStateRelevantProseSave(params: {
+  readonly bookDir: string;
+  readonly chapter: number;
+  readonly language: RuntimeStateLanguage;
+}): Promise<{
+  readonly indexEntryUpdate: (entry: ChapterMeta) => ChapterMeta;
+  readonly shellWrite: { relativePath: string; content: string };
+  readonly receiptWrites: ReadonlyArray<{ relativePath: string; content: string }>;
+}> {
+  // Fail closed on a corrupt artifact BEFORE building any replacement input;
+  // a missing artifact is fine (fresh invalidation for legacy/first edits).
+  await loadStateReview(params.bookDir, params.chapter);
+
+  const createdAt = new Date().toISOString();
+  const parsedShell = StateReviewArtifactSchema.safeParse({
+    schemaVersion: 1,
+    status: "rebuild_required",
+    sourceChapter: params.chapter,
+    createdAt,
+    language: params.language,
+    reason: "",
+  });
+  if (!parsedShell.success || parsedShell.data.status !== "rebuild_required") {
+    throw new StateReviewError(
+      "state_review_invalid_change",
+      `failed to construct rebuild_required shell for chapter ${params.chapter}`
+        + `${parsedShell.success ? "" : `: ${parsedShell.error.issues[0]?.message ?? "unknown"}`}`,
+    );
+  }
+  return {
+    indexEntryUpdate: (entry: ChapterMeta): ChapterMeta =>
+      entry.number === params.chapter
+        ? { ...entry, status: "needs-state-review", updatedAt: createdAt }
+        : entry,
+    shellWrite: {
+      relativePath: ACTIVE_REVIEW_RELPATH(params.chapter),
+      content: JSON.stringify(parsedShell.data, null, 2),
+    },
+    receiptWrites: await supersedeReceiptsForChapter({
+      bookDir: params.bookDir,
+      chapter: params.chapter,
+    }),
+  };
 }
