@@ -21,11 +21,11 @@ import {
   ACTIVE_REVIEW_RELPATH,
   loadStateReview,
   publishActiveProposal,
+  readLiveRuntimeStateSnapshot,
   saveStateReviewShell,
   supersedeReceiptsForChapter,
 } from "./state-review-store.js";
 import { readStoryCanon } from "./canon-service.js";
-import { resolveDurableStoryProgress } from "./state-bootstrap.js";
 import { computeProseRevision } from "../utils/prose-revision.js";
 import { mutateActiveProposal } from "./state-review-store.js";
 
@@ -434,10 +434,15 @@ function sanitizeRebuildFailureReason(error: unknown): string {
  *   `state_review_stale`, missing artifact ⇒ `state_review_not_found` — all
  *   with ZERO writes.
  * - Inputs are read fresh from disk EVERY attempt: durable chapter bytes ⇒
- *   `proseRevision`, pure `readStoryCanon` ⇒ `baseCanonRevision`, and
- *   `effectiveChapter = resolveDurableStoryProgress + 1` (§20 — historical
- *   source chapters therefore anchor at head+1 automatically). Nothing is
- *   reused from the destroyed proposal, its decisions, or any receipt.
+ *   `proseRevision`, pure `readStoryCanon` ⇒ `baseCanonRevision`, and the
+ *   temporal anchor follows design §20 using the CONFIRMED Canon head
+ *   (`manifest.lastAppliedChapter` via the pure
+ *   `readLiveRuntimeStateSnapshot`): `source <= confirmedHead` ⇒
+ *   `effectiveChapter = confirmedHead + 1` (historical / READY-head
+ *   corrections), otherwise `effectiveChapter = source` (a pending current
+ *   chapter N over confirmed N-1 anchors at N, NOT N+1 — durable file counts
+ *   are never used as proof of confirmed semantics). Nothing is reused from
+ *   the destroyed proposal, its decisions, or any receipt.
  * - `analyze()` is the ONLY AI seam (production wires the real chapter
  *   analyzer via a thin adapter; tests inject fakes). An analyze THROW
  *   durably converts the shell to `rebuild_failed` (reason = sanitized
@@ -489,7 +494,10 @@ export async function rebuildStateReview(params: {
   const durableProse = await readLatestDurableChapterProse(params.bookDir, params.chapter);
   const proseRevision = computeProseRevision(durableProse);
   const canonView = await readStoryCanon(params.bookDir);
-  const effectiveChapter = (await resolveDurableStoryProgress({ bookDir: params.bookDir })) + 1;
+  // Design §20: anchor by CONFIRMED Canon head — never by durable file counts,
+  // which include the unresolved pending chapter itself.
+  const confirmedHead = (await readLiveRuntimeStateSnapshot(params.bookDir)).manifest.lastAppliedChapter;
+  const effectiveChapter = params.chapter <= confirmedHead ? confirmedHead + 1 : params.chapter;
 
   // ---- Analysis (the single AI seam; failure ⇒ durable rebuild_failed) ----
   let delta: RuntimeStateDelta;

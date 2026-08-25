@@ -502,14 +502,13 @@ NO post-transaction `deps.saveChapterIndex` call remains on this path (legacy no
 export async function rebuildStateReview(params: {
   bookDir: string; chapter: number; language: RuntimeStateLanguage;
   analyze: (input: { chapterContent: string }) => Promise<RuntimeStateDelta>;
-  // production wires ChapterAnalyzerAgent.analyzeChapter (chapter-analyzer.ts:42); adapter extracts .runtimeStateDelta
 }): Promise<{ artifact: ActiveArtifact }>;
 ```
 
-- Loads shell (`rebuild_required`|`rebuild_failed` else `already_resolved`/`stale`); reads latest prose bytes ⇒ `proseRevision`; `readStoryCanon` ⇒ `baseCanonRevision`; `effectiveChapter = resolveDurableStoryProgress({bookDir}) + 1` (§20); `analyze()` ⇒ items via Task 4; **`reviewId = randomUUID()`** — brand-new for EVERY successful rebuild, including when NO receipt exists yet (no counters, no clock-derived ids); persisted once, stable within the generation. Analyze throw ⇒ shell→`rebuild_failed` (durable) + `StateReviewError("state_review_rebuild_failed", original.message)`. No decision carry-forward.
+- Loads shell (`rebuild_required`|`rebuild_failed` else `already_resolved`/`stale`); reads latest prose bytes ⇒ `proseRevision`; `readStoryCanon` ⇒ `baseCanonRevision`; `effectiveChapter` follows design §20 CONFIRMED-Canon head semantics (amended — the earlier `resolveDurableStoryProgress()+1` shorthand counted the pending chapter's own durable file and wrongly shifted current-pending rebuilds): let `confirmedHead = readLiveRuntimeStateSnapshot(bookDir).manifest.lastAppliedChapter`; `source <= confirmedHead ⇒ effectiveChapter = confirmedHead + 1`, else `effectiveChapter = source`. Production proposal regeneration uses the canonical RuntimeStateDelta-producing settlement path `WriterAgent.settleChapterState(...)` (the chapter analyzer/parser never emits `.runtimeStateDelta`); missing/invalid settlement delta ⇒ ordinary rebuild failure. `analyze()` ⇒ items via Task 4; **`reviewId = randomUUID()`** — brand-new for EVERY successful rebuild, including when NO receipt exists yet (no counters, no clock-derived ids); persisted once, stable within the generation. Analyze throw ⇒ shell→`rebuild_failed` (durable) + `StateReviewError("state_review_rebuild_failed", original.message)`. No decision carry-forward.
 
 - [ ] RED: (1) R1 active → `handleStateRelevantProseSave` → rebuild ⇒ R2 active with **R1.reviewId !== R2.reviewId** and ZERO intervening receipts; (2) shell rebuild_failed → failing analyze again stays failed; then succeeding retry ⇒ new successful proposal with yet another fresh reviewId; (3) anchors equal freshly computed revisions; (4) confirm attempt on shell refused; Canon frozen throughout.
-- [ ] GREEN; runner gets thin `regenerateStateReview(bookId, chapter)` wrapper (analyzer construction). Verify focused; commit `feat(core): state review rebuild with per-generation review ids`.
+- [ ] GREEN; runner gets public `regenerateStateReview(bookId, chapter)` wrapper that owns the book mutation lock exactly once (anchor reads → settlement → publication inside it; no nested lock) and wires the settlement adapter. Verify focused; commit `feat(core): state review rebuild with per-generation review ids`.
 
 ## Area G/H/I — PREPARE + CONFIRM
 

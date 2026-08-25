@@ -1844,39 +1844,69 @@ export class PipelineRunner {
   }
 
   /**
-   * Task 10 — thin production wrapper: rebuilds the chapter's State Review
-   * from LATEST durable prose + LATEST live Canon, wiring the real chapter
-   * analyzer as the single AI seam (its `.runtimeStateDelta` is extracted;
-   * a missing delta is an ordinary rebuild failure). Runs under the caller's
-   * book lock; pass `deps.createAnalyzer` in tests to inject a stub.
+   * Task 10 — production rebuild entry point. PUBLIC and SAFE: it acquires
+   * the book mutation lock exactly once (anchor reads → settlement →
+   * publication all happen inside), so future HTTP/CLI consumers need no
+   * hidden locking knowledge. The proposal is produced by the CANONICAL
+   * RuntimeStateDelta path established in Task 7 —
+   * `WriterAgent.settleChapterState` over the LATEST durable prose against
+   * LIVE Canon — NOT by `ChapterAnalyzerAgent`, whose parser never emits a
+   * runtime state delta. Tests may inject `deps.createWriter`.
    */
   async regenerateStateReview(
     bookId: string,
     chapterNumber: number,
     deps?: {
-      readonly createAnalyzer?: () => Pick<ChapterAnalyzerAgent, "analyzeChapter">;
+      readonly createWriter?: () => Pick<WriterAgent, "settleChapterState">;
+    },
+  ): Promise<{ artifact: ActiveStateReviewArtifact }> {
+    const releaseLock = await this.state.acquireBookLock(bookId);
+    try {
+      return await this.regenerateStateReviewLocked(bookId, chapterNumber, deps);
+    } finally {
+      releaseLock();
+    }
+  }
+
+  private async regenerateStateReviewLocked(
+    bookId: string,
+    chapterNumber: number,
+    deps?: {
+      readonly createWriter?: () => Pick<WriterAgent, "settleChapterState">;
     },
   ): Promise<{ artifact: ActiveStateReviewArtifact }> {
     const bookDir = this.state.bookDir(bookId);
     const book = await this.state.loadBookConfig(bookId);
+    // Authoritative title comes from the chapter index model — never parsed
+    // ad hoc from markdown headings.
+    const index = await this.state.loadChapterIndex(bookId);
+    const title = index.find((entry) => entry.number === chapterNumber)?.title
+      ?? `第${chapterNumber}章`;
     return rebuildStateReview({
       bookDir,
       chapter: chapterNumber,
       language: book.language ?? "en",
       analyze: async ({ chapterContent }) => {
-        const analyzer = deps?.createAnalyzer?.()
-          ?? new ChapterAnalyzerAgent(this.agentCtxFor("chapter-analyzer", bookId));
-        const output = await analyzer.analyzeChapter({
+        const writer = deps?.createWriter?.()
+          ?? new WriterAgent(this.agentCtxFor("writer", bookId));
+        const settled = await writer.settleChapterState({
           book,
           bookDir,
           chapterNumber,
-          chapterContent,
+          title,
+          content: chapterContent,
         });
-        const delta = output.runtimeStateDelta;
-        if (!delta) {
-          throw new Error("chapter analysis produced no runtime state delta");
+        if (!settled.runtimeStateDelta) {
+          throw new Error("chapter settlement produced no runtime state delta");
         }
-        return delta;
+        const parsedDelta = RuntimeStateDeltaSchema.safeParse(settled.runtimeStateDelta);
+        if (!parsedDelta.success) {
+          throw new Error(
+            "settlement produced an invalid runtime state delta: "
+              + `${parsedDelta.error.issues[0]?.message ?? "unknown"}`,
+          );
+        }
+        return parsedDelta.data;
       },
     });
   }

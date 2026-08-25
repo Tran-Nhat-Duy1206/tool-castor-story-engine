@@ -13,6 +13,9 @@ import { resolveDurableStoryProgress } from "../state/state-bootstrap.js";
 import { computeProseRevision } from "../utils/prose-revision.js";
 import { addUserStateReviewItem, decideStateReviewItem, rebuildStateReview } from "../state/state-review-service.js";
 import { executeEditTransaction } from "../interaction/edit-controller.js";
+import { PipelineRunner } from "../pipeline/runner.js";
+import { ChapterAnalyzerAgent } from "../agents/chapter-analyzer.js";
+import type { WriterAgent } from "../agents/writer.js";
 import type { ReviewItem } from "../models/state-review.js";
 import type { RuntimeStateDelta } from "../models/runtime-state.js";
 import { RuntimeStateDeltaSchema } from "../models/runtime-state.js";
@@ -75,7 +78,11 @@ async function readDurableProse(fixture: CanonBookFixture, chapter: number): Pro
   return readFile(join(fixture.bookDir, "chapters", fileName), "utf-8");
 }
 
-async function saveViaTask9(fixture: CanonBookFixture, fullText: string): Promise<void> {
+async function saveViaTask9(
+  fixture: CanonBookFixture,
+  fullText: string,
+  chapterNumber = 16,
+): Promise<void> {
   await executeEditTransaction(
     {
       bookDir: () => fixture.bookDir,
@@ -83,14 +90,21 @@ async function saveViaTask9(fixture: CanonBookFixture, fullText: string): Promis
         JSON.parse(await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8")) as never,
       saveChapterIndex: async () => undefined,
     },
-    { kind: "chapter-replace", bookId: "demo-canon-book", chapterNumber: 16, fullText },
+    { kind: "chapter-replace", bookId: "demo-canon-book", chapterNumber, fullText },
   );
+}
+
+async function setConfirmedHead(fixture: CanonBookFixture, lastAppliedChapter: number): Promise<void> {
+  const manifestPath = join(fixture.bookDir, "story", "state", "manifest.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf-8")) as { lastAppliedChapter: number };
+  manifest.lastAppliedChapter = lastAppliedChapter;
+  await writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf-8");
 }
 
 function factDelta(chapter: number, object: string): RuntimeStateDelta {
   return RuntimeStateDeltaSchema.parse({
     chapter,
-    currentStatePatch: { 当前位置: object },
+    currentStatePatch: { currentLocation: object },
   });
 }
 
@@ -148,10 +162,11 @@ describe("state-review-regenerate", () => {
     // Analyzer received EXACTLY the latest durable prose.
     const durableP2 = await readDurableProse(fixture, 16);
     expect(analyzedContent).toBe(durableP2);
-    // Anchors are freshly computed.
+    // Anchors are freshly computed. Fixture Canon confirmed through ch12;
+    // source 16 is AHEAD of confirmed head ⇒ §20 keeps effective = source.
     expect(artifact.proseRevision).toBe(computeProseRevision(durableP2));
     expect(artifact.baseCanonRevision).toBe((await readStoryCanon(fixture.bookDir)).revision);
-    expect(artifact.effectiveChapter).toBe((await resolveDurableStoryProgress({ bookDir: fixture.bookDir })) + 1);
+    expect(artifact.effectiveChapter).toBe(16);
     expect(artifact.sourceChapter).toBe(16);
     expect(artifact.reviewRevision).toBe(1);
     // Items come ONLY from Task 4 over the fresh delta — fresh undecided AI
@@ -364,8 +379,9 @@ describe("state-review-regenerate", () => {
     expect(second.artifact.items.every((item) => item.decision === "undecided")).toBe(true);
   });
 
-  it("(R20/J) historical rebuild binds sourceChapter=edited but effectiveChapter=head+1", async () => {
-    // Contiguous durable head 25 (files + index entries 1..25), editing ch16.
+  it("(R20/J) historical rebuild binds sourceChapter=edited but effectiveChapter=confirmedHead+1", async () => {
+    // Confirmed Canon semantics applied through ch25; editing historical ch16.
+    await setConfirmedHead(fixture, 25);
     await seedChapters(fixture, Array.from({ length: 15 }, (_, index) => index + 1)
       .concat([17, 18, 19, 20, 21, 22, 23, 24, 25]));
     await writeFile(
@@ -407,5 +423,176 @@ describe("state-review-regenerate", () => {
     expect((await readdir(join(fixture.bookDir, "story", "runtime")))
       .filter((name) => name.startsWith(".tmp") || name.includes(".inkos-")))
       .toEqual([]);
+  });
+  // -------------------------------------------------------------------------
+  // Fix-up (C-10.1 / I-10.1 / I-10.2 / I-10.3): production adapter, semantic
+  // Canon basis, and the public mutation-lock boundary.
+  // -------------------------------------------------------------------------
+
+  function makeRunner(): PipelineRunner {
+    return new PipelineRunner({
+      client: {
+        provider: "openai", apiFormat: "chat", stream: false,
+        defaults: { temperature: 0.7, maxTokens: 4096, thinkingBudget: 0 },
+      } as ConstructorParameters<typeof PipelineRunner>[0]["client"],
+      model: "test-model",
+      projectRoot: fixture.root,
+    });
+  }
+
+  interface SettleProbe {
+    readonly calls: string[];
+    readonly settledContents: string[];
+    readonly settledCanonRevisions: string[];
+  }
+
+  function makeFakeWriter(
+    probe: SettleProbe,
+    mode: "valid" | "missing-delta" | "invalid-delta",
+  ): Pick<WriterAgent, "settleChapterState"> {
+    return {
+      settleChapterState: async (input) => {
+        probe.calls.push("settle");
+        probe.settledContents.push(input.content);
+        // The settlement semantic basis is LIVE Canon read from disk — the
+        // fake mirrors what WriterAgent.settleChapterState really does.
+        probe.settledCanonRevisions.push((await readStoryCanon(fixture.bookDir)).revision);
+        if (mode === "missing-delta") return {} as never;
+        if (mode === "invalid-delta") {
+          return { runtimeStateDelta: { chapter: "not-a-number" } } as never;
+        }
+        return {
+          runtimeStateDelta: factDelta(16, `灯塔目标-第${probe.settledCanonRevisions.length}次`),
+        } as never;
+      },
+    };
+  }
+
+  it("(B/C/D/J) public wrapper delegates to canonical settleChapterState under ONE mutation lock; analyzer is not the provider", async () => {
+    await saveViaTask9(fixture, PROSE_P2);
+    const runner = makeRunner();
+    const probe: SettleProbe = { calls: [], settledContents: [], settledCanonRevisions: [] };
+    const stateAny = runner as unknown as {
+      state: {
+        acquireBookLock: (bookId: string) => Promise<() => void>;
+        loadBookConfig: (bookId: string) => Promise<unknown>;
+      };
+    };
+    const realAcquire = stateAny.state.acquireBookLock.bind(stateAny.state);
+    vi.spyOn(stateAny.state, "acquireBookLock").mockImplementation(async (bookId) => {
+      probe.calls.push("acquire");
+      const release = await realAcquire(bookId);
+      return () => {
+        probe.calls.push("release");
+        release();
+      };
+    });
+    vi.spyOn(stateAny.state, "loadBookConfig").mockResolvedValue({ language: "zh" } as never);
+    // Guard: the impossible analyzer path must NEVER be exercised.
+    const analyzerSpy = vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter")
+      .mockRejectedValue(new Error("analyzer must not be the proposal provider"));
+
+    let settleInput: { readonly content: string; readonly chapterNumber: number } | undefined;
+    const writer = makeFakeWriter(probe, "valid");
+    const wrappedWriter: Pick<WriterAgent, "settleChapterState"> = {
+      settleChapterState: async (input) => {
+        settleInput = { content: input.content, chapterNumber: input.chapterNumber };
+        return writer.settleChapterState(input);
+      },
+    };
+
+    const { artifact } = await runner.regenerateStateReview("demo-canon-book", 16, {
+      createWriter: () => wrappedWriter,
+    });
+
+    expect(analyzerSpy).not.toHaveBeenCalled();
+    expect(settleInput?.chapterNumber).toBe(16);
+    expect(settleInput?.content).toBe(await readDurableProse(fixture, 16));
+    expect(artifact.status).toBe("active");
+    expect(artifact.items.length).toBeGreaterThan(0);
+    // Lock acquired exactly once; settlement happened INSIDE the boundary.
+    expect(probe.calls).toEqual(["acquire", "settle", "release"]);
+    // Proposal semantics derive from the SAME live Canon as the anchor (I-10.2).
+    expect(artifact.baseCanonRevision).toBe(probe.settledCanonRevisions[0]);
+  });
+
+  it("(M2/M3) missing or invalid settlement delta fails safely into rebuild_failed", async () => {
+    await saveViaTask9(fixture, PROSE_P2);
+    const runner = makeRunner();
+    const stateAny = runner as unknown as {
+      state: { loadBookConfig: (bookId: string) => Promise<unknown> };
+    };
+    vi.spyOn(stateAny.state, "loadBookConfig").mockResolvedValue({ language: "zh" } as never);
+
+    for (const mode of ["missing-delta", "invalid-delta"] as const) {
+      const probe: SettleProbe = { calls: [], settledContents: [], settledCanonRevisions: [] };
+      const proseAtStart = await readDurableProse(fixture, 16);
+      await expect(runner.regenerateStateReview("demo-canon-book", 16, {
+        createWriter: () => makeFakeWriter(probe, mode),
+      })).rejects.toMatchObject({ code: "state_review_rebuild_failed" });
+      expect((await loadStateReview(fixture.bookDir, 16))?.status).toBe("rebuild_failed");
+      // Failure never touches prose.
+      expect(await readDurableProse(fixture, 16)).toBe(proseAtStart);
+      // Retry authorization requires a shell ⇒ flip back via Task 9 for round 2.
+      if (mode === "missing-delta") {
+        await saveViaTask9(fixture, `${PROSE_P2}\n\n重试前再改一笔。`);
+      }
+    }
+  });
+
+  it("(G/F-B) pending CURRENT chapter over confirmed head anchors effective at its OWN source (26), not 27", async () => {
+    // Confirmed Canon head = 25 (semantics APPLIED through ch25), while ch26
+    // exists only as a pending gated review awaiting human confirmation.
+    await setConfirmedHead(fixture, 25);
+    await seedChapters(fixture, [26]);
+    await writeFile(
+      join(fixture.bookDir, "chapters", "index.json"),
+      JSON.stringify([
+        ...Array.from({ length: 25 }, (_, index) => ({
+          number: index + 1, title: `第${index + 1}章`, status: "approved",
+          wordCount: 10, createdAt: CREATED_AT, updatedAt: CREATED_AT,
+          auditIssues: [], lengthWarnings: [],
+        })),
+        {
+          number: 26, title: "第26章", status: "needs-state-review",
+          wordCount: 10, createdAt: CREATED_AT, updatedAt: CREATED_AT,
+          auditIssues: [], lengthWarnings: [],
+        },
+      ], null, 2),
+      "utf-8",
+    );
+    await saveViaTask9(fixture, "# 第26章 反转\n\n林秋烧毁了账本。", 26);
+
+    const { artifact } = await rebuildStateReview({
+      bookDir: fixture.bookDir, chapter: 26, language: "zh",
+      analyze: async () => factDelta(26, "北岸灯塔"),
+    });
+
+    // Design §20 literal result — NOT resolveDurableStoryProgress()+1 (=27).
+    expect(artifact.sourceChapter).toBe(26);
+    expect(artifact.effectiveChapter).toBe(26);
+  });
+
+  it("(F-C) edited READY-head source re-anchors at confirmedHead+1", async () => {
+    await setConfirmedHead(fixture, 25);
+    await seedChapters(fixture, Array.from({ length: 25 }, (_, index) => index + 1));
+    await writeFile(
+      join(fixture.bookDir, "chapters", "index.json"),
+      JSON.stringify(Array.from({ length: 25 }, (_, index) => ({
+        number: index + 1, title: `第${index + 1}章`,
+        status: (index + 1) === 16 ? "needs-state-review" : "approved",
+        wordCount: 10, createdAt: CREATED_AT, updatedAt: CREATED_AT,
+        auditIssues: [], lengthWarnings: [],
+      })), null, 2),
+      "utf-8",
+    );
+    await saveViaTask9(fixture, PROSE_P2); // source 16 <= confirmed head 25
+
+    const { artifact } = await rebuildStateReview({
+      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      analyze: async () => factDelta(16, "北岸灯塔"),
+    });
+    expect(artifact.sourceChapter).toBe(16);
+    expect(artifact.effectiveChapter).toBe(26);
   });
 });
