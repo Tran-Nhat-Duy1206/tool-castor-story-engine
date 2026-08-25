@@ -512,30 +512,187 @@ describe("PipelineRunner gated Phase 4 publication", () => {
     }
   });
 
-  it("ungated legacy control: outputs WITHOUT a Settler delta keep the full legacy publication behavior", async () => {
+  it("governed passed-audit chapter with MISSING Settler delta FAILS CLOSED before any authoritative write", async () => {
     const { root, runner, bookId, bookDir } = await createGatedFixture();
+    const canonJsonBefore = await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8");
+    const projectionBefore = await readFile(join(bookDir, "story", "current_state.md"), "utf-8");
+    // NO runtimeStateDelta anywhere: governed run cannot build a proposal.
     const writeSpy = vi.spyOn(WriterAgent.prototype, "writeChapter").mockResolvedValue(stubOutput());
     const writerSaveSpy = vi.spyOn(WriterAgent.prototype, "saveChapter");
     const saveIndexSpy = vi.spyOn(StateManager.prototype, "saveChapterIndex");
     const snapshotSpy = vi.spyOn(StateManager.prototype, "snapshotState");
 
     try {
-      const result = await runner.writeNextChapter(bookId, CHAPTER_BODY.length);
+      await expect(runner.writeNextChapter(bookId, CHAPTER_BODY.length))
+        .rejects.toThrow(/state review proposal/i);
 
-      expect(result.status).toBe("ready-for-review");
+      // Fail closed: zero authoritative or derived state mutation.
       expect(writeSpy).toHaveBeenCalledTimes(1);
-      expect(saveIndexSpy).toHaveBeenCalled();
-      expect(snapshotSpy).toHaveBeenCalled();
-      expect(await stat(join(bookDir, "story", "snapshots", "1"))).toBeTruthy();
+      expect(writerSaveSpy).not.toHaveBeenCalled();
+      expect(saveIndexSpy).not.toHaveBeenCalled();
+      expect(snapshotSpy).not.toHaveBeenCalled();
       await expect(readFile(join(bookDir, ACTIVE_REVIEW_RELPATH(1)), "utf-8"))
         .rejects.toMatchObject({ code: "ENOENT" });
-      expect(writerSaveSpy).toHaveBeenCalledTimes(1);
-      expect(writerSaveSpy.mock.calls[0]![4]).toBeUndefined();
-      // The WRITER's own commit stays legacy: prose only, never the index.
-      const writerCommit = seam.invocations.find((invocation) =>
-        normalizePaths(invocation).some((path) => path.startsWith("chapters/0001_")));
-      expect(writerCommit).toBeDefined();
-      expect(normalizePaths(writerCommit!)).not.toContain("chapters/index.json");
+      await expect(readFile(join(bookDir, "chapters", "index.json"), "utf-8"))
+        .rejects.toMatchObject({ code: "ENOENT" });
+      await expect(stat(join(bookDir, "story", "snapshots"))).rejects.toMatchObject({ code: "ENOENT" });
+      expect(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8"))
+        .toBe(canonJsonBefore);
+      expect(await readFile(join(bookDir, "story", "current_state.md"), "utf-8"))
+        .toBe(projectionBefore);
+    } finally {
+      await rm(root, { recursive: true, force: true }).catch(() => undefined);
+    }
+  });
+
+  it("audit-REVISED prose re-settles the FINAL content into gated State Review publication (C-1)", async () => {
+    const { root, runner, bookId, bookDir } = await createGatedFixture();
+    const P1 = "林秋在雨夜核对了账本";
+    const P2 = "林秋在黎明烧毁了账本";
+    const canonJsonBefore = await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8");
+    const projectionBefore = await readFile(join(bookDir, "story", "current_state.md"), "utf-8");
+    const hooksProjectionBefore = await readFile(join(bookDir, "story", "pending_hooks.md"), "utf-8");
+
+    // P1 carries the STALE proposal (Paris). The revision changes the story so
+    // a stale D1 would be detectable. The analyzer mock mirrors the REAL
+    // parser contract: it produces truth-file markdown but NO delta field.
+    const staleDelta = { ...gatedDelta(), currentStatePatch: { currentGoal: "前往巴黎核对账本" } };
+    const finalDelta = { ...gatedDelta(), currentStatePatch: { currentGoal: "留守伦敦追查遗嘱" } };
+    const writeSpy = vi.spyOn(WriterAgent.prototype, "writeChapter").mockResolvedValue(
+      stubOutput({ content: P1, wordCount: P1.length, runtimeStateDelta: staleDelta }),
+    );
+    vi.spyOn(ContinuityAuditor.prototype, "auditChapter")
+      .mockResolvedValueOnce({
+        passed: false,
+        issues: [{ severity: "critical", category: "continuity", description: "rewrite the ending", suggestion: "revise" }],
+        summary: "needs revision",
+        overallScore: 40,
+        tokenUsage: ZERO_USAGE,
+      })
+      .mockResolvedValue(passingAudit());
+    vi.spyOn(ReviserAgent.prototype, "reviseChapter").mockResolvedValue({
+      revisedContent: P2,
+      wordCount: P2.length,
+      fixedIssues: ["rewrote the ending"],
+      tokenUsage: ZERO_USAGE,
+    });
+    vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter").mockImplementation(async (input) => ({
+      chapterNumber: input.chapterNumber,
+      title: input.chapterTitle ?? "雨夜提案",
+      content: input.chapterContent,
+      wordCount: input.chapterContent.length,
+      preWriteCheck: "",
+      postSettlement: "",
+      updatedState: "# 当前状态\n\n- PROPOSED-STATE-B\n",
+      updatedHooks: "# 伏笔池\n",
+      updatedLedger: "# 粒子账本\n",
+      updatedSubplots: "# 支线进度\n",
+      updatedEmotionalArcs: "# 情感弧线\n",
+      updatedCharacterMatrix: "# 角色矩阵\n",
+      chapterSummary: "| 1 | 雨夜提案 | 林秋 | 烧毁账本 | 起疑 | | 平静 | 调查 |",
+      postWriteErrors: [],
+      postWriteWarnings: [],
+      tokenUsage: ZERO_USAGE,
+    }));
+    const settleSpy = vi.spyOn(WriterAgent.prototype, "settleChapterState").mockResolvedValue(
+      stubOutput({ content: P2, wordCount: P2.length, runtimeStateDelta: finalDelta }),
+    );
+    const writerSaveSpy = vi.spyOn(WriterAgent.prototype, "saveChapter");
+    const saveIndexSpy = vi.spyOn(StateManager.prototype, "saveChapterIndex");
+    const snapshotSpy = vi.spyOn(StateManager.prototype, "snapshotState");
+
+    try {
+      const result = await runner.writeNextChapter(bookId, P2.length);
+
+      expect(result.status).toBe("needs-state-review");
+
+      // FINAL prose P2 is what is durable — never P1.
+      const durableProse = await readFile(join(bookDir, "chapters", "0001_雨夜提案.md"), "utf-8");
+      expect(durableProse).toContain(P2);
+      expect(durableProse).not.toContain(P1.replace("。", ""));
+
+      // The re-settlement ran against EXACTLY the final publishable content.
+      expect(settleSpy).toHaveBeenCalledTimes(1);
+      expect(settleSpy.mock.calls[0]![0].content).toBe(P2);
+
+      // Anchors bind to P2's bytes and D2's semantics — London, not Paris.
+      const artifact = expectActive(StateReviewArtifactSchema.parse(
+        JSON.parse(await readFile(join(bookDir, ACTIVE_REVIEW_RELPATH(1)), "utf-8")),
+      ));
+      expect(artifact.proseRevision).toBe(computeProseRevision(durableProse));
+      expect(artifact.items).toEqual(
+        buildStateReviewItems(finalDelta, { chapterContent: durableProse, language: "zh" }),
+      );
+      expect(JSON.stringify(artifact.items)).toContain("留守伦敦追查遗嘱");
+      expect(JSON.stringify(artifact.items)).not.toContain("前往巴黎核对账本");
+
+      // Canon A untouched; projections untouched; no proposed snapshot.
+      expect(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8"))
+        .toBe(canonJsonBefore);
+      expect(await readFile(join(bookDir, "story", "current_state.md"), "utf-8"))
+        .toBe(projectionBefore);
+      expect(await readFile(join(bookDir, "story", "pending_hooks.md"), "utf-8"))
+        .toBe(hooksProjectionBefore);
+      expect(saveIndexSpy).not.toHaveBeenCalled();
+      expect(snapshotSpy).not.toHaveBeenCalled();
+
+      // One atomic writer commit carrying all three payloads, deferred mode on.
+      const writerCommits = seam.invocations.filter((invocation) =>
+        normalizePaths(invocation).some((path) => path.startsWith("chapters/")));
+      expect(writerCommits).toHaveLength(1);
+      const paths = normalizePaths(writerCommits[0]!);
+      expect(paths).toContain("chapters/0001_雨夜提案.md");
+      expect(paths).toContain("chapters/index.json");
+      expect(paths).toContain(ACTIVE_REVIEW_RELPATH(1));
+      const options = writerSaveSpy.mock.calls[0]![4];
+      expect(options?.deferStateApplication).toBe(true);
+      expect(options?.stateReviewJson).toBeDefined();
+      expect(options?.updatedChapterIndexJson).toBeDefined();
+      void writeSpy;
+    } finally {
+      await rm(root, { recursive: true, force: true }).catch(() => undefined);
+    }
+  });
+
+  it("governed passed-audit chapter with an INVALID Settler delta FAILS CLOSED (no legacy application)", async () => {
+    const { root, runner, bookId, bookDir } = await createGatedFixture();
+    const canonJsonBefore = await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8");
+    const projectionBefore = await readFile(join(bookDir, "story", "current_state.md"), "utf-8");
+    // Deliberately SCHEMA-INVALID delta: hookOps.upsert must be an array.
+    const malformedDelta = {
+      chapter: 1,
+      currentStatePatch: { currentGoal: "PROPOSED-GOAL-B" },
+      hookOps: { upsert: "natural-language numeric drift", resolve: [], defer: [] },
+      newHookCandidates: [],
+      notes: [],
+    };
+    const writeSpy = vi.spyOn(WriterAgent.prototype, "writeChapter").mockResolvedValue(
+      stubOutput({ runtimeStateDelta: malformedDelta as unknown as WriteChapterOutput["runtimeStateDelta"] }),
+    );
+    const writerSaveSpy = vi.spyOn(WriterAgent.prototype, "saveChapter");
+    const saveIndexSpy = vi.spyOn(StateManager.prototype, "saveChapterIndex");
+    const snapshotSpy = vi.spyOn(StateManager.prototype, "snapshotState");
+
+    try {
+      await expect(runner.writeNextChapter(bookId, CHAPTER_BODY.length))
+        .rejects.toThrow(/state review proposal/i);
+
+      expect(writeSpy).toHaveBeenCalledTimes(1);
+      expect(writerSaveSpy).not.toHaveBeenCalled();
+      expect(saveIndexSpy).not.toHaveBeenCalled();
+      expect(snapshotSpy).not.toHaveBeenCalled();
+      await expect(readFile(join(bookDir, ACTIVE_REVIEW_RELPATH(1)), "utf-8"))
+        .rejects.toMatchObject({ code: "ENOENT" });
+      await expect(readFile(join(bookDir, "chapters", "index.json"), "utf-8"))
+        .rejects.toMatchObject({ code: "ENOENT" });
+      await expect(stat(join(bookDir, "story", "snapshots"))).rejects.toMatchObject({ code: "ENOENT" });
+      expect(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8"))
+        .toBe(canonJsonBefore);
+      expect(await readFile(join(bookDir, "story", "current_state.md"), "utf-8"))
+        .toBe(projectionBefore);
+      // No prose leaked either.
+      const chapterFiles = (await readdir(join(bookDir, "chapters"))).filter((f) => f.endsWith(".md"));
+      expect(chapterFiles).toEqual([]);
     } finally {
       await rm(root, { recursive: true, force: true }).catch(() => undefined);
     }

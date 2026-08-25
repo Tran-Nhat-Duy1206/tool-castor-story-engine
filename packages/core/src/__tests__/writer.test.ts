@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { WriterAgent } from "../agents/writer.js";
+import { WriterAgent, type WriteChapterOutput } from "../agents/writer.js";
 import { buildLengthSpec } from "../utils/length-metrics.js";
 
 const ZERO_USAGE = {
@@ -106,6 +106,94 @@ describe("WriterAgent", () => {
         .toContain("| 2 | 雨夜对账 |");
       expect(await readFile(join(storyDir, "current_state.md"), "utf-8"))
         .toContain("账目被篡改");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("repairs chapter-number drift in the writer delta during legacy publication", async () => {
+    // Regression preserved from the pre-Phase-4 runner path: legacy
+    // saveChapter (revise/repair/import flows) still normalizes a drifted
+    // `chapter` field BEFORE applying runtime state. Governed next-chapter
+    // runs never reach this branch — they capture proposals instead.
+    const root = await mkdtemp(join(tmpdir(), "inkos-writer-drift-"));
+    const bookDir = join(root, "book");
+    const storyDir = join(bookDir, "story");
+    const stateDir = join(storyDir, "state");
+    await mkdir(stateDir, { recursive: true });
+    const stateCard = [
+      "# 当前状态",
+      "",
+      "| 字段 | 值 |",
+      "| --- | --- |",
+      "| Current Chapter | 0 |",
+      "| Current Location | Ashen ferry crossing |",
+      "| Protagonist State | Lin Yue still hides the oath token. |",
+      "| Current Goal | Find the vanished mentor. |",
+      "| Current Constraint | The city gates are watched. |",
+      "| Current Alliances | Mentor allies are scattered. |",
+      "| Current Conflict | The mentor debt is still personal. |",
+      "",
+    ].join("\n");
+    await Promise.all([
+      writeFile(join(storyDir, "current_state.md"), stateCard, "utf-8"),
+      writeFile(join(storyDir, "pending_hooks.md"), "# Pending Hooks\n", "utf-8"),
+      writeFile(join(storyDir, "chapter_summaries.md"), "# Chapter Summaries\n", "utf-8"),
+      writeFile(join(stateDir, "manifest.json"), JSON.stringify({
+        schemaVersion: 2,
+        language: "en",
+        lastAppliedChapter: 0,
+        projectionVersion: 1,
+        migrationWarnings: [],
+      }, null, 2), "utf-8"),
+      writeFile(join(stateDir, "current_state.json"), JSON.stringify({
+        chapter: 0,
+        facts: [],
+      }, null, 2), "utf-8"),
+      writeFile(join(stateDir, "hooks.json"), JSON.stringify({ hooks: [] }, null, 2), "utf-8"),
+      writeFile(join(stateDir, "chapter_summaries.json"), JSON.stringify({ rows: [] }, null, 2), "utf-8"),
+    ]);
+    const agent = new WriterAgent({
+      client: {
+        provider: "openai",
+        apiFormat: "chat",
+        stream: false,
+        defaults: { temperature: 0.7, maxTokens: 4096, thinkingBudget: 0, extra: {} },
+      },
+      model: "test-model",
+      projectRoot: root,
+    });
+
+    try {
+      await agent.saveChapter(bookDir, {
+        chapterNumber: 2,
+        title: "Drifted Delta",
+        content: "Broken chapter body.",
+        wordCount: 3,
+        preWriteCheck: "",
+        postSettlement: "",
+        updatedState: "# 当前状态\n\n- 林秋确认账目被篡改。\n",
+        updatedLedger: "# 粒子账本\n",
+        updatedHooks: "# 伏笔池\n",
+        chapterSummary: "| 2 | Drifted Delta | 林秋 | 确认账目 | 获得实证 | | 平静 | 调查 |",
+        updatedSubplots: "# 支线进度\n",
+        updatedEmotionalArcs: "# 情感弧线\n",
+        updatedCharacterMatrix: "# 角色矩阵\n",
+        postWriteErrors: [],
+        postWriteWarnings: [],
+        runtimeStateDelta: {
+          chapter: 0,
+          hookOps: { upsert: [], mention: [], resolve: [], defer: [] },
+          newHookCandidates: [],
+          notes: [],
+        } as unknown as NonNullable<WriteChapterOutput["runtimeStateDelta"]>,
+      }, false, "en");
+
+      // The drifted chapter 0 was repaired to 2 before persisting runtime state.
+      expect(await readFile(join(storyDir, "state", "manifest.json"), "utf-8"))
+        .toContain("\"lastAppliedChapter\": 2");
+      expect(await readFile(join(storyDir, "current_state.md"), "utf-8"))
+        .toMatch(/\|\s*(Current Chapter|当前章节)\s*\|\s*2\s*\|/);
     } finally {
       await rm(root, { recursive: true, force: true });
     }

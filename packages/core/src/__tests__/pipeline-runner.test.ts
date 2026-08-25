@@ -117,6 +117,17 @@ function createWriterOutput(overrides: Partial<WriteChapterOutput> = {}): WriteC
   };
 }
 
+// Phase 4 governance: minimal SCHEMA-VALID Settler proposal so passed-audit
+// stubs publish through the gated State Review path instead of failing closed.
+function governedDelta(chapter = 1): NonNullable<ReturnType<typeof createWriterOutput>["runtimeStateDelta"]> {
+  return {
+    chapter,
+    hookOps: { upsert: [], mention: [], resolve: [], defer: [] },
+    newHookCandidates: [],
+    notes: [],
+  } as unknown as NonNullable<ReturnType<typeof createWriterOutput>["runtimeStateDelta"]>;
+}
+
 function createReviseOutput(overrides: Partial<ReviseOutput> = {}): ReviseOutput {
   return {
     revisedContent: "Revised chapter body.",
@@ -1993,6 +2004,7 @@ describe("PipelineRunner", () => {
         chapterNumber: 1,
         content: nearTargetDraft,
         wordCount: nearTargetDraft.length,
+        runtimeStateDelta: governedDelta(1),
       }),
     );
     const auditChapter = vi.spyOn(
@@ -2295,6 +2307,7 @@ describe("PipelineRunner", () => {
       createWriterOutput({
         content: draftBody,
         wordCount: draftBody.length,
+        runtimeStateDelta: governedDelta(1),
       }),
     );
     vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockResolvedValue(
@@ -2476,7 +2489,7 @@ describe("PipelineRunner", () => {
     await rm(root, { recursive: true, force: true });
   });
 
-  it("repairs chapter-number drift in writer delta before persisting runtime state", async () => {
+  it("fails closed when the writer delta carries a below-range chapter number", async () => {
     const { root, runner, state, bookId } = await createRunnerFixture({
     });
     const storyDir = join(state.bookDir(bookId), "story");
@@ -2535,13 +2548,17 @@ describe("PipelineRunner", () => {
       }),
     );
 
-    const result = await runner.writeNextChapter(bookId, "Broken chapter body.".length);
-
-    expect(result.status).toBe("ready-for-review");
-    await expect(readFile(join(storyDir, "current_state.md"), "utf-8"))
-      .resolves.toMatch(/\|\s*(Current Chapter|当前章节)\s*\|\s*1\s*\|/);
+    // Phase 4: the drifted delta is SCHEMA-INVALID (chapter must be >= 1), so
+    // the governed publication FAILS CLOSED — no legacy repair-and-apply, no
+    // authoritative writes. Writer-side drift normalization for genuine legacy
+    // flows is pinned separately in writer.test.ts.
+    await expect(runner.writeNextChapter(bookId, "Broken chapter body.".length))
+      .rejects.toThrow(/state review proposal invalid/i);
+    const stateCard = await readFile(join(storyDir, "current_state.md"), "utf-8");
+    expect(stateCard).toContain("Ashen ferry crossing");
+    expect(stateCard).not.toMatch(/\|\s*(Current Chapter|当前章节)\s*\|\s*1\s*\|/);
     await expect(readFile(join(storyDir, "state", "manifest.json"), "utf-8"))
-      .resolves.toContain("\"lastAppliedChapter\": 1");
+      .resolves.toContain("\"lastAppliedChapter\": 0");
 
     await rm(root, { recursive: true, force: true });
   });
@@ -2676,6 +2693,7 @@ describe("PipelineRunner", () => {
         updatedState: "broken state",
         updatedHooks: "broken hooks",
         updatedLedger: "broken ledger",
+        runtimeStateDelta: governedDelta(1),
       }),
     );
     const settleSpy = vi.spyOn(
@@ -2690,6 +2708,7 @@ describe("PipelineRunner", () => {
         updatedState: "fixed state",
         updatedHooks: "fixed hooks",
         updatedLedger: "fixed ledger",
+        runtimeStateDelta: governedDelta(1),
       }),
     );
     vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockResolvedValue(
@@ -2717,7 +2736,7 @@ describe("PipelineRunner", () => {
       countChapterLength("Healthy chapter body with the copper token in his coat.", "zh_chars"),
     );
 
-    expect(result.status).toBe("ready-for-review");
+    expect(result.status).toBe("needs-state-review");
     expect(writeSpy).toHaveBeenCalledTimes(1);
     expect(settleSpy).toHaveBeenCalledTimes(1);
     expect(settleSpy).toHaveBeenCalledWith(expect.objectContaining({
@@ -2726,8 +2745,10 @@ describe("PipelineRunner", () => {
       content: "Healthy chapter body with the copper token in his coat.",
       validationFeedback: expect.stringContaining("怀里的铜牌"),
     }));
-    await expect(readFile(join(storyDir, "current_state.md"), "utf-8")).resolves.toBe("fixed state");
-    await expect(readFile(join(storyDir, "pending_hooks.md"), "utf-8")).resolves.toBe("fixed hooks");
+    // Gated publication: the settled truth files are captured for review, not
+    // applied to the live projections.
+    await expect(readFile(join(storyDir, "current_state.md"), "utf-8")).resolves.toBe("stable state");
+    await expect(readFile(join(storyDir, "pending_hooks.md"), "utf-8")).resolves.toBe("stable hooks");
 
     await rm(root, { recursive: true, force: true });
   });
@@ -3110,6 +3131,20 @@ describe("PipelineRunner", () => {
         wordCount: 0,
       }),
     );
+    // Governed publication: the FINAL prose is re-settled through the existing
+    // settlement path, which supplies the validated proposal for the revision.
+    vi.spyOn(
+      WriterAgent.prototype as unknown as {
+        settleChapterState: (input: Record<string, unknown>) => Promise<WriteChapterOutput>;
+      },
+      "settleChapterState",
+    ).mockResolvedValue(
+      createWriterOutput({
+        content: revisedBody,
+        wordCount: revisedBody.length,
+        runtimeStateDelta: governedDelta(1),
+      }),
+    );
 
     const result = await runner.writeNextChapter(bookId, revisedBody.length);
     const savedChapter = await readFile(join(chaptersDir, "0001_Test_Chapter.md"), "utf-8");
@@ -3119,7 +3154,7 @@ describe("PipelineRunner", () => {
     expect(result.wordCount).toBe(expectedCount);
     expect(savedChapter).toContain(revisedBody);
     expect(savedIndex[0]?.wordCount).toBe(expectedCount);
-    expect(savedIndex[0]?.status).toBe("ready-for-review");
+    expect(savedIndex[0]?.status).toBe("needs-state-review");
 
     await rm(root, { recursive: true, force: true });
   });

@@ -2320,17 +2320,51 @@ export class PipelineRunner {
       }
     }
 
-    // Phase 4 (Task 7): CAPTURE — never apply — the proposed RuntimeStateDelta.
-    // Only a SCHEMA-VALID Settler delta constitutes a Phase 4 proposal; legacy
-    // outputs (absent or intentionally malformed deltas exercising Writer's
-    // own drift repair) keep the untouched legacy publication path.
+    // Phase 4 governed publication boundary (Task 7 fix-up): EVERY publishable
+    // passed-audit next-chapter run MUST produce a validated proposal for its
+    // FINAL prose. Governance is NEVER inferred from data shape — an absent or
+    // schema-invalid RuntimeStateDelta FAILS CLOSED before any authoritative
+    // write instead of selecting legacy state application.
     let stateReviewJson: string | undefined;
-    const phase4Gated = chapterStatus === null
-      && auditResult.passed
-      && persistenceOutput.runtimeStateDelta !== undefined
-      && RuntimeStateDeltaSchema.safeParse(persistenceOutput.runtimeStateDelta).success;
-    if (phase4Gated) {
-      const runtimeDelta = persistenceOutput.runtimeStateDelta!;
+    const publishablePassedAudit = chapterStatus === null && auditResult.passed;
+    if (publishablePassedAudit) {
+      let proposalDelta = persistenceOutput.runtimeStateDelta;
+      if (!proposalDelta && persistenceOutput.content !== output.content) {
+        // The audit/review cycle rewrote the prose: the original Settler delta
+        // described stale content. Re-settle the FINAL publishable prose
+        // through THE existing delta-producing settlement path (Writer Settler)
+        // so the proposal is anchored to what will actually be published.
+        const resettledFinal = await writer.settleChapterState({
+          book,
+          bookDir,
+          chapterNumber,
+          title: persistenceOutput.title,
+          content: persistenceOutput.content,
+          ...(reducedControlInput ? {
+            chapterIntent: reducedControlInput.chapterIntent,
+            contextPackage: reducedControlInput.contextPackage,
+            ruleStack: reducedControlInput.ruleStack,
+          } : {}),
+        });
+        proposalDelta = resettledFinal.runtimeStateDelta;
+      }
+      if (!proposalDelta) {
+        throw new Error(
+          `State review proposal unavailable for chapter ${chapterNumber}: governed `
+          + "publication requires a validated RuntimeStateDelta for the final "
+          + "prose. Generation stopped before any authoritative write.",
+        );
+      }
+      const parsedProposal = RuntimeStateDeltaSchema.safeParse(proposalDelta);
+      if (!parsedProposal.success) {
+        throw new Error(
+          `State review proposal invalid for chapter ${chapterNumber} `
+          + `(RuntimeStateDelta schema: ${parsedProposal.error.issues[0]?.message ?? "unknown"}). `
+          + "Generation stopped before any authoritative write.",
+        );
+      }
+
+      const runtimeDelta = parsedProposal.data;
       const durableProgress = await resolveDurableStoryProgress({ bookDir });
       // Temporal binding (plan Part Q): no silent relocation — the proposal's
       // effective chapter MUST be exactly the chapter being persisted.
@@ -2368,9 +2402,9 @@ export class PipelineRunner {
     }
 
     const resolvedStatus = chapterStatus
-      ?? (auditResult.passed
-        ? (phase4Gated ? "needs-state-review" : "ready-for-review")
-        : "audit-failed");
+      ?? (publishablePassedAudit && stateReviewJson !== undefined
+        ? "needs-state-review"
+        : (auditResult.passed ? "ready-for-review" : "audit-failed"));
     await persistChapterArtifacts({
       chapterNumber,
       chapterTitle: persistenceOutput.title,

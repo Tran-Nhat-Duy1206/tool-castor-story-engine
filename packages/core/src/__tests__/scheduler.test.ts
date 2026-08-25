@@ -120,4 +120,99 @@ describe("Scheduler", () => {
     expect(handleAuditFailure).toHaveBeenCalledWith("book-1", 3, ["state-validation"]);
     expect(onChapterComplete).toHaveBeenCalledWith("book-1", 3, "state-degraded");
   });
+
+  it("treats needs-state-review as successful publication and pauses further advancement (I-1)", async () => {
+    const onChapterComplete = vi.fn();
+    const scheduler = new Scheduler({
+      ...createConfig(),
+      chaptersPerCycle: 3,
+      onChapterComplete,
+    });
+    const bookConfig: BookConfig = {
+      id: "book-1",
+      title: "Book 1",
+      platform: "other",
+      genre: "other",
+      status: "active",
+      targetChapters: 10,
+      chapterWordCount: 2200,
+      createdAt: "2026-04-01T00:00:00.000Z",
+      updatedAt: "2026-04-01T00:00:00.000Z",
+    };
+
+    const writeNextSpy = vi.spyOn(
+      (scheduler as unknown as { pipeline: { writeNextChapter: (bookId: string, words?: number, temp?: number) => Promise<unknown> } }).pipeline,
+      "writeNextChapter",
+    ).mockResolvedValue({
+      chapterNumber: 1,
+      title: "Gated Chapter",
+      wordCount: 2100,
+      revised: false,
+      status: "needs-state-review",
+      auditResult: { passed: true, issues: [], summary: "clean" },
+    });
+    const handleAuditFailure = vi.spyOn(
+      scheduler as unknown as { handleAuditFailure: (bookId: string, chapterNumber: number, issueCategories?: string[]) => Promise<void> },
+      "handleAuditFailure",
+    ).mockResolvedValue(undefined);
+    const recordChapterWritten = vi.spyOn(
+      scheduler as unknown as { recordChapterWritten: () => void },
+      "recordChapterWritten",
+    );
+
+    // Drive the multi-chapter loop directly: a gated result must count as
+    // success AND terminate the cycle without retries or a second chapter.
+    (scheduler as unknown as { running: boolean }).running = true;
+    const success = await (
+      scheduler as unknown as {
+        processBook: (bookId: string, bookConfig: BookConfig) => Promise<void>;
+        writeOneChapter: (bookId: string, bookConfig: BookConfig) => Promise<boolean>;
+      }
+    ).processBook("book-1", bookConfig);
+
+    expect(writeNextSpy).toHaveBeenCalledTimes(1);
+    expect(handleAuditFailure).not.toHaveBeenCalled();
+    expect(recordChapterWritten).toHaveBeenCalledTimes(1);
+    expect(onChapterComplete).toHaveBeenCalledWith("book-1", 1, "needs-state-review");
+    void success;
+  });
+
+  it("keeps treating ready-for-review as scheduler success (legacy regression)", async () => {
+    const onChapterComplete = vi.fn();
+    const scheduler = new Scheduler({
+      ...createConfig(),
+      onChapterComplete,
+    });
+    const bookConfig: BookConfig = {
+      id: "book-1",
+      title: "Book 1",
+      platform: "other",
+      genre: "other",
+      status: "active",
+      targetChapters: 10,
+      chapterWordCount: 2200,
+      createdAt: "2026-04-01T00:00:00.000Z",
+      updatedAt: "2026-04-01T00:00:00.000Z",
+    };
+    vi.spyOn(
+      (scheduler as unknown as { pipeline: { writeNextChapter: (bookId: string, words?: number, temp?: number) => Promise<unknown> } }).pipeline,
+      "writeNextChapter",
+    ).mockResolvedValue({
+      chapterNumber: 2,
+      title: "Legacy Chapter",
+      wordCount: 2100,
+      revised: false,
+      status: "ready-for-review",
+      auditResult: { passed: true, issues: [], summary: "clean" },
+    });
+
+    const success = await (
+      scheduler as unknown as {
+        writeOneChapter: (bookId: string, bookConfig: BookConfig) => Promise<boolean>;
+      }
+    ).writeOneChapter("book-1", bookConfig);
+
+    expect(success).toBe(true);
+    expect(onChapterComplete).toHaveBeenCalledWith("book-1", 2, "ready-for-review");
+  });
 });

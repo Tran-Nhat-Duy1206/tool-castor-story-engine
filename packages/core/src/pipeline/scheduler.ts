@@ -206,15 +206,20 @@ export class Scheduler {
         await this.sleep(this.config.cooldownAfterChapterMs);
       }
 
-      const success = await this.writeOneChapter(bookId, bookConfig);
-      if (!success) {
+      const outcome = await this.writeOneChapterDetailed(bookId, bookConfig);
+      // Phase 4: a needs-state-review chapter is a SUCCESSFUL publication that
+      // intentionally pauses advancement until human State Review. Never retry
+      // it as a failure and never roll straight into the next chapter.
+      if (outcome.gated) return;
+      if (!outcome.success) {
         // Immediate retry with delay (if within retry limit)
         const failures = this.consecutiveFailures.get(bookId) ?? 0;
         if (failures <= this.gates.maxAuditRetries && this.config.retryDelayMs > 0) {
           this.log?.warn(`${bookId} retrying in ${this.config.retryDelayMs}ms`);
           await this.sleep(this.config.retryDelayMs);
-          const retrySuccess = await this.writeOneChapter(bookId, bookConfig);
-          if (!retrySuccess) break; // Stop this book's cycle on second failure
+          const retry = await this.writeOneChapterDetailed(bookId, bookConfig);
+          if (retry.gated) return;
+          if (!retry.success) break; // Stop this book's cycle on second failure
         } else {
           break; // Stop this book's cycle
         }
@@ -222,8 +227,18 @@ export class Scheduler {
     }
   }
 
-  /** Write one chapter for a book. Returns true if approved. */
-  private async writeOneChapter(bookId: string, bookConfig: BookConfig): Promise<boolean> {
+  /**
+   * Write one chapter for a book.
+   *
+   * `success` — the chapter was published (scheduler-success covers BOTH the
+   * legacy `ready-for-review` and the Phase-4 `needs-state-review` outcomes).
+   * `gated`   — published as `needs-state-review`: advancement is now
+   * intentionally paused until human State Review completes.
+   */
+  private async writeOneChapterDetailed(
+    bookId: string,
+    bookConfig: BookConfig,
+  ): Promise<{ readonly success: boolean; readonly gated: boolean }> {
     try {
       // Compute temperature override: base 0.7 + failures * step
       const failures = this.consecutiveFailures.get(bookId) ?? 0;
@@ -233,29 +248,35 @@ export class Scheduler {
 
       const result = await this.pipeline.writeNextChapter(bookId, undefined, tempOverride);
 
-      if (result.status === "ready-for-review") {
+      if (result.status === "ready-for-review" || result.status === "needs-state-review") {
         this.consecutiveFailures.delete(bookId);
         this.recordChapterWritten();
 
-        // Auto-detection loop after successful audit
-        if (this.config.detection?.enabled) {
+        // Auto-detection loop after successful audit (legacy path only — a
+        // gated chapter must not run detection before its review completes).
+        if (result.status === "ready-for-review" && this.config.detection?.enabled) {
           await this.runDetection(bookId, bookConfig, result.chapterNumber);
         }
 
         this.config.onChapterComplete?.(bookId, result.chapterNumber, result.status);
-        return true;
+        return { success: true, gated: result.status === "needs-state-review" };
       }
 
       // Audit failed — apply quality gates
       const issueCategories = result.auditResult.issues.map((i) => i.category);
       await this.handleAuditFailure(bookId, result.chapterNumber, issueCategories);
       this.config.onChapterComplete?.(bookId, result.chapterNumber, result.status);
-      return false;
+      return { success: false, gated: false };
     } catch (e) {
       this.config.onError?.(bookId, e as Error);
       await this.handleAuditFailure(bookId, 0);
-      return false;
+      return { success: false, gated: false };
     }
+  }
+
+  /** Write one chapter for a book. Returns true if successfully published. */
+  private async writeOneChapter(bookId: string, bookConfig: BookConfig): Promise<boolean> {
+    return (await this.writeOneChapterDetailed(bookId, bookConfig)).success;
   }
 
   private async runDetection(
