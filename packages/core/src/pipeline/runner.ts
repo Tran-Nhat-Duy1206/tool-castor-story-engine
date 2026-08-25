@@ -62,7 +62,8 @@ import { resolveDurableStoryProgress } from "../state/state-bootstrap.js";
 import { readStoryCanon } from "../state/canon-service.js";
 import { computeProseRevision } from "../utils/prose-revision.js";
 import { buildStateReviewItems } from "../state/state-review-items.js";
-import { StateReviewArtifactSchema } from "../models/state-review.js";
+import { StateReviewArtifactSchema, type ActiveStateReviewArtifact } from "../models/state-review.js";
+import { rebuildStateReview } from "../state/state-review-service.js";
 import { buildChapterFileContent } from "../agents/writer.js";
 import { randomUUID } from "node:crypto";
 import { runChapterReviewCycle } from "./chapter-review-cycle.js";
@@ -1840,6 +1841,44 @@ export class PipelineRunner {
     } finally {
       await releaseLock();
     }
+  }
+
+  /**
+   * Task 10 — thin production wrapper: rebuilds the chapter's State Review
+   * from LATEST durable prose + LATEST live Canon, wiring the real chapter
+   * analyzer as the single AI seam (its `.runtimeStateDelta` is extracted;
+   * a missing delta is an ordinary rebuild failure). Runs under the caller's
+   * book lock; pass `deps.createAnalyzer` in tests to inject a stub.
+   */
+  async regenerateStateReview(
+    bookId: string,
+    chapterNumber: number,
+    deps?: {
+      readonly createAnalyzer?: () => Pick<ChapterAnalyzerAgent, "analyzeChapter">;
+    },
+  ): Promise<{ artifact: ActiveStateReviewArtifact }> {
+    const bookDir = this.state.bookDir(bookId);
+    const book = await this.state.loadBookConfig(bookId);
+    return rebuildStateReview({
+      bookDir,
+      chapter: chapterNumber,
+      language: book.language ?? "en",
+      analyze: async ({ chapterContent }) => {
+        const analyzer = deps?.createAnalyzer?.()
+          ?? new ChapterAnalyzerAgent(this.agentCtxFor("chapter-analyzer", bookId));
+        const output = await analyzer.analyzeChapter({
+          book,
+          bookDir,
+          chapterNumber,
+          chapterContent,
+        });
+        const delta = output.runtimeStateDelta;
+        if (!delta) {
+          throw new Error("chapter analysis produced no runtime state delta");
+        }
+        return delta;
+      },
+    });
   }
 
   async writeChapters(

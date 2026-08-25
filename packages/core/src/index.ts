@@ -109,6 +109,7 @@ export {
   decideStateReviewItem,
   editStateReviewItem,
   handleStateRelevantProseSave,
+  rebuildStateReview,
   rejectAllAiItems,
   removeUserStateReviewItem,
   type StateReviewMutationDeps,

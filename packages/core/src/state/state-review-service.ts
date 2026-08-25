@@ -1,4 +1,9 @@
 import {
+  mkdir, readFile, readdir,
+} from "node:fs/promises";
+import { join } from "node:path";
+import { randomUUID } from "node:crypto";
+import {
   ProposalChangeSchema,
   StateReviewArtifactSchema,
   StateReviewError,
@@ -10,12 +15,18 @@ import {
   type StateReviewShellArtifact,
 } from "../models/state-review.js";
 import type { ChapterMeta } from "../models/chapter.js";
-import type { RuntimeStateLanguage } from "../models/runtime-state.js";
+import type { RuntimeStateDelta, RuntimeStateLanguage } from "../models/runtime-state.js";
+import { buildStateReviewItems } from "./state-review-items.js";
 import {
   ACTIVE_REVIEW_RELPATH,
   loadStateReview,
+  publishActiveProposal,
+  saveStateReviewShell,
   supersedeReceiptsForChapter,
 } from "./state-review-store.js";
+import { readStoryCanon } from "./canon-service.js";
+import { resolveDurableStoryProgress } from "./state-bootstrap.js";
+import { computeProseRevision } from "../utils/prose-revision.js";
 import { mutateActiveProposal } from "./state-review-store.js";
 
 /**
@@ -380,4 +391,147 @@ export async function handleStateRelevantProseSave(params: {
       chapter: params.chapter,
     }),
   };
+}
+
+/** Latest DURABLE chapter prose, read fresh from disk on every rebuild
+ * attempt (frozen rule: Retry Audit runs from latest saved prose). */
+async function readLatestDurableChapterProse(bookDir: string, chapter: number): Promise<string> {
+  const chaptersDir = join(bookDir, "chapters");
+  const padded = String(chapter).padStart(4, "0");
+  let entries: string[];
+  try {
+    entries = await readdir(chaptersDir);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new StateReviewError(
+        "state_review_not_found",
+        `chapter ${chapter} prose not found: no chapters directory`,
+      );
+    }
+    throw error;
+  }
+  const fileName = entries.find((name) => name.startsWith(`${padded}_`) && name.endsWith(".md"));
+  if (!fileName) {
+    throw new StateReviewError("state_review_not_found", `chapter ${chapter} prose file not found`);
+  }
+  return readFile(join(chaptersDir, fileName), "utf-8");
+}
+
+function sanitizeRebuildFailureReason(error: unknown): string {
+  const raw = typeof error === "object" && error !== null && "message" in error
+    ? String((error as { message?: unknown }).message ?? "")
+    : String(error ?? "");
+  const trimmed = raw.trim().replace(/\s+/g, " ").slice(0, 300);
+  return trimmed.length > 0 ? trimmed : "unknown rebuild failure";
+}
+
+/**
+ * Task 10 — rebuild a FRESH ACTIVE State Review from LATEST durable inputs.
+ *
+ * Frozen semantics (plan Task 10):
+ * - Authorized ONLY from `rebuild_required` / `rebuild_failed` shells. An
+ *   ACTIVE artifact ⇒ `state_review_already_resolved`, `stale` ⇒
+ *   `state_review_stale`, missing artifact ⇒ `state_review_not_found` — all
+ *   with ZERO writes.
+ * - Inputs are read fresh from disk EVERY attempt: durable chapter bytes ⇒
+ *   `proseRevision`, pure `readStoryCanon` ⇒ `baseCanonRevision`, and
+ *   `effectiveChapter = resolveDurableStoryProgress + 1` (§20 — historical
+ *   source chapters therefore anchor at head+1 automatically). Nothing is
+ *   reused from the destroyed proposal, its decisions, or any receipt.
+ * - `analyze()` is the ONLY AI seam (production wires the real chapter
+ *   analyzer via a thin adapter; tests inject fakes). An analyze THROW
+ *   durably converts the shell to `rebuild_failed` (reason = sanitized
+ *   original message) and raises
+ *   `StateReviewError("state_review_rebuild_failed")`; prose/Canon/index are
+ *   untouched by that conversion. Precondition/read failures fail closed
+ *   BEFORE any write and do NOT touch the shell.
+ * - On success: brand-new `reviewId = randomUUID()` per generation,
+ *   `reviewRevision = 1`, items built EXCLUSIVELY by Task 4
+ *   `buildStateReviewItems` (all undecided, origin "ai"; zero items remain
+ *   valid) — NO decision carry-forward of any kind. Item IDs stay Task 4
+ *   deterministic: generation identity comes solely from the fresh reviewId.
+ * - Publication uses only the Task 3 atomic store seams. A publication
+ *   failure propagates WITHOUT writing anything — the prior shell remains,
+ *   never a falsely successful active proposal.
+ *
+ * Caller owns the book lock (same convention as Task 9): anchor reads →
+ * analysis → publication must not race other mutations.
+ */
+export async function rebuildStateReview(params: {
+  readonly bookDir: string;
+  readonly chapter: number;
+  readonly language: RuntimeStateLanguage;
+  readonly analyze: (input: { readonly chapterContent: string }) => Promise<RuntimeStateDelta>;
+}): Promise<{ readonly artifact: ActiveStateReviewArtifact }> {
+  // ---- Authorization (zero-write fail-closed preconditions) ---------------
+  const existing = await loadStateReview(params.bookDir, params.chapter);
+  if (!existing) {
+    throw new StateReviewError(
+      "state_review_not_found",
+      `no state review artifact for chapter ${params.chapter}`,
+    );
+  }
+  if (existing.status === "active") {
+    throw new StateReviewError(
+      "state_review_already_resolved",
+      `chapter ${params.chapter} already has an active state review`,
+    );
+  }
+  if (existing.status === "stale") {
+    throw new StateReviewError(
+      "state_review_stale",
+      `chapter ${params.chapter} review artifact is stale`,
+    );
+  }
+  // remaining statuses: rebuild_required | rebuild_failed shells
+
+  // ---- Fresh durable inputs (latest prose + latest live Canon + head) -----
+  const durableProse = await readLatestDurableChapterProse(params.bookDir, params.chapter);
+  const proseRevision = computeProseRevision(durableProse);
+  const canonView = await readStoryCanon(params.bookDir);
+  const effectiveChapter = (await resolveDurableStoryProgress({ bookDir: params.bookDir })) + 1;
+
+  // ---- Analysis (the single AI seam; failure ⇒ durable rebuild_failed) ----
+  let delta: RuntimeStateDelta;
+  try {
+    delta = await params.analyze({ chapterContent: durableProse });
+  } catch (error) {
+    const reason = sanitizeRebuildFailureReason(error);
+    await saveStateReviewShell(params.bookDir, {
+      schemaVersion: 1,
+      status: "rebuild_failed",
+      sourceChapter: params.chapter,
+      createdAt: new Date().toISOString(),
+      language: params.language,
+      reason,
+    });
+    throw new StateReviewError("state_review_rebuild_failed", reason);
+  }
+
+  // ---- Fresh generation: Task-4 items only, no decision carry-forward -----
+  const parsedArtifact = StateReviewArtifactSchema.safeParse({
+    schemaVersion: 1,
+    status: "active",
+    reviewId: randomUUID(),
+    sourceChapter: params.chapter,
+    effectiveChapter,
+    createdAt: new Date().toISOString(),
+    language: params.language,
+    proseRevision,
+    baseCanonRevision: canonView.revision,
+    reviewRevision: 1,
+    items: buildStateReviewItems(delta, {
+      chapterContent: durableProse,
+      language: params.language,
+    }),
+  });
+  if (!parsedArtifact.success || parsedArtifact.data.status !== "active") {
+    throw new StateReviewError(
+      "state_review_invalid_change",
+      "rebuilt proposal failed active-artifact validation"
+        + `${parsedArtifact.success ? "" : `: ${parsedArtifact.error.issues[0]?.message ?? "unknown"}`}`,
+    );
+  }
+  await publishActiveProposal(params.bookDir, parsedArtifact.data);
+  return { artifact: parsedArtifact.data };
 }
