@@ -24,7 +24,7 @@
  */
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createCanonBook, type CanonBookFixture } from "./helpers/canon-fixture.js";
 import {
   ACTIVE_REVIEW_RELPATH,
@@ -35,12 +35,12 @@ import {
 import {
   addUserStateReviewItem,
   decideStateReviewItem,
-  rebuildStateReview,
 } from "../state/state-review-service.js";
 import { prepareStateReviewConfirm } from "../state/state-review-confirm.js";
 import { confirmStateReview } from "../state/state-review-finalize.js";
 import { assertCanAdvanceStory } from "../state/advancement-gate.js";
 import { executeEditTransaction, type EditExecutionDeps } from "../interaction/edit-controller.js";
+import { PipelineRunner } from "../pipeline/runner.js";
 import { StateManager } from "../state/manager.js";
 import { MemoryDB } from "../state/memory-db.js";
 import { readStoryCanon } from "../state/canon-service.js";
@@ -281,10 +281,13 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       await expect(assertCanAdvanceStory(bookDir, EFFECTIVE))
         .rejects.toThrow(/Rebuild required/i);
 
-      // ---- Task 10: PUBLIC rebuild from latest prose against head25 ------
-      const analyzeInputs: Array<string> = [];
+      // ---- Task 10: PUBLIC regenerateStateReview boundary -----------------
+      // The production adapter (book lock, index-authoritative title wiring,
+      // WriterAgent.settleChapterState over the LATEST durable prose against
+      // LIVE Canon) runs for real; only the Settler itself is a fake via the
+      // approved `deps.createWriter` seam. No external LLM.
       const settlementDelta: RuntimeStateDelta = {
-        chapter: EFFECTIVE,
+        chapter: SOURCE,
         currentStatePatch: { currentLocation: "新灯塔" },
         hookOps: { upsert: [], mention: [], resolve: [], defer: [] },
         newHookCandidates: [],
@@ -306,16 +309,61 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
         characterMatrixOps: [],
         notes: [],
       };
-      const { artifact } = await rebuildStateReview({
-        bookDir,
-        chapter: SOURCE,
-        language: "zh",
-        analyze: async (input) => {
-          analyzeInputs.push(input.chapterContent);
-          return settlementDelta;
+      const settleProbe = {
+        calls: [] as string[],
+        chapterNumbers: [] as number[],
+        titles: [] as string[],
+        contents: [] as string[],
+        canonRevisions: [] as string[],
+      };
+      const runner = new PipelineRunner({
+        client: {
+          provider: "openai", apiFormat: "chat", stream: false,
+          defaults: { temperature: 0.7, maxTokens: 4096, thinkingBudget: 0, extra: {} },
         },
+        model: "test-model",
+        projectRoot: fixture.root,
       });
-      expect(analyzeInputs).toEqual([P16_NEW]); // latest durable prose
+      {
+        // Public mutation-lock boundary probe (same pattern as the Task 10
+        // suite): acquire → settle → release around ONE wrapper call.
+        const stateAny = runner as unknown as {
+          state: { acquireBookLock: (id: string) => Promise<() => void> };
+        };
+        const realAcquire = stateAny.state.acquireBookLock.bind(stateAny.state);
+        vi.spyOn(stateAny.state, "acquireBookLock").mockImplementation(async (id) => {
+          settleProbe.calls.push("acquire");
+          const release = await realAcquire(id);
+          return () => {
+            settleProbe.calls.push("release");
+            release();
+          };
+        });
+      }
+      const { artifact } = await runner.regenerateStateReview(basename(bookDir), SOURCE, {
+        createWriter: () => ({
+          settleChapterState: async (input) => {
+            settleProbe.calls.push("settle");
+            settleProbe.chapterNumbers.push(input.chapterNumber);
+            settleProbe.titles.push(input.title);
+            settleProbe.contents.push(input.content);
+            settleProbe.canonRevisions.push((await readStoryCanon(bookDir)).revision);
+            return {
+              runtimeStateDelta: settlementDelta,
+              updatedState: "# 当前状态\n",
+              updatedHooks: "# 伏笔池\n",
+            } as never;
+          },
+        }),
+      });
+      // Public boundary really ran: lock wrapped settlement; the Settler saw
+      // the authoritative index title, source number, LATEST prose bytes and
+      // the LIVE head25 Canon as its semantic basis.
+      expect(settleProbe.calls).toEqual(["acquire", "settle", "release"]);
+      expect(settleProbe.chapterNumbers).toEqual([SOURCE]);
+      expect(settleProbe.titles).toEqual(["第16章"]);
+      expect(settleProbe.contents).toEqual([P16_NEW]); // latest durable prose
+      expect(settleProbe.canonRevisions).toEqual([canonBefore.revision]);
       expect(artifact.status).toBe("active");
       expect(artifact.sourceChapter).toBe(SOURCE);
       expect(artifact.effectiveChapter).toBe(EFFECTIVE); // head25 ⇒ anchored 26
@@ -417,6 +465,12 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       await readFile(join(bookDir, "story/state/current_state.json"), "utf-8"),
     ));
     expect(liveState.chapter).toBe(EFFECTIVE);
+    // DURABILITY of the forward-applied head in the SEMANTIC-CHANGE flow too:
+    // the production loader must keep head 26 consistent with no clamping.
+    const reloadedCanonPrimary = await readStoryCanon(bookDir);
+    expect(reloadedCanonPrimary.manifest.lastAppliedChapter).toBe(EFFECTIVE);
+    expect(reloadedCanonPrimary.currentState.chapter).toBe(EFFECTIVE);
+    expect(reloadedCanonPrimary.revision).toBe(result.resultingCanonRevision);
     // V1 provenance convention: application anchor 26 in Canon facts.
     const appliedFact = liveState.facts.find((f) => f.predicate === "当前位置" && f.object === "新灯塔")!;
     expect(appliedFact.sourceChapter).toBe(EFFECTIVE);
@@ -602,7 +656,8 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
     const index = ChapterMetaSchema.array().parse(
       JSON.parse(await readFile(join(bookDir, "chapters/index.json"), "utf-8")),
     );
-    // Fixture seeded ch16 approved; flip through a quick sanity instead:
+    // Source chapter restored to approved — not just bookkeeping length.
+    expect(index.find((meta) => meta.number === SOURCE)?.status).toBe("approved");
     expect(index.length).toBe(HEAD);
     expect(await loadStateReview(bookDir, SOURCE)).toBeNull();
     // Zero cascade on the tail.

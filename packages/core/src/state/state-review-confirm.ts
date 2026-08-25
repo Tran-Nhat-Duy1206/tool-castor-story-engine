@@ -33,6 +33,7 @@ import {
   type CurrentStateSlotKey,
 } from "./state-projections.js";
 import { SNAPSHOT_STORY_FILE_NAMES } from "./snapshot-set.js";
+import { resolveEffectiveChapter } from "./state-review-temporal.js";
 
 /**
  * Task 11 — PURE Final-Confirm PREPARE (design §9.A; hardened plan Area G).
@@ -489,9 +490,7 @@ export async function prepareStateReviewConfirm(params: {
       `confirmed Canon head ${params.durableHead} reached the proposal's effective chapter ${active.effectiveChapter}; the proposal must be rebuilt, not rebased`,
     );
   }
-  const expectedEffective = active.sourceChapter <= params.durableHead
-    ? params.durableHead + 1
-    : active.sourceChapter;
+  const expectedEffective = resolveEffectiveChapter(active.sourceChapter, params.durableHead);
   if (expectedEffective !== active.effectiveChapter) {
     throw new StateReviewError(
       "state_review_conflict",

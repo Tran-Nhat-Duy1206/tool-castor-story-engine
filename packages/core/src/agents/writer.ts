@@ -73,6 +73,13 @@ export interface WriteChapterInput {
   readonly lengthSpec?: LengthSpec;
   readonly wordCountOverride?: number;
   readonly temperatureOverride?: number;
+  /**
+   * Task 6/7 governed deferred publication: the settlement delta is PROPOSAL
+   * material only — it must NEVER be applied against the LIVE runtime
+   * snapshot during generation (Task 11/12 own application at the confirmed
+   * effective slot). Absent/false ⇒ byte-identical legacy behavior.
+   */
+  readonly deferStateApplication?: boolean;
 }
 
 export interface SettleChapterStateInput {
@@ -88,6 +95,8 @@ export interface SettleChapterStateInput {
   readonly contextPackage?: ContextPackage;
   readonly ruleStack?: RuleStack;
   readonly validationFeedback?: string;
+  /** Same governed deferred contract as {@link WriteChapterInput.deferStateApplication}. */
+  readonly deferStateApplication?: boolean;
 }
 
 export interface TokenUsage {
@@ -317,13 +326,24 @@ export class WriterAgent extends BaseAgent {
     });
     const settlement = settleResult.settlement;
     const settleUsage = settleResult.usage;
-    const runtimeStateArtifacts = await this.buildRuntimeStateArtifactsIfPresent(
-      bookDir,
-      settlement.runtimeStateDelta,
-      resolvedLanguage,
-      chapterNumber,
-    );
-    const resolvedRuntimeStateDelta = runtimeStateArtifacts?.resolvedDelta ?? settlement.runtimeStateDelta;
+    // Task 6/7 governed deferred publication: the proposal delta rides the
+    // result UNSPPLIED — no candidate artifacts are built against the LIVE
+    // snapshot, so a confirmed semantic head ahead of the prose prefix
+    // (historical corrections) can never trip the reducer's reapply guard.
+    // The delta stays SOURCE-oriented (normalized to the prose source number)
+    // because Task 11/12 own application-time temporal retargeting.
+    const runtimeStateArtifacts = input.deferStateApplication === true
+      ? null
+      : await this.buildRuntimeStateArtifactsIfPresent(
+          bookDir,
+          settlement.runtimeStateDelta,
+          resolvedLanguage,
+          chapterNumber,
+        );
+    const resolvedRuntimeStateDelta = runtimeStateArtifacts?.resolvedDelta
+      ?? (input.deferStateApplication === true && settlement.runtimeStateDelta
+        ? this.normalizeRuntimeStateDeltaChapter(settlement.runtimeStateDelta, chapterNumber)
+        : settlement.runtimeStateDelta);
     const priorHookIds = new Set(parsePendingHooksMarkdown(hooks).map((hook) => hook.hookId));
     const hookHealthIssues = resolvedRuntimeStateDelta
       && (runtimeStateArtifacts?.snapshot ?? settlement.runtimeStateSnapshot)
@@ -475,15 +495,24 @@ export class WriterAgent extends BaseAgent {
       originalCharacterMatrix: characterMatrix,
     });
     const settlement = settleResult.settlement;
-    const runtimeStateArtifacts = await this.buildRuntimeStateArtifactsIfPresent(
-      input.bookDir,
-      settlement.runtimeStateDelta,
-      resolvedLanguage,
-      input.chapterNumber,
-      input.allowReapply,
-      input.baselineChapter,
-      input.allowNewHooks,
-    );
+    // Governed deferred contract — see writeChapter. Proposal material only:
+    // never applied against the LIVE snapshot; still source-normalized.
+    const deferredProposalDelta = input.deferStateApplication === true
+      ? settlement.runtimeStateDelta
+        ? this.normalizeRuntimeStateDeltaChapter(settlement.runtimeStateDelta, input.chapterNumber)
+        : undefined
+      : undefined;
+    const runtimeStateArtifacts = input.deferStateApplication === true
+      ? null
+      : await this.buildRuntimeStateArtifactsIfPresent(
+          input.bookDir,
+          settlement.runtimeStateDelta,
+          resolvedLanguage,
+          input.chapterNumber,
+          input.allowReapply,
+          input.baselineChapter,
+          input.allowNewHooks,
+        );
 
     return {
       chapterNumber: input.chapterNumber,
@@ -495,7 +524,9 @@ export class WriterAgent extends BaseAgent {
       ),
       preWriteCheck: "",
       postSettlement: settlement.postSettlement,
-      runtimeStateDelta: runtimeStateArtifacts?.resolvedDelta ?? settlement.runtimeStateDelta,
+      runtimeStateDelta: runtimeStateArtifacts?.resolvedDelta
+        ?? deferredProposalDelta
+        ?? settlement.runtimeStateDelta,
       runtimeStateSnapshot: runtimeStateArtifacts?.snapshot ?? settlement.runtimeStateSnapshot,
       updatedState: runtimeStateArtifacts?.currentStateMarkdown ?? settlement.updatedState,
       updatedLedger: settlement.updatedLedger,

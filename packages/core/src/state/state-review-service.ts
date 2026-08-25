@@ -28,6 +28,7 @@ import {
 import { readStoryCanon } from "./canon-service.js";
 import { computeProseRevision } from "../utils/prose-revision.js";
 import { mutateActiveProposal } from "./state-review-store.js";
+import { resolveEffectiveChapter } from "./state-review-temporal.js";
 
 /**
  * Task 8 — human State Review DECISION mutations (Phase 4).
@@ -497,7 +498,7 @@ export async function rebuildStateReview(params: {
   // Design §20: anchor by CONFIRMED Canon head — never by durable file counts,
   // which include the unresolved pending chapter itself.
   const confirmedHead = (await readLiveRuntimeStateSnapshot(params.bookDir)).manifest.lastAppliedChapter;
-  const effectiveChapter = params.chapter <= confirmedHead ? confirmedHead + 1 : params.chapter;
+  const effectiveChapter = resolveEffectiveChapter(params.chapter, confirmedHead);
 
   // ---- Analysis (the single AI seam; failure ⇒ durable rebuild_failed) ----
   let delta: RuntimeStateDelta;

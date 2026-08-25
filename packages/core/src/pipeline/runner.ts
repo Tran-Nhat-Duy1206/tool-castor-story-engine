@@ -49,6 +49,8 @@ import {
   readVolumeMap,
 } from "../utils/outline-paths.js";
 import { rewriteStructuredStateFromMarkdown } from "../state/state-bootstrap.js";
+import { resolveEffectiveChapter } from "../state/state-review-temporal.js";
+import { readLiveRuntimeStateSnapshot } from "../state/state-review-store.js";
 import { readFile, readdir, writeFile, mkdir, rename, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -1895,6 +1897,9 @@ export class PipelineRunner {
           chapterNumber,
           title,
           content: chapterContent,
+          // Proposal material only — never applied against the live snapshot
+          // (critical when the confirmed semantic head leads the prefix).
+          deferStateApplication: true,
         });
         if (!settled.runtimeStateDelta) {
           throw new Error("chapter settlement produced no runtime state delta");
@@ -2127,6 +2132,12 @@ export class PipelineRunner {
       lengthSpec,
       ...(wordCount ? { wordCountOverride: wordCount } : {}),
       ...(temperatureOverride ? { temperatureOverride } : {}),
+      // Governed next-chapter flow (Task 7): publication of this run is
+      // proposal-based and FAILS CLOSED — the writer's settlement delta is
+      // source-oriented proposal material and must never be applied against
+      // the LIVE semantic head during generation (critical when historical
+      // corrections put the confirmed head ahead of the prose prefix).
+      deferStateApplication: true,
     });
     this.throwIfOperationAborted();
     const writerCount = countChapterLength(output.content, lengthSpec.countingMode);
@@ -2436,7 +2447,7 @@ export class PipelineRunner {
       const runtimeDelta = parsedProposal.data;
       const durableProgress = await resolveDurableStoryProgress({ bookDir });
       // Temporal binding (plan Part Q): no silent relocation — the proposal's
-      // effective chapter MUST be exactly the chapter being persisted.
+      // PROSE continuity anchor MUST be exactly the chapter being persisted.
       if (durableProgress + 1 !== chapterNumber) {
         throw new Error(
           `Refusing to publish chapter ${chapterNumber}: durable story progress is `
@@ -2445,6 +2456,14 @@ export class PipelineRunner {
         );
       }
       const canonBeforePublication = await readStoryCanon(bookDir);
+      // Temporal identity (§20) comes from the CONFIRMED SEMANTIC head — the
+      // same rule as Task 10/11 — NOT from the prose prefix. After historical
+      // corrections the confirmed head leads the prefix, so a normal prose
+      // chapter N publishes as sourceChapter=N / effectiveChapter=N+1… and a
+      // healthy book still yields effectiveChapter===N.
+      const confirmedSemanticHead =
+        (await readLiveRuntimeStateSnapshot(bookDir)).manifest.lastAppliedChapter;
+      const effectiveChapter = resolveEffectiveChapter(chapterNumber, confirmedSemanticHead);
       const durableChapterContent = buildChapterFileContent(
         chapterNumber,
         persistenceOutput.title,
@@ -2456,7 +2475,7 @@ export class PipelineRunner {
         status: "active",
         reviewId: randomUUID(),
         sourceChapter: chapterNumber,
-        effectiveChapter: durableProgress + 1,
+        effectiveChapter,
         language: pipelineLang === "en" ? "en" : "zh",
         createdAt: new Date().toISOString(),
         proseRevision: computeProseRevision(durableChapterContent),
