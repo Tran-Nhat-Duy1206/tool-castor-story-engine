@@ -114,6 +114,10 @@ export {
   removeUserStateReviewItem,
   type StateReviewMutationDeps,
 } from "./state/state-review-service.js";
+export {
+  prepareStateReviewConfirm,
+  type PreparedStateReviewConfirm,
+} from "./state/state-review-confirm.js";
 export { assertCanAdvanceStory } from "./state/advancement-gate.js";
 export {
   type PlayActionKind,
