@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Date | 2026-08-27 |
-| Status | **DESIGN SPEC — section decisions approved; consolidated written spec pending human approval. Implementation NOT begun; no implementation plan created yet.** |
+| Status | **AUTHORITATIVE DESIGN — human-approved. Implementation governed by this specification.** |
 | Product | Tool Castor Story Engine (CLI: `castor`) |
 | Branch | `feature/human-controlled-story-state-v1` (standalone repository `Tran-Nhat-Duy1206/tool-castor-story-engine`) |
 | Builds on | Phase 4 Human-Governed Post-Chapter State Review (spec `2026-08-24-human-governed-post-chapter-state-review-design.md`, technically complete at tag `v0.1.0`) · existing Architect / Foundation Reviewer / Planner / ChapterIntent / ChapterMemo / Writer integration · atomic persistence and recovery primitives · local retrieval/index infrastructure · Studio · CLI |
