@@ -181,7 +181,7 @@ export async function resolveBookId(
 
   if (books.length === 0) {
     throw new Error(
-      "No books found. Create one first:\n  inkos book create --title '...' --genre xuanhuan",
+      "No books found. Create one first:\n  castor book create --title '...' --genre xuanhuan",
     );
   }
   if (books.length === 1) {

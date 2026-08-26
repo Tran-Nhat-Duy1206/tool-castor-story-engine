@@ -4897,7 +4897,7 @@ describe("createStudioServer daemon lifecycle", () => {
   }, 60_000);
 
   it("returns BOOK_BUSY when direct write-next collides with an active write", async () => {
-    const lockError = 'Book "demo-book" is locked by an active InkOS write. Wait for it to finish or stop the running task, then retry.';
+    const lockError = 'Book "demo-book" is locked by an active Castor write. Wait for it to finish or stop the running task, then retry.';
     writeNextChapterMock.mockRejectedValueOnce(Object.assign(new Error(lockError), { code: "BOOK_BUSY" }));
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -5859,7 +5859,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(response.status).toBe(500);
     const json = await response.json() as { error: { code: string; message: string }; response: string };
     expect(json.error.code).toBe("AGENT_INTERNAL_ERROR");
-    expect(json.error.message).toContain("InkOS 内部流程错误");
+    expect(json.error.message).toContain("Castor 内部流程错误");
     expect(json.error.message).toContain("missing YAML frontmatter delimiters");
     expect(json.error.message).not.toMatch(/kkaiapi/i);
     expect(json.response).toBe(json.error.message);
@@ -5867,7 +5867,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("returns an active book write lock as BOOK_BUSY instead of a provider error", async () => {
-    const lockError = 'Book "demo-book" is locked by an active InkOS write (pid:123). Wait for it to finish or stop the running task, then retry. Stale locks are recovered automatically.';
+    const lockError = 'Book "demo-book" is locked by an active Castor write (pid:123). Wait for it to finish or stop the running task, then retry. Stale locks are recovered automatically.';
     runAgentSessionMock.mockResolvedValueOnce({
       responseText: "",
       errorMessage: lockError,

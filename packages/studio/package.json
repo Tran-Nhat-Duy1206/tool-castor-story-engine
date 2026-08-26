@@ -1,7 +1,7 @@
 {
   "name": "@actalk/inkos-studio",
   "version": "1.8.0",
-  "description": "InkOS Studio web workbench for novels, short fiction, scripts, interactive film and worlds, and translation",
+  "description": "Castor Studio web workbench for novels, short fiction, scripts, interactive film and worlds, and translation (derived from InkOS)",
   "type": "module",
   "main": "dist/api/index.js",
   "types": "dist/api/index.d.ts",
@@ -12,7 +12,7 @@
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Narcooo/inkos.git",
+    "url": "https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine.git",
     "directory": "packages/studio"
   },
   "scripts": {

@@ -1,56 +1,36 @@
+<h1 align="center">Tool Castor Story Engine</h1>
+
 <p align="center">
-  <img src="assets/logo.svg" width="120" height="120" alt="InkOS Logo">
-  <img src="assets/inkos-text.svg" width="240" height="65" alt="InkOS">
+  <strong>面向长短篇小说、剧本剧作、互动影游、IP 内容与多语言翻译的 AI 创作智能体系统（CLI：<code>castor</code>）</strong>
 </p>
 
-<h1 align="center">Story Creation AI Agent<br><sub>面向长短篇小说、剧本剧作、互动影游、IP 内容与多语言翻译的创作智能体系统</sub></h1>
-
 <p align="center">
-  <a href="https://www.npmjs.com/package/@actalk/inkos"><img src="https://img.shields.io/npm/v/@actalk/inkos.svg?color=cb3837&logo=npm" alt="npm version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL-3.0"></a>
-  <a href="https://github.com/Narcooo/inkos/stargazers"><img src="https://img.shields.io/github/stars/Narcooo/inkos?style=flat&logo=github&color=yellow" alt="GitHub stars"></a>
-  <a href="https://www.npmjs.com/package/@actalk/inkos"><img src="https://img.shields.io/npm/dm/@actalk/inkos?color=cb3837&logo=npm&label=downloads" alt="npm downloads"></a>
-  <a href="https://clawhub.ai/narcooo/inkos"><img src="https://img.shields.io/badge/🦞%20ClawHub-Skill-FF6B35?labelColor=1a1a1a" alt="ClawHub Skill"></a>
+  <a href="https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine"><img src="https://img.shields.io/badge/GitHub-tool--castor--story--engine-181717?logo=github" alt="GitHub"></a>
 </p>
 
 <p align="center">
   <a href="README.en.md">English</a> | 中文 | <a href="README.ja.md">日本語</a>
 </p>
 
-<p align="center">
-  <strong>InkOS 网页版上线！</strong>
-  <a href="https://huohuaapi.com/apps">立刻体验</a>
-</p>
+---
+
+> **派生项目声明 / Derived project notice**
+>
+> Tool Castor Story Engine（Castor）由 [InkOS](https://github.com/Narcooo/inkos)（作者 Narcooo）派生，经过了大量修改与演进，已成为独立的长篇 AI 故事写作系统。本项目保留 InkOS 的 Git 历史、版权声明与 AGPL-3.0 许可证义务；上游 InkOS 代码并非本项目作者编写。本修改版本同样以 [AGPL-3.0](LICENSE) 许可发布。
+>
+> *Tool Castor Story Engine (Castor) is derived from [InkOS](https://github.com/Narcooo/inkos) by Narcooo and has been substantially modified and evolved into an independent long-form AI story-writing system. This project preserves InkOS's Git history, copyright notices and AGPL-3.0 obligations. The original InkOS code was not authored by the maintainers of this project. This modified work remains licensed under AGPL-3.0.*
 
 ---
 
-InkOS 是一个面向故事创作与多语言翻译的 AI Agent 系统：长篇连载、独立短篇、剧本剧作、同人番外、仿写续写、互动影游、开放世界和长文翻译，都可以从同一个工作台开始。支持 Studio、TUI、CLI 交互形式，把创意、设定、角色、记忆、审稿、修订、封面、互动状态和跨语言交付交给智能体统一管理。
-
-<p align="left">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://kimi-file.moonshot.cn/prod-chat-kimi/kfs/4/1/2026-06-05/1d8h69mt3v89kkekg24gg">
-    <img alt="Kimi Open Source Friends" width="420" src="https://kimi-file.moonshot.cn/prod-chat-kimi/kfs/4/1/2026-06-05/1d8h69fudcmosb3pipls0">
-  </picture>
-  <br>
-  🎉🎉 InkOS 入选首批 KIMI 开源合作伙伴 🎉🎉
-</p>
-
-<p align="center">
-  <a href="https://www.kimi.com/code/?aff=inkos"><img src="https://gcdn.moonshot.cn/growth-cdn/sponsor/kimi-zh.png" width="900" alt="Kimi 赞助 InkOS"></a>
-</p>
-
-感谢 [Kimi](https://www.kimi.com/code/?aff=inkos) 赞助本项目！[Kimi K3](https://www.kimi.com/blog/kimi-k3) 是 Moonshot AI 迄今能力最强的模型，也是全球首个开源 3T 级模型，拥有原生视觉能力与 100 万 Token 上下文。搭配 InkOS，K3 可以参与长短篇小说、剧本、互动影游与多语言内容的规划、写作、审稿和修订；InkOS 则持续管理角色、设定、伏笔与故事状态，让长篇创作更连贯、更可控。
-
-**InkOS Studio 已支持 Moonshot（Kimi）。前往 Kimi 开放平台（[中文站](https://platform.kimi.com/?aff=inkos)｜[Global](https://platform.kimi.ai/?aff=inkos)）获取 API Key，即可开始创作。**
-
-> 💡 **写小说，先给 Agent 接一层专业数据** —— 写小说不只缺模型，更缺素材。推荐搭配 [**火花数据API（huohuaapi）**](https://huohuaapi.com/)：按调用计费的小说 / 网文创作数据，让 Agent 动笔前先查小说正文、章节结构、人物设定、文风和创作方法等带来源素材，而不是只靠 Prompt 硬凑一份“剧情提纲”。
+Tool Castor Story Engine（Castor）是一个面向故事创作与多语言翻译的 AI Agent 系统：长篇连载、独立短篇、剧本剧作、同人番外、仿写续写、互动影游、开放世界和长文翻译，都可以从同一个工作台开始。支持 Studio、TUI、CLI（`castor`）交互形式，把创意、设定、角色、记忆、审稿、修订、封面、互动状态和跨语言交付交给智能体统一管理。核心包含 **Phase 4 人工治理的章节状态复核（Human-Governed Post-Chapter State Review）**：AI 只生成提案，人工决定后原子确认，正文编辑立即触发复核。
 
 ## v1.8.0 - 统一 Pi Agent Harness 与专业创作内核
 
-InkOS 1.8.0 把“Chat Agent 调工具”和“各类作品管线”收敛成一套围绕 pi-agent 的生产 harness。模型负责理解、提议和调用能力；InkOS 负责确认、上下文、状态、原子落盘和产物真实性。长篇、短篇、剧本、分镜、互动影游、Play 与翻译继续保留各自的专业方法，但共享同一套执行、检索、观测和恢复基础设施。
+Castor 1.8.0 把“Chat Agent 调工具”和“各类作品管线”收敛成一套围绕 pi-agent 的生产 harness。模型负责理解、提议和调用能力；Castor 负责确认、上下文、状态、原子落盘和产物真实性。长篇、短篇、剧本、分镜、互动影游、Play 与翻译继续保留各自的专业方法，但共享同一套执行、检索、观测和恢复基础设施。
 
 - **模型配置**：Studio 内置多服务配置、模型路由和封面服务配置；支持 [kkaiapi](https://kkaiapi.com/) / OpenRouter 等全球主流模型聚合入口，以及自定义 OpenAI-compatible 服务。
-- **单一生产 Harness**：Studio Chat、TUI、`inkos interact` 与生产 worker 共用 pi-agent 工具循环和结构化 action/result；既有 pipeline 降为可直接调用、可中断、可观测的确定性能力，不再维护平行的自然语言决策内核。
+- **单一生产 Harness**：Studio Chat、TUI、`castor interact` 与生产 worker 共用 pi-agent 工具循环和结构化 action/result；既有 pipeline 降为可直接调用、可中断、可观测的确定性能力，不再维护平行的自然语言决策内核。
 - **15 个内置专业 Skills**：长篇写作 / 审稿、商业短篇、Play、剧本、分镜、互动影游、翻译、拆稿、市场研究、导入、封面与去 AI 味都拥有独立 `SKILL.md`；各作品类型复用 Skill 架构，不复用不适合自己的长篇提示词。
 - **统一本地检索**：故事记忆、材料库和 Skill 参考资料共用 SQLite FTS5 / BM25 检索投影；原始文件仍是权威来源，索引可重建，检索结果保留来源与位置。
 - **书籍参考资料绑定**：导入材料可以显式绑定到某本书并声明用途，写作时按当前任务检索相关段落，而不是把所有文件全文塞进上下文。
@@ -61,8 +41,8 @@ InkOS 1.8.0 把“Chat Agent 调工具”和“各类作品管线”收敛成一
 - **模型与工作台补齐**：新增 LM Studio 本地服务，动态模型目录和外部母本导入可持久化；Studio 支持自定义封面 Base URL、宽屏章节预览和安全章节重写。
 
 <p align="center">
-  <img src="assets/interactive-film-e2e.png" width="440" alt="InkOS 互动影游剧情树实测截图">
-  <img src="assets/studio-play-1-5.png" width="440" alt="InkOS Play Studio 开放世界界面">
+  <img src="assets/interactive-film-e2e.png" width="440" alt="Castor 互动影游剧情树实测截图">
+  <img src="assets/studio-play-1-5.png" width="440" alt="Castor Play Studio 开放世界界面">
 </p>
 
 ### 主要创作形态
@@ -71,9 +51,9 @@ InkOS 1.8.0 把“Chat Agent 调工具”和“各类作品管线”收敛成一
 
 **剧情多线推演** — 在写下一章前，基于当前正史生成 2-5 条彼此隔离的未来分支，并在 Studio Chat 中横向比较章节节拍、人物决定、预计变化、风险和作者意图匹配度。采用分支只会保存 `selected-branch-plan.md` 候选计划，不会修改正文、大纲或正史状态；正史变化后旧推演会标记为过期。
 
-**InkOS Short** — Studio Chat 和 CLI 可以直接产出独立短篇：完整正文、大纲记录、审稿记录、简介卖点、封面提示词，并在配置封面服务后生成封面图。
+**Castor Short** — Studio Chat 和 CLI 可以直接产出独立短篇：完整正文、大纲记录、审稿记录、简介卖点、封面提示词，并在配置封面服务后生成封面图。
 
-**InkOS Play** — 新增开放世界与分支互动。你可以用自然语言指定世界契约、时间推进方式、角色 agent、物品 / 证据 / 关系规则和视觉风格；系统维护世界状态、可点击选择、自由动作、HUD 和自动配图。
+**Castor Play** — 新增开放世界与分支互动。你可以用自然语言指定世界契约、时间推进方式、角色 agent、物品 / 证据 / 关系规则和视觉风格；系统维护世界状态、可点击选择、自由动作、HUD 和自动配图。
 
 **Studio Chat** — 普通聊天、建书、短篇、封面、互动世界都走同一套 action surface。重动作先确认，生成物可预览，可通过聊天修改章节、封面提示词、世界状态和持久化文本产物。
 
@@ -95,32 +75,29 @@ InkOS 1.8.0 把“Chat Agent 调工具”和“各类作品管线”收敛成一
 需要 **Node.js 22 或更高版本**。
 
 ```bash
-npm i -g @actalk/inkos
+git clone https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine.git
+cd tool-castor-story-engine
+pnpm install
+pnpm build
 ```
+
+> 上游 InkOS 的 npm 包（`@actalk/inkos`）与 [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) 仍然属于 Narcooo 的 InkOS 项目；本独立仓库从源码构建使用。历史用户数据、`inkos.json` 配置、`INKOS_*` 环境变量与书籍目录结构保持兼容，`castor` 命令可直接加载既有 InkOS 项目。
 
 ### 通过 OpenClaw 使用 🦞
 
-InkOS 已发布为 [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill，可被任何兼容 Agent（Claude Code、OpenClaw 等）直接调用：
+上游 InkOS 已发布为 [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill。本仓库派生自 InkOS，继承了同一套共享交互入口；从源码构建后可直接调用：
 
 ```bash
-clawhub install inkos          # 从 ClawHub 安装 InkOS Skill
-```
-
-通过 npm 安装或克隆本项目时，`skills/SKILL.md` 已包含在内，🦞 可直接读取——无需额外从 ClawHub 安装。
-
-安装后，Claw 应优先通过共享交互入口调用 InkOS：
-
-```bash
-inkos interact --json --message "继续当前书，但把节奏再收紧一点"
+castor interact --json --message "继续当前书，但把节奏再收紧一点"
 ```
 
 这条入口直接走和项目 TUI 相同的交互执行内核，因此 OpenClaw、TUI、Studio 共用同一套控制脑。当前 JSON 输出包含 assistant 文本回复和 interaction session 信息；真正的执行结果以工具结果和落盘文件为准，不从模型口头声明推断完成。
 
-`plan chapter` / `compose chapter` / `draft` / `audit` / `revise` / `write next` 这些原子命令仍然保留，但更适合作为底层工具，而不是 OpenClaw 的首选入口。也可以在 [ClawHub](https://clawhub.ai) 搜索 `inkos` 在线查看。
+`plan chapter` / `compose chapter` / `draft` / `audit` / `revise` / `write next` 这些原子命令仍然保留，但更适合作为底层工具，而不是 OpenClaw 的首选入口。
 
 ### Agent Skills
 
-InkOS 直接使用标准 `SKILL.md` 作为专业能力扩展，不再维护一套 InkOS 私有 Skill 协议。Skill 只向 Chat Agent 提供专业说明和静态参考资料，不会增加执行权限；创建、写入、编辑和生成图片仍然由 InkOS 工具与确认闸门控制。
+Castor 直接使用标准 `SKILL.md` 作为专业能力扩展，不再维护一套 Castor 私有 Skill 协议。Skill 只向 Chat Agent 提供专业说明和静态参考资料，不会增加执行权限；创建、写入、编辑和生成图片仍然由 Castor 工具与确认闸门控制。
 
 可用方式：
 
@@ -128,7 +105,7 @@ InkOS 直接使用标准 `SKILL.md` 作为专业能力扩展，不再维护一�
 - 或设置 `INKOS_SKILL_DIRS=/abs/path/to/skills`，可指向单个 skill 目录，也可指向包含多个 skill 子目录的目录。多个目录按系统分隔符分隔。
 - 在 Chat 里用 `@skill-id` 强制本轮使用，例如：`@detective-play 做一个证据链驱动的开放世界`。
 - 不写 `@skill-id` 时，Chat Agent 根据用户当前意图决定是否调用 `use_skill`；不再通过 session 类型、关键词或字符串包含匹配机械启用。
-- 外部 Skill 只提供指令和静态参考资料，InkOS 不会自动执行其中的脚本；它也不会绕过现有工具权限与确认闸门。
+- 外部 Skill 只提供指令和静态参考资料，Castor 不会自动执行其中的脚本；它也不会绕过现有工具权限与确认闸门。
 
 提示词配置不是 Skill。Studio 的 **项目设置 → 提示词** 单独管理 prompt packs，项目级覆盖文件写入 `prompt/<pack>/<prompt>.md`，例如 `prompt/play/renderer.md`、`prompt/longform/writer.md`。
 
@@ -144,14 +121,14 @@ Use evidence chains; do not turn clues into generic atmosphere.
 
 ### 配置
 
-当前 InkOS 将 LLM 配置分成两条清晰路径：**Studio 用可视化服务配置**，**CLI / daemon / 部署环境支持 env 覆盖**。两者不会互相污染。
+当前 Castor 将 LLM 配置分成两条清晰路径：**Studio 用可视化服务配置**，**CLI / daemon / 部署环境支持 env 覆盖**。两者不会互相污染。
 
 #### 方式一：Studio 服务配置（推荐）
 
 适合本地写作、Web 工作台和可视化管理。
 
 ```bash
-inkos init my-novel
+castor init my-novel
 cd my-novel
 inkos
 ```
@@ -180,7 +157,7 @@ provider bank 默认值
 全局 env：
 
 ```bash
-inkos config set-global \
+castor config set-global \
   --provider <openai|anthropic|custom> \
   --base-url <API 地址> \
   --api-key <你的 API Key> \
@@ -214,15 +191,15 @@ Studio/project service 配置
 → CLI 参数
 ```
 
-也就是说，CLI 默认可以复用 Studio 配好的服务和密钥；如果 env 里声明了 `INKOS_LLM_SERVICE`、`INKOS_LLM_MODEL`、`INKOS_LLM_BASE_URL` 或 `INKOS_LLM_API_KEY`，则作为覆盖层生效。旧 env 只写 `baseUrl + model + apiKey` 也能继续用，InkOS 会尽量从 baseUrl 反推 service。
+也就是说，CLI 默认可以复用 Studio 配好的服务和密钥；如果 env 里声明了 `INKOS_LLM_SERVICE`、`INKOS_LLM_MODEL`、`INKOS_LLM_BASE_URL` 或 `INKOS_LLM_API_KEY`，则作为覆盖层生效。旧 env 只写 `baseUrl + model + apiKey` 也能继续用，Castor 会尽量从 baseUrl 反推 service。
 
 一次性指定服务或模型：
 
 ```bash
-inkos write next --service google --model gemini-2.5-flash
-inkos write next --service moonshot --model kimi-k2.5 --no-stream
-inkos agent "继续写下一章" --api-key-env MOONSHOT_API_KEY
-inkos doctor --service minimaxCodingPlan --model MiniMax-M2.7
+castor write next --service google --model gemini-2.5-flash
+castor write next --service moonshot --model kimi-k2.5 --no-stream
+castor agent "继续写下一章" --api-key-env MOONSHOT_API_KEY
+castor doctor --service minimaxCodingPlan --model MiniMax-M2.7
 ```
 
 `--service` 会从 provider bank 自动推导 baseUrl、协议和兼容策略；`--model` 必须属于最终 service，否则会直接报错，避免把 Kimi 模型发到 Gemini 这类错配问题。
@@ -233,9 +210,9 @@ inkos doctor --service minimaxCodingPlan --model MiniMax-M2.7
 
 ```bash
 # 给不同 agent 配不同模型/提供商
-inkos config set-model writer <model> --provider <provider> --base-url <url> --api-key-env <ENV_VAR>
-inkos config set-model auditor <model> --provider <provider>
-inkos config show-models        # 查看当前路由
+castor config set-model writer <model> --provider <provider> --base-url <url> --api-key-env <ENV_VAR>
+castor config set-model auditor <model> --provider <provider>
+castor config show-models        # 查看当前路由
 ```
 
 未单独配置的 Agent 自动使用全局模型。
@@ -243,7 +220,7 @@ inkos config show-models        # 查看当前路由
 #### 配置排查
 
 ```bash
-inkos doctor
+castor doctor
 ```
 
 `doctor` 会显示当前 effective config mode、service/model/API Key 来源，并尝试 API 连通性。常见模式：
@@ -256,14 +233,14 @@ inkos doctor
 | `legacy-env`     | 旧 env 模式：兼容老项目的纯 `.env` 配置                |
 
 
-如果服务测试失败，优先检查服务商、模型和协议是否匹配。Google Gemini 的 AI Studio API Key 可用于 Gemini OpenAI-compatible endpoint；InkOS 会自动禁用 Google 不支持的 OpenAI `store` 参数。MiniMax 默认走官方 OpenAI-compatible `/v1/chat/completions`，并优先使用可工作的非流式 transport，避免流式返回 usage 但无正文的问题；`MiniMax-M3*` 会默认关闭 thinking 返回，M2.x thinking 由上游限制无法关闭。
+如果服务测试失败，优先检查服务商、模型和协议是否匹配。Google Gemini 的 AI Studio API Key 可用于 Gemini OpenAI-compatible endpoint；Castor 会自动禁用 Google 不支持的 OpenAI `store` 参数。MiniMax 默认走官方 OpenAI-compatible `/v1/chat/completions`，并优先使用可工作的非流式 transport，避免流式返回 usage 但无正文的问题；`MiniMax-M3*` 会默认关闭 thinking 返回，M2.x thinking 由上游限制无法关闭。
 
 ### LLM 配置更新
 
 - **Studio / CLI 配置隔离**：Studio 固定使用服务页配置和 `.inkos/secrets.json`；CLI、daemon、部署环境支持 env 覆盖和一次性命令参数。
 - **Provider bank 能力表**：内置 Google Gemini、Moonshot、MiniMax、智谱、百炼、DeepSeek、硅基流动、火山、腾讯混元、文心、讯飞星火、OpenRouter、kkaiapi、Ollama、CodingPlan 等服务的 baseUrl、协议、模型和兼容策略。
 - **模型归属校验**：`--service google --model kimi-k2.5` 这类错配会直接报错，避免把请求发到错误服务商。
-- **Google Gemini 兼容修复**：AI Studio API Key 可直接用于 Gemini OpenAI-compatible endpoint，InkOS 会自动禁用 Google 不支持的 OpenAI `store` 参数。
+- **Google Gemini 兼容修复**：AI Studio API Key 可直接用于 Gemini OpenAI-compatible endpoint，Castor 会自动禁用 Google 不支持的 OpenAI `store` 参数。
 - **MiniMax transport 探测**：MiniMax / MiniMax CodingPlan 使用官方 OpenAI-compatible `/v1` 入口，并自动使用可工作的非流式 transport，规避流式 usage 正常但正文为空的问题。
 - **旧 env 兼容**：老的 `INKOS_LLM_BASE_URL + INKOS_LLM_MODEL + INKOS_LLM_API_KEY` 仍可用于 CLI；没有 `INKOS_LLM_SERVICE` 时会尝试从 baseUrl 反推服务商。
 
@@ -273,20 +250,20 @@ inkos doctor
 
 - **Studio Chat**：讨论、建书、短篇、封面、Play、编辑持久化文件都从同一个对话入口发起；重动作会先展示确认卡。
 - **开始创作入口**：长篇小说、短篇小说、同人创作、番外创作、仿写创作、续写创作、分支互动、开放世界都可以从 Studio 顶部入口进入。
-- **TUI 仪表盘**：`inkos tui` 进入终端全屏交互；支持 `/new`、`/short`、`/play`、`/cover`、`/write`、`/confirm`、`/cancel` 和会话级 `/model <模型名>`。
-- **外部 Agent 入口**：`inkos interact --json --message "..."` 仍是 OpenClaw / 其他 agent 的结构化入口。
+- **TUI 仪表盘**：`castor tui` 进入终端全屏交互；支持 `/new`、`/short`、`/play`、`/cover`、`/write`、`/confirm`、`/cancel` 和会话级 `/model <模型名>`。
+- **外部 Agent 入口**：`castor interact --json --message "..."` 仍是 OpenClaw / 其他 agent 的结构化入口。
 - **原子命令保留**：`plan` / `compose` / `draft` / `audit` / `revise` / `write next` 仍适合脚本和高级用户。
 
 ### 写第一本书
 
 ```bash
-inkos book create --title "吞天魔帝" --genre xuanhuan  # 创建新书
-inkos write next 吞天魔帝      # 写下一章（草稿 → 审计 → 按配置修订）
-inkos status                   # 查看状态
-inkos review list 吞天魔帝     # 审阅草稿
-inkos review approve-all 吞天魔帝  # 批量通过
-inkos export 吞天魔帝          # 导出全书
-inkos export 吞天魔帝 --format epub  # 导出 EPUB（手机/Kindle 阅读）
+castor book create --title "吞天魔帝" --genre xuanhuan  # 创建新书
+castor write next 吞天魔帝      # 写下一章（草稿 → 审计 → 按配置修订）
+castor status                   # 查看状态
+castor review list 吞天魔帝     # 审阅草稿
+castor review approve-all 吞天魔帝  # 批量通过
+castor export 吞天魔帝          # 导出全书
+castor export 吞天魔帝 --format epub  # 导出 EPUB（手机/Kindle 阅读）
 ```
 
 ### 写完整短篇
@@ -300,7 +277,7 @@ inkos export 吞天魔帝 --format epub  # 导出 EPUB（手机/Kindle 阅读）
 也可以走 CLI：
 
 ```bash
-inkos short run \
+castor short run \
   --direction "都市短篇 婚姻反转 女主证据反杀" \
   --chapters 12 \
   --chars 1000
@@ -340,7 +317,7 @@ inkos short run \
 
 Studio Chat 不再只是问答框。它可以创建长篇、跑短篇、生成封面、启动 Play、编辑持久化文本文件，并在需要执行重动作前给出确认。普通讨论会直接回答；明确创作动作才进入工具执行。
 
-### InkOS Play：开放世界与分支互动
+### Castor Play：开放世界与分支互动
 
 Play 维护一个可持续推进的世界状态：角色、地点、物品、证据、关系、时间、场景和 HUD。它不是固定 RPG 模板，你可以用自然语言定义世界契约：修仙装备可以有稀有感，恋爱本可以有心动层级，侦探本可以有证据生命周期。系统把这些规则写进世界状态，再用于后续叙事和配图。
 
@@ -352,11 +329,11 @@ Play 维护一个可持续推进的世界状态：角色、地点、物品、证
 
 ### 文风仿写
 
-`inkos style analyze` 分析参考文本，提取统计指纹（句长分布、词频特征、节奏模式）和 LLM 风格指南。`inkos style import` 将指纹注入指定书籍，后续所有章节自动采用该风格，修订者也会用风格标准做审计。
+`castor style analyze` 分析参考文本，提取统计指纹（句长分布、词频特征、节奏模式）和 LLM 风格指南。`castor style import` 将指纹注入指定书籍，后续所有章节自动采用该风格，修订者也会用风格标准做审计。
 
 ### 创作简报
 
-`inkos book create --brief my-ideas.md` 传入你的脑洞、世界观设定、人设文档。建筑师 agent 会基于简报生成故事设定（`story_bible.md`）和创作规则（`book_rules.md`），而非凭空创作；同时把简报落盘到 `story/author_intent.md`，让这本书的长期创作意图不会只在建书时生效一次。
+`castor book create --brief my-ideas.md` 传入你的脑洞、世界观设定、人设文档。建筑师 agent 会基于简报生成故事设定（`story_bible.md`）和创作规则（`book_rules.md`），而非凭空创作；同时把简报落盘到 `story/author_intent.md`，让这本书的长期创作意图不会只在建书时生效一次。
 
 ### 输入治理控制面
 
@@ -368,8 +345,8 @@ Play 维护一个可持续推进的世界状态：角色、地点、物品、证
 写作前可以先跑：
 
 ```bash
-inkos plan chapter 吞天魔帝 --context "本章先把注意力拉回师徒矛盾"
-inkos compose chapter 吞天魔帝
+castor plan chapter 吞天魔帝 --context "本章先把注意力拉回师徒矛盾"
+castor compose chapter 吞天魔帝
 ```
 
 这会生成 `story/runtime/chapter-XXXX.intent.md`、`context.json`、`rule-stack.yaml`、`trace.json`。其中 `intent.md` 给人看，其他文件给系统执行和调试。`plan` 会调用 LLM 生成章节意图；`compose` 只编译本地文档和状态，可在没配好 API Key 前先验证控制输入。
@@ -380,24 +357,24 @@ inkos compose chapter 吞天魔帝
 
 - `--words` 指定的是目标字数，系统会自动推导一个允许区间，不承诺逐字精确命中
 - 中文默认按 `zh_chars` 计数，英文默认按 `en_words` 计数
-- 如果正文超出允许区间，InkOS 最多只会追加 1 次纠偏归一化（压缩或补足），不会直接硬截断正文
+- 如果正文超出允许区间，Castor 最多只会追加 1 次纠偏归一化（压缩或补足），不会直接硬截断正文
 - 如果 1 次纠偏后仍然超出 hard range，章节照常保存，但会在结果和 chapter index 里留下长度 warning / telemetry
 
 ### 续写已有作品
 
-`inkos import chapters` 从已有小说文本导入章节，自动重建结构化状态、章节摘要、伏笔、角色关系和可读 Markdown 投影，支持 `第X章` 和自定义分割模式、断点续导。导入后 `inkos write next` 可继续创作。
+`castor import chapters` 从已有小说文本导入章节，自动重建结构化状态、章节摘要、伏笔、角色关系和可读 Markdown 投影，支持 `第X章` 和自定义分割模式、断点续导。导入后 `castor write next` 可继续创作。
 
 ### 同人创作
 
-`inkos fanfic init --from source.txt --mode canon` 从原作素材创建同人书。支持四种模式：canon（正典延续）、au（架空世界）、ooc（性格重塑）、cp（CP 向）。内置正典导入器、同人专属审计维度和信息边界管控——确保设定不矛盾。
+`castor fanfic init --from source.txt --mode canon` 从原作素材创建同人书。支持四种模式：canon（正典延续）、au（架空世界）、ooc（性格重塑）、cp（CP 向）。内置正典导入器、同人专属审计维度和信息边界管控——确保设定不矛盾。
 
 ### 多模型路由
 
-不同 Agent 可以走不同模型和 Provider。写手用 Claude（创意强），审计用 GPT-4o（便宜快速），雷达用本地模型（零成本）。`inkos config set-model` 按 agent 粒度配置，未配置的自动回退全局模型。
+不同 Agent 可以走不同模型和 Provider。写手用 Claude（创意强），审计用 GPT-4o（便宜快速），雷达用本地模型（零成本）。`castor config set-model` 按 agent 粒度配置，未配置的自动回退全局模型。
 
 ### 守护进程 + 通知推送
 
-`inkos up` 启动后台循环自动写章。管线会自动推进可处理的非关键问题；需要人工判断的问题会暂停并留下可审结果。通知推送支持 Telegram、飞书、企业微信、Webhook（HMAC-SHA256 签名 + 事件过滤）。日志写入 `inkos.log`（JSON Lines），`-q` 静默模式。
+`castor up` 启动后台循环自动写章。管线会自动推进可处理的非关键问题；需要人工判断的问题会暂停并留下可审结果。通知推送支持 Telegram、飞书、企业微信、Webhook（HMAC-SHA256 签名 + 事件过滤）。日志写入 `inkos.log`（JSON Lines），`-q` 静默模式。
 
 ### 本地模型兼容
 
@@ -405,7 +382,7 @@ inkos compose chapter 吞天魔帝
 
 ### 可靠性保障
 
-每章自动创建状态快照，`inkos write rewrite` 可回滚任意章节。写手动笔前输出自检表（上下文、资源、伏笔、风险），写完输出结算表，审计员交叉验证。文件锁防止并发写入。写后验证器含跨章重复检测和十余条硬规则自动 spot-fix。
+每章自动创建状态快照，`castor write rewrite` 可回滚任意章节。写手动笔前输出自检表（上下文、资源、伏笔、风险），写完输出结算表，审计员交叉验证。文件锁防止并发写入。写后验证器含跨章重复检测和十余条硬规则自动 spot-fix。
 
 伏笔系统使用 Zod schema 校验——`lastAdvancedChapter` 必须是整数，`status` 只能是 open/progressing/deferred/resolved。LLM 输出的 JSON delta 在写入前经过 `applyRuntimeStateDelta` 做 immutable 更新 + `validateRuntimeState` 结构校验。坏数据直接拒绝，不会滚雪球。
 
@@ -415,16 +392,16 @@ inkos compose chapter 吞天魔帝
 
 ## 工作原理
 
-InkOS 以 pi-agent harness 作为统一认知与工具调用内核：Agent 理解用户意图并产生结构化 action，宿主执行确定性工具、确认权限、管理状态并以真实文件和 tool result 判定完成。长篇、短篇、剧本、分镜、互动影游、Play 和翻译复用这套架构，但保留各自的专业 Skill、状态模型与生产步骤。
+Castor 以 pi-agent harness 作为统一认知与工具调用内核：Agent 理解用户意图并产生结构化 action，宿主执行确定性工具、确认权限、管理状态并以真实文件和 tool result 判定完成。长篇、短篇、剧本、分镜、互动影游、Play 和翻译复用这套架构，但保留各自的专业 Skill、状态模型与生产步骤。
 
 <p align="center">
-  <img src="assets/arch-system.svg" width="900" alt="InkOS 整体系统架构">
+  <img src="assets/arch-system.svg" width="900" alt="Castor 整体系统架构">
 </p>
 
 长篇每一章默认按“规划 → 编排 → 写作 → 审计 → 必要修订 → 状态同步”运行：
 
 <p align="center">
-  <img src="assets/arch-pipeline.svg" width="900" alt="InkOS 章节生产管线">
+  <img src="assets/arch-pipeline.svg" width="900" alt="Castor 章节生产管线">
 </p>
 
 
@@ -442,7 +419,7 @@ InkOS 以 pi-agent harness 作为统一认知与工具调用内核：Agent 理�
 | **修订者 Reviser**     | 修复审计发现的关键问题；默认最多自动修订一次，可通过 `writing.reviewRetries` 调整，其他问题标记给人工审核 |
 
 
-如果审计不通过，默认管线只做一次"修订 → 再审计"；仍未解决的问题会保留在结果和状态里，交给人工或后续命令继续处理。需要更强自动闭环时，可以运行 `inkos config set writing.reviewRetries 3` 把修订轮数调高。
+如果审计不通过，默认管线只做一次"修订 → 再审计"；仍未解决的问题会保留在结果和状态里，交给人工或后续命令继续处理。需要更强自动闭环时，可以运行 `castor config set writing.reviewRetries 3` 把修订轮数调高。
 
 ### 长期记忆
 
@@ -463,12 +440,12 @@ Settler 不再要求模型输出完整 markdown 文件，而是输出 JSON delta
 Node 22+ 环境下自动启用 SQLite 时序记忆数据库（`story/memory.db`），支持按相关性检索历史事实、伏笔和章节摘要，避免全量注入导致的上下文膨胀。
 
 <p align="center">
-  <img src="assets/arch-memory.svg" width="900" alt="InkOS 长期记忆与状态">
+  <img src="assets/arch-memory.svg" width="900" alt="Castor 长期记忆与状态">
 </p>
 
 ### 控制面与运行时产物
 
-除了运行时状态，InkOS 还把“护栏”和“自定义”拆成可审阅的控制层：
+除了运行时状态，Castor 还把“护栏”和“自定义”拆成可审阅的控制层：
 
 - `story/author_intent.md`：长期作者意图
 - `story/current_focus.md`：当前阶段的关注点
@@ -487,13 +464,13 @@ Node 22+ 环境下自动启用 SQLite 时序记忆数据库（`story/memory.db`�
 
 ## 使用模式
 
-InkOS 提供四种交互方式，底层共享同一组原子操作：
+Castor 提供四种交互方式，底层共享同一组原子操作：
 
 ### 1. 完整管线（一键式）
 
 ```bash
-inkos write next 吞天魔帝          # 写草稿 → 审计 → 按配置自动修订
-inkos write next 吞天魔帝 --count 5 # 连续写 5 章
+castor write next 吞天魔帝          # 写草稿 → 审计 → 按配置自动修订
+castor write next 吞天魔帝 --count 5 # 连续写 5 章
 ```
 
 `write next` 现在默认走 `plan -> compose -> write` 的输入治理链路，审计后的自动修订轮数默认是 1。若你需要回退到旧的 prompt 拼装路径，可在 `inkos.json` 中显式设置：
@@ -509,11 +486,11 @@ inkos write next 吞天魔帝 --count 5 # 连续写 5 章
 ### 2. 原子命令（可组合，适合外部 Agent 调用）
 
 ```bash
-inkos plan chapter 吞天魔帝 --context "本章重点写师徒矛盾" --json
-inkos compose chapter 吞天魔帝 --json
-inkos draft 吞天魔帝 --context "本章重点写师徒矛盾" --json
-inkos audit 吞天魔帝 31 --json
-inkos revise 吞天魔帝 31 --json
+castor plan chapter 吞天魔帝 --context "本章重点写师徒矛盾" --json
+castor compose chapter 吞天魔帝 --json
+castor draft 吞天魔帝 --context "本章重点写师徒矛盾" --json
+castor audit 吞天魔帝 31 --json
+castor revise 吞天魔帝 31 --json
 ```
 
 每个命令独立执行单一操作，`--json` 输出结构化数据。`plan` / `compose` 负责控制输入，`draft` / `audit` / `revise` 负责正文与质量链路。可被外部 AI Agent 通过 `exec` 调用，也可用于脚本编排。
@@ -521,9 +498,9 @@ inkos revise 吞天魔帝 31 --json
 ### 3. 自然语言 Agent 模式
 
 ```bash
-inkos agent "帮我写一本都市修仙，主角是个程序员"
-inkos agent "写下一章，重点写师徒矛盾"
-inkos agent "先扫描市场趋势，然后根据结果创建一本新书"
+castor agent "帮我写一本都市修仙，主角是个程序员"
+castor agent "写下一章，重点写师徒矛盾"
+castor agent "先扫描市场趋势，然后根据结果创建一本新书"
 ```
 
 Agent 模式暴露的是按场景收窄后的工具集：建书、读写控制面、规划、编排、写作、审稿、修订、短篇、封面、Play 等能力会按当前 session 类型开放。推荐的 Agent 工作流是：先调整控制面，再 `plan` / `compose`，最后决定写草稿还是跑完整管线。
@@ -535,78 +512,78 @@ Studio 里的「开放世界」和「分支互动」是交互式创作入口。�
 ## Studio 实测截图与生成结果
 
 <p align="center">
-  <img src="assets/studio-dashboard.png" width="760" alt="InkOS Studio 开始创作入口">
+  <img src="assets/studio-dashboard.png" width="760" alt="Castor Studio 开始创作入口">
 </p>
 
 <p align="center">
-  <strong>InkOS Short 手机封面</strong><br>
+  <strong>Castor Short 手机封面</strong><br>
   <img src="assets/inkos-short-demo-cover.png" width="260" alt="短篇封面">
 </p>
 
 <p align="center">
-  <strong>InkOS Play 恋爱互动</strong><br>
+  <strong>Castor Play 恋爱互动</strong><br>
   <img src="assets/play-openworld-romance.png" width="560" alt="恋爱互动">
 </p>
 
 <p align="center">
-  <strong>InkOS Play 侦探互动</strong><br>
+  <strong>Castor Play 侦探互动</strong><br>
   <img src="assets/play-openworld-detective.png" width="560" alt="侦探互动">
 </p>
 
 <p align="center">
-  <strong>InkOS Play 物品配图</strong><br>
+  <strong>Castor Play 物品配图</strong><br>
   <img src="assets/play-item-warcraft.png" width="560" alt="物品配图">
 </p>
 
-第一张是当前 Studio 的本地实测截图。后面四张来自 InkOS Short 和 InkOS Play 的真实本地生成结果：短篇封面用于手机端缩略图点击，Play 图用于展示开放世界、侦探证据、互动场景和物品视觉能力。
+第一张是当前 Studio 的本地实测截图。后面四张来自 Castor Short 和 Castor Play 的真实本地生成结果：短篇封面用于手机端缩略图点击，Play 图用于展示开放世界、侦探证据、互动场景和物品视觉能力。
 
 ## 命令参考
 
 
 | 命令                                          | 说明                                                                                         |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `inkos init [name]`                         | 初始化项目（省略 name 在当前目录初始化）                                                                    |
-| `inkos book create`                         | 创建新书（`--genre`、`--platform`、`--chapter-words`、`--target-chapters`、`--brief <file>` 传入创作简报） |
-| `inkos book update [id]`                    | 修改书设置（`--chapter-words`、`--target-chapters`、`--status`）                                    |
-| `inkos book list`                           | 列出所有书籍                                                                                     |
-| `inkos book delete <id>`                    | 删除书籍及全部数据（`--force` 跳过确认）                                                                  |
-| `inkos genre list/show/copy/create`         | 查看、复制、创建题材                                                                                 |
-| `inkos plan chapter [id]`                   | 生成下一章的 `intent.md`（`--context` / `--context-file` 传入当前指令）                                  |
-| `inkos compose chapter [id]`                | 生成下一章的 `context.json`、`rule-stack.yaml`、`trace.json`                                       |
-| `inkos write next [id]`                     | 完整管线写下一章（`--words` 覆盖字数，`--count` 连写，`-q` 静默模式）                                            |
-| `inkos write rewrite [id] <n>`              | 重写第 N 章（恢复状态快照，`--force` 跳过确认，`--words` 覆盖字数）                                              |
-| `inkos draft [id]`                          | 只写草稿（`--words` 覆盖字数，`-q` 静默模式）                                                             |
-| `inkos audit [id] [n]`                      | 审计指定章节                                                                                     |
-| `inkos revise [id] [n]`                     | 修订指定章节                                                                                     |
-| `inkos agent <instruction>`                 | 自然语言 Agent 模式                                                                              |
-| `inkos review list [id]`                    | 审阅草稿                                                                                       |
-| `inkos review approve-all [id]`             | 批量通过                                                                                       |
-| `inkos status [id]`                         | 项目状态                                                                                       |
-| `inkos export [id]`                         | 导出书籍（`--format txt/md/epub`、`--output <path>`、`--approved-only`）                           |
-| `inkos radar scan`                          | 扫描平台趋势                                                                                     |
-| `inkos fanfic init`                         | 从原作素材创建同人书（`--from`、`--mode canon/au/ooc/cp`）                                              |
-| `inkos short run`                           | 生成独立短篇包（正文、简介卖点、封面提示词、可选封面图）                                                               |
-| `inkos eval [id]`                           | 生成质量评估报告（支持 `--json`、章节范围）                                                                 |
-| `inkos consolidate [id]`                    | 归并长篇章节摘要，降低长书上下文压力                                                                         |
-| `inkos forecast create/show/select`          | 生成、核验并选择长篇的非正史剧情分支；选择只保存候选计划，不修改正史                                                        |
-| `inkos interact`                            | 外部 agent / CLI 自然语言入口（`--json`、`--message`、`--book`）                                       |
-| `inkos config set-global`                   | 设置 CLI / daemon / 部署环境的全局 LLM env（`~/.inkos/.env`）                                         |
-| `inkos config show-global`                  | 查看全局配置                                                                                     |
-| `inkos config set/show`                     | 查看/更新项目配置                                                                                  |
-| `inkos config set-model <agent> <model>`    | 为指定 agent 设置模型覆盖（`--base-url`、`--provider`、`--api-key-env` 支持多 Provider 路由）                |
-| `inkos config remove-model <agent>`         | 移除 agent 模型覆盖（回退到默认）                                                                       |
-| `inkos config show-models`                  | 查看当前模型路由                                                                                   |
-| `inkos doctor`                              | 诊断配置问题（显示 effective config mode、来源、API 连通性和提供商兼容性提示）                                       |
-| `inkos detect [id] [n]`                     | AIGC 检测（`--all` 全部章节，`--stats` 统计）                                                         |
-| `inkos style analyze <file>`                | 分析参考文本提取文风指纹                                                                               |
-| `inkos style import <file> [id]`            | 导入文风指纹到指定书                                                                                 |
-| `inkos import canon [id] --from <parent>`   | 导入正传正典到番外书                                                                                 |
-| `inkos import chapters [id] --from <path>`  | 导入已有章节续写（`--split`、`--resume-from`）                                                        |
-| `inkos analytics [id]` / `inkos stats [id]` | 书籍数据分析（审计通过率、高频问题、章节排名、token 用量）                                                           |
-| `inkos update`                              | 更新到最新版本                                                                                    |
-| `inkos studio` / `inkos`                    | 启动 Web 工作台（`-p` 指定端口，默认 4567；Studio 使用服务页配置，不使用 env 覆盖）                                    |
-| `inkos tui`                                 | 启动终端全屏 TUI                                                                                 |
-| `inkos up / down`                           | 启动/停止守护进程（`-q` 静默模式，自动写入 `inkos.log`）                                                      |
+| `castor init [name]`                         | 初始化项目（省略 name 在当前目录初始化）                                                                    |
+| `castor book create`                         | 创建新书（`--genre`、`--platform`、`--chapter-words`、`--target-chapters`、`--brief <file>` 传入创作简报） |
+| `castor book update [id]`                    | 修改书设置（`--chapter-words`、`--target-chapters`、`--status`）                                    |
+| `castor book list`                           | 列出所有书籍                                                                                     |
+| `castor book delete <id>`                    | 删除书籍及全部数据（`--force` 跳过确认）                                                                  |
+| `castor genre list/show/copy/create`         | 查看、复制、创建题材                                                                                 |
+| `castor plan chapter [id]`                   | 生成下一章的 `intent.md`（`--context` / `--context-file` 传入当前指令）                                  |
+| `castor compose chapter [id]`                | 生成下一章的 `context.json`、`rule-stack.yaml`、`trace.json`                                       |
+| `castor write next [id]`                     | 完整管线写下一章（`--words` 覆盖字数，`--count` 连写，`-q` 静默模式）                                            |
+| `castor write rewrite [id] <n>`              | 重写第 N 章（恢复状态快照，`--force` 跳过确认，`--words` 覆盖字数）                                              |
+| `castor draft [id]`                          | 只写草稿（`--words` 覆盖字数，`-q` 静默模式）                                                             |
+| `castor audit [id] [n]`                      | 审计指定章节                                                                                     |
+| `castor revise [id] [n]`                     | 修订指定章节                                                                                     |
+| `castor agent <instruction>`                 | 自然语言 Agent 模式                                                                              |
+| `castor review list [id]`                    | 审阅草稿                                                                                       |
+| `castor review approve-all [id]`             | 批量通过                                                                                       |
+| `castor status [id]`                         | 项目状态                                                                                       |
+| `castor export [id]`                         | 导出书籍（`--format txt/md/epub`、`--output <path>`、`--approved-only`）                           |
+| `castor radar scan`                          | 扫描平台趋势                                                                                     |
+| `castor fanfic init`                         | 从原作素材创建同人书（`--from`、`--mode canon/au/ooc/cp`）                                              |
+| `castor short run`                           | 生成独立短篇包（正文、简介卖点、封面提示词、可选封面图）                                                               |
+| `castor eval [id]`                           | 生成质量评估报告（支持 `--json`、章节范围）                                                                 |
+| `castor consolidate [id]`                    | 归并长篇章节摘要，降低长书上下文压力                                                                         |
+| `castor forecast create/show/select`          | 生成、核验并选择长篇的非正史剧情分支；选择只保存候选计划，不修改正史                                                        |
+| `castor interact`                            | 外部 agent / CLI 自然语言入口（`--json`、`--message`、`--book`）                                       |
+| `castor config set-global`                   | 设置 CLI / daemon / 部署环境的全局 LLM env（`~/.inkos/.env`）                                         |
+| `castor config show-global`                  | 查看全局配置                                                                                     |
+| `castor config set/show`                     | 查看/更新项目配置                                                                                  |
+| `castor config set-model <agent> <model>`    | 为指定 agent 设置模型覆盖（`--base-url`、`--provider`、`--api-key-env` 支持多 Provider 路由）                |
+| `castor config remove-model <agent>`         | 移除 agent 模型覆盖（回退到默认）                                                                       |
+| `castor config show-models`                  | 查看当前模型路由                                                                                   |
+| `castor doctor`                              | 诊断配置问题（显示 effective config mode、来源、API 连通性和提供商兼容性提示）                                       |
+| `castor detect [id] [n]`                     | AIGC 检测（`--all` 全部章节，`--stats` 统计）                                                         |
+| `castor style analyze <file>`                | 分析参考文本提取文风指纹                                                                               |
+| `castor style import <file> [id]`            | 导入文风指纹到指定书                                                                                 |
+| `castor import canon [id] --from <parent>`   | 导入正传正典到番外书                                                                                 |
+| `castor import chapters [id] --from <path>`  | 导入已有章节续写（`--split`、`--resume-from`）                                                        |
+| `castor analytics [id]` / `castor stats [id]` | 书籍数据分析（审计通过率、高频问题、章节排名、token 用量）                                                           |
+| `castor update`                              | 更新到最新版本                                                                                    |
+| `castor studio` / `castor`                    | 启动 Web 工作台（`-p` 指定端口，默认 4567；Studio 使用服务页配置，不使用 env 覆盖）                                    |
+| `castor tui`                                 | 启动终端全屏 TUI                                                                                 |
+| `castor up / down`                           | 启动/停止守护进程（`-q` 静默模式，自动写入 `inkos.log`）                                                      |
 
 
 `[id]` 参数在项目只有一本书时可省略，自动检测。所有命令支持 `--json` 输出结构化数据。`draft` / `write next` / `plan chapter` / `compose chapter` 支持 `--context` 传入创作指导，`--words` 覆盖每章目标字数。`book create` 支持 `--brief <file>` 传入创作简报（你的脑洞/设定文档），Architect 会基于此生成设定而非凭空创作。`plan chapter` 会调用 LLM 生成章节意图；`compose chapter` 不要求在线 LLM，可在配置 API Key 之前先检查输入治理结果。
@@ -614,13 +591,13 @@ Studio 里的「开放世界」和「分支互动」是交互式创作入口。�
 CLI 运行时还支持一次性 LLM 覆盖参数：`--service`、`--model`、`--api-key-env`、`--base-url`、`--api-format <chat|responses>`、`--stream`、`--no-stream`。例如：
 
 ```bash
-inkos write next --service google --model gemini-2.5-flash
-inkos up --service moonshot --model kimi-k2.5 --api-key-env MOONSHOT_API_KEY
+castor write next --service google --model gemini-2.5-flash
+castor up --service moonshot --model kimi-k2.5 --api-key-env MOONSHOT_API_KEY
 ```
 
 ## 路线图
 
-- ~~`packages/studio` Web UI 工作台（Vite + React + Hono）~~ — 已发布，`inkos` 或 `inkos studio` 启动
+- ~~`packages/studio` Web UI 工作台（Vite + React + Hono）~~ — 已发布，`castor` 或 `castor studio` 启动
 - ~~互动小说 / 开放世界（分支叙事 + 自由动作 + 自动配图）~~ — Studio Play 已落地
 - 局部干预（重写半章 + 级联更新后续 truth 文件）
 - 自定义 agent 插件系统
@@ -670,7 +647,7 @@ pnpm typecheck    # 类型检查
 
 ## 致谢
 
-InkOS 的 agent 运行时构建在 [pi](https://github.com/badlogic/pi-mono)（`@mariozechner/pi-ai` 与 `@mariozechner/pi-agent-core`，作者 Mario Zechner）之上。感谢 pi 提供的扎实底座。
+Castor 的 agent 运行时构建在 [pi](https://github.com/badlogic/pi-mono)（`@mariozechner/pi-ai` 与 `@mariozechner/pi-agent-core`，作者 Mario Zechner）之上。感谢 pi 提供的扎实底座。
 
 本开源项目已链接并认可 [LINUX DO](https://linux.do/) 社区，感谢社区成员的反馈、测试与讨论。
 

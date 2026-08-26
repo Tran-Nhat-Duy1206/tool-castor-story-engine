@@ -63,7 +63,7 @@ forecastCommand
       log(`Forecast created: ${result.forecast.forecastId} (base chapter ${result.forecast.baseChapter})`);
       for (const line of formatBranchLines(result.forecast)) log(line);
       log(`Comparison: ${result.comparisonPath}`);
-      log(`Select a branch with: inkos forecast select ${bookId} ${result.forecast.forecastId} <branch-id>`);
+      log(`Select a branch with: castor forecast select ${bookId} ${result.forecast.forecastId} <branch-id>`);
     } catch (e) {
       failForecastCommand("Forecast create failed", e, opts.json);
     }
@@ -157,7 +157,7 @@ export function parseForecastShowArgs(args: ReadonlyArray<string>): {
 } {
   if (args.length === 1) return { forecastId: args[0]! };
   if (args.length === 2) return { bookIdArg: args[0]!, forecastId: args[1]! };
-  throw new Error("Usage: inkos forecast show [book-id] <forecast-id>");
+  throw new Error("Usage: castor forecast show [book-id] <forecast-id>");
 }
 
 export function parseForecastSelectArgs(args: ReadonlyArray<string>): {
@@ -167,7 +167,7 @@ export function parseForecastSelectArgs(args: ReadonlyArray<string>): {
 } {
   if (args.length === 2) return { forecastId: args[0]!, branchId: args[1]! };
   if (args.length === 3) return { bookIdArg: args[0]!, forecastId: args[1]!, branchId: args[2]! };
-  throw new Error("Usage: inkos forecast select [book-id] <forecast-id> <branch-id>");
+  throw new Error("Usage: castor forecast select [book-id] <forecast-id> <branch-id>");
 }
 
 function formatBranchLines(forecast: NarrativeForecast): string[] {

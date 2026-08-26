@@ -222,8 +222,8 @@ export function resolveTuiAgentRoute(
   const shortMatch = input.match(/^\/short(?:\s+([\s\S]+))?$/i);
   if (shortMatch) {
     return entryRoute("short", commandBody(shortMatch[1], language === "en"
-      ? "I want to create an InkOS Short. Confirm the direction with me first."
-      : "我想做 InkOS Short，请先和我确认方向。"));
+      ? "I want to create an Castor Short. Confirm the direction with me first."
+      : "我想做 Castor Short，请先和我确认方向。"));
   }
 
   const coverMatch = input.match(/^\/cover(?:\s+([\s\S]+))?$/i);

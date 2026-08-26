@@ -2,7 +2,7 @@
   "name": "inkos",
   "version": "1.8.0",
   "private": true,
-  "description": "Story Creation AI Agent for novels, short fiction, scripts, interactive worlds, and multilingual translation",
+  "description": "Tool Castor Story Engine - long-form AI story-writing system derived from InkOS: novels, short fiction, scripts, interactive worlds, and multilingual translation",
   "keywords": [
     "story-creation-ai-agent",
     "story-agent",
@@ -21,7 +21,7 @@
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Narcooo/inkos"
+    "url": "https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine"
   },
   "scripts": {
     "build": "pnpm -r build",

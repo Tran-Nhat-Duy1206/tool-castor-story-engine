@@ -1,23 +1,12 @@
+<h1 align="center">Tool Castor Story Engine</h1>
+
 <p align="center">
-  <img src="assets/logo.svg" width="120" height="120" alt="InkOS Logo">
-  <img src="assets/inkos-text.svg" width="240" height="65" alt="InkOS">
+  <strong>長編・短編小説、脚本、インタラクティブ影遊、IP コンテンツ、多言語翻訳のための AI 創作システム（CLI: <code>castor</code>）</strong>
 </p>
 
-<h1 align="center">Story Creation AI Agent<br><sub>長編・短編小説、脚本、インタラクティブ影遊、IP コンテンツ、多言語翻訳のための創作 AI Agent システム</sub></h1>
-
 <p align="center">
-  <a href="https://www.npmjs.com/package/@actalk/inkos"><img src="https://img.shields.io/npm/v/@actalk/inkos.svg?color=cb3837&logo=npm" alt="npm version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL-3.0"></a>
-  <a href="https://github.com/Narcooo/inkos/stargazers"><img src="https://img.shields.io/github/stars/Narcooo/inkos?style=flat&logo=github&color=yellow" alt="GitHub stars"></a>
-  <a href="https://www.npmjs.com/package/@actalk/inkos"><img src="https://img.shields.io/npm/dm/@actalk/inkos?color=cb3837&logo=npm&label=downloads" alt="npm downloads"></a>
-  <a href="https://clawhub.ai/narcooo/inkos"><img src="https://img.shields.io/badge/🦞%20ClawHub-Skill-FF6B35?labelColor=1a1a1a" alt="ClawHub Skill"></a>
-</p>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://kimi-file.moonshot.cn/prod-chat-kimi/kfs/4/1/2026-06-05/1d8h69mt3v89kkekg24gg">
-    <img alt="Kimi Open Source Friends" width="760" src="https://kimi-file.moonshot.cn/prod-chat-kimi/kfs/4/1/2026-06-05/1d8h69fudcmosb3pipls0">
-  </picture>
+  <a href="https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine"><img src="https://img.shields.io/badge/GitHub-tool--castor--story--engine-181717?logo=github" alt="GitHub"></a>
 </p>
 
 <p align="center">
@@ -26,16 +15,22 @@
 
 ---
 
-InkOS は、物語創作と多言語翻訳のための AI Agent システムです。長編小説、独立短編、脚本、絵コンテ、二次創作、番外、文体模倣、続き書き、インタラクティブ影遊、インタラクティブ世界、長文翻訳を同じワークベンチから始められます。Studio Chat、CLI、TUI は同じ action surface を共有し、相談、確認、生成、レビュー、永続編集、言語をまたぐ納品を一つの流れで扱えます。
+> **派生プロジェクトのお知らせ**
+>
+> Tool Castor Story Engine（Castor）は [InkOS](https://github.com/Narcooo/inkos)（作者 Narcooo）から派生し、大幅な修正・進化を経て独立した長編 AI ストーリー執筆システムになりました。本プロジェクトは InkOS の Git 履歴、著作権表示、AGPL-3.0 の義務を保持します。元の InkOS コードは本プロジェクトの保守者による著作ではありません。本修正版も [AGPL-3.0](LICENSE) で提供されます。
 
-> 💡 **主要モデルをキー 1 本で** —— InkOS には [**kkaiapi**](https://en.kkaiapi.com/) の併用がおすすめです。Claude / GPT / Gemini / DeepSeek / Kimi / Qwen / GLM と画像モデルを扱える OpenAI 互換ゲートウェイとして、base URL `https://api.kkaiapi.com/v1` をカスタムサービスに設定すれば、複数プロバイダーのアカウントを行き来せずに Studio でモデルを切り替えられます。
+---
+
+Castor は、物語創作と多言語翻訳のための AI Agent システムです。長編小説、独立短編、脚本、絵コンテ、二次創作、番外、文体模倣、続き書き、インタラクティブ影遊、インタラクティブ世界、長文翻訳を同じワークベンチから始められます。Studio Chat、CLI、TUI は同じ action surface を共有し、相談、確認、生成、レビュー、永続編集、言語をまたぐ納品を一つの流れで扱えます。中核には **Phase 4 の人間主導・章別状態レビュー** があり、AI は提案を生成し、人間が決定し、Canon は原子的な最終確認でのみ更新されます。
+
+> 💡 **主要モデルをキー 1 本で** —— Castor には [**kkaiapi**](https://en.kkaiapi.com/) の併用がおすすめです。Claude / GPT / Gemini / DeepSeek / Kimi / Qwen / GLM と画像モデルを扱える OpenAI 互換ゲートウェイとして、base URL `https://api.kkaiapi.com/v1` をカスタムサービスに設定すれば、複数プロバイダーのアカウントを行き来せずに Studio でモデルを切り替えられます。
 
 ## v1.8.0 統一 Pi Agent Harness と専門創作カーネル
 
-InkOS 1.8.0 は、Chat Agent と各作品パイプラインを一つの pi-agent 中心 harness に統合します。モデルは理解・提案・能力呼び出しを担当し、InkOS は確認、コンテキスト、状態、原子的な保存、成果物の真実性を管理します。長編、短編、脚本、絵コンテ、インタラクティブ影遊、Play、翻訳は、それぞれの専門手法を保ちながら、実行・検索・観測・復旧基盤を共有します。
+Castor 1.8.0 は、Chat Agent と各作品パイプラインを一つの pi-agent 中心 harness に統合します。モデルは理解・提案・能力呼び出しを担当し、Castor は確認、コンテキスト、状態、原子的な保存、成果物の真実性を管理します。長編、短編、脚本、絵コンテ、インタラクティブ影遊、Play、翻訳は、それぞれの専門手法を保ちながら、実行・検索・観測・復旧基盤を共有します。
 
 - **モデル設定**：Studio はサービス設定、モデルルーティング、表紙サービス、[kkaiapi](https://en.kkaiapi.com/) / OpenRouter などのモデル集約入口、カスタム OpenAI-compatible エンドポイントに対応します。
-- **単一の production harness**：Studio Chat、TUI、`inkos interact`、production worker が pi-agent のツールループと型付き action/result 境界を共有します。既存 pipeline は並行する自然言語判断エンジンではなく、決定論的で中断可能な能力になります。
+- **単一の production harness**：Studio Chat、TUI、`castor interact`、production worker が pi-agent のツールループと型付き action/result 境界を共有します。既存 pipeline は並行する自然言語判断エンジンではなく、決定論的で中断可能な能力になります。
 - **15 個の内蔵専門 Skills**：長編執筆 / レビュー、商業短編、Play、脚本、絵コンテ、インタラクティブ影遊、翻訳、分析、市場調査、取り込み、表紙、脱 AI 表現を専用 `SKILL.md` で提供します。
 - **統一本地検索**：物語メモリ、資料庫、Skill 参考資料を、再構築可能な SQLite FTS5 / BM25 投影で検索します。原本ファイルが正規データであり、検索結果には出典位置が残ります。
 - **書籍への参考資料バインド**：取り込んだ資料を用途付きで書籍に結び、タスクごとに関連部分だけを取得できます。
@@ -46,25 +41,25 @@ InkOS 1.8.0 は、Chat Agent と各作品パイプラインを一つの pi-agent
 - **モデルとワークベンチ**：LM Studio、永続化される動的モデル一覧と外部母本、カスタム表紙 Base URL、広い章プレビュー、安全な章リライトワークスペースに対応します。
 
 <p align="center">
-  <img src="assets/interactive-film-e2e.png" width="900" alt="InkOS インタラクティブ影遊ストーリーグラフ E2E スクリーンショット">
+  <img src="assets/interactive-film-e2e.png" width="900" alt="Castor インタラクティブ影遊ストーリーグラフ E2E スクリーンショット">
 </p>
 
 ### 主な創作形式
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="210" alt="InkOS Short 表紙例">
-  <img src="assets/play-openworld-warcraft.png" width="210" alt="InkOS Play ファンタジー開放世界例">
-  <img src="assets/play-openworld-romance.png" width="210" alt="InkOS Play 恋愛例">
-  <img src="assets/play-openworld-detective.png" width="210" alt="InkOS Play 探偵例">
+  <img src="assets/inkos-short-demo-cover.png" width="210" alt="Castor Short 表紙例">
+  <img src="assets/play-openworld-warcraft.png" width="210" alt="Castor Play ファンタジー開放世界例">
+  <img src="assets/play-openworld-romance.png" width="210" alt="Castor Play 恋愛例">
+  <img src="assets/play-openworld-detective.png" width="210" alt="Castor Play 探偵例">
 </p>
 
 **長編小説** — ブリーフから書籍を作成し、基礎設定、章の意図、コンテキスト、本文、レビュー、修正、状態更新まで管理します。長編でも制御を失わないように、コンテキストは protected / compressible に分けて扱います。
 
 **物語の複数ルート予測** — 次章を書く前に、現在の正史から互いに独立した 2-5 本の未来ルートを生成し、章のビート、人物の決断、予想される変化、リスク、作者意図との一致度を Studio Chat で横並びに比較できます。ルートを採用しても保存されるのは `selected-branch-plan.md` だけで、本文、アウトライン、正史状態は変更されません。正史が変わると古い予測は stale として扱われます。
 
-**InkOS Short** — Studio Chat と CLI から独立した短編パッケージを生成できます。完成本文、アウトライン記録、レビュー記録、あらすじ、セールスポイント、表紙プロンプト、表紙画像に対応します。
+**Castor Short** — Studio Chat と CLI から独立した短編パッケージを生成できます。完成本文、アウトライン記録、レビュー記録、あらすじ、セールスポイント、表紙プロンプト、表紙画像に対応します。
 
-**InkOS Play** — 自然言語の世界契約から、開放世界や分岐型インタラクティブ物語を開始できます。時間の進み方、キャラクター agent、所持品、証拠、関係性、シーン状態、ビジュアルルール、自由行動、選択肢、画像生成に対応します。
+**Castor Play** — 自然言語の世界契約から、開放世界や分岐型インタラクティブ物語を開始できます。時間の進み方、キャラクター agent、所持品、証拠、関係性、シーン状態、ビジュアルルール、自由行動、選択肢、画像生成に対応します。
 
 **インタラクティブ影遊** — アイデア、脚本、または小説素材から、分岐シーン、変数、エンディング、画像プロンプト、ノード画像、エクスポート可能なプロジェクトを生成します。
 
@@ -73,7 +68,7 @@ InkOS 1.8.0 は、Chat Agent と各作品パイプラインを一つの pi-agent
 **Agent Skills とリサーチ** — `.agents/skills/`、標準 AgentSkills / OpenClaw ディレクトリ、または Studio のフォルダー導入から標準 `SKILL.md` を追加できます。Chat Agent は意図に応じて利用し、`@skill-id` で強制使用もできます。外部 skill のスクリプトは自動実行しません。外部事実が必要な場合は出典付き Markdown リサーチレポートを生成できます。
 
 <p align="center">
-  <img src="assets/play-item-warcraft.png" width="420" alt="InkOS Play アイテム画像例">
+  <img src="assets/play-item-warcraft.png" width="420" alt="Castor Play アイテム画像例">
 </p>
 
 **英語ネイティブ小説執筆に対応！** — 10種類の英語ジャンルプロファイルを内蔵し、専用のペーシングルール、疲労語リスト、監査ディメンションを搭載。`--lang en` を設定するだけですぐに始められます。
@@ -85,35 +80,32 @@ InkOS 1.8.0 は、Chat Agent と各作品パイプラインを一つの pi-agent
 **Node.js 22 以降**が必要です。
 
 ```bash
-npm i -g @actalk/inkos
+git clone https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine.git
+cd tool-castor-story-engine
+pnpm install
+pnpm build
 ```
+
+> 上流の InkOS npm パッケージ（`@actalk/inkos`）と [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) は Narcooo の InkOS プロジェクトに属します。本スタンドアロンリポジトリはソースからビルドして使います。既存ユーザーデータ（`inkos.json` 設定、`INKOS_*` 環境変数、書籍ディレクトリ構造）は互換のままで、`castor` コマンドは既存の InkOS プロジェクトを直接読み込めます。
 
 ### OpenClaw 🦞 経由で使用
 
-InkOS は [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill として公開されており、互換エージェント（Claude Code、OpenClaw など）から呼び出し可能です：
+上流の InkOS が [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill として公開されています。本リポジトリは InkOS から派生し、同じ共有インタラクション入口を受け継いでいます。ソースからビルド後、直接呼び出せます：
 
 ```bash
-clawhub install inkos          # ClawHub からインストール
-```
-
-npm でインストール済み、またはリポジトリをクローン済みの場合、`skills/SKILL.md` が含まれているため、ClawHub の別途インストールなしで 🦞 が直接読み取れます。
-
-インストール後、Claw は共有インタラクション入口を優先してください：
-
-```bash
-inkos interact --json --message "continue the current book, but keep the pacing tighter"
+castor interact --json --message "continue the current book, but keep the pacing tighter"
 ```
 
 この入口はプロジェクト TUI と同じ会話実行カーネルを使います。現在の JSON 出力には assistant の返信と interaction session が含まれます。実際に完了したかどうかは、モデルの文章ではなく、ツール結果と生成ファイルで判断します。`plan` / `compose` / `draft` / `audit` / `revise` / `write next` などのアトミックコマンドも、スクリプトや上級者向けの下位ツールとして残っています。
 
 ### 設定
 
-InkOS は設定経路を分けています。**Studio は可視化されたサービス設定**を使い、**CLI / daemon / デプロイ環境は env オーバーライド**を使えます。両者は暗黙に上書きしません。
+Castor は設定経路を分けています。**Studio は可視化されたサービス設定**を使い、**CLI / daemon / デプロイ環境は env オーバーライド**を使えます。両者は暗黙に上書きしません。
 
 **方法1：Studio サービス設定（ローカル執筆に推奨）**
 
 ```bash
-inkos init my-novel
+castor init my-novel
 cd my-novel
 inkos
 ```
@@ -127,12 +119,12 @@ Studio を開き、**モデル設定**へ進みます：
 
 Studio はプロジェクトのサービス設定と `.inkos/secrets.json` を使います。env が検出されてもヒントとして表示するだけで、Studio で選んだ service / model / base URL / API Key を上書きしません。
 
-MiniMax は公式 OpenAI-compatible `/v1/chat/completions` エンドポイントを使用します。InkOS は `MiniMax-M3*` の thinking 返却をデフォルトで無効化します。M2.x の thinking は上流サービス側の制限により無効化できません。
+MiniMax は公式 OpenAI-compatible `/v1/chat/completions` エンドポイントを使用します。Castor は `MiniMax-M3*` の thinking 返却をデフォルトで無効化します。M2.x の thinking は上流サービス側の制限により無効化できません。
 
 **方法2：CLI / daemon / デプロイ環境の env 設定**
 
 ```bash
-inkos config set-global \
+castor config set-global \
   --lang en \
   --provider <openai|anthropic|custom> \
   --base-url <APIエンドポイント> \
@@ -172,9 +164,9 @@ CLI の解決順序は、Studio/project サービス設定、サービス secret
 
 ```bash
 # 異なるエージェントに異なるモデル/プロバイダーを割り当て
-inkos config set-model writer <model> --provider <provider> --base-url <url> --api-key-env <ENV_VAR>
-inkos config set-model auditor <model> --provider <provider>
-inkos config show-models        # 現在のルーティングを表示
+castor config set-model writer <model> --provider <provider> --base-url <url> --api-key-env <ENV_VAR>
+castor config set-model auditor <model> --provider <provider>
+castor config show-models        # 現在のルーティングを表示
 ```
 
 明示的なオーバーライドがないエージェントはグローバルモデルにフォールバックします。
@@ -185,8 +177,8 @@ inkos config show-models        # 現在のルーティングを表示
 
 - **Studio Chat**：相談、書籍作成、Short、表紙、Play、永続ファイル編集を一つのチャット入口から扱えます。重い操作は確認カードを表示します。
 - **創作入口**：長編、短編、二次創作、番外、文体模倣、続き書き、分岐インタラクション、開放世界を Studio の上部入口から開始できます。
-- **TUI ダッシュボード**：`inkos tui` でフルスクリーン端末 UI を開き、`/new`、`/short`、`/play`、`/cover`、`/write`、`/confirm`、`/cancel`、セッション単位の `/model <name>` を利用できます。
-- **外部 Agent 入口**：`inkos interact --json --message "..."` は OpenClaw など外部 agent 向けの構造化入口です。
+- **TUI ダッシュボード**：`castor tui` でフルスクリーン端末 UI を開き、`/new`、`/short`、`/play`、`/cover`、`/write`、`/confirm`、`/cancel`、セッション単位の `/model <name>` を利用できます。
+- **外部 Agent 入口**：`castor interact --json --message "..."` は OpenClaw など外部 agent 向けの構造化入口です。
 - **アトミックコマンド**：`plan` / `compose` / `draft` / `audit` / `revise` / `write next` はスクリプトや上級者向けに残っています。
 
 ### 最初の本を書く
@@ -194,15 +186,15 @@ inkos config show-models        # 現在のルーティングを表示
 英語ジャンルプロファイルではデフォルトで英語が使用されます。ジャンルを選んで始めましょう：
 
 ```bash
-inkos book create --title "The Last Delver" --genre litrpg     # LitRPG小説（デフォルトで英語）
-inkos write next my-book          # 次の章を執筆（フルパイプライン：draft → audit → revise）
-inkos status                      # ステータスを確認
-inkos review list my-book         # 下書きをレビュー
-inkos review approve-all my-book  # 一括承認
-inkos export my-book --format epub  # EPUB形式でエクスポート（スマホ/Kindleで読める）
+castor book create --title "The Last Delver" --genre litrpg     # LitRPG小説（デフォルトで英語）
+castor write next my-book          # 次の章を執筆（フルパイプライン：draft → audit → revise）
+castor status                      # ステータスを確認
+castor review list my-book         # 下書きをレビュー
+castor review approve-all my-book  # 一括承認
+castor export my-book --format epub  # EPUB形式でエクスポート（スマホ/Kindleで読める）
 ```
 
-言語はジャンルごとにデフォルトで設定されます。`--lang en` または `--lang zh` で明示的に上書き可能です。`inkos genre list` で利用可能なすべてのジャンルとデフォルト言語を確認できます。
+言語はジャンルごとにデフォルトで設定されます。`--lang en` または `--lang zh` で明示的に上書き可能です。`castor genre list` で利用可能なすべてのジャンルとデフォルト言語を確認できます。
 
 ### 完成短編を書く
 
@@ -215,7 +207,7 @@ Studio のチャットでは、次のように依頼できます：
 CLI からも実行できます：
 
 ```bash
-inkos short run \
+castor short run \
   --direction "modern short fiction marriage reversal evidence-driven heroine" \
   --chapters 12 \
   --chars 1000
@@ -233,12 +225,12 @@ inkos short run \
 
 表紙ツールは `covers/<title>/cover-prompt.md` と `covers/<title>/cover.png` を生成します。表紙サービス未設定の場合は、先に Studio のモデル設定で表紙サービスと API Key を設定してください。
 
-生成後もチャットで表紙プロンプトを調整できます。例：「人物をもっと近く、タイトル文字を大きく、冷たい笑みにして」。InkOS は新しい指示を `coverPrompt` として渡し、`cover-prompt.md` を更新して表紙を再生成します。本文を書き直す必要はありません。
+生成後もチャットで表紙プロンプトを調整できます。例：「人物をもっと近く、タイトル文字を大きく、冷たい笑みにして」。Castor は新しい指示を `coverPrompt` として渡し、`cover-prompt.md` を更新して表紙を再生成します。本文を書き直す必要はありません。
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="260" alt="InkOS Short 表紙例">
-  <img src="assets/play-openworld-warcraft.png" width="260" alt="InkOS Play 開放世界例">
-  <img src="assets/play-openworld-detective.png" width="260" alt="InkOS Play 探偵例">
+  <img src="assets/inkos-short-demo-cover.png" width="260" alt="Castor Short 表紙例">
+  <img src="assets/play-openworld-warcraft.png" width="260" alt="Castor Play 開放世界例">
+  <img src="assets/play-openworld-detective.png" width="260" alt="Castor Play 探偵例">
 </p>
 
 ### 開放世界 / 分岐型インタラクションを始める
@@ -249,13 +241,13 @@ Studio Chat で **Open World** または **Branching Interactive** を選び、�
 Warcraft 風の国境見張り塔を舞台にした開放世界を作って。時間は固定ターンではなく、巡回は1時間、訓練は数日かかる。装備には希少感があるが、数値表は使わず、素材・光沢・雰囲気で表現する。
 ```
 
-InkOS は世界、キャラクター、アイテム、証拠、関係性、現在シーン、候補アクションを生成します。Open World は自由入力の行動に対応し、Branching Interactive はクリック可能な選択肢を提示します。画像生成を設定すると、キャラクター、アイテム、証拠、シーン画像をチャットの流れの中で表示できます。
+Castor は世界、キャラクター、アイテム、証拠、関係性、現在シーン、候補アクションを生成します。Open World は自由入力の行動に対応し、Branching Interactive はクリック可能な選択肢を提示します。画像生成を設定すると、キャラクター、アイテム、証拠、シーン画像をチャットの流れの中で表示できます。
 
 ---
 
 ## 英語ジャンルプロファイル
 
-InkOS には10種類の英語ネイティブジャンルプロファイルが同梱されています。各プロファイルにはジャンル固有のルール、ペーシング、疲労語検出、監査ディメンションが含まれます：
+Castor には10種類の英語ネイティブジャンルプロファイルが同梱されています。各プロファイルにはジャンル固有のルール、ペーシング、疲労語検出、監査ディメンションが含まれます：
 
 | ジャンル | 主要メカニクス |
 |---------|--------------|
@@ -282,7 +274,7 @@ InkOS には10種類の英語ネイティブジャンルプロファイルが同
 
 Studio Chat は単なる Q&A ではありません。長編作成、Short、表紙生成、Play 起動、永続テキストファイル編集を扱い、重いアクションの前に確認を出します。普通の相談は普通に回答し、明確な創作アクションだけがツール実行になります。
 
-### InkOS Play：開放世界と分岐インタラクション
+### Castor Play：開放世界と分岐インタラクション
 
 Play は、キャラクター、場所、アイテム、証拠、関係性、時間、現在シーン、HUD、画像を含む持続的な世界状態を管理します。固定 RPG システムではありません。修仙世界なら希少度や境界、恋愛ものなら感情段階、探偵ものなら証拠のライフサイクルを、ユーザーの世界契約として状態に保存できます。
 
@@ -294,11 +286,11 @@ Play は、キャラクター、場所、アイテム、証拠、関係性、時
 
 ### 文体クローニング
 
-`inkos style analyze` で参考テキストを分析し、統計的なフィンガープリント（文長分布、語頻度パターン、リズムプロファイル）とLLM可読のスタイルガイドを抽出。`inkos style import` でこのフィンガープリントを書籍にインジェクト — 以降のすべての章がその文体を採用し、修正エージェントが文体に対して監査を行います。
+`castor style analyze` で参考テキストを分析し、統計的なフィンガープリント（文長分布、語頻度パターン、リズムプロファイル）とLLM可読のスタイルガイドを抽出。`castor style import` でこのフィンガープリントを書籍にインジェクト — 以降のすべての章がその文体を採用し、修正エージェントが文体に対して監査を行います。
 
 ### クリエイティブブリーフ
 
-`inkos book create --brief my-ideas.md` — ブレインストーミングノート、世界観設定書、キャラクターシートを渡せます。アーキテクトエージェントがゼロから生成するのではなく、ブリーフを基に構築（`story_bible.md` と `book_rules.md` を生成）し、ブリーフを `story/author_intent.md` に永続化して、初期化後も書籍の長期的な意図が失われないようにします。
+`castor book create --brief my-ideas.md` — ブレインストーミングノート、世界観設定書、キャラクターシートを渡せます。アーキテクトエージェントがゼロから生成するのではなく、ブリーフを基に構築（`story_bible.md` と `book_rules.md` を生成）し、ブリーフを `story/author_intent.md` に永続化して、初期化後も書籍の長期的な意図が失われないようにします。
 
 ### 入力ガバナンスコントロールサーフェス
 
@@ -310,8 +302,8 @@ Play は、キャラクター、場所、アイテム、証拠、関係性、時
 執筆前に以下を実行できます：
 
 ```bash
-inkos plan chapter my-book --context "まずメンターとの対立に注意を引き戻す"
-inkos compose chapter my-book
+castor plan chapter my-book --context "まずメンターとの対立に注意を引き戻す"
+castor compose chapter my-book
 ```
 
 これにより `story/runtime/chapter-XXXX.intent.md`、`context.json`、`rule-stack.yaml`、`trace.json` が生成されます。`intent.md` は人間が読める契約書で、その他は実行/デバッグ用のアーティファクトです。`plan` は LLM を呼び出して章の意図を作成します。`compose` はローカルドキュメントとステートのコンパイルのみを行うため、APIキーの設定完了前でも実行できます。
@@ -322,32 +314,32 @@ inkos compose chapter my-book
 
 - `--words` は正確なハード制限ではなく、目標バンドを設定
 - 中国語の章はデフォルトで `zh_chars`、英語の章はデフォルトで `en_words` を使用
-- 章がソフトバンドから逸脱した場合、InkOS はプロを乱暴にカットするのではなく、1回の補正正規化パス（圧縮または拡張）を実行する場合があります
-- 1回のパス後もハードレンジを外れる場合、InkOS は保存しますが、結果とチャプターインデックスに可視的な文字数警告とテレメトリを表示
+- 章がソフトバンドから逸脱した場合、Castor はプロを乱暴にカットするのではなく、1回の補正正規化パス（圧縮または拡張）を実行する場合があります
+- 1回のパス後もハードレンジを外れる場合、Castor は保存しますが、結果とチャプターインデックスに可視的な文字数警告とテレメトリを表示
 
 ### 続編執筆
 
-`inkos import chapters` で既存の小説テキストをインポートし、構造化状態、章サマリー、フック、キャラクター関係、人間が読める Markdown プロジェクションを自動で再構築。`Chapter N` とカスタム分割パターンに対応し、再開可能なインポートをサポート。インポート後、`inkos write next` で物語を継続できます。
+`castor import chapters` で既存の小説テキストをインポートし、構造化状態、章サマリー、フック、キャラクター関係、人間が読める Markdown プロジェクションを自動で再構築。`Chapter N` とカスタム分割パターンに対応し、再開可能なインポートをサポート。インポート後、`castor write next` で物語を継続できます。
 
 ### 二次創作
 
-`inkos fanfic init --from source.txt --mode canon` で原作素材から二次創作書籍を作成。4つのモード：canon（忠実な続編）、au（パラレルワールド）、ooc（キャラクター崩壊）、cp（カップリング重視）。原作インポーター、二次創作専用の監査ディメンション、設定の一貫性を保つ情報境界管理を搭載。
+`castor fanfic init --from source.txt --mode canon` で原作素材から二次創作書籍を作成。4つのモード：canon（忠実な続編）、au（パラレルワールド）、ooc（キャラクター崩壊）、cp（カップリング重視）。原作インポーター、二次創作専用の監査ディメンション、設定の一貫性を保つ情報境界管理を搭載。
 
 ### マルチモデルルーティング
 
-異なるエージェントに異なるモデルとプロバイダーを使用可能。WriterにClaude（より強力なクリエイティブ）、AuditorにGPT-4o（安価で高速）、Radarにローカルモデル（コストゼロ）。`inkos config set-model` でエージェントごとに設定可能；未設定のエージェントはグローバルモデルにフォールバック。
+異なるエージェントに異なるモデルとプロバイダーを使用可能。WriterにClaude（より強力なクリエイティブ）、AuditorにGPT-4o（安価で高速）、Radarにローカルモデル（コストゼロ）。`castor config set-model` でエージェントごとに設定可能；未設定のエージェントはグローバルモデルにフォールバック。
 
 ### デーモンモード + 通知
 
-`inkos up` で自律的なバックグラウンドループを開始し、スケジュールに従って章を執筆。処理可能な非重要問題は自動で進め、人間の判断が必要な場合はレビュー可能な結果を残して一時停止します。TelegramとWebhook（HMAC-SHA256署名 + イベントフィルタリング）による通知。`inkos.log`（JSON Lines）にログ出力、`-q` でクワイエットモード。
+`castor up` で自律的なバックグラウンドループを開始し、スケジュールに従って章を執筆。処理可能な非重要問題は自動で進め、人間の判断が必要な場合はレビュー可能な結果を残して一時停止します。TelegramとWebhook（HMAC-SHA256署名 + イベントフィルタリング）による通知。`inkos.log`（JSON Lines）にログ出力、`-q` でクワイエットモード。
 
 ### ローカルモデル互換性
 
-任意のOpenAI互換エンドポイント（`--provider custom`）に対応。ストリーム自動フォールバック — SSEがサポートされていない場合、InkOS は自動的に同期モードでリトライ。フォールバックパーサーが小型モデルの非標準出力を処理し、ストリーム中断時には部分コンテンツリカバリが作動。
+任意のOpenAI互換エンドポイント（`--provider custom`）に対応。ストリーム自動フォールバック — SSEがサポートされていない場合、Castor は自動的に同期モードでリトライ。フォールバックパーサーが小型モデルの非標準出力を処理し、ストリーム中断時には部分コンテンツリカバリが作動。
 
 ### 信頼性
 
-章ごとに自動ステートスナップショットを作成 — `inkos write rewrite` で任意の章を執筆前の状態にロールバック可能。Writerは執筆前チェックリスト（コンテキストスコープ、リソース、保留中のフック、リスク）と執筆後決済テーブルを出力し、Auditorが両方をクロスバリデーション。ファイルロックにより同時書き込みを防止。執筆後バリデーターにはクロスチャプター反復検出と十数のハードルールによる自動スポット修正を搭載。
+章ごとに自動ステートスナップショットを作成 — `castor write rewrite` で任意の章を執筆前の状態にロールバック可能。Writerは執筆前チェックリスト（コンテキストスコープ、リソース、保留中のフック、リスク）と執筆後決済テーブルを出力し、Auditorが両方をクロスバリデーション。ファイルロックにより同時書き込みを防止。執筆後バリデーターにはクロスチャプター反復検出と十数のハードルールによる自動スポット修正を搭載。
 
 フックシステムはZodスキーマバリデーションを使用 — `lastAdvancedChapter` は整数、`status` は open/progressing/deferred/resolved のみ。LLMからのJSONデルタは `applyRuntimeStateDelta`（イミュータブル更新）と `validateRuntimeState`（構造チェック）を経て永続化。破損データは伝播されず、拒否されます。
 
@@ -357,7 +349,7 @@ inkos compose chapter my-book
 
 ## 仕組み
 
-InkOS は pi-agent harness を共通の推論・ツール呼び出しカーネルとして使用します。Agent がユーザー意図を解釈して型付き action を生成し、host が決定論的ツールの実行、確認と権限、状態管理、実ファイルと tool result による完了判定を担当します。長編、短編、脚本、絵コンテ、インタラクティブ影遊、Play、翻訳はこの構造を共有しつつ、専用 Skill、状態モデル、制作工程を保持します。
+Castor は pi-agent harness を共通の推論・ツール呼び出しカーネルとして使用します。Agent がユーザー意図を解釈して型付き action を生成し、host が決定論的ツールの実行、確認と権限、状態管理、実ファイルと tool result による完了判定を担当します。長編、短編、脚本、絵コンテ、インタラクティブ影遊、Play、翻訳はこの構造を共有しつつ、専用 Skill、状態モデル、制作工程を保持します。
 
 <p align="center">
   <img src="assets/arch-system.svg" width="900" alt="システム構成">
@@ -406,7 +398,7 @@ Node 22+ では、SQLite時系列メモリデータベース（`story/memory.db`
 
 ### コントロールサーフェスとランタイムアーティファクト
 
-ランタイム状態に加え、InkOS はガードレールをカスタマイズからレビュー可能なコントロールドキュメントに分離します：
+ランタイム状態に加え、Castor はガードレールをカスタマイズからレビュー可能なコントロールドキュメントに分離します：
 
 - `story/author_intent.md`：長期的な著者の意図
 - `story/current_focus.md`：短期的なステアリング
@@ -415,7 +407,7 @@ Node 22+ では、SQLite時系列メモリデータベース（`story/memory.db`
 - `story/runtime/chapter-XXXX.rule-stack.yaml`：優先度レイヤーとオーバーライド関係
 - `story/runtime/chapter-XXXX.trace.json`：この章のコンパイルトレース
 
-つまり、ブリーフ、アウトラインノード、ブックルール、現在のリクエストが1つのプロンプトブロブに混ぜ合わされることはなくなりました。InkOS はまずコンパイルし、それから執筆します。
+つまり、ブリーフ、アウトラインノード、ブックルール、現在のリクエストが1つのプロンプトブロブに混ぜ合わされることはなくなりました。Castor はまずコンパイルし、それから執筆します。
 
 ### 執筆ルールシステム
 
@@ -425,13 +417,13 @@ Writerエージェントには約25の汎用執筆ルール（キャラクター
 
 ## 使用モード
 
-InkOS は4つのインタラクションモードを提供し、すべて同じアトミック操作を共有します：
+Castor は4つのインタラクションモードを提供し、すべて同じアトミック操作を共有します：
 
 ### 1. フルパイプライン（ワンコマンド）
 
 ```bash
-inkos write next my-book              # Draft → audit → 自動修正、すべて一括
-inkos write next my-book --count 5    # 5章連続で執筆
+castor write next my-book              # Draft → audit → 自動修正、すべて一括
+castor write next my-book --count 5    # 5章連続で執筆
 ```
 
 `write next` はデフォルトで `plan -> compose -> write` ガバナンスチェーンを使用します。以前のプロンプトアセンブリパスが必要な場合は、`inkos.json` で明示的に設定してください：
@@ -447,11 +439,11 @@ inkos write next my-book --count 5    # 5章連続で執筆
 ### 2. アトミックコマンド（コンポーザブル、外部エージェントフレンドリー）
 
 ```bash
-inkos plan chapter my-book --context "まずメンターとの対立にフォーカス" --json
-inkos compose chapter my-book --json
-inkos draft my-book --context "ダンジョンボス戦とパーティダイナミクスにフォーカス" --json
-inkos audit my-book 31 --json
-inkos revise my-book 31 --json
+castor plan chapter my-book --context "まずメンターとの対立にフォーカス" --json
+castor compose chapter my-book --json
+castor draft my-book --context "ダンジョンボス戦とパーティダイナミクスにフォーカス" --json
+castor audit my-book 31 --json
+castor revise my-book 31 --json
 ```
 
 各コマンドは単一の操作を独立して実行。`--json` で構造化データを出力。`plan` / `compose` は入力を管理し、`draft` / `audit` / `revise` は散文と品質チェックを処理。外部AIエージェントから `exec` 経由で呼び出し可能で、スクリプトでも使用できます。
@@ -459,21 +451,21 @@ inkos revise my-book 31 --json
 ### 3. 自然言語エージェントモード
 
 ```bash
-inkos agent "ダンジョン世界のヒーラークラスのMCを持つLitRPG小説を書いて"
-inkos agent "次の章を書いて、ボス戦と戦利品の分配にフォーカス"
-inkos agent "1つの呪文しか使えない魔法使いのプログレッションファンタジーを作成して"
+castor agent "ダンジョン世界のヒーラークラスのMCを持つLitRPG小説を書いて"
+castor agent "次の章を書いて、ボス戦と戦利品の分配にフォーカス"
+castor agent "1つの呪文しか使えない魔法使いのプログレッションファンタジーを作成して"
 ```
 
 Agent モードは現在の session 種別に応じてツールを絞ります。書籍作成、コントロールサーフェス編集、計画、コンテキスト編成、執筆、監査、修正、Short、表紙、Play は、必要な場面でだけ利用可能になります。推奨フローは、まずコントロールサーフェスを調整し、次に `plan` / `compose`、最後にドラフトのみかフルパイプライン執筆を選ぶ形です。
 
 ### 4. Studio Play モード
 
-Studio の **Open World** と **Branching Interactive** は、先に書籍を作らなくても開始できるインタラクティブ創作入口です。世界の動き方、時間の進み方、キャラクターが agent として動くか、アイテムや証拠がどう効くかを説明すると、InkOS は継続可能なローカル世界状態として保存します。
+Studio の **Open World** と **Branching Interactive** は、先に書籍を作らなくても開始できるインタラクティブ創作入口です。世界の動き方、時間の進み方、キャラクターが agent として動くか、アイテムや証拠がどう効くかを説明すると、Castor は継続可能なローカル世界状態として保存します。
 
 ## Studio スクリーンショットと実行結果
 
 <p align="center">
-  <img src="assets/studio-dashboard.png" width="760" alt="InkOS Studio 創作入口スクリーンショット">
+  <img src="assets/studio-dashboard.png" width="760" alt="Castor Studio 創作入口スクリーンショット">
 </p>
 
 <p align="center">
@@ -483,57 +475,57 @@ Studio の **Open World** と **Branching Interactive** は、先に書籍を作
   <img src="assets/play-item-warcraft.png" width="230" alt="インタラクティブ世界のアイテム画像出力例">
 </p>
 
-最初の画像はローカル Studio のスクリーンショットです。ほかの画像は InkOS Short と InkOS Play のローカル実行で生成された実例で、短編表紙、開放世界シーン、探偵証拠ビジュアル、アイテム画像を示します。
+最初の画像はローカル Studio のスクリーンショットです。ほかの画像は Castor Short と Castor Play のローカル実行で生成された実例で、短編表紙、開放世界シーン、探偵証拠ビジュアル、アイテム画像を示します。
 
 ## CLIリファレンス
 
 | コマンド | 説明 |
 |---------|------|
-| `inkos init [name]` | プロジェクトを初期化（nameを省略するとカレントディレクトリを初期化） |
-| `inkos book create` | 新しい書籍を作成（`--genre`、`--chapter-words`、`--target-chapters`、`--brief <file>`、`--lang en/zh`） |
-| `inkos book update [id]` | 書籍設定を更新（`--chapter-words`、`--target-chapters`、`--status`、`--lang`） |
-| `inkos book list` | すべての書籍を一覧表示 |
-| `inkos book delete <id>` | 書籍とそのすべてのデータを削除（`--force` で確認をスキップ） |
-| `inkos genre list/show/copy/create` | ジャンルの表示、コピー、作成 |
-| `inkos plan chapter [id]` | 次の章の `intent.md` を生成（`--context` / `--context-file` で現在のステアリング） |
-| `inkos compose chapter [id]` | 次の章の `context.json`、`rule-stack.yaml`、`trace.json` を生成 |
-| `inkos write next [id]` | フルパイプライン：次の章を執筆（`--words` でオーバーライド、`--count` でバッチ、`-q` クワイエットモード） |
-| `inkos write rewrite [id] <n>` | 第N章をリライト（ステートスナップショットを復元、`--force` で確認をスキップ） |
-| `inkos draft [id]` | ドラフトのみ執筆（`--words` で文字数をオーバーライド、`-q` クワイエットモード） |
-| `inkos audit [id] [n]` | 特定の章を監査 |
-| `inkos revise [id] [n]` | 特定の章を修正 |
-| `inkos agent <instruction>` | 自然言語エージェントモード |
-| `inkos review list [id]` | 下書きをレビュー |
-| `inkos review approve-all [id]` | 一括承認 |
-| `inkos status [id]` | プロジェクトのステータス |
-| `inkos export [id]` | 書籍をエクスポート（`--format txt/md/epub`、`--output <path>`、`--approved-only`） |
-| `inkos radar scan` | 新規書籍の方向性に使う市場 / トレンド入力をスキャン |
-| `inkos fanfic init` | 原作素材から二次創作書籍を作成（`--from`、`--mode canon/au/ooc/cp`） |
-| `inkos short run` | 独立短編パッケージを生成 |
-| `inkos eval [id]` | 品質評価レポートを生成（`--json`、章範囲指定） |
-| `inkos consolidate [id]` | 長編の章要約を統合し、コンテキスト負荷を下げる |
-| `inkos forecast create/show/select` | 長編の非正史ルートを生成・再検証・選択。選択時は候補計画だけを保存し、正史は変更しない |
-| `inkos interact` | 外部 agent / CLI 自然言語入口（`--json`、`--message`、`--book`） |
-| `inkos config set-global` | グローバルLLM設定を設定（~/.inkos/.env） |
-| `inkos config set-model <agent> <model>` | エージェントごとのモデルオーバーライド（`--base-url`、`--provider`、`--api-key-env`） |
-| `inkos config show-models` | 現在のモデルルーティングを表示 |
-| `inkos doctor` | セットアップの問題を診断（API接続テスト + プロバイダー互換性ヒント） |
-| `inkos detect [id] [n]` | AIGC検出（`--all` で全章、`--stats` で統計） |
-| `inkos style analyze <file>` | 参考テキストを分析してスタイルフィンガープリントを抽出 |
-| `inkos style import <file> [id]` | スタイルフィンガープリントを書籍にインポート |
-| `inkos import canon [id] --from <parent>` | 番外 / スピンオフ用に親作品の正典を導入 |
-| `inkos import chapters [id] --from <path>` | 続編執筆用に既存の章をインポート（`--split`、`--resume-from`） |
-| `inkos analytics [id]` / `inkos stats [id]` | 書籍分析（監査合格率、主要な問題、章ランキング、トークン使用量） |
-| `inkos update` | 最新バージョンへ更新 |
-| `inkos` / `inkos studio` | Webワークベンチを起動（`-p` でポート指定、デフォルト4567） |
-| `inkos tui` | 端末フルスクリーン TUI を起動 |
-| `inkos up / down` | デーモンの開始/停止（`-q` クワイエットモード、`inkos.log` に自動出力） |
+| `castor init [name]` | プロジェクトを初期化（nameを省略するとカレントディレクトリを初期化） |
+| `castor book create` | 新しい書籍を作成（`--genre`、`--chapter-words`、`--target-chapters`、`--brief <file>`、`--lang en/zh`） |
+| `castor book update [id]` | 書籍設定を更新（`--chapter-words`、`--target-chapters`、`--status`、`--lang`） |
+| `castor book list` | すべての書籍を一覧表示 |
+| `castor book delete <id>` | 書籍とそのすべてのデータを削除（`--force` で確認をスキップ） |
+| `castor genre list/show/copy/create` | ジャンルの表示、コピー、作成 |
+| `castor plan chapter [id]` | 次の章の `intent.md` を生成（`--context` / `--context-file` で現在のステアリング） |
+| `castor compose chapter [id]` | 次の章の `context.json`、`rule-stack.yaml`、`trace.json` を生成 |
+| `castor write next [id]` | フルパイプライン：次の章を執筆（`--words` でオーバーライド、`--count` でバッチ、`-q` クワイエットモード） |
+| `castor write rewrite [id] <n>` | 第N章をリライト（ステートスナップショットを復元、`--force` で確認をスキップ） |
+| `castor draft [id]` | ドラフトのみ執筆（`--words` で文字数をオーバーライド、`-q` クワイエットモード） |
+| `castor audit [id] [n]` | 特定の章を監査 |
+| `castor revise [id] [n]` | 特定の章を修正 |
+| `castor agent <instruction>` | 自然言語エージェントモード |
+| `castor review list [id]` | 下書きをレビュー |
+| `castor review approve-all [id]` | 一括承認 |
+| `castor status [id]` | プロジェクトのステータス |
+| `castor export [id]` | 書籍をエクスポート（`--format txt/md/epub`、`--output <path>`、`--approved-only`） |
+| `castor radar scan` | 新規書籍の方向性に使う市場 / トレンド入力をスキャン |
+| `castor fanfic init` | 原作素材から二次創作書籍を作成（`--from`、`--mode canon/au/ooc/cp`） |
+| `castor short run` | 独立短編パッケージを生成 |
+| `castor eval [id]` | 品質評価レポートを生成（`--json`、章範囲指定） |
+| `castor consolidate [id]` | 長編の章要約を統合し、コンテキスト負荷を下げる |
+| `castor forecast create/show/select` | 長編の非正史ルートを生成・再検証・選択。選択時は候補計画だけを保存し、正史は変更しない |
+| `castor interact` | 外部 agent / CLI 自然言語入口（`--json`、`--message`、`--book`） |
+| `castor config set-global` | グローバルLLM設定を設定（~/.inkos/.env） |
+| `castor config set-model <agent> <model>` | エージェントごとのモデルオーバーライド（`--base-url`、`--provider`、`--api-key-env`） |
+| `castor config show-models` | 現在のモデルルーティングを表示 |
+| `castor doctor` | セットアップの問題を診断（API接続テスト + プロバイダー互換性ヒント） |
+| `castor detect [id] [n]` | AIGC検出（`--all` で全章、`--stats` で統計） |
+| `castor style analyze <file>` | 参考テキストを分析してスタイルフィンガープリントを抽出 |
+| `castor style import <file> [id]` | スタイルフィンガープリントを書籍にインポート |
+| `castor import canon [id] --from <parent>` | 番外 / スピンオフ用に親作品の正典を導入 |
+| `castor import chapters [id] --from <path>` | 続編執筆用に既存の章をインポート（`--split`、`--resume-from`） |
+| `castor analytics [id]` / `castor stats [id]` | 書籍分析（監査合格率、主要な問題、章ランキング、トークン使用量） |
+| `castor update` | 最新バージョンへ更新 |
+| `castor` / `castor studio` | Webワークベンチを起動（`-p` でポート指定、デフォルト4567） |
+| `castor tui` | 端末フルスクリーン TUI を起動 |
+| `castor up / down` | デーモンの開始/停止（`-q` クワイエットモード、`inkos.log` に自動出力） |
 
 `[id]` はプロジェクトに書籍が1つしかない場合に自動検出されます。すべてのコマンドが `--json` による構造化出力に対応。`draft` / `write next` / `plan chapter` / `compose chapter` は `--context` でステアリング可能、`--words` で目標章サイズをオーバーライド。`book create` は `--brief <file>` でクリエイティブブリーフを渡せます — アーキテクトがゼロから生成するのではなく、あなたのアイデアを基に構築します。`plan chapter` は LLM を呼び出して章の意図を作成します。`compose chapter` はライブLLMを必要としないため、APIセットアップ完了前でも管理された入力を確認できます。
 
 ## ロードマップ
 
-- [x] ~~`packages/studio` Webワークベンチ（Vite + React + Hono）~~ — リリース済み、`inkos` または `inkos studio` で起動
+- [x] ~~`packages/studio` Webワークベンチ（Vite + React + Hono）~~ — リリース済み、`castor` または `castor studio` で起動
 - [x] ~~インタラクティブフィクション / 開放世界（分岐選択 + 自由行動 + 画像生成）~~ — Studio Play としてリリース済み
 - [ ] 部分的な章介入（章の半分をリライト + 真実ファイルの連鎖更新）
 - [ ] カスタムエージェントプラグインシステム
@@ -575,7 +567,7 @@ pnpm typecheck    # 出力なしで型チェック
 
 ## 謝辞
 
-InkOS のエージェントランタイムは Mario Zechner 氏の [pi](https://github.com/badlogic/pi-mono)（`@mariozechner/pi-ai` と `@mariozechner/pi-agent-core`）の上に構築されています。堅実な土台を提供してくれた pi に感謝します。
+Castor のエージェントランタイムは Mario Zechner 氏の [pi](https://github.com/badlogic/pi-mono)（`@mariozechner/pi-ai` と `@mariozechner/pi-agent-core`）の上に構築されています。堅実な土台を提供してくれた pi に感謝します。
 
 ## ライセンス
 

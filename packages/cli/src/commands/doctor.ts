@@ -137,7 +137,7 @@ export const doctorCommand = new Command("doctor")
       await readFile(join(root, "inkos.json"), "utf-8");
       checks.push({ name: "inkos.json", ok: true, detail: "Found" });
     } catch {
-      checks.push({ name: "inkos.json", ok: false, detail: "Not found. Run 'inkos init'" });
+      checks.push({ name: "inkos.json", ok: false, detail: "Not found. Run 'castor init'" });
     }
 
     // 3. Check .env exists
@@ -158,7 +158,7 @@ export const doctorCommand = new Command("doctor")
       checks.push({
         name: "Global Config",
         ok: hasGlobal,
-        detail: hasGlobal ? `Found (${GLOBAL_ENV_PATH})` : "Not set. Run 'inkos config set-global'",
+        detail: hasGlobal ? `Found (${GLOBAL_ENV_PATH})` : "Not set. Run 'castor config set-global'",
       });
     }
 
@@ -228,7 +228,7 @@ export const doctorCommand = new Command("doctor")
           checks.push({
             name: "Version Migration",
             ok: false,
-            detail: `${legacyCount} book(s) using legacy format (pre-v0.6). Run 'inkos write next' on each to auto-migrate, or re-init with 'inkos init'.`,
+            detail: `${legacyCount} book(s) using legacy format (pre-v0.6). Run 'castor write next' on each to auto-migrate, or re-init with 'castor init'.`,
           });
         } else if (bookIds.length > 0) {
           checks.push({
@@ -277,7 +277,7 @@ export const doctorCommand = new Command("doctor")
         checks.push({
           name: "  Hint",
           ok: false,
-          detail: "Run `inkos setup`, `inkos config set-global`, or add LLM settings to the project .env file.",
+          detail: "Run `castor setup`, `castor config set-global`, or add LLM settings to the project .env file.",
         });
       } else {
         checks.push({
@@ -382,7 +382,7 @@ export const doctorCommand = new Command("doctor")
     }
 
     // Output
-    log("\nInkOS Doctor\n");
+    log("\nCastor Doctor\n");
     for (const check of checks) {
       const icon = check.ok ? "[OK]" : "[!!]";
       log(`  ${icon} ${check.name}: ${check.detail}`);

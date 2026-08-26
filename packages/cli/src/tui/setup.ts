@@ -145,14 +145,14 @@ export function buildAutoInitMessages(projectName: string, locale: TuiLocale): {
     return {
       initializing: `Initializing project in ${projectName}/ ...`,
       initialized: "Project initialized",
-      envTemplateHeader: "# LLM Configuration — run inkos tui to configure interactively",
+      envTemplateHeader: "# LLM Configuration — run castor tui to configure interactively",
     };
   }
 
   return {
     initializing: `正在初始化项目：${projectName}/ ...`,
     initialized: "项目已初始化",
-    envTemplateHeader: "# LLM 配置 —— 运行 inkos tui 进行交互式配置",
+    envTemplateHeader: "# LLM 配置 —— 运行 castor tui 进行交互式配置",
   };
 }
 

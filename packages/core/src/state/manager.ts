@@ -37,7 +37,7 @@ export class BookWriteLockError extends Error {
     lockData?: string,
   ) {
     super(
-      `Book "${bookId}" is locked by an active InkOS write${lockData ? ` (${lockData})` : ""}. ` +
+      `Book "${bookId}" is locked by an active Castor write${lockData ? ` (${lockData})` : ""}. ` +
       "Wait for it to finish or stop the running task, then retry. Stale locks are recovered automatically.",
     );
     this.name = "BookWriteLockError";

@@ -82,14 +82,14 @@ describe("CLI integration", () => {
   describe("inkos --help", () => {
     it("prints help with command list", () => {
       const output = run(["--help"]);
-      expect(output).toContain("inkos");
+      expect(output).toContain("castor");
       expect(output).toContain("init");
       expect(output).toContain("book");
       expect(output).toContain("write");
     });
   });
 
-  describe("inkos init", () => {
+  describe("castor init", () => {
     it("initializes project in current directory", () => {
       const output = run(["init"]);
       expect(output).toContain("Project initialized");
@@ -128,7 +128,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos init <name>", () => {
+  describe("castor init <name>", () => {
     it("creates project in subdirectory", () => {
       const output = run(["init", "subproject"]);
       expect(output).toContain("Project initialized");
@@ -161,7 +161,7 @@ describe("CLI integration", () => {
       try {
         const output = run(["init", englishDir, "--lang", "en"]);
         expect(output).toContain("Project initialized");
-        expect(output).toContain("inkos book create --title 'My Novel'");
+        expect(output).toContain("castor book create --title 'My Novel'");
         expect(output).not.toContain("我的小说");
       } finally {
         await rm(englishDir, { recursive: true, force: true });
@@ -206,7 +206,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos interact", () => {
+  describe("castor interact", () => {
     it("returns the agent-session JSON contract for natural-language interactions", async () => {
       const initialized = await stat(join(projectDir, "inkos.json")).then(() => true).catch(() => false);
       if (!initialized) run(["init"]);
@@ -267,7 +267,7 @@ describe("CLI integration", () => {
     }, CLI_PROCESS_TIMEOUT_MS);
   });
 
-  describe("inkos config set-model", () => {
+  describe("castor config set-model", () => {
     it("rejects raw API keys passed to --api-key-env", async () => {
       const { exitCode, stderr } = runStderr([
         "config",
@@ -304,7 +304,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos book create", () => {
+  describe("castor book create", () => {
     it("removes stale incomplete book directories before retrying create", async () => {
       try {
         await stat(join(projectDir, "inkos.json"));
@@ -335,7 +335,7 @@ describe("CLI integration", () => {
     }, CLI_PROCESS_TIMEOUT_MS);
   });
 
-  describe("inkos status", () => {
+  describe("castor status", () => {
     it("shows project status with zero books", () => {
       const output = run(["status"]);
       expect(output).toContain("Books: 0");
@@ -539,10 +539,10 @@ describe("CLI integration", () => {
     }, DOUBLE_CLI_INVOCATION_TEST_TIMEOUT_MS);
   });
 
-  describe("inkos doctor", () => {
+  describe("castor doctor", () => {
     it("checks environment health", () => {
       const { stdout } = runStderr(["doctor"]);
-      expect(stdout).toContain("InkOS Doctor");
+      expect(stdout).toContain("Castor Doctor");
       expect(stdout).toContain("Node.js >= 22");
       expect(stdout).toContain("inkos.json");
     });
@@ -780,7 +780,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos review", () => {
+  describe("castor review", () => {
     it("preserves the original chapter snapshot when approving review", async () => {
       const configPath = join(projectDir, "inkos.json");
       const initialized = await stat(configPath).then(() => true).catch(() => false);

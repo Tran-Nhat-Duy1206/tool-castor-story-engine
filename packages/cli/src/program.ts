@@ -48,8 +48,8 @@ export function createProgram(hooks: ProgramHooks = {}): Command {
   const program = new Command();
 
   program
-    .name("inkos")
-    .description("InkOS — Multi-agent novel production system")
+    .name("castor")
+    .description("Tool Castor Story Engine — Multi-agent novel production system")
     .version(version)
     .enablePositionalOptions()
     .option("--service <service>", "Override LLM service for this CLI run")

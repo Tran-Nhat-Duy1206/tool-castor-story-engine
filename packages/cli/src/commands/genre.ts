@@ -192,7 +192,7 @@ genreCommand
       try {
         content = await readFile(srcPath, "utf-8");
       } catch {
-        logError(`Built-in genre "${id}" not found. Use 'inkos genre list' to see available genres.`);
+        logError(`Built-in genre "${id}" not found. Use 'castor genre list' to see available genres.`);
         process.exit(1);
         return;
       }

@@ -165,7 +165,7 @@ describe("--notify command option", () => {
       // project config itself and falls back to zh with no book name.
       expect(channels).toBe(notifyChannels);
       expect(message.title).toBe("❌ 重写失败");
-      expect(message.body).toContain("Usage: inkos write rewrite");
+      expect(message.body).toContain("Usage: castor write rewrite");
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });

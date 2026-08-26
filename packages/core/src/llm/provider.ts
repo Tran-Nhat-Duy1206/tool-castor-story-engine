@@ -443,7 +443,7 @@ export class ContextWindowExceededError extends Error {
     readonly model: string;
   }) {
     super(
-      `InkOS context window guard: estimated input ${params.estimatedInputTokens} tokens + ` +
+      `Castor context window guard: estimated input ${params.estimatedInputTokens} tokens + ` +
       `reserved output ${params.reservedOutputTokens} tokens exceeds context window ${params.contextWindow} ` +
       `for model "${params.model}". Please compress the active book/session context before retrying; ` +
       `InkOS will not truncate semantic text automatically.`,

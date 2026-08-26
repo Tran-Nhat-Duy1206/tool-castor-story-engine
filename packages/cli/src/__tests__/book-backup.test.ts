@@ -115,7 +115,7 @@ describe("book backup module", () => {
   });
 });
 
-describe("inkos book backup / restore commands", () => {
+describe("castor book backup / restore commands", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

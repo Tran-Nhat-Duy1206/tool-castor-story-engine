@@ -3,8 +3,8 @@
 ## Setup
 
 ```bash
-git clone https://github.com/Narcooo/inkos.git
-cd inkos
+git clone https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine.git
+cd tool-castor-story-engine
 pnpm install
 pnpm build
 pnpm test
@@ -86,4 +86,4 @@ For features touching the LLM pipeline, mock the LLM calls — don't make real A
 
 ## Questions?
 
-Open an issue or check existing ones: https://github.com/Narcooo/inkos/issues
+Open an issue or check existing ones: https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine/issues

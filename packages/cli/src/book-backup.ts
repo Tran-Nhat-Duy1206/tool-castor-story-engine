@@ -105,7 +105,7 @@ export async function restoreBookBackup(
   if (!backupInfo?.isDirectory()) {
     throw new Error(
       `Backup "${backupId}" not found for book "${bookId}". `
-      + `List available backups with: inkos book backup ${bookId} --list`,
+      + `List available backups with: castor book backup ${bookId} --list`,
     );
   }
 

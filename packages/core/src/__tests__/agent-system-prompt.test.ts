@@ -212,7 +212,7 @@ describe("buildAgentSystemPrompt", () => {
   describe("short mode", () => {
     it("gates short-fiction and cover production behind a confirmation proposal", () => {
       const prompt = buildAgentSystemPrompt(null, "zh", "short");
-      expect(prompt).toContain("InkOS Short 助手");
+      expect(prompt).toContain("Castor Short 助手");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("short_run");
       expect(prompt).toContain("generate_cover");
@@ -249,7 +249,7 @@ describe("buildAgentSystemPrompt", () => {
 
     it("English short mode does not mention book-creation internals before confirmation", () => {
       const prompt = buildAgentSystemPrompt(null, "en", "short");
-      expect(prompt).toContain("InkOS Short assistant");
+      expect(prompt).toContain("Castor Short assistant");
       expect(prompt).toContain("propose_action");
       expect(prompt).not.toContain("short_fiction_run");
       expect(prompt).not.toContain("sub_agent");
@@ -367,7 +367,7 @@ describe("buildAgentSystemPrompt", () => {
   describe("play mode", () => {
     it("gates new world start behind a confirmation proposal before a world exists", () => {
       const prompt = buildAgentSystemPrompt(null, "zh", "play", { playWorldExists: false });
-      expect(prompt).toContain("InkOS Play 助手");
+      expect(prompt).toContain("Castor Play 助手");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("play_start");
       expect(prompt).toContain("propose_action 就是确认卡");
@@ -389,7 +389,7 @@ describe("buildAgentSystemPrompt", () => {
 
     it("exposes play_step, play_revise, and play_edit after a world exists", () => {
       const prompt = buildAgentSystemPrompt(null, "zh", "play", { playWorldExists: true });
-      expect(prompt).toContain("InkOS Play 助手");
+      expect(prompt).toContain("Castor Play 助手");
       expect(prompt).toContain("play_step");
       expect(prompt).toContain("play_revise");
       expect(prompt).toContain("play_edit");

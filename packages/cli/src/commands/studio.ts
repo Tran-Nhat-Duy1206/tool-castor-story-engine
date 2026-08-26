@@ -126,7 +126,7 @@ export async function launchStudioWorkbench(root: string, port: string): Promise
     logError(
       "InkOS Studio not found. If you cloned the repo, run:\n" +
       "  cd packages/studio && pnpm install && pnpm build\n" +
-      "Then run 'inkos studio' from the project root.",
+      "Then run 'castor studio' from the project root.",
     );
     process.exit(1);
   }

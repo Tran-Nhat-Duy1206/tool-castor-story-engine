@@ -1,7 +1,7 @@
 {
   "name": "@actalk/inkos-core",
   "version": "1.8.0",
-  "description": "InkOS pi-agent production harness for story creation, governed context, retrieval, review, and interactive worlds",
+  "description": "Tool Castor Story Engine pi-agent production harness for story creation, governed context, retrieval, review, and interactive worlds (derived from InkOS)",
   "keywords": [
     "story-creation-ai-agent",
     "story-agent",
@@ -47,7 +47,7 @@
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Narcooo/inkos.git",
+    "url": "https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine.git",
     "directory": "packages/core"
   },
   "scripts": {

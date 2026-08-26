@@ -1,4 +1,4 @@
-# InkOS Evolution — Product Vision
+# Tool Castor Story Engine — Product Vision
 
 **Status:** Product direction / source of intent
 **Purpose:** Define what this fork of InkOS is intended to become.

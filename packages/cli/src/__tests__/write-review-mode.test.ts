@@ -43,7 +43,7 @@ vi.mock("../localization.js", () => ({
   resolveCliLanguage: vi.fn(() => "zh"),
 }));
 
-describe("inkos write next review mode", () => {
+describe("castor write next review mode", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     writeNextChapterMock.mockResolvedValue({

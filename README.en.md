@@ -1,16 +1,12 @@
+<h1 align="center">Tool Castor Story Engine</h1>
+
 <p align="center">
-  <img src="assets/logo.svg" width="120" height="120" alt="InkOS Logo">
-  <img src="assets/inkos-text.svg" width="240" height="65" alt="InkOS">
+  <strong>An AI creation system for long-form and short fiction, scripts, interactive film/games, IP content, and multilingual translation (CLI: <code>castor</code>)</strong>
 </p>
 
-<h1 align="center">Story Creation AI Agent<br><sub>Creation system for long-form and short fiction, scripts, interactive film/games, IP content, and multilingual translation</sub></h1>
-
 <p align="center">
-  <a href="https://www.npmjs.com/package/@actalk/inkos"><img src="https://img.shields.io/npm/v/@actalk/inkos.svg?color=cb3837&logo=npm" alt="npm version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL-3.0"></a>
-  <a href="https://github.com/Narcooo/inkos/stargazers"><img src="https://img.shields.io/github/stars/Narcooo/inkos?style=flat&logo=github&color=yellow" alt="GitHub stars"></a>
-  <a href="https://www.npmjs.com/package/@actalk/inkos"><img src="https://img.shields.io/npm/dm/@actalk/inkos?color=cb3837&logo=npm&label=downloads" alt="npm downloads"></a>
-  <a href="https://clawhub.ai/narcooo/inkos"><img src="https://img.shields.io/badge/🦞%20ClawHub-Skill-FF6B35?labelColor=1a1a1a" alt="ClawHub Skill"></a>
+  <a href="https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine"><img src="https://img.shields.io/badge/GitHub-tool--castor--story--engine-181717?logo=github" alt="GitHub"></a>
 </p>
 
 <p align="center">
@@ -19,31 +15,22 @@
 
 ---
 
-InkOS is an AI Agent system for story creation and multilingual translation: long-form novels, standalone short fiction, scripts, storyboards, fan fiction, spinoffs, style imitation, continuation, interactive film projects, interactive worlds, and long-document translation all start from the same workbench. Studio Chat, CLI, and TUI share the same action surface for discussion, confirmed actions, generation, review, persistent editing, and cross-language delivery.
+> **Derived project notice**
+>
+> Tool Castor Story Engine (Castor) is derived from [InkOS](https://github.com/Narcooo/inkos) by Narcooo and has been substantially modified and evolved into an independent long-form AI story-writing system. This project preserves InkOS's Git history, copyright notices and AGPL-3.0 obligations. The original InkOS code was not authored by the maintainers of this project. This modified work remains licensed under [AGPL-3.0](LICENSE).
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://kimi-file.moonshot.cn/prod-chat-kimi/kfs/4/1/2026-06-05/1d8h69mt3v89kkekg24gg">
-    <img alt="Kimi Open Source Friends" width="760" src="https://kimi-file.moonshot.cn/prod-chat-kimi/kfs/4/1/2026-06-05/1d8h69fudcmosb3pipls0">
-  </picture>
-</p>
+---
 
-<p align="center">
-  <a href="https://www.kimi.com/code/?aff=inkos"><img src="https://gcdn.moonshot.cn/growth-cdn/sponsor/kimi-en.png" width="900" alt="Kimi sponsors InkOS"></a>
-</p>
+Castor is an AI Agent system for story creation and multilingual translation: long-form novels, standalone short fiction, scripts, storyboards, fan fiction, spinoffs, style imitation, continuation, interactive film projects, interactive worlds, and long-document translation all start from the same workbench. Studio Chat, CLI, and TUI share the same action surface for discussion, confirmed actions, generation, review, persistent editing, and cross-language delivery. Its core includes the **Phase 4 Human-Governed Post-Chapter State Review**: AI generates proposals, the human decides, and Canon changes only on atomic Final Confirm.
 
-Thanks to [Kimi](https://www.kimi.com/code/?aff=inkos) for sponsoring this project! [Kimi K3](https://www.kimi.com/blog/kimi-k3) is Moonshot AI's most capable model and the world's first open 3T-class model, featuring native vision and a 1-million-token context window. With InkOS, K3 can assist with planning, drafting, reviewing, and revising novels, scripts, interactive stories, and multilingual content, while InkOS manages characters, worldbuilding, plot threads, and persistent story state to keep long-form creation coherent and controllable.
-
-**InkOS Studio already supports Moonshot (Kimi). Get an API key from the Kimi Open Platform ([中文站](https://platform.kimi.com/?aff=inkos) | [Global](https://platform.kimi.ai/?aff=inkos)) and start creating.**
-
-> 💡 **One key for global frontier models** — pair InkOS with [**kkaiapi**](https://en.kkaiapi.com/): an OpenAI-compatible gateway for Claude, GPT, Gemini, DeepSeek, Kimi, Qwen, GLM, and image models. Add it as a custom service with base URL `https://api.kkaiapi.com/v1`, then switch models in Studio without juggling multiple provider accounts.
+> 💡 **One key for global frontier models** — pair Castor with [**kkaiapi**](https://en.kkaiapi.com/): an OpenAI-compatible gateway for Claude, GPT, Gemini, DeepSeek, Kimi, Qwen, GLM, and image models. Add it as a custom service with base URL `https://api.kkaiapi.com/v1`, then switch models in Studio without juggling multiple provider accounts.
 
 ## v1.8.0 Unified Pi Agent Harness and Professional Creation Kernel
 
-InkOS 1.8.0 converges the Chat Agent and every production workflow on one pi-agent-centered harness. Models understand, propose, and invoke capabilities; InkOS owns confirmation, context, state, atomic persistence, and artifact truth. Long fiction, short fiction, scripts, storyboards, interactive films, Play, and translation keep their own craft methods while sharing execution, retrieval, observation, and recovery infrastructure.
+Castor 1.8.0 converges the Chat Agent and every production workflow on one pi-agent-centered harness. Models understand, propose, and invoke capabilities; Castor owns confirmation, context, state, atomic persistence, and artifact truth. Long fiction, short fiction, scripts, storyboards, interactive films, Play, and translation keep their own craft methods while sharing execution, retrieval, observation, and recovery infrastructure.
 
 - **Model setup**: Studio includes provider settings, model routing, cover-service settings, [kkaiapi](https://en.kkaiapi.com/) / OpenRouter aggregator entries, and custom OpenAI-compatible endpoints.
-- **One production harness**: Studio Chat, TUI, `inkos interact`, and production workers share the pi-agent tool loop and typed action/result boundary. Existing pipelines are deterministic, interruptible capabilities rather than parallel natural-language decision engines.
+- **One production harness**: Studio Chat, TUI, `castor interact`, and production workers share the pi-agent tool loop and typed action/result boundary. Existing pipelines are deterministic, interruptible capabilities rather than parallel natural-language decision engines.
 - **15 built-in professional Skills**: dedicated `SKILL.md` packages cover long-form writing/review, commercial shorts, Play, scripts, storyboards, interactive film, translation, analysis, market research, import, covers, and semantic de-slopping. Each medium shares the Skill architecture, not long-form-specific prompts.
 - **Unified local retrieval**: story memory, archived materials, and Skill references use one rebuildable SQLite FTS5 / BM25 projection. Source files remain authoritative and retrieved evidence keeps source locations.
 - **Book-bound references**: imported material can be explicitly bound to a book with intended uses, then retrieved by task instead of injecting every file in full.
@@ -54,25 +41,25 @@ InkOS 1.8.0 converges the Chat Agent and every production workflow on one pi-age
 - **Models and workbench**: LM Studio support, persistent dynamic model catalogs and external canon imports, custom cover Base URLs, wider chapter previews, and a safe chapter rewrite workspace.
 
 <p align="center">
-  <img src="assets/interactive-film-e2e.png" width="900" alt="InkOS interactive-film story graph E2E screenshot">
+  <img src="assets/interactive-film-e2e.png" width="900" alt="Castor interactive-film story graph E2E screenshot">
 </p>
 
 ### Core Creation Modes
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="210" alt="InkOS Short cover example">
-  <img src="assets/play-openworld-warcraft.png" width="210" alt="InkOS Play fantasy open-world example">
-  <img src="assets/play-openworld-romance.png" width="210" alt="InkOS Play romance example">
-  <img src="assets/play-openworld-detective.png" width="210" alt="InkOS Play detective example">
+  <img src="assets/inkos-short-demo-cover.png" width="210" alt="Castor Short cover example">
+  <img src="assets/play-openworld-warcraft.png" width="210" alt="Castor Play fantasy open-world example">
+  <img src="assets/play-openworld-romance.png" width="210" alt="Castor Play romance example">
+  <img src="assets/play-openworld-detective.png" width="210" alt="Castor Play detective example">
 </p>
 
 **Long-form novels** — create from a brief, generate foundations, chapter intent, context packages, prose, review, revision, and state settlement. Context is governed with protected / compressible layers so long books remain steerable.
 
 **Narrative forecast** — before writing the next chapter, generate 2-5 isolated future branches from current canon and compare their chapter beats, character decisions, projected changes, risks, and author-intent alignment directly in Studio Chat. Selecting a branch writes only `selected-branch-plan.md`; it does not change prose, outlines, or canonical state. Forecasts are marked stale when canon changes.
 
-**InkOS Short** — Studio chat and CLI can create a complete standalone short-fiction package: full manuscript, outline records, review records, synopsis, selling points, cover prompt, and an optional cover image when a cover provider is configured.
+**Castor Short** — Studio chat and CLI can create a complete standalone short-fiction package: full manuscript, outline records, review records, synopsis, selling points, cover prompt, and an optional cover image when a cover provider is configured.
 
-**InkOS Play** — build open worlds or branching interactive fiction from natural-language world contracts: time flow, character agents, inventory, evidence, relationships, scene state, visual rules, guided choices, free actions, and optional image generation.
+**Castor Play** — build open worlds or branching interactive fiction from natural-language world contracts: time flow, character agents, inventory, evidence, relationships, scene state, visual rules, guided choices, free actions, and optional image generation.
 
 **Interactive film/games** — turn an idea, script, or prose reference into branching scenes, variables, endings, image prompts, node images, and an exportable project package.
 
@@ -81,7 +68,7 @@ InkOS 1.8.0 converges the Chat Agent and every production workflow on one pi-age
 **Agent Skills and research** — add standard `SKILL.md` packages under `.agents/skills/` or another AgentSkills directory, force them with `@skill-id`, or ask for web research to generate a sourced Markdown report.
 
 <p align="center">
-  <img src="assets/play-item-warcraft.png" width="420" alt="InkOS Play item image example">
+  <img src="assets/play-item-warcraft.png" width="420" alt="Castor Play item image example">
 </p>
 
 **Native English novel writing now supported！** — 10 built-in English genre profiles with dedicated pacing rules, fatigue word lists, and audit dimensions. Set `--lang en` and go.
@@ -93,32 +80,29 @@ InkOS 1.8.0 converges the Chat Agent and every production workflow on one pi-age
 Requires **Node.js 22 or later**.
 
 ```bash
-npm i -g @actalk/inkos
+git clone https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine.git
+cd tool-castor-story-engine
+pnpm install
+pnpm build
 ```
+
+> The upstream InkOS npm package (`@actalk/inkos`) and its [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) belong to Narcooo's InkOS project; this standalone repository is built from source. Existing user data — `inkos.json` config, `INKOS_*` environment variables, and book directory layout — remains compatible, and the `castor` command loads existing InkOS projects directly.
 
 ### Use via OpenClaw 🦞
 
-InkOS is published as an [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill, callable by any compatible agent (Claude Code, OpenClaw, etc.):
+Upstream InkOS is published as an [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill. This repository is derived from InkOS and inherits the same shared interaction entry; built from source, it is invoked directly:
 
 ```bash
-clawhub install inkos          # Install from ClawHub
-```
-
-If you installed via npm or cloned the repo, `skills/SKILL.md` is already included — 🦞 can read it directly without a separate ClawHub install.
-
-Once installed, Claw should prefer the shared interaction entry:
-
-```bash
-inkos interact --json --message "continue the current book, but keep the pacing tighter"
+castor interact --json --message "continue the current book, but keep the pacing tighter"
 ```
 
 This routes through the same conversation executor used by the project TUI, so OpenClaw, TUI, and Studio stay on the same control brain. The current JSON output includes assistant response text and the interaction session; real completion should still be derived from tool results and files, not from prose claims.
 
-Atomic commands (`plan chapter` / `compose chapter` / `draft` / `audit` / `revise` / `write next`) are still available, but they are now lower-level tools rather than the preferred OpenClaw entry. You can also browse it on [ClawHub](https://clawhub.ai) by searching `inkos`.
+Atomic commands (`plan chapter` / `compose chapter` / `draft` / `audit` / `revise` / `write next`) are still available, but they are now lower-level tools rather than the preferred OpenClaw entry.
 
 ### Agent Skills
 
-InkOS uses the standard `SKILL.md` format directly and no longer maintains a separate InkOS-specific skill protocol. A skill gives the Chat Agent professional guidance and static references, but no extra execution authority. Creating, writing, editing, and image generation still go through InkOS tools and confirmation gates.
+Castor uses the standard `SKILL.md` format directly and no longer maintains a separate Castor-specific skill protocol. A skill gives the Chat Agent professional guidance and static references, but no extra execution authority. Creating, writing, editing, and image generation still go through Castor tools and confirmation gates.
 
 How to use them:
 
@@ -126,7 +110,7 @@ How to use them:
 - Or set `INKOS_SKILL_DIRS=/abs/path/to/skills`; the path may point to one skill directory or a directory containing multiple skill subdirectories. Use the platform path delimiter for multiple paths.
 - Force one for a turn with `@skill-id`, for example: `@detective-play create an evidence-chain open world`.
 - Without `@skill-id`, the Chat Agent decides from the user's current intent whether to call `use_skill`. Session kinds, trigger phrases, and substring matching no longer activate skills.
-- External skills provide instructions and static references only. InkOS never auto-executes their scripts, and a skill cannot bypass existing tool permissions or confirmation gates.
+- External skills provide instructions and static references only. Castor never auto-executes their scripts, and a skill cannot bypass existing tool permissions or confirmation gates.
 - Prompt configuration is not a skill. Built-in prompt packs are edited separately in **Project Settings → Prompt packs**, with project overrides under `prompt/<pack>/<prompt>.md`.
 
 Minimal `SKILL.md`:
@@ -141,12 +125,12 @@ Use evidence chains; do not turn clues into generic atmosphere.
 
 ### Configure
 
-InkOS now separates two configuration paths: **Studio uses visual service settings**, while **CLI / daemon / deployment can still use env overrides**. They do not silently overwrite each other.
+Castor now separates two configuration paths: **Studio uses visual service settings**, while **CLI / daemon / deployment can still use env overrides**. They do not silently overwrite each other.
 
 **Option 1: Studio service settings (recommended for local writing)**
 
 ```bash
-inkos init my-novel
+castor init my-novel
 cd my-novel
 inkos
 ```
@@ -160,12 +144,12 @@ Open Studio, then go to **Model Settings**:
 
 Studio uses project service settings and `.inkos/secrets.json`. It may show env-detection hints, but env files do not override the Studio-selected service/model/base URL/API key.
 
-MiniMax uses the official OpenAI-compatible `/v1/chat/completions` endpoint. InkOS disables returned thinking by default for `MiniMax-M3*`; M2.x thinking cannot be disabled by the upstream service.
+MiniMax uses the official OpenAI-compatible `/v1/chat/completions` endpoint. Castor disables returned thinking by default for `MiniMax-M3*`; M2.x thinking cannot be disabled by the upstream service.
 
 **Option 2: CLI / daemon / deployment env config**
 
 ```bash
-inkos config set-global \
+castor config set-global \
   --lang en \
   --provider <openai|anthropic|custom> \
   --base-url <API endpoint> \
@@ -205,9 +189,9 @@ Assign different models to different agents — balance quality and cost:
 
 ```bash
 # Assign different models/providers to different agents
-inkos config set-model writer <model> --provider <provider> --base-url <url> --api-key-env <ENV_VAR>
-inkos config set-model auditor <model> --provider <provider>
-inkos config show-models        # View current routing
+castor config set-model writer <model> --provider <provider> --base-url <url> --api-key-env <ENV_VAR>
+castor config set-model auditor <model> --provider <provider>
+castor config show-models        # View current routing
 ```
 
 Agents without explicit overrides fall back to the global model.
@@ -215,7 +199,7 @@ Agents without explicit overrides fall back to the global model.
 **Configuration troubleshooting**
 
 ```bash
-inkos doctor
+castor doctor
 ```
 
 `doctor` prints the current effective config mode, where the service / model / API key come from, and runs an API connectivity check. Common modes:
@@ -226,16 +210,16 @@ inkos doctor
 | `cli-project` | CLI runtime: Studio settings as the base, with env and CLI flags layered on top |
 | `legacy-env` | Legacy env mode: compatibility with old `.env`-only projects |
 
-If a service test fails, first check that the service, model, and protocol match each other. Google Gemini AI Studio API keys work with the Gemini OpenAI-compatible endpoint; InkOS automatically disables the OpenAI `store` parameter that Google does not support. MiniMax defaults to the official OpenAI-compatible `/v1/chat/completions` endpoint and prefers a working non-streaming transport, avoiding streams that return usage but no text; `MiniMax-M3*` disables returned thinking by default, while M2.x thinking cannot be disabled upstream.
+If a service test fails, first check that the service, model, and protocol match each other. Google Gemini AI Studio API keys work with the Gemini OpenAI-compatible endpoint; Castor automatically disables the OpenAI `store` parameter that Google does not support. MiniMax defaults to the official OpenAI-compatible `/v1/chat/completions` endpoint and prefers a working non-streaming transport, avoiding streams that return usage but no text; `MiniMax-M3*` disables returned thinking by default, while M2.x thinking cannot be disabled upstream.
 
 ### LLM Configuration Notes
 
 - **Studio / CLI config isolation**: Studio always uses the service page settings and `.inkos/secrets.json`; the CLI, daemon, and deployment environments support env overrides and one-off command flags.
 - **Provider bank capability table**: built-in baseUrl, protocol, models, and compatibility policies for 15 services — Google Gemini, Moonshot, MiniMax, Zhipu (GLM), Bailian (Alibaba Cloud Model Studio), DeepSeek, SiliconFlow, Volcengine, Tencent Hunyuan, Baidu ERNIE (Wenxin), iFlytek Spark, OpenRouter, kkaiapi, Ollama, and CodingPlan.
 - **Model ownership validation**: mismatches like `--service google --model kimi-k2.5` fail immediately, so requests are never sent to the wrong provider.
-- **Google Gemini compatibility fix**: AI Studio API keys work directly with the Gemini OpenAI-compatible endpoint; InkOS automatically disables the OpenAI `store` parameter Google does not support.
+- **Google Gemini compatibility fix**: AI Studio API keys work directly with the Gemini OpenAI-compatible endpoint; Castor automatically disables the OpenAI `store` parameter Google does not support.
 - **MiniMax transport probing**: MiniMax / MiniMax CodingPlan use the official OpenAI-compatible `/v1` entry and automatically pick a working non-streaming transport, working around streams that report usage but return an empty body.
-- **Legacy env compatibility**: the old `INKOS_LLM_BASE_URL + INKOS_LLM_MODEL + INKOS_LLM_API_KEY` combination still works for the CLI; without `INKOS_LLM_SERVICE`, InkOS tries to infer the service from the baseUrl.
+- **Legacy env compatibility**: the old `INKOS_LLM_BASE_URL + INKOS_LLM_MODEL + INKOS_LLM_API_KEY` combination still works for the CLI; without `INKOS_LLM_SERVICE`, Castor tries to infer the service from the baseUrl.
 
 ### Current Interaction Entry Points
 
@@ -243,8 +227,8 @@ If a service test fails, first check that the service, model, and protocol match
 
 - **Studio Chat**: discuss, create books, run Short, generate covers, launch Play, and edit persistent files from one chat surface; heavy actions show confirmation cards.
 - **Creation entries**: Long-form Novel, Short Fiction, Fan Fiction, Spinoff, Style Imitation, Continuation, Branching Interactive, and Open World are available as first-class Studio entries.
-- **TUI dashboard**: `inkos tui` opens the full-screen terminal interface with `/new`, `/short`, `/play`, `/cover`, `/write`, `/confirm`, `/cancel`, and session-level `/model <name>` commands.
-- **External agent entry**: `inkos interact --json --message "..."` remains the structured entry for OpenClaw and other agents.
+- **TUI dashboard**: `castor tui` opens the full-screen terminal interface with `/new`, `/short`, `/play`, `/cover`, `/write`, `/confirm`, `/cancel`, and session-level `/model <name>` commands.
+- **External agent entry**: `castor interact --json --message "..."` remains the structured entry for OpenClaw and other agents.
 - **Atomic commands remain**: `plan` / `compose` / `draft` / `audit` / `revise` / `write next` still work for scripting and advanced usage.
 
 ### Write Your First Book
@@ -252,15 +236,15 @@ If a service test fails, first check that the service, model, and protocol match
 English is the default for English genre profiles. Pick a genre and go:
 
 ```bash
-inkos book create --title "The Last Delver" --genre litrpg     # LitRPG novel (English by default)
-inkos write next my-book          # Write next chapter (full pipeline: draft → audit → revise)
-inkos status                      # Check status
-inkos review list my-book         # Review drafts
-inkos review approve-all my-book  # Batch approve
-inkos export my-book --format epub  # Export EPUB (read on phone/Kindle)
+castor book create --title "The Last Delver" --genre litrpg     # LitRPG novel (English by default)
+castor write next my-book          # Write next chapter (full pipeline: draft → audit → revise)
+castor status                      # Check status
+castor review list my-book         # Review drafts
+castor review approve-all my-book  # Batch approve
+castor export my-book --format epub  # Export EPUB (read on phone/Kindle)
 ```
 
-Language is set per-genre by default. Override explicitly with `--lang en` or `--lang zh`. Use `inkos genre list` to see all available genres and their default languages.
+Language is set per-genre by default. Override explicitly with `--lang en` or `--lang zh`. Use `castor genre list` to see all available genres and their default languages.
 
 ### Write Complete Short Fiction
 
@@ -273,7 +257,7 @@ Write a 12-chapter short fiction piece about a modern marriage reversal where th
 Or run it from the CLI:
 
 ```bash
-inkos short run \
+castor short run \
   --direction "modern short fiction marriage reversal evidence-driven heroine" \
   --chapters 12 \
   --chars 1000
@@ -291,12 +275,12 @@ Generate a short-fiction cover for "The Divorce Papers He Regretted", modern cit
 
 The cover tool writes `covers/<title>/cover-prompt.md` and `covers/<title>/cover.png`. If no cover provider is configured yet, set the cover provider and API key in Studio model settings first.
 
-After generation, you can keep editing the cover prompt through chat, for example: "move the character closer, make the title text bigger, and give her a colder smile." InkOS will pass the revised direction as `coverPrompt`, rewrite `cover-prompt.md`, and regenerate the cover without rewriting the story.
+After generation, you can keep editing the cover prompt through chat, for example: "move the character closer, make the title text bigger, and give her a colder smile." Castor will pass the revised direction as `coverPrompt`, rewrite `cover-prompt.md`, and regenerate the cover without rewriting the story.
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="260" alt="InkOS Short cover example">
-  <img src="assets/play-openworld-warcraft.png" width="260" alt="InkOS Play open-world example">
-  <img src="assets/play-openworld-detective.png" width="260" alt="InkOS Play detective example">
+  <img src="assets/inkos-short-demo-cover.png" width="260" alt="Castor Short cover example">
+  <img src="assets/play-openworld-warcraft.png" width="260" alt="Castor Play open-world example">
+  <img src="assets/play-openworld-detective.png" width="260" alt="Castor Play detective example">
 </p>
 
 ### Launch an Open World or Branching Story
@@ -307,13 +291,13 @@ In Studio Chat, choose **Open World** or **Branching Interactive**, then describ
 Create a Warcraft-like border watchtower open world. Time is not fixed per turn: patrols take an hour, training can take several days. Equipment has rarity, but no stat sheet; show rarity through material, glow, and atmosphere.
 ```
 
-InkOS creates the world, characters, items, evidence, relationships, current scene, and suggested actions. Open World supports free-form actions; Branching Interactive provides clickable choices. When image generation is configured, characters, items, evidence, and scenes can render images directly inside the chat stream.
+Castor creates the world, characters, items, evidence, relationships, current scene, and suggested actions. Open World supports free-form actions; Branching Interactive provides clickable choices. When image generation is configured, characters, items, evidence, and scenes can render images directly inside the chat stream.
 
 ---
 
 ## English Genre Profiles
 
-InkOS ships with 10 English-native genre profiles. Each includes genre-specific rules, pacing, fatigue word detection, and audit dimensions:
+Castor ships with 10 English-native genre profiles. Each includes genre-specific rules, pacing, fatigue word detection, and audit dimensions:
 
 | Genre | Key Mechanics |
 |-------|--------------|
@@ -340,7 +324,7 @@ Every genre includes a **fatigue word list** (e.g., "delve", "tapestry", "testam
 
 Studio Chat is not just a Q&A box. It can create long-form books, run Short, generate covers, launch Play, edit persistent text artifacts, and ask for confirmation before heavy actions. Plain discussion remains plain text; explicit creation requests become tool actions.
 
-### InkOS Play: Open Worlds and Branching Interaction
+### Castor Play: Open Worlds and Branching Interaction
 
 Play maintains a durable interactive world state: characters, locations, items, evidence, relationships, time, current scene, HUD, and images. It is not a hard-coded RPG system. A cultivation world may use rarity and realms; a romance story may use emotional stages; a detective story may use evidence lifecycle and credibility. The rules come from the user's world contract and stay in the world state.
 
@@ -352,11 +336,11 @@ De-AI-ification rules are baked into the Writer agent's prompts: fatigue word li
 
 ### Style Cloning
 
-`inkos style analyze` examines reference text and extracts a statistical fingerprint (sentence length distribution, word frequency patterns, rhythm profiles) plus an LLM-readable style guide. `inkos style import` injects this fingerprint into a book — all future chapters adopt the style, and the Reviser audits against it.
+`castor style analyze` examines reference text and extracts a statistical fingerprint (sentence length distribution, word frequency patterns, rhythm profiles) plus an LLM-readable style guide. `castor style import` injects this fingerprint into a book — all future chapters adopt the style, and the Reviser audits against it.
 
 ### Creative Brief
 
-`inkos book create --brief my-ideas.md` — pass your brainstorming notes, worldbuilding doc, or character sheets. The Architect agent builds from your brief (generating `story_bible.md` and `book_rules.md`) instead of inventing from scratch, and persists the brief into `story/author_intent.md` so the book's long-horizon intent does not disappear after initialization.
+`castor book create --brief my-ideas.md` — pass your brainstorming notes, worldbuilding doc, or character sheets. The Architect agent builds from your brief (generating `story_bible.md` and `book_rules.md`) instead of inventing from scratch, and persists the brief into `story/author_intent.md` so the book's long-horizon intent does not disappear after initialization.
 
 ### Input Governance Control Surface
 
@@ -368,8 +352,8 @@ Every book now has two long-lived Markdown control docs:
 Before writing, you can run:
 
 ```bash
-inkos plan chapter my-book --context "Pull attention back to the mentor conflict first"
-inkos compose chapter my-book
+castor plan chapter my-book --context "Pull attention back to the mentor conflict first"
+castor compose chapter my-book
 ```
 
 This generates `story/runtime/chapter-XXXX.intent.md`, `context.json`, `rule-stack.yaml`, and `trace.json`. `intent.md` is the human-readable contract; the others are execution/debug artifacts. `plan` calls the LLM to produce the chapter intent; `compose` only compiles local documents and state, so it can run before you finish API key setup.
@@ -380,32 +364,32 @@ This generates `story/runtime/chapter-XXXX.intent.md`, `context.json`, `rule-sta
 
 - `--words` sets a target band, not an exact hard promise
 - Chinese chapters default to `zh_chars`; English chapters default to `en_words`
-- If the chapter drifts outside the soft band, InkOS may run one corrective normalization pass (compress or expand) instead of hard-cutting prose
-- If the chapter still misses the hard range after that one pass, InkOS still saves it, but surfaces a visible length warning and telemetry in the result and chapter index
+- If the chapter drifts outside the soft band, Castor may run one corrective normalization pass (compress or expand) instead of hard-cutting prose
+- If the chapter still misses the hard range after that one pass, Castor still saves it, but surfaces a visible length warning and telemetry in the result and chapter index
 
 ### Continuation Writing
 
-`inkos import chapters` imports existing novel text and rebuilds structured state, chapter summaries, hooks, character relationships, and readable Markdown projections. It supports `Chapter N`, custom split patterns, and resumable import. After import, `inkos write next` can continue the story.
+`castor import chapters` imports existing novel text and rebuilds structured state, chapter summaries, hooks, character relationships, and readable Markdown projections. It supports `Chapter N`, custom split patterns, and resumable import. After import, `castor write next` can continue the story.
 
 ### Fan Fiction
 
-`inkos fanfic init --from source.txt --mode canon` creates a fanfic book from source material. Four modes: canon (faithful continuation), au (alternate universe), ooc (out of character), cp (ship-focused). Includes a canon importer, fanfic-specific audit dimensions, and information boundary controls to keep lore consistent.
+`castor fanfic init --from source.txt --mode canon` creates a fanfic book from source material. Four modes: canon (faithful continuation), au (alternate universe), ooc (out of character), cp (ship-focused). Includes a canon importer, fanfic-specific audit dimensions, and information boundary controls to keep lore consistent.
 
 ### Multi-Model Routing
 
-Different agents can use different models and providers. Writer on Claude (stronger creative), Auditor on GPT-4o (cheaper and fast), Radar on a local model (zero cost). `inkos config set-model` configures per-agent; unconfigured agents fall back to the global model.
+Different agents can use different models and providers. Writer on Claude (stronger creative), Auditor on GPT-4o (cheaper and fast), Radar on a local model (zero cost). `castor config set-model` configures per-agent; unconfigured agents fall back to the global model.
 
 ### Daemon Mode + Notifications
 
-`inkos up` starts an autonomous background loop that writes chapters on a schedule. The pipeline continues through handleable non-critical issues, pausing with reviewable results when human judgment is needed. Notifications via Telegram, Feishu (Lark), WeCom (Enterprise WeChat), and Webhook (HMAC-SHA256 signing + event filtering). Logs to `inkos.log` (JSON Lines), `-q` for quiet mode.
+`castor up` starts an autonomous background loop that writes chapters on a schedule. The pipeline continues through handleable non-critical issues, pausing with reviewable results when human judgment is needed. Notifications via Telegram, Feishu (Lark), WeCom (Enterprise WeChat), and Webhook (HMAC-SHA256 signing + event filtering). Logs to `inkos.log` (JSON Lines), `-q` for quiet mode.
 
 ### Local Model Compatibility
 
-Supports any OpenAI-compatible endpoint (`--provider custom`). Stream auto-fallback — when SSE isn't supported, InkOS retries with sync mode automatically. Fallback parser handles non-standard output from smaller models, and partial content recovery kicks in on stream interruption.
+Supports any OpenAI-compatible endpoint (`--provider custom`). Stream auto-fallback — when SSE isn't supported, Castor retries with sync mode automatically. Fallback parser handles non-standard output from smaller models, and partial content recovery kicks in on stream interruption.
 
 ### Reliability
 
-Every chapter creates an automatic state snapshot — `inkos write rewrite` rolls back any chapter to its pre-write state. The Writer outputs a pre-write checklist (context scope, resources, pending hooks, risks) and a post-write settlement table; the Auditor cross-validates both. File locking prevents concurrent writes. Post-write validator includes cross-chapter repetition detection and a dozen hard rules with auto spot-fix.
+Every chapter creates an automatic state snapshot — `castor write rewrite` rolls back any chapter to its pre-write state. The Writer outputs a pre-write checklist (context scope, resources, pending hooks, risks) and a post-write settlement table; the Auditor cross-validates both. File locking prevents concurrent writes. Post-write validator includes cross-chapter repetition detection and a dozen hard rules with auto spot-fix.
 
 The hook system uses Zod schema validation — `lastAdvancedChapter` must be an integer, `status` can only be open/progressing/deferred/resolved. JSON deltas from the LLM are processed through `applyRuntimeStateDelta` (immutable update) and `validateRuntimeState` (structural check) before persistence. Corrupted data is rejected, not propagated.
 
@@ -415,7 +399,7 @@ Model output limits are managed by provider model cards in the provider bank. Re
 
 ## How It Works
 
-InkOS uses a pi-agent harness as its shared reasoning and tool-call kernel. The Agent interprets user intent and emits typed actions; the host executes deterministic tools, enforces confirmation and permissions, manages state, and derives completion from real files and tool results. Long fiction, short fiction, scripts, storyboards, interactive film, Play, and translation share this architecture while retaining dedicated Skills, state models, and production steps.
+Castor uses a pi-agent harness as its shared reasoning and tool-call kernel. The Agent interprets user intent and emits typed actions; the host executes deterministic tools, enforces confirmation and permissions, manages state, and derives completion from real files and tool results. Long fiction, short fiction, scripts, storyboards, interactive film, Play, and translation share this architecture while retaining dedicated Skills, state models, and production steps.
 
 <p align="center">
   <img src="assets/arch-system.svg" width="900" alt="System architecture">
@@ -464,7 +448,7 @@ On Node 22+, a SQLite temporal memory database (`story/memory.db`) is automatica
 
 ### Control Surface and Runtime Artifacts
 
-Alongside runtime state, InkOS splits guardrails from customization into reviewable control docs:
+Alongside runtime state, Castor splits guardrails from customization into reviewable control docs:
 
 - `story/author_intent.md`: long-horizon author intent
 - `story/current_focus.md`: near-term steering
@@ -473,7 +457,7 @@ Alongside runtime state, InkOS splits guardrails from customization into reviewa
 - `story/runtime/chapter-XXXX.rule-stack.yaml`: priority layers and override relationships
 - `story/runtime/chapter-XXXX.trace.json`: compilation trace for this chapter
 
-That means briefs, outline nodes, book rules, and current requests are no longer mashed into one prompt blob; InkOS compiles them first, then writes.
+That means briefs, outline nodes, book rules, and current requests are no longer mashed into one prompt blob; Castor compiles them first, then writes.
 
 ### Writing Rule System
 
@@ -483,13 +467,13 @@ On top of that, each genre has dedicated rules (prohibitions, language constrain
 
 ## Usage Modes
 
-InkOS provides four interaction modes, all sharing the same atomic operations:
+Castor provides four interaction modes, all sharing the same atomic operations:
 
 ### 1. Full Pipeline (One Command)
 
 ```bash
-inkos write next my-book              # Draft → audit → auto-revise, all in one
-inkos write next my-book --count 5    # Write 5 chapters in sequence
+castor write next my-book              # Draft → audit → auto-revise, all in one
+castor write next my-book --count 5    # Write 5 chapters in sequence
 ```
 
 `write next` now uses the `plan -> compose -> write` governance chain by default. If you need the older prompt-assembly path, set this explicitly in `inkos.json`:
@@ -505,11 +489,11 @@ The default is now `v2`. `legacy` remains available as an explicit fallback.
 ### 2. Atomic Commands (Composable, External Agent Friendly)
 
 ```bash
-inkos plan chapter my-book --context "Focus on the mentor conflict first" --json
-inkos compose chapter my-book --json
-inkos draft my-book --context "Focus on the dungeon boss encounter and party dynamics" --json
-inkos audit my-book 31 --json
-inkos revise my-book 31 --json
+castor plan chapter my-book --context "Focus on the mentor conflict first" --json
+castor compose chapter my-book --json
+castor draft my-book --context "Focus on the dungeon boss encounter and party dynamics" --json
+castor audit my-book 31 --json
+castor revise my-book 31 --json
 ```
 
 Each command performs a single operation independently. `--json` outputs structured data. `plan` / `compose` govern inputs; `draft` / `audit` / `revise` handle prose and quality checks. They can be called by external AI agents via `exec`, or used in scripts.
@@ -517,21 +501,21 @@ Each command performs a single operation independently. `--json` outputs structu
 ### 3. Natural Language Agent Mode
 
 ```bash
-inkos agent "Write a LitRPG novel where the MC is a healer class in a dungeon world"
-inkos agent "Write the next chapter, focus on the boss fight and loot distribution"
-inkos agent "Create a progression fantasy about a mage who can only use one spell"
+castor agent "Write a LitRPG novel where the MC is a healer class in a dungeon world"
+castor agent "Write the next chapter, focus on the boss fight and loot distribution"
+castor agent "Create a progression fantasy about a mage who can only use one spell"
 ```
 
 Agent mode exposes tools according to the current session kind: book creation, control-surface edits, planning, composition, writing, audit, revision, Short, cover, and Play tools are only made available where they make sense. The recommended agent flow is: adjust the control surface first, then `plan` / `compose`, then choose draft-only or full-pipeline writing.
 
 ### 4. Studio Play Mode
 
-Studio's **Open World** and **Branching Interactive** entries launch interactive creation without first creating a book. Describe how the world runs, how time advances, whether characters act as agents, and how items/evidence matter. InkOS writes the result back to a local world state so the session can continue.
+Studio's **Open World** and **Branching Interactive** entries launch interactive creation without first creating a book. Describe how the world runs, how time advances, whether characters act as agents, and how items/evidence matter. Castor writes the result back to a local world state so the session can continue.
 
 ## Studio Screenshots and Run Outputs
 
 <p align="center">
-  <img src="assets/studio-dashboard.png" width="760" alt="InkOS Studio creation entry screenshot">
+  <img src="assets/studio-dashboard.png" width="760" alt="Castor Studio creation entry screenshot">
 </p>
 
 <p align="center">
@@ -541,67 +525,67 @@ Studio's **Open World** and **Branching Interactive** entries launch interactive
   <img src="assets/play-item-warcraft.png" width="230" alt="Interactive-world item image output">
 </p>
 
-The first image is a local Studio screenshot. The other images are real local outputs from InkOS Short and InkOS Play: mobile-first short-fiction covers, open-world scenes, detective evidence visuals, and item imagery.
+The first image is a local Studio screenshot. The other images are real local outputs from Castor Short and Castor Play: mobile-first short-fiction covers, open-world scenes, detective evidence visuals, and item imagery.
 
 ## CLI Reference
 
 | Command | Description |
 |---------|-------------|
-| `inkos init [name]` | Initialize project (omit name to init current directory) |
-| `inkos book create` | Create a new book (`--genre`, `--chapter-words`, `--target-chapters`, `--brief <file>`, `--lang en/zh`) |
-| `inkos book update [id]` | Update book settings (`--chapter-words`, `--target-chapters`, `--status`, `--lang`) |
-| `inkos book list` | List all books |
-| `inkos book delete <id>` | Delete a book and all its data (`--force` to skip confirmation) |
-| `inkos genre list/show/copy/create` | View, copy, or create genres |
-| `inkos plan chapter [id]` | Generate the next chapter's `intent.md` (`--context` / `--context-file` for current steering) |
-| `inkos compose chapter [id]` | Generate the next chapter's `context.json`, `rule-stack.yaml`, and `trace.json` |
-| `inkos write next [id]` | Full pipeline: write next chapter (`--words` to override, `--count` for batch, `-q` quiet mode) |
-| `inkos write rewrite [id] <n>` | Rewrite chapter N (restores state snapshot, `--force` to skip confirmation) |
-| `inkos draft [id]` | Write draft only (`--words` to override word count, `-q` quiet mode) |
-| `inkos audit [id] [n]` | Audit a specific chapter |
-| `inkos revise [id] [n]` | Revise a specific chapter |
-| `inkos agent <instruction>` | Natural language agent mode |
-| `inkos review list [id]` | Review drafts |
-| `inkos review approve-all [id]` | Batch approve |
-| `inkos status [id]` | Project status |
-| `inkos export [id]` | Export book (`--format txt/md/epub`, `--output <path>`, `--approved-only`) |
-| `inkos radar scan` | Scan market / trend inputs for new-book direction |
-| `inkos fanfic init` | Create a fanfic book from source material (`--from`, `--mode canon/au/ooc/cp`) |
-| `inkos short run` | Generate a standalone short-fiction package |
-| `inkos eval [id]` | Generate a quality evaluation report (`--json`, chapter ranges) |
-| `inkos consolidate [id]` | Consolidate chapter summaries for long-book context control |
-| `inkos forecast create/show/select` | Create, re-check, and select non-canonical long-form branches; selection saves a candidate plan only |
-| `inkos interact` | External-agent / CLI natural-language entry (`--json`, `--message`, `--book`) |
-| `inkos config set-global` | Set the global CLI / daemon / deployment LLM env config (`~/.inkos/.env`) |
-| `inkos config show-global` | Show the global config |
-| `inkos config set/show` | View or update project configuration |
-| `inkos config set-model <agent> <model>` | Per-agent model override (`--base-url`, `--provider`, `--api-key-env`) |
-| `inkos config remove-model <agent>` | Remove a per-agent model override (fall back to the default) |
-| `inkos config show-models` | Show current model routing |
-| `inkos doctor` | Diagnose setup issues (API connectivity test + provider compatibility hints) |
-| `inkos detect [id] [n]` | AIGC detection (`--all` for all chapters, `--stats` for statistics) |
-| `inkos style analyze <file>` | Analyze reference text to extract style fingerprint |
-| `inkos style import <file> [id]` | Import style fingerprint into a book |
-| `inkos import canon [id] --from <parent>` | Import parent canon into a spinoff book |
-| `inkos import chapters [id] --from <path>` | Import existing chapters for continuation (`--split`, `--resume-from`) |
-| `inkos analytics [id]` / `inkos stats [id]` | Book analytics (audit pass rate, top issues, chapter ranking, token usage) |
-| `inkos update` | Update to the latest version |
-| `inkos` / `inkos studio` | Start web workbench (`-p` for port, default 4567) |
-| `inkos tui` | Start terminal full-screen TUI |
-| `inkos up / down` | Start/stop daemon (`-q` quiet mode, auto-writes `inkos.log`) |
+| `castor init [name]` | Initialize project (omit name to init current directory) |
+| `castor book create` | Create a new book (`--genre`, `--chapter-words`, `--target-chapters`, `--brief <file>`, `--lang en/zh`) |
+| `castor book update [id]` | Update book settings (`--chapter-words`, `--target-chapters`, `--status`, `--lang`) |
+| `castor book list` | List all books |
+| `castor book delete <id>` | Delete a book and all its data (`--force` to skip confirmation) |
+| `castor genre list/show/copy/create` | View, copy, or create genres |
+| `castor plan chapter [id]` | Generate the next chapter's `intent.md` (`--context` / `--context-file` for current steering) |
+| `castor compose chapter [id]` | Generate the next chapter's `context.json`, `rule-stack.yaml`, and `trace.json` |
+| `castor write next [id]` | Full pipeline: write next chapter (`--words` to override, `--count` for batch, `-q` quiet mode) |
+| `castor write rewrite [id] <n>` | Rewrite chapter N (restores state snapshot, `--force` to skip confirmation) |
+| `castor draft [id]` | Write draft only (`--words` to override word count, `-q` quiet mode) |
+| `castor audit [id] [n]` | Audit a specific chapter |
+| `castor revise [id] [n]` | Revise a specific chapter |
+| `castor agent <instruction>` | Natural language agent mode |
+| `castor review list [id]` | Review drafts |
+| `castor review approve-all [id]` | Batch approve |
+| `castor status [id]` | Project status |
+| `castor export [id]` | Export book (`--format txt/md/epub`, `--output <path>`, `--approved-only`) |
+| `castor radar scan` | Scan market / trend inputs for new-book direction |
+| `castor fanfic init` | Create a fanfic book from source material (`--from`, `--mode canon/au/ooc/cp`) |
+| `castor short run` | Generate a standalone short-fiction package |
+| `castor eval [id]` | Generate a quality evaluation report (`--json`, chapter ranges) |
+| `castor consolidate [id]` | Consolidate chapter summaries for long-book context control |
+| `castor forecast create/show/select` | Create, re-check, and select non-canonical long-form branches; selection saves a candidate plan only |
+| `castor interact` | External-agent / CLI natural-language entry (`--json`, `--message`, `--book`) |
+| `castor config set-global` | Set the global CLI / daemon / deployment LLM env config (`~/.inkos/.env`) |
+| `castor config show-global` | Show the global config |
+| `castor config set/show` | View or update project configuration |
+| `castor config set-model <agent> <model>` | Per-agent model override (`--base-url`, `--provider`, `--api-key-env`) |
+| `castor config remove-model <agent>` | Remove a per-agent model override (fall back to the default) |
+| `castor config show-models` | Show current model routing |
+| `castor doctor` | Diagnose setup issues (API connectivity test + provider compatibility hints) |
+| `castor detect [id] [n]` | AIGC detection (`--all` for all chapters, `--stats` for statistics) |
+| `castor style analyze <file>` | Analyze reference text to extract style fingerprint |
+| `castor style import <file> [id]` | Import style fingerprint into a book |
+| `castor import canon [id] --from <parent>` | Import parent canon into a spinoff book |
+| `castor import chapters [id] --from <path>` | Import existing chapters for continuation (`--split`, `--resume-from`) |
+| `castor analytics [id]` / `castor stats [id]` | Book analytics (audit pass rate, top issues, chapter ranking, token usage) |
+| `castor update` | Update to the latest version |
+| `castor` / `castor studio` | Start web workbench (`-p` for port, default 4567) |
+| `castor tui` | Start terminal full-screen TUI |
+| `castor up / down` | Start/stop daemon (`-q` quiet mode, auto-writes `inkos.log`) |
 
 `[id]` is auto-detected when the project has only one book. All commands support `--json` for structured output. `draft` / `write next` / `plan chapter` / `compose chapter` accept `--context` for steering, and `--words` overrides the target chapter size. `book create` supports `--brief <file>` to pass a creative brief — the Architect builds from your ideas instead of generating from scratch. `plan chapter` calls the LLM to create chapter intent; `compose chapter` does not require a live LLM, so you can inspect governed inputs before finishing API setup.
 
 The CLI also accepts one-off LLM override flags at runtime: `--service`, `--model`, `--api-key-env`, `--base-url`, `--api-format <chat|responses>`, `--stream`, `--no-stream`. For example:
 
 ```bash
-inkos write next --service google --model gemini-2.5-flash
-inkos up --service moonshot --model kimi-k2.5 --api-key-env MOONSHOT_API_KEY
+castor write next --service google --model gemini-2.5-flash
+castor up --service moonshot --model kimi-k2.5 --api-key-env MOONSHOT_API_KEY
 ```
 
 ## Roadmap
 
-- [x] ~~`packages/studio` Web UI workbench (Vite + React + Hono)~~ — shipped, run `inkos` or `inkos studio`
+- [x] ~~`packages/studio` Web UI workbench (Vite + React + Hono)~~ — shipped, run `castor` or `castor studio`
 - [x] ~~Interactive fiction / open worlds (branching choices + free actions + generated images)~~ — shipped in Studio Play
 - [ ] Partial chapter intervention (rewrite half a chapter + cascade truth file updates)
 - [ ] Custom agent plugin system
@@ -652,7 +636,7 @@ pnpm typecheck    # Type-check without emitting
 
 ## Acknowledgments
 
-InkOS's agent runtime is built on [pi](https://github.com/badlogic/pi-mono) (`@mariozechner/pi-ai` and `@mariozechner/pi-agent-core`) by Mario Zechner. Thanks to pi for the solid foundation.
+Castor's agent runtime is built on [pi](https://github.com/badlogic/pi-mono) (`@mariozechner/pi-ai` and `@mariozechner/pi-agent-core`) by Mario Zechner. Thanks to pi for the solid foundation.
 
 ## License
 

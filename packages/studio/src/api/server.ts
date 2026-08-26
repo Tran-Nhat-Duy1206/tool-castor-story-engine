@@ -1085,7 +1085,7 @@ type AgentFailureKind = "busy" | "llm" | "internal" | "unknown";
 function classifyAgentFailure(message: string): AgentFailureKind {
   const text = message.trim();
   if (!text) return "unknown";
-  if (/BookWriteLockError|locked by an active InkOS write|BOOK_BUSY/i.test(text)) {
+  if (/BookWriteLockError|locked by an active Castor write|BOOK_BUSY/i.test(text)) {
     return "busy";
   }
   if (
@@ -1115,7 +1115,7 @@ function formatAgentFailure(
   if (kind === "internal") {
     return {
       code: "AGENT_INTERNAL_ERROR",
-      message: pick(lang, `InkOS 内部流程错误：${message}`, `InkOS internal pipeline error: ${message}`),
+      message: pick(lang, `Castor 内部流程错误：${message}`, `Castor internal pipeline error: ${message}`),
       status: 500,
     };
   }

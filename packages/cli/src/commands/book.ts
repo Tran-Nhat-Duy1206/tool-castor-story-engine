@@ -83,7 +83,7 @@ bookCommand
           genre: book.genre,
           platform: book.platform,
           location: `books/${bookId}/`,
-          nextStep: `inkos write next ${bookId}`,
+          nextStep: `castor write next ${bookId}`,
         }, null, 2));
       } else {
         log(formatBookCreateCreated(language, bookId));
@@ -175,7 +175,7 @@ bookCommand
         if (opts.json) {
           log(JSON.stringify({ books: [] }));
         } else {
-          log("No books found. Create one with: inkos book create --title '...'");
+          log("No books found. Create one with: castor book create --title '...'");
         }
         return;
       }
@@ -310,7 +310,7 @@ bookCommand
   .command("restore")
   .description("Restore a whole-book backup (the current book state is automatically backed up first)")
   .argument("<book-id>", "Book ID")
-  .argument("<backup-id>", "Backup ID, see `inkos book backup <book-id> --list`")
+  .argument("<backup-id>", "Backup ID, see `castor book backup <book-id> --list`")
   .option("--json", "Output JSON")
   .action(async (bookId: string, backupId: string, opts) => {
     try {

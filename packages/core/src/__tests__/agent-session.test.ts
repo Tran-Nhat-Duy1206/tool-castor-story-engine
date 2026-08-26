@@ -391,14 +391,14 @@ describe("runAgentSession cache — bookId switch", () => {
     );
 
     expect(result.responseText).toBe("");
-    expect(result.errorMessage).toContain("InkOS context window guard");
+    expect(result.errorMessage).toContain("Castor context window guard");
     expect(streamCalls).toHaveLength(0);
     const events = await readTranscriptEvents(projectRoot, "s-context-window");
     expect(events.some(
       (event: any) =>
         event.type === "request_failed" &&
         typeof event.error === "string" &&
-        event.error.includes("InkOS context window guard"),
+        event.error.includes("Castor context window guard"),
     )).toBe(true);
   });
 

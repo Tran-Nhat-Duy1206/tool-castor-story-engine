@@ -39,7 +39,7 @@ export const autoCommand = new Command("auto")
         if (isNaN(targetChapter)) throw new Error(`Expected target chapter number, got "${args[1]}"`);
         bookId = await resolveBookId(args[0], root);
       } else {
-        throw new Error("Usage: inkos auto [book-id] <target-chapter>");
+        throw new Error("Usage: castor auto [book-id] <target-chapter>");
       }
       if (targetChapter < 1) {
         throw new Error(`Target chapter must be >= 1, got ${targetChapter}`);
@@ -66,7 +66,7 @@ export const autoCommand = new Command("auto")
       }
 
       const config = await loadConfig();
-      // `inkos auto` is unattended batch writing, so the audit→revise loop must
+      // `castor auto` is unattended batch writing, so the audit→revise loop must
       // run inline: force "auto" regardless of book/project reviewMode settings.
       const pipeline = new PipelineRunner(buildPipelineConfig(config, root, {
         quiet: opts.quiet,
@@ -109,7 +109,7 @@ export const autoCommand = new Command("auto")
 
         if (result.status === "state-degraded") {
           throw new Error(
-            `Chapter ${result.chapterNumber} finished in state-degraded status, stopping auto-write. Run "inkos write repair-state ${bookId} ${result.chapterNumber}" first, then re-run inkos auto.`,
+            `Chapter ${result.chapterNumber} finished in state-degraded status, stopping auto-write. Run "castor write repair-state ${bookId} ${result.chapterNumber}" first, then re-run castor auto.`,
           );
         }
       }

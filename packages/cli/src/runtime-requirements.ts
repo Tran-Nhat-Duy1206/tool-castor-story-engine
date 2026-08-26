@@ -48,7 +48,7 @@ export async function inspectNodeRuntimePinFiles(root: string): Promise<NodeRunt
 
   return {
     ok: false,
-    detail: `Missing or outdated: ${missing.join(", ")}. Run 'inkos doctor --repair-node-runtime'.`,
+    detail: `Missing or outdated: ${missing.join(", ")}. Run 'castor doctor --repair-node-runtime'.`,
     missing,
   };
 }
@@ -102,7 +102,7 @@ export function evaluateNodeRuntimeSupport(options?: {
   if (major < MIN_NODE_MAJOR) {
     return {
       ok: false,
-      detail: `Unsupported runtime ${nodeVersion}. InkOS requires Node ${MIN_NODE_MAJOR}+.`,
+      detail: `Unsupported runtime ${nodeVersion}. Castor requires Node ${MIN_NODE_MAJOR}+.`,
     };
   }
 

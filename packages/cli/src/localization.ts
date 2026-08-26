@@ -98,8 +98,8 @@ export function formatBookCreateFoundationReady(language: CliLanguage): string {
 
 export function formatBookCreateNextStep(language: CliLanguage, bookId: string): string {
   return localize(language, {
-    zh: `下一步：inkos write next ${bookId}`,
-    en: `Next: inkos write next ${bookId}`,
+    zh: `下一步：castor write next ${bookId}`,
+    en: `Next: castor write next ${bookId}`,
   });
 }
 
@@ -336,8 +336,8 @@ export function formatImportChaptersComplete(
     }),
     "",
     localize(language, {
-      zh: `运行 "inkos write next ${result.continueBookId}" 继续写作。`,
-      en: `Run "inkos write next ${result.continueBookId}" to continue writing.`,
+      zh: `运行 "castor write next ${result.continueBookId}" 继续写作。`,
+      en: `Run "castor write next ${result.continueBookId}" to continue writing.`,
     }),
   ];
 }
@@ -437,7 +437,7 @@ export function formatFanficSourceTooShortError(length: number): string {
 }
 
 export function formatFanficCanonMissingError(): string {
-  return "No fanfic canon found for this book. Create one with `inkos fanfic init`（该书没有同人正典文件，用 inkos fanfic init 创建同人书）";
+  return "No fanfic canon found for this book. Create one with `castor fanfic init`（该书没有同人正典文件，用 castor fanfic init 创建同人书）";
 }
 
 export function formatFanficSourceDirEmptyError(sourcePath: string): string {
@@ -519,8 +519,8 @@ export function formatBookBackupCreated(language: CliLanguage, bookId: string, b
 
 export function formatBookBackupListEmpty(language: CliLanguage, bookId: string): string {
   return localize(language, {
-    zh: `${bookId} 还没有备份。用 inkos book backup ${bookId} 创建一份。`,
-    en: `No backups for ${bookId} yet. Create one with: inkos book backup ${bookId}`,
+    zh: `${bookId} 还没有备份。用 castor book backup ${bookId} 创建一份。`,
+    en: `No backups for ${bookId} yet. Create one with: castor book backup ${bookId}`,
   });
 }
 

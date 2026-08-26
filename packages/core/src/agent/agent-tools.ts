@@ -192,7 +192,7 @@ const SuggestedActionParam = Type.Union([
     text: Type.Optional(Type.String({ description: "Concrete action text." })),
     title: Type.Optional(Type.String({ description: "Short action title." })),
     description: Type.Optional(Type.String({ description: "Optional action description." })),
-  }, { description: "A model may describe an action as an object; InkOS will normalize it to one short action string." }),
+  }, { description: "A model may describe an action as an object; Castor will normalize it to one short action string." }),
 ], { description: "Suggested action as a string or small action object." });
 
 type SuggestedActionParamType = Static<typeof SuggestedActionParam>;
@@ -411,7 +411,7 @@ const ProposeActionParams = Type.Object({
   }, { description: "Structured execution args for action=continuation_import. This imports and rebuilds state directly after confirmation." })),
   spinoffCreate: Type.Optional(Type.Object({
     title: Type.String({ description: "Confirmed side-story title." }),
-    parentBookId: Type.String({ description: "Existing InkOS parent book id whose canon is inherited." }),
+    parentBookId: Type.String({ description: "Existing Castor parent book id whose canon is inherited." }),
     direction: Type.Optional(Type.String({ description: "Confirmed standalone side-story direction." })),
     genre: Type.Optional(Type.String({ description: "Optional genre override; defaults to the parent book." })),
     platform: Type.Optional(Type.Union([
@@ -461,9 +461,9 @@ function proposedActionFallbackTitle(action: ProposeActionParamsType["action"], 
     case "create_book":
       return isZh ? "创建长篇书籍" : "Create a long-form book";
     case "short_run":
-      return isZh ? "生成 InkOS Short" : "Generate InkOS Short";
+      return isZh ? "生成 Castor Short" : "Generate Castor Short";
     case "play_start":
-      return isZh ? "启动 InkOS Play" : "Start InkOS Play";
+      return isZh ? "启动 Castor Play" : "Start Castor Play";
     case "generate_cover":
       return isZh ? "生成封面" : "Generate cover";
     case "fanfic_init":
@@ -494,7 +494,7 @@ function proposedActionFallbackTitle(action: ProposeActionParamsType["action"], 
 function proposedActionFallbackSummary(action: ProposeActionParamsType["action"], isZh: boolean): string {
   return isZh
     ? "确认后将直接执行这条需求；不会要求你再去另一个表单重复填写。"
-    : "After confirmation, InkOS will run this request directly without asking you to repeat it in another form.";
+    : "After confirmation, Castor will run this request directly without asking you to repeat it in another form.";
 }
 
 function compactObject<T extends Record<string, unknown>>(value: T | undefined): T | undefined {
@@ -803,7 +803,7 @@ const SubAgentParams = Type.Object({
   chapterCount: Type.Optional(Type.Integer({
     minimum: 1,
     maximum: 20,
-    description: "writer only: number of consecutive new chapters to write in this operation. Default: 1. InkOS writes them sequentially under one book lock.",
+    description: "writer only: number of consecutive new chapters to write in this operation. Default: 1. Castor writes them sequentially under one book lock.",
   })),
   // -- architect params --
   title: Type.Optional(Type.String({ description: "architect only: explicit book title. Required when creating a book." })),
@@ -849,7 +849,7 @@ const ArchitectCreateSubAgentParams = Type.Object({
   agent: Type.Literal("architect"),
   instruction: Type.String({ description: "Confirmed self-contained book-creation instruction for the architect." }),
   bookId: Type.Optional(Type.String({
-    description: "Optional new book ID. Usually omit it and let InkOS derive the ID from title.",
+    description: "Optional new book ID. Usually omit it and let Castor derive the ID from title.",
   })),
   title: Type.Optional(Type.String({ description: "Confirmed book title. Required when creating a book." })),
   genre: Type.Optional(Type.String({ description: "Confirmed book genre." })),
@@ -931,7 +931,7 @@ export function createSubAgentTool(
   return {
     name: "sub_agent",
     description: options.architectCreateOnly
-      ? "Create a new long-form InkOS book foundation. This confirmation turn can only call agent='architect'; writing chapters happens after the session is bound to the created book."
+      ? "Create a new long-form Castor book foundation. This confirmation turn can only call agent='architect'; writing chapters happens after the session is bound to the created book."
       : "Delegate a heavy operation to a specialised sub-agent. " +
         "Use agent='architect' to initialise a new book, 'writer' to write the next chapter, " +
         "'auditor' to audit quality, 'reviser' to revise a chapter, 'exporter' to export.",
@@ -1778,7 +1778,7 @@ export function createFanficBookTool(
 
 const SpinoffCreateParams = Type.Object({
   title: Type.String({ description: "Standalone side-story title." }),
-  parentBookId: Type.String({ description: "Existing InkOS parent book id." }),
+  parentBookId: Type.String({ description: "Existing Castor parent book id." }),
   direction: Type.Optional(Type.String({ description: "Side-story direction that must not advance the parent mainline." })),
   genre: Type.Optional(Type.String()),
   platform: Type.Optional(Type.Union([

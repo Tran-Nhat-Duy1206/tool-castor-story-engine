@@ -112,7 +112,7 @@ beforeEach(() => {
   restoreStateMock.mockResolvedValue(true);
 });
 
-describe("inkos write next — State Review gate refusal surfacing", () => {
+describe("castor write next — State Review gate refusal surfacing", () => {
   it("prints the gate refusal verbatim: reason, blocking chapter and Studio pointer, then exits nonzero without replaying", async () => {
     writeNextChapterMock.mockRejectedValue(gateRefusalError(3, 3, 4));
 
@@ -148,7 +148,7 @@ describe("inkos write next — State Review gate refusal surfacing", () => {
   });
 });
 
-describe("inkos write rewrite — State Review gate refusal surfacing", () => {
+describe("castor write rewrite — State Review gate refusal surfacing", () => {
   function setupRewriteFixtures(): void {
     loadChapterIndexMock.mockResolvedValue([
       { number: 4, title: "第四章", wordCount: 1000, status: "approved" },
@@ -174,7 +174,7 @@ describe("inkos write rewrite — State Review gate refusal surfacing", () => {
 });
 
 describe("prose review command surface — no collision with State Review", () => {
-  it("keeps the existing inkos review subcommand set unchanged", async () => {
+  it("keeps the existing castor review subcommand set unchanged", async () => {
     const { reviewCommand } = await import("../commands/review.js");
     const names = reviewCommand.commands.map((command) => command.name()).sort();
     expect(names).toEqual(["approve", "approve-all", "list", "reject"]);

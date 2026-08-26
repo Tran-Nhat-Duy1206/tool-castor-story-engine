@@ -54,7 +54,7 @@ function chapterResult(chapterNumber: number, status = "ready-for-review") {
 
 const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
 
-describe("inkos auto command", () => {
+describe("castor auto command", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     loadBookConfigMock.mockResolvedValue({

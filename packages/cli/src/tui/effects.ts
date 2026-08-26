@@ -468,7 +468,7 @@ export function buildStyledHelpSections(locale: TuiLocale = resolveTuiLocale()):
         commands: [
           ["/clear", "Clear screen"],
           ["/help", "Show this help"],
-          ["/quit", "Exit InkOS TUI"],
+          ["/quit", "Exit Castor TUI"],
         ],
       },
     ];
@@ -500,7 +500,7 @@ export function buildStyledHelpSections(locale: TuiLocale = resolveTuiLocale()):
       commands: [
         ["/clear", "清空当前屏幕"],
         ["/help", "显示帮助"],
-        ["/quit", "退出 InkOS TUI"],
+        ["/quit", "退出 Castor TUI"],
       ],
     },
   ];
