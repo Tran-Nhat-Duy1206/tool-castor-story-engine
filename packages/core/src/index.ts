@@ -124,6 +124,7 @@ export {
   type ConfirmStateReviewResult,
 } from "./state/state-review-finalize.js";
 export { assertCanAdvanceStory } from "./state/advancement-gate.js";
+export { computeProseRevision } from "./utils/prose-revision.js";
 export {
   type PlayActionKind,
   type PlayActionIntentInput,

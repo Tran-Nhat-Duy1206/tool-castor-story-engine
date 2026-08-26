@@ -42,6 +42,7 @@ import {
   buildExportArtifact,
   evaluateBookQuality,
   ConsolidatorAgent,
+  WriterAgent,
   DetectionConfigSchema,
   ResearchSearchConfigSchema,
   GLOBAL_ENV_PATH,
@@ -119,6 +120,15 @@ import {
   readChapterUserBrief,
   readChapterVersion,
   saveChapterUserBrief,
+  loadStateReview,
+  listReceiptsForChapter,
+  decideStateReviewItem,
+  editStateReviewItem,
+  addUserStateReviewItem,
+  removeUserStateReviewItem,
+  rejectAllAiItems,
+  confirmStateReview,
+  StateReviewError,
   createTranslationProjectFromFile,
   loadTranslationChapter,
   loadTranslationManifest,
@@ -2597,6 +2607,15 @@ export function createStudioServer(
      * only). Production leaves this undefined so the real defaults run.
      */
     readonly canonCommitDeps?: CanonCommitDeps;
+    /**
+     * DI seam for the State Review rebuild route (Task 14, tests only): the
+     * injected settler replaces WriterAgent inside the public
+     * `PipelineRunner.regenerateStateReview` boundary. Production leaves this
+     * undefined so the real LLM-backed writer runs.
+     */
+    readonly stateReviewRebuildDeps?: {
+      readonly createWriter: () => Pick<WriterAgent, "settleChapterState">;
+    };
   } = {},
 ) {
   const app = new Hono();
@@ -3008,6 +3027,327 @@ export function createStudioServer(
           console.warn("[inkos] failed to release book lock after canon commit:", releaseError);
         }
       }
+    }
+  });
+
+  // --- Phase 4 State Review (Task 14) --------------------------------------
+  //
+  // Error mapping (frozen contract): StateReviewError `state_review_not_found`
+  // ⇒ 404; every other code ⇒ 409 `{error, code, itemId?}`; non-StateReview
+  // failures ⇒ 500 with a FIXED string (never paths/stacks). BookWriteLockError
+  // keeps the canon-boundary convention (409 book_write_locked).
+
+  function mapStateReviewError(e: unknown): { status: 400 | 404 | 409 | 500; body: Record<string, unknown> } {
+    if (e instanceof StateReviewError) {
+      const body: Record<string, unknown> = { error: e.message, code: e.code };
+      if (e.itemId !== undefined) body.itemId = e.itemId;
+      return {
+        status: e.code === "state_review_not_found" ? 404 : 409,
+        body,
+      };
+    }
+    if (e instanceof BookWriteLockError) {
+      return { status: 409, body: { error: e.message, code: "book_write_locked" } };
+    }
+    console.error("[inkos] state review operation failed:", e);
+    return { status: 500, body: { error: "Internal error while processing the state review." } };
+  }
+
+  async function parseStateReviewTarget(
+    c: Context,
+  ): Promise<
+    | { ok: true; bookId: string; chapter: number }
+    | { ok: false; response: Response }
+  > {
+    const id = c.req.param("id");
+    const chapter = Number.parseInt(c.req.param("num") ?? "", 10);
+    if (!Number.isInteger(chapter) || chapter <= 0) {
+      return { ok: false, response: c.json({ error: "Invalid chapter number.", code: "invalid_request" }, 400) };
+    }
+    // Membership check BEFORE any read so unknown ids never touch the
+    // filesystem or trigger bootstrap side effects.
+    const bookIds = await state.listBooks();
+    if (!bookIds.includes(id ?? "")) {
+      return { ok: false, response: c.json({ error: `Book "${id}" not found`, code: "book_not_found" }, 404) };
+    }
+    return { ok: true, bookId: id!, chapter };
+  }
+
+  function parseExpectedRevision(value: unknown): number | null {
+    const expected = typeof value === "string" ? Number.parseInt(value, 10) : Number(value);
+    return Number.isInteger(expected) && expected >= 1 ? expected : null;
+  }
+
+  const stateReviewBase = "/api/v1/books/:id/chapters/:num/state-review";
+
+  // READ — single-file schema-checked load; no lock required.
+  app.get(stateReviewBase, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    try {
+      const review = await loadStateReview(state.bookDir(target.bookId), target.chapter);
+      return c.json({ bookId: target.bookId, chapter: target.chapter, review });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    }
+  });
+
+  app.get(`${stateReviewBase}/receipts`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    try {
+      const receipts = await listReceiptsForChapter(state.bookDir(target.bookId), target.chapter);
+      return c.json({ bookId: target.bookId, chapter: target.chapter, receipts });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    }
+  });
+
+  /**
+   * CAS mutations. LOCK OWNERSHIP LIVES HERE (same discipline as the canon
+   * commit route): the route wraps the ENTIRE Core call in
+   * `acquireBookLock` … `finally release()` — Core's CAS services add no lock
+   * of their own by design.
+   */
+  app.post(`${stateReviewBase}/decision`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    const body = await c.req.json<{
+      itemId?: string;
+      decision?: string;
+      expectedReviewRevision?: number;
+      overrideExplicitWarning?: boolean;
+    }>().catch(() => undefined) as { itemId?: string; decision?: string; expectedReviewRevision?: number; overrideExplicitWarning?: boolean } | undefined;
+    const expected = parseExpectedRevision(body?.expectedReviewRevision);
+    if (!body?.itemId || (body.decision !== "accept" && body.decision !== "reject") || expected === null) {
+      return c.json({ error: "decision requires itemId, decision(accept|reject) and a positive integer expectedReviewRevision.", code: "invalid_request" }, 400);
+    }
+    let release: (() => Promise<void>) | undefined;
+    try {
+      release = await state.acquireBookLock(target.bookId);
+      const artifact = await decideStateReviewItem({
+        bookDir: state.bookDir(target.bookId),
+        chapter: target.chapter,
+        itemId: body.itemId,
+        decision: body.decision,
+        expectedReviewRevision: expected,
+        ...(typeof body.overrideExplicitWarning === "boolean"
+          ? { overrideExplicitWarning: body.overrideExplicitWarning }
+          : {}),
+      });
+      return c.json({ ok: true, artifact });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    } finally {
+      if (release) {
+        try {
+          await release();
+        } catch (releaseError) {
+          console.warn("[inkos] failed to release book lock after state review decision:", releaseError);
+        }
+      }
+    }
+  });
+
+  app.post(`${stateReviewBase}/edit`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    const body = await c.req.json<{ itemId?: string; editedChange?: unknown; expectedReviewRevision?: number }>().catch(() => undefined);
+    const expected = parseExpectedRevision(body?.expectedReviewRevision);
+    if (!body?.itemId || body.editedChange === undefined || expected === null) {
+      return c.json({ error: "edit requires itemId, editedChange and a positive integer expectedReviewRevision.", code: "invalid_request" }, 400);
+    }
+    let release: (() => Promise<void>) | undefined;
+    try {
+      release = await state.acquireBookLock(target.bookId);
+      const artifact = await editStateReviewItem({
+        bookDir: state.bookDir(target.bookId),
+        chapter: target.chapter,
+        itemId: body.itemId,
+        editedChange: body.editedChange as Parameters<typeof editStateReviewItem>[0]["editedChange"],
+        expectedReviewRevision: expected,
+      });
+      return c.json({ ok: true, artifact });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    } finally {
+      if (release) {
+        try {
+          await release();
+        } catch (releaseError) {
+          console.warn("[inkos] failed to release book lock after state review edit:", releaseError);
+        }
+      }
+    }
+  });
+
+  app.post(`${stateReviewBase}/items`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    const body = await c.req.json<{ kind?: string; change?: unknown; title?: string; expectedReviewRevision?: number }>().catch(() => undefined);
+    const expected = parseExpectedRevision(body?.expectedReviewRevision);
+    if (!body?.kind || !body.title || body.change === undefined || expected === null) {
+      return c.json({ error: "items requires kind, change, title and a positive integer expectedReviewRevision.", code: "invalid_request" }, 400);
+    }
+    let release: (() => Promise<void>) | undefined;
+    try {
+      release = await state.acquireBookLock(target.bookId);
+      const artifact = await addUserStateReviewItem({
+        bookDir: state.bookDir(target.bookId),
+        chapter: target.chapter,
+        kind: body.kind as Parameters<typeof addUserStateReviewItem>[0]["kind"],
+        change: body.change as Parameters<typeof addUserStateReviewItem>[0]["change"],
+        title: body.title,
+        expectedReviewRevision: expected,
+      });
+      return c.json({ ok: true, artifact });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    } finally {
+      if (release) {
+        try {
+          await release();
+        } catch (releaseError) {
+          console.warn("[inkos] failed to release book lock after state review item add:", releaseError);
+        }
+      }
+    }
+  });
+
+  app.delete(`${stateReviewBase}/items/user/:itemId`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    const itemId = c.req.param("itemId");
+    const expected = parseExpectedRevision(c.req.query("expectedReviewRevision"));
+    if (!itemId || expected === null) {
+      return c.json({ error: "removal requires an itemId path param and a positive integer expectedReviewRevision query param.", code: "invalid_request" }, 400);
+    }
+    let release: (() => Promise<void>) | undefined;
+    try {
+      release = await state.acquireBookLock(target.bookId);
+      const artifact = await removeUserStateReviewItem({
+        bookDir: state.bookDir(target.bookId),
+        chapter: target.chapter,
+        itemId,
+        expectedReviewRevision: expected,
+      });
+      return c.json({ ok: true, artifact });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    } finally {
+      if (release) {
+        try {
+          await release();
+        } catch (releaseError) {
+          console.warn("[inkos] failed to release book lock after state review item removal:", releaseError);
+        }
+      }
+    }
+  });
+
+  app.post(`${stateReviewBase}/reject-all`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    const body = await c.req.json<{ expectedReviewRevision?: number; overrideExplicitWarning?: boolean }>().catch(() => undefined);
+    const expected = parseExpectedRevision(body?.expectedReviewRevision);
+    if (expected === null) {
+      return c.json({ error: "reject-all requires a positive integer expectedReviewRevision.", code: "invalid_request" }, 400);
+    }
+    let release: (() => Promise<void>) | undefined;
+    try {
+      release = await state.acquireBookLock(target.bookId);
+      const artifact = await rejectAllAiItems({
+        bookDir: state.bookDir(target.bookId),
+        chapter: target.chapter,
+        expectedReviewRevision: expected,
+        ...(typeof body?.overrideExplicitWarning === "boolean"
+          ? { overrideExplicitWarning: body.overrideExplicitWarning }
+          : {}),
+      });
+      return c.json({ ok: true, artifact });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    } finally {
+      if (release) {
+        try {
+          await release();
+        } catch (releaseError) {
+          console.warn("[inkos] failed to release book lock after reject-all:", releaseError);
+        }
+      }
+    }
+  });
+
+  /**
+   * Final Confirm. `confirmStateReview` ACQUIRES THE PROCESS BOOK LOCK ITSELF
+   * (finalize.ts) for its receipt-first idempotency → PREPARE → commit
+   * sequence; the process lock is intentionally NON-reentrant, so this route
+   * must NOT wrap acquireBookLock around it. Serialization is preserved by
+   * the inner lock against every other writer.
+   */
+  app.post(`${stateReviewBase}/confirm`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    const body = await c.req.json<{ reviewId?: unknown; expectedReviewRevision?: unknown }>().catch(() => undefined) as
+      { reviewId?: unknown; expectedReviewRevision?: unknown } | undefined;
+    // reviewId is REQUIRED (Task 12 identity binding): confirming without it
+    // can never be idempotent and fails BEFORE any lock/Core work.
+    if (typeof body?.reviewId !== "string" || body.reviewId.trim() === "") {
+      return c.json({ error: "confirm requires the reviewId of the loaded generation.", code: "invalid_request" }, 400);
+    }
+    const expected = parseExpectedRevision(body.expectedReviewRevision);
+    if (expected === null) {
+      return c.json({ error: "confirm requires a positive integer expectedReviewRevision.", code: "invalid_request" }, 400);
+    }
+    try {
+      const result = await confirmStateReview({
+        bookDir: state.bookDir(target.bookId),
+        chapter: target.chapter,
+        reviewId: body.reviewId,
+        expectedReviewRevision: expected,
+      });
+      return c.json({
+        ok: true,
+        status: result.status,
+        receipt: result.receipt,
+        resultingCanonRevision: result.resultingCanonRevision,
+        warnings: [...result.warnings],
+      });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
+    }
+  });
+
+  /**
+   * Retry Audit (rebuild). `PipelineRunner.regenerateStateReview` owns the
+   * process book lock internally (runner.ts) — same non-reentrancy as
+   * confirm, so no outer acquireBookLock here. Analyzer/settler failure is
+   * converted by Core into a durable rebuild_failed shell plus
+   * `state_review_rebuild_failed` (Task 10), mapped to 409 below.
+   */
+  app.post(`${stateReviewBase}/rebuild`, async (c) => {
+    const target = await parseStateReviewTarget(c);
+    if (!target.ok) return target.response;
+    try {
+      const pipeline = new PipelineRunner(await buildPipelineConfig());
+      const injectedWriter = overrides?.stateReviewRebuildDeps;
+      const { artifact } = await pipeline.regenerateStateReview(
+        target.bookId,
+        target.chapter,
+        injectedWriter ? { createWriter: () => injectedWriter.createWriter() } : undefined,
+      );
+      return c.json({ ok: true, artifact });
+    } catch (e) {
+      const mapped = mapStateReviewError(e);
+      return c.json(mapped.body, mapped.status);
     }
   });
 
