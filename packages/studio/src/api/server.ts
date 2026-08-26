@@ -128,6 +128,7 @@ import {
   removeUserStateReviewItem,
   rejectAllAiItems,
   confirmStateReview,
+  ReviewItemKindSchema,
   StateReviewError,
   createTranslationProjectFromFile,
   loadTranslationChapter,
@@ -3190,8 +3191,15 @@ export function createStudioServer(
     if (!target.ok) return target.response;
     const body = await c.req.json<{ kind?: string; change?: unknown; title?: string; expectedReviewRevision?: number }>().catch(() => undefined);
     const expected = parseExpectedRevision(body?.expectedReviewRevision);
-    if (!body?.kind || !body.title || body.change === undefined || expected === null) {
-      return c.json({ error: "items requires kind, change, title and a positive integer expectedReviewRevision.", code: "invalid_request" }, 400);
+    // Task14-M1: validate the V1 item-kind family at the Studio boundary so
+    // unsupported kinds answer 400 invalid_request instead of escaping into
+    // Core as a generic 500. The semantic shape validation stays Core-owned.
+    const parsedKind = ReviewItemKindSchema.safeParse(body?.kind);
+    if (!parsedKind.success || !body?.title || body.change === undefined || expected === null) {
+      return c.json({
+        error: `items requires a supported V1 kind (${ReviewItemKindSchema.options.join(", ")}), change, title and a positive integer expectedReviewRevision.`,
+        code: "invalid_request",
+      }, 400);
     }
     let release: (() => Promise<void>) | undefined;
     try {
@@ -3199,7 +3207,7 @@ export function createStudioServer(
       const artifact = await addUserStateReviewItem({
         bookDir: state.bookDir(target.bookId),
         chapter: target.chapter,
-        kind: body.kind as Parameters<typeof addUserStateReviewItem>[0]["kind"],
+        kind: parsedKind.data,
         change: body.change as Parameters<typeof addUserStateReviewItem>[0]["change"],
         title: body.title,
         expectedReviewRevision: expected,

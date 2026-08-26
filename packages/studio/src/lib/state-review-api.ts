@@ -18,6 +18,16 @@ import type {
   StateReviewArtifact,
 } from "@actalk/inkos-core";
 
+/** Browser-safe type surface for pages/models (erased at build time). */
+export type {
+  ActiveStateReviewArtifact,
+  ProposalChange,
+  ResolvedReviewReceipt,
+  ReviewItem,
+  ReviewItemKind,
+  StateReviewArtifact,
+} from "@actalk/inkos-core";
+
 export type StateReviewViewDto = StateReviewArtifact;
 
 export interface StateReviewViewResponseDto {

@@ -6,6 +6,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { ChatPage } from "./pages/ChatPage";
 import { BookDetail } from "./pages/BookDetail";
 import { ChapterReader } from "./pages/ChapterReader";
+import { StateReviewPage } from "./pages/StateReviewPage";
 import { Analytics } from "./pages/Analytics";
 import { ServiceListPage } from "./pages/ServiceListPage";
 import { ServiceDetailPage } from "./pages/ServiceDetailPage";
@@ -98,6 +99,8 @@ export function App() {
     toBookCreate: () => setRoute({ page: "book-create" }),
     toChapter: (bookId: string, chapterNumber: number) =>
       setRoute({ page: "chapter", bookId, chapterNumber }),
+    toStateReview: (bookId: string, chapterNumber: number) =>
+      setRoute({ page: "state-review", bookId, chapterNumber }),
     toAnalytics: (bookId: string) => setRoute({ page: "analytics", bookId }),
     toServices: () => setRoute({ page: "services" }),
     toProjectSettings: () => setRoute({ page: "project-settings" }),
@@ -278,6 +281,13 @@ export function App() {
           {route.page === "chapter" && (
             <div className="mx-auto w-full max-w-[1400px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16 2xl:px-12 fade-in">
               <ChapterReader bookId={route.bookId} chapterNumber={route.chapterNumber} nav={nav} theme={theme} t={t} />
+            </div>
+          )}
+          {route.page === "state-review" && (
+            <div className="mx-auto w-full max-w-[1400px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16 2xl:px-12 fade-in">
+              {/* Keyed by bookId per plan Task 15: switching books remounts
+                  the page so no stale review generation survives. */}
+              <StateReviewPage key={route.bookId} bookId={route.bookId} chapterNumber={route.chapterNumber} nav={nav} />
             </div>
           )}
           {route.page === "analytics" && (

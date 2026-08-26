@@ -317,6 +317,24 @@ describe("state-review HTTP routes (Task 14)", () => {
     expect(removed.artifact.items.some((entry) => entry.origin === "user")).toBe(false);
   });
 
+  it("items add with an unknown kind ⇒ 400 invalid_request at the Studio boundary, never a generic 500 (Task14 M1)", async () => {
+    await seedActiveReview(bookDir);
+    const app = makeApp(root);
+    const res = await post(app, `${base}/items`, {
+      kind: "relationship-rewrite",
+      change: { type: "fact", change: { action: "set", subject: "a", predicate: "b", object: "c" } },
+      title: "Unsupported family",
+      expectedReviewRevision: 1,
+    });
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { code: string; error?: string };
+    expect(body.code).toBe("invalid_request");
+    expect(typeof body.error).toBe("string");
+    // The active artifact must be untouched — zero-write rejection.
+    const get = await app.request(base);
+    expect(((await get.json()) as { review: { reviewRevision: number } }).review.reviewRevision).toBe(1);
+  });
+
   it("reject-all demands the explicit-evidence override, then flips every actionable AI item", async () => {
     await seedActiveReview(bookDir);
     const app = makeApp(root);

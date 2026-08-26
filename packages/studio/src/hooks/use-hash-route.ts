@@ -10,6 +10,7 @@ export type HashRoute =
   | { page: "project-settings" }
   | { page: "service-detail"; serviceId: string }
   | { page: "chapter"; bookId: string; chapterNumber: number }
+  | { page: "state-review"; bookId: string; chapterNumber: number }
   | { page: "analytics"; bookId: string }
   | { page: "truth"; bookId: string }
   | { page: "story-state"; bookId: string }

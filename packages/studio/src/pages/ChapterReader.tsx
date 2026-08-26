@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchJson, useApi, postApi } from "../hooks/use-api";
 import type { Theme } from "../hooks/use-theme";
 import type { TFunction } from "../hooks/use-i18n";
 import { useColors } from "../hooks/use-colors";
 import { ChapterWorkspacePanel } from "../components/ChapterWorkspacePanel";
+import { fetchStateReview, postStateReviewRebuild } from "../lib/state-review-api";
+import type { StateReviewArtifact } from "../lib/state-review-api";
 import {
   ChevronLeft,
   Check,
@@ -11,6 +13,7 @@ import {
   List,
   RotateCcw,
   BookOpen,
+  Brain,
   CheckCircle2,
   XCircle,
   Hash,
@@ -19,6 +22,8 @@ import {
   Pencil,
   Save,
   Eye,
+  FileWarning,
+  RefreshCw,
 } from "lucide-react";
 
 interface ChapterData {
@@ -30,6 +35,7 @@ interface ChapterData {
 interface Nav {
   toBook: (id: string) => void;
   toDashboard: () => void;
+  toStateReview?: (bookId: string, chapterNumber: number) => void;
 }
 
 export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
@@ -47,6 +53,52 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
   const [editContent, setEditContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [workspaceRevision, setWorkspaceRevision] = useState(0);
+
+  // --- Task 15: State Review visibility on the chapter page ---------------
+  // The authoritative workflow state comes from the Task 14 GET contract —
+  // never inferred from the index status alone.
+  const bookIndex = useApi<{ chapters?: ReadonlyArray<{ number: number; status: string }> }>(
+    `/books/${bookId}`,
+  );
+  const chapterStatus = bookIndex.data?.chapters?.find((entry) => entry.number === chapterNumber)?.status;
+  const needsStateReview = chapterStatus === "needs-state-review";
+  const [reviewArtifact, setReviewArtifact] = useState<StateReviewArtifact | null>(null);
+  const [rebuildPending, setRebuildPending] = useState(false);
+  const refreshReviewArtifact = () => {
+    if (!needsStateReview) {
+      setReviewArtifact(null);
+      return;
+    }
+    void fetchStateReview(bookId, chapterNumber)
+      .then((view) => setReviewArtifact(view.review))
+      .catch(() => setReviewArtifact(null));
+  };
+  useEffect(refreshReviewArtifact, [bookId, chapterNumber, needsStateReview]);
+  useEffect(() => {
+    const handler = () => {
+      bookIndex.refetch();
+      refreshReviewArtifact();
+    };
+    window.addEventListener("inkos:api-invalidate", handler);
+    return () => window.removeEventListener("inkos:api-invalidate", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId, chapterNumber, needsStateReview]);
+
+  const handleRetryAudit = async () => {
+    if (rebuildPending) return;
+    setRebuildPending(true);
+    try {
+      const outcome = await postStateReviewRebuild(bookId, chapterNumber);
+      if (outcome.ok) setReviewArtifact(outcome.artifact);
+      else refreshReviewArtifact();
+      bookIndex.refetch();
+    } catch {
+      refreshReviewArtifact();
+    } finally {
+      setRebuildPending(false);
+    }
+  };
+  // ------------------------------------------------------------------------
 
   const handleStartEdit = () => {
     if (!data) return;
@@ -195,6 +247,70 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
           </button>
         </div>
       </div>
+
+      {/* Task 15: rebuild-failed banner (Retry Audit / Review State) */}
+      {needsStateReview && reviewArtifact?.status === "rebuild_failed" && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5" role="alert">
+          <div className="flex items-center gap-2 text-sm font-medium text-destructive">
+            <FileWarning size={15} />
+            状态复核重建失败 · State review rebuild failed
+          </div>
+          {reviewArtifact.reason && (
+            <p className="mt-1.5 break-words text-xs text-muted-foreground">{reviewArtifact.reason}</p>
+          )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => void handleRetryAudit()}
+              disabled={rebuildPending}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm disabled:opacity-50"
+            >
+              {rebuildPending ? (
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground/20 border-t-primary-foreground" />
+              ) : (
+                <RefreshCw size={13} />
+              )}
+              重试审计 · Retry Audit
+            </button>
+            {nav.toStateReview && (
+              <button
+                onClick={() => nav.toStateReview?.(bookId, chapterNumber)}
+                className="inline-flex items-center gap-2 rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
+              >
+                查看详情 · Details
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Task 15: needs-state-review badge + entry point (design §26) */}
+      {needsStateReview && reviewArtifact?.status !== "rebuild_failed" && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/5 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-amber-600">
+            <Brain size={16} />
+            需要人工状态复核 · State Review Required
+          </div>
+          {reviewArtifact?.status === "rebuild_required" || reviewArtifact?.status === "stale" ? (
+            <button
+              onClick={() => void handleRetryAudit()}
+              disabled={rebuildPending}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm disabled:opacity-50"
+            >
+              <RefreshCw size={13} />
+              重建状态复核 · Rebuild State Review
+            </button>
+          ) : null}
+          {nav.toStateReview && (
+            <button
+              onClick={() => nav.toStateReview?.(bookId, chapterNumber)}
+              data-testid="open-state-review"
+              className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-600 hover:bg-amber-500 hover:text-white transition-all"
+            >
+              审阅状态修改 · Review State Changes
+            </button>
+          )}
+        </div>
+      )}
 
       <ChapterWorkspacePanel
         key={`${chapterNumber}-${workspaceRevision}`}
