@@ -348,6 +348,44 @@ export function isExplicitEvidenceWarningRequired(view: MutationOutcomeView): bo
   return view.tone === "explicit-warning-required";
 }
 
+// ---------------------------------------------------------------------------
+// §6 batch Reject-All flow (pure control state — review C1)
+// ---------------------------------------------------------------------------
+
+export interface RejectAllUiPatch {
+  /**
+   * TRUE when the §6 armed confirmation must STAY open. An
+   * explicit-evidence outcome arms the dialog and it MUST survive the whole
+   * request lifecycle — a `finally` disarm here silently killed the batch
+   * friction in review C1.
+   */
+  readonly armed: boolean;
+  /** Adopt the authoritative artifact from a successful mutation. */
+  readonly adoptArtifact: boolean;
+  /** CAS conflict ⇒ refetch the latest artifact; never auto-retry. */
+  readonly refetchLatest: boolean;
+}
+
+export function rejectAllUiPatch(
+  _prior: { readonly armed: boolean },
+  outcome: StateReviewMutationOutcome,
+  lang: UiLanguage,
+): RejectAllUiPatch {
+  void _prior; // armed state is derived from the outcome, not accumulated
+  const view = mutationOutcomeToUi(outcome, lang);
+  if (view.tone === "explicit-warning-required") {
+    // Friction hit: arm (keep armed) and wait for the human's second action.
+    return { armed: true, adoptArtifact: false, refetchLatest: false };
+  }
+  return {
+    armed: false,
+    // Success ADOPTS the returned artifact (no separate refetch); conflicts
+    // never adopt and always demand the latest state instead.
+    adoptArtifact: outcome.ok,
+    refetchLatest: !outcome.ok && view.refetchLatest,
+  };
+}
+
 export function mutationOutcomeToUi(
   outcome: StateReviewMutationOutcome,
   _lang: UiLanguage,

@@ -53,6 +53,7 @@ import {
   mutationOutcomeToUi,
   receiptChips,
   rebuildFailedBannerView,
+  rejectAllUiPatch,
   reviewKindLabel,
   reviewProgress,
   type ConfirmOutcomeView,
@@ -198,7 +199,11 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
       setEditingItemId(null);
       setEditDraft({});
     } else if (view.refetchLatest) {
-      void refetchReview(); // CAS conflict: load latest, never auto-retry
+      // CAS conflict: load latest and DISCARD stale buffers — the human must
+      // reassess against current state; nothing auto-overwrites server data.
+      setEditingItemId(null);
+      setEditDraft({});
+      void refetchReview();
     }
   };
 
@@ -291,18 +296,23 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
         expectedReviewRevision: active.reviewRevision,
         ...(overrideExplicitWarning ? { overrideExplicitWarning: true } : {}),
       });
+      // §6 batch flow is owned by the pure model: an explicit-evidence
+      // outcome ARMS the confirmation and it must STAY armed across this
+      // lifecycle (review C1 — a finally-disarm here used to make the
+      // friction dialog unreachable).
+      const patch = rejectAllUiPatch({ armed: rejectAllArmed }, outcome, lang);
       const view = mutationOutcomeToUi(outcome, lang);
-      if (view.tone === "explicit-warning-required") {
-        setRejectAllArmed(true); // §6 batch friction: explicit second confirmation
-        return;
+      setRejectAllArmed(patch.armed);
+      setMutationView(view.tone === "success" ? null : view.tone === "explicit-warning-required" ? null : view);
+      if (patch.adoptArtifact && outcome.ok) setReview(outcome.artifact);
+      else if (patch.refetchLatest) {
+        setEditingItemId(null);
+        setEditDraft({});
+        void refetchReview();
       }
-      setMutationView(view.tone === "success" ? null : view);
-      if (outcome.ok) setReview(outcome.artifact);
-      else if (view.refetchLatest) void refetchReview();
     } catch (e) {
       setMutationView(mutationOutcomeToUi({ ok: false, message: e instanceof Error ? e.message : String(e) }, lang));
     } finally {
-      setRejectAllArmed(false);
       setPendingAction(null);
     }
   };
@@ -579,8 +589,6 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
           setUserDraft={setUserDraft}
           draftIssues={draftIssues}
           rejectAllArmed={rejectAllArmed}
-          onRejectAllArm={() => setRejectAllArmed(true)}
-          onRejectAllCancel={() => setRejectAllArmed(false)}
           onAccept={handleAccept}
           onReject={handleRejectClick}
           onStartEdit={startEdit}
@@ -738,8 +746,6 @@ interface ActiveSurfaceProps {
   setUserDraft: (draft: UserDraft) => void;
   draftIssues: string[];
   rejectAllArmed: boolean;
-  onRejectAllArm: () => void;
-  onRejectAllCancel: () => void;
   onAccept: (item: ReviewItem) => void;
   onReject: (item: ReviewItem) => void;
   onStartEdit: (item: ReviewItem) => void;
@@ -1018,10 +1024,11 @@ function ReviewItemCard({
         )}
       </div>
 
-      {/* Actions */}
-      {!isNote && (
+      {/* Actions — Core permits re-deciding an active item, so decided AI
+          items keep their affordances (review I1); CAS protects each call. */}
+      {!isNote && !editing && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {!isUser && !decided && !editing && (
+          {!isUser && (
             <>
               <ActionButton onClick={onAccept} disabled={busy} tone="positive" label={zh ? "接受" : "Accept"} icon={<Check size={12} />} />
               <ActionButton onClick={onStartEdit} disabled={busy} tone="neutral" label={zh ? "编辑" : "Edit"} icon={<Pencil size={12} />} />
@@ -1031,9 +1038,9 @@ function ReviewItemCard({
           {isUser && (
             <ActionButton onClick={onRemove} disabled={busy} tone="negative" label={zh ? "删除" : "Remove"} icon={<Trash2 size={12} />} />
           )}
-          {decided && !isUser && !editing && (
+          {decided && !isUser && (
             <span className="self-center text-[11px] text-muted-foreground">
-              {zh ? "已裁定（可重新编辑更改决定）" : "decided (edit to change your decision)"}
+              {zh ? "已裁定 · 可再次修改决定" : "decided · you can change this decision"}
             </span>
           )}
         </div>

@@ -75,7 +75,13 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
   };
   useEffect(refreshReviewArtifact, [bookId, chapterNumber, needsStateReview]);
   useEffect(() => {
-    const handler = () => {
+    const handler = (event: Event) => {
+      // Only react to invalidations that actually touch this book's data.
+      const detail = (event as CustomEvent<{ paths?: ReadonlyArray<string> }>).detail;
+      const paths = detail?.paths ?? [];
+      if (paths.length > 0 && !paths.some((path) => path.includes(`/books/${bookId}`))) {
+        return;
+      }
       bookIndex.refetch();
       refreshReviewArtifact();
     };

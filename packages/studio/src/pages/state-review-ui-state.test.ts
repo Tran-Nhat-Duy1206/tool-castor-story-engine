@@ -21,6 +21,7 @@ import {
   mutationOutcomeToUi,
   receiptChips,
   rebuildFailedBannerView,
+  rejectAllUiPatch,
   reviewProgress,
   reviewKindLabel,
 } from "./state-review-ui-state";
@@ -259,6 +260,44 @@ describe("decision dispatches", () => {
     expect(isExplicitEvidenceWarningRequired(blocked)).toBe(true);
     expect(blocked.tone).toBe("explicit-warning-required");
     expect(blocked.itemId).toBe("item-fact");
+  });
+});
+
+describe("rejectAllUiPatch — §6 batch flow (review C1 regression)", () => {
+  const frictionOutcome = {
+    ok: false as const,
+    code: "state_review_invalid_change",
+    itemId: "item-fact",
+    message:
+      "explicit-evidence-warning-required: batch includes verified explicit AI proposals; pass overrideExplicitWarning to Reject Anyway",
+  };
+
+  it("an explicit-evidence outcome ARMS the dialog and it STAYS armed (never disarmed by the request lifecycle)", () => {
+    // C1 regression pin: previously the page's `finally` block reset the
+    // armed flag after the arming branch returned, making the §6 dialog
+    // unreachable whenever a verified-explicit item existed.
+    const patch = rejectAllUiPatch({ armed: false }, frictionOutcome, "zh");
+    expect(patch.armed).toBe(true);
+    expect(patch.adoptArtifact).toBe(false);
+    expect(patch.refetchLatest).toBe(false);
+  });
+
+  it("a successful batch keeps nothing armed and adopts the authoritative artifact", () => {
+    const patch = rejectAllUiPatch(
+      { armed: true },
+      { ok: true, artifact: activeReview([]) },
+      "en",
+    );
+    expect(patch).toEqual({ armed: false, adoptArtifact: true, refetchLatest: false });
+  });
+
+  it("a CAS conflict disarms without adopting and demands a refetch", () => {
+    const patch = rejectAllUiPatch(
+      { armed: true },
+      { ok: false, code: "state_review_edit_conflict", message: "moved" },
+      "en",
+    );
+    expect(patch).toEqual({ armed: false, adoptArtifact: false, refetchLatest: true });
   });
 });
 
