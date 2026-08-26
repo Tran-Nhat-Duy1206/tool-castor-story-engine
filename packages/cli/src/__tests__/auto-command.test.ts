@@ -137,4 +137,46 @@ describe("inkos auto command", () => {
     );
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
+
+  // Task 16 — CLI refusal surfacing (hardened plan): the Phase 4 advancement
+  // gate refuses unattended batch writing when a chapter's human-governed
+  // State Review is unresolved. The refusal text Core throws MUST reach the
+  // terminal VERBATIM — "State Review" + the blocking chapter + the Studio
+  // pointer — so an author is guided to the right interface instead of seeing
+  // a generic failure.
+  it("surfaces the State Review gate refusal verbatim: reason, blocking chapter and Studio pointer", async () => {
+    getNextChapterNumberMock.mockResolvedValue(3);
+    // Exact blocker shape thrown by assertCanAdvanceStory (advancement-gate).
+    writeNextChapterMock.mockRejectedValue(new Error(
+      "State Review for chapter 3 is unresolved and its proposed changes affect "
+      + "chapter 3, which is not ahead of chapter 3. Resolve chapter 3's State "
+      + "Review in Studio before generating chapter 3. Open State Review in Studio.",
+    ));
+
+    const { autoCommand } = await import("../commands/auto.js");
+    await autoCommand.parseAsync(["node", "auto", "demo-book", "5"], { from: "node" });
+
+    expect(writeNextChapterMock).toHaveBeenCalledTimes(1); // stopped immediately, no replay
+    const printed = logErrorMock.mock.calls.map((call) => String(call[0])).join("\n");
+    expect(printed).toContain("State Review");
+    expect(printed).toContain("chapter 3");
+    expect(printed).toContain("Open State Review in Studio.");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it("keeps the gate refusal intact in --json mode", async () => {
+    getNextChapterNumberMock.mockResolvedValue(1);
+    writeNextChapterMock.mockRejectedValue(new Error(
+      "Chapter 1 has not completed its review gate (status: needs-state-review). "
+      + "Open State Review in Studio.",
+    ));
+
+    const { autoCommand } = await import("../commands/auto.js");
+    await autoCommand.parseAsync(["node", "auto", "demo-book", "2", "--json"], { from: "node" });
+
+    const printed = logMock.mock.calls.map((call) => String(call[0])).join("\n");
+    expect(printed).toContain("State Review");
+    expect(printed).toContain("Open State Review in Studio.");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
 });
