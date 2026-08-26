@@ -100,11 +100,16 @@ No `governance` capability/version markers exist yet anywhere (verified); they a
 - Phase 4 Final Confirm remains the Canon settlement boundary.
 - Direct declared dependency invalidation only — no recursive cascade at change time.
 - Approved/published Foundation is AI-readable and AI-immutable.
-- Published versions immutable; never backward pointer moves.
+- Published versions immutable; never backward pointer moves. **Published Foundation is
+  ONE global authority version (Foundation v1, v2, …) identifying the complete
+  authoritative Foundation state** — individual unit revisions are governed beneath it,
+  never confused with the global version number.
 - No silent semantic `CANON_CONFLICT` classification by AI (deterministic Core only).
 - Lookahead is advisory only; scores are informational only.
 - Authorization consumes only on Canon evidence — derived and validated by Core, never
-  from a raw caller ID list — atomically with Canon settlement.
+  from a raw caller ID list — atomically with Canon settlement. **There is exactly ONE
+  ACTIVE→CONSUMED transition: the Phase 4 Final Confirm / Canon settlement transaction;
+  no standalone consumption write path exists.**
 - Writer cannot run without a valid immutable Execution Snapshot; the CORE production
   write entry enforces this (CLI/Studio are not the security boundary).
 - One deliberate Write action produces at most one chapter.
@@ -133,17 +138,17 @@ New files (all under `packages/`; tests beside sources per repo convention
 | `core/src/governance/dependencies.ts` | `DependencyManager` — Core-owned dep semantics, concrete links, direct-only invalidation, graph validity | T4 |
 | `core/src/governance/conflicts.ts` | Two-layer conflict classifier (deterministic Core vs semantic AI) + Human Resolution Record | T6 |
 | `core/src/governance/authorizations.ts` | Author Decision vocabulary, pending→active Authorization, typed scopes/conditions, evidence-derived consumption, Core Human Direction NL parser | T11 |
-| `core/src/governance/versions.ts` | **Generic version/history primitives only**: `VersionEnvelope<T>`, `VersionStore`, `restoreVersionAsRevisionCandidate` (never publishes, never advances the current pointer) | T5 |
+| `core/src/governance/versions.ts` | **Generic version/history primitives only**: `VersionEnvelope<T>`, `FoundationPublishedSnapshot` (global whole-Foundation snapshot), read-only `VersionStore` (read/current/list/integrity) + `prepareVersionAppend`/`prepareCurrentVersionPointer` (writes committed ONLY by the Task 9 coordinator), `restoreVersionAsRevisionCandidate` (never publishes, never advances the current pointer) | T5 |
 | `core/src/governance/transactions.ts` | **Single authoritative `TransactionCoordinator`** (PREPARE/VALIDATE/STAGE/JOURNAL/COMMIT/MATERIALIZE/FINALIZE) over `atomic-file-set` | T9 |
 | `core/src/governance/provenance.ts` | Provenance recorder (version/evidence/resolution provenance records) | T5/T6 |
-| `core/src/foundation/manifest.ts` | Foundation V2 unit manifests with **logical content locators** (whole_file / section / rule / entry), identity, kind, importance, status, deps, revision, approval, staleness, provenance | T2 |
-| `core/src/foundation/bootstrap.ts` | Governance-mode detection, legacy parse → `legacy_established`, opt-in upgrade **candidate preparation** (`status: "prepared"` only, no preflight, never publishes) | T3 |
+| `core/src/foundation/manifest.ts` | Foundation V2 unit manifests with **logical content locators** (whole_file / section / rule / entry), identity, kind, importance, status, deps, revision, approval, staleness, provenance (internal persistence primitive only) | T2 |
+| `core/src/foundation/bootstrap.ts` | Governance-mode detection, legacy parse → `legacy_established`, opt-in upgrade **candidate preparation** (`status: "prepared"`, ephemeral; no preflight, never publishes) — consumed by T10 which persists a durable revisionId | T3 |
 | `core/src/foundation/review.ts` | Finding schema, reviewer-only diagnosis, bounded repair policy (2 rounds), verification invocation | T7 |
-| `core/src/foundation/revision-service.ts` | **Core Foundation Human review operations**: open/load/save draft, approve, mark-needs-revision, reapprove-stale, discard — the ONLY approval state transitions (never publishes) | T8 |
-| `core/src/foundation/publish.ts` | Foundation Publish gate + explicit Human Publish + atomic V2 marker activation + external-edit Compare/Adopt/Discard, on the shared TransactionCoordinator | T9 |
-| `core/src/foundation/pipeline.ts` | Adaptive intake (0–3 MUST-KNOW gaps), global generate → global review → local repair → **Human-reviewable Revision Draft** (never publishes) | T10 |
-| `core/src/planning/arc-plan.ts` | Arc Plan draft/restore-candidate/publish interfaces, `ArcPlanVersion = VersionEnvelope<ArcPlanSnapshot>`, consuming T5/T9 primitives | T12 |
-| `core/src/planning/arc-pipeline.ts` | **Arc Planner + Arc preflight pipeline**: generate Arc Draft, deterministic preflight, semantic review, Arc findings, LOCAL repair, verification, 2-round cap, AUTHOR_DECISION routing | T13 |
+| `core/src/foundation/revision-service.ts` | **Core Foundation Human review operations**: open/load/save draft, approve, mark-needs-revision, reapprove-stale, discard — Core computes/verifies hash+revision (caller never supplies truth); the ONLY approval transitions; never publishes | T8 |
+| `core/src/foundation/publish.ts` | Foundation Publish gate (evaluated over trusted persisted state) + explicit Human Publish + atomic V2 marker activation + external-edit Compare/Adopt/Discard, on the shared TransactionCoordinator | T9 |
+| `core/src/foundation/pipeline.ts` | Adaptive intake (0–3 MUST-KNOW gaps), global generate → global review → local repair → **durable Human-reviewable revisionId** (never publishes) | T10 |
+| `core/src/planning/arc-plan.ts` | Arc Plan **storage/domain only**: `ArcPlanSnapshot`, `ArcPlanDraftRecord`, `saveArcPlanDraft`/`loadArcPlanDraft`, read-only Published history, `restoreArcPlanAsRevisionDraft`, Beat model/evidence — NO publish | T12 |
+| `core/src/planning/arc-pipeline.ts` | **Arc Planner + Arc preflight + Human Publish boundary**: generate Arc Draft (via T12 save), persisted preflight bound to draft hash + Foundation/Canon bases, semantic review, LOCAL repair, verification, `publishArcPlan`, atomic planning V2 marker | T13 |
 | `core/src/planning/beats.ts` | Major Beat lifecycle/importance/categories + Canon-evidence evaluation (deterministic + semantic) | T12 |
 | `core/src/planning/lookahead.ts` | Advisory Rolling Lookahead with typed `PlanningDependencyRef` provenance + selective invalidation | T14 |
 | `core/src/planning/detailed-plan.ts` | Detailed Chapter Plan V2 evolving `ChapterIntent/ChapterMemo`, typed binding refs, PLAN_SCOPE_TOO_BROAD | T15 |
@@ -187,8 +192,8 @@ set) and `models/book.ts` (T1 additive optional field).
 9  → T9    TransactionCoordinator + Foundation Human Publish + atomic V2 marker + external edits
 10 → T10   Foundation AI pipeline (stops at Human-reviewable Draft)
 11 → T11   Human Direction + Authorization (pending→active, typed scopes) + Core NL parser
-12 → T12   Arc Plan storage + Major Beat authority (draft/publish/restore-candidate)
-13 → T13   Arc Planner + Arc preflight pipeline (deterministic + semantic + repair)
+12 → T12   Arc Plan storage + Major Beat model (NO publish)
+13 → T13   Arc Planner + Arc preflight + Human Publish boundary
 14 → T14   Rolling Lookahead lifecycle + typed selective invalidation
 15 → T15   Detailed Chapter Plan V2
 16 → T16   Planning Gate + planning-specific bounded repair
@@ -205,10 +210,14 @@ set) and `models/book.ts` (T1 additive optional field).
 ```
 
 Post-review corrections: restore produces revision candidates only (T5/T12); the Arc
-Planner/preflight pipeline is a real task (T13); the Core write gate lives in
-`runner.ts` (T19); Foundation Human approval is a dedicated Core service (T8); V2
-marker activation is atomic with first Human Publish (T9/T12); planning/context
-dependency refs share one typed vocabulary (T1).
+Planner/preflight pipeline is a real task (T13) and `publishArcPlan` lives THERE, not in
+T12 (storage-only) — no Core path can create Arc authority before preflight exists; the
+Core write gate lives in `runner.ts` (T19) with an explicit governance-mode write
+matrix; Foundation Human approval is a dedicated Core service (T8) that computes/verifies
+state; Foundation Publish loads trusted persisted revision state (T9); V2 marker
+activation is atomic with first Human Publish (T9/T13); Authorization becomes CONSUMED
+only inside Canon settlement (T20); planning/context dependency refs share one typed
+vocabulary capturing observed state (T1).
 
 ---
 
@@ -252,6 +261,7 @@ export const HookLifecycleStateSchema = z.enum([
   "resolved", "deferred", "abandoned",
 ]);
 export const HookAuthorityLevelSchema = z.enum(["foundation_hook", "runtime_hook"]);
+export type HookAuthorityLevel = z.infer<typeof HookAuthorityLevelSchema>; // inferred TS type for interfaces
 export const TimelineConstraintKindSchema = z.enum(["hard", "soft", "target"]);
 export const BookRuleKindSchema = z.enum([
   "pov", "language", "style", "content_boundary", "world_invariant",
@@ -300,16 +310,23 @@ export const AttemptDefectSchema = z.enum([
   "prose_defect", "plan_defect", "authority_defect", "canon_conflict",
 ]);
 // Typed dependency refs shared by Lookahead / Detailed Plan / Context (single vocabulary).
+// Each variant records the OBSERVED source state so selective revalidation can answer
+// deterministically: "Has THIS declared dependency changed since I planned against it?"
 export type PlanningDependencyRef =
-  | { kind: "foundation_unit"; unitId: string; revision: number }
-  | { kind: "canon_fact"; factKey: string; canonRevision: number }
-  | { kind: "hook"; hookId: string; authority: HookAuthorityLevelSchema }
-  | { kind: "relationship"; relationshipId: string }
-  | { kind: "timeline"; anchorId: string }
-  | { kind: "character_state"; characterId: string }
-  | { kind: "arc_beat"; beatId: string }
-  | { kind: "human_direction"; directionId: string }
-  | { kind: "authorization"; authorizationId: string };
+  | { kind: "foundation_unit"; unitId: string; contentRevision: number; approvedRevision: number; foundationVersion: number }
+  | { kind: "canon_fact"; factKey: string; canonRevision: number; evidenceRevision: string }
+  | { kind: "hook"; hookId: string; authority: HookAuthorityLevel; observedLifecycleRevision: string }
+  | { kind: "relationship"; relationshipId: string; observedStateRevision: string }
+  | { kind: "timeline"; anchorId: string; observedRevision: string }
+  | { kind: "character_state"; characterId: string; observedStateRevision: string }
+  | { kind: "arc_beat"; beatId: string; observedEvidenceRevision: string }
+  | { kind: "human_direction"; directionId: string; lifecycleRevision: string }
+  | { kind: "authorization"; authorizationId: string; lifecycleRevision: string; confirmedAt?: string };
+// The observed token is a revision number or a stable hash depending on the existing
+// store; the artifact MUST carry enough information to detect a direct change without
+// staling on unrelated Canon changes. A schema member like HookAuthorityLevelSchema is
+// exported as `type HookAuthorityLevel = z.infer<typeof HookAuthorityLevelSchema>` —
+// interfaces use the inferred TS type, never the zod value.
 ```
 
 **Steps**
@@ -468,28 +485,49 @@ depends on them; protagonist always required; graph cycles rejected.
 - Create `packages/core/src/governance/versions.ts`
 - Create `packages/core/src/__tests__/governance-versions.test.ts`
 
-**Interfaces** (generic only — NO forward type references)
+**Interfaces** (generic only — NO forward type references; the Foundation version is ONE
+global authority version, NOT a per-unit version)
 
 ```ts
 export interface VersionEnvelope<TSnapshot> {
   readonly artifactKind: "foundation" | "arc_plan";
-  readonly unitId: string;                 // or arcId for arc plans
+  readonly unitId: string;                 // "foundation" for the whole-Foundation snapshot; arcId for arc plans
   readonly version: number;
   readonly parentVersion: number | null;
   readonly baseCanonRevision: number;
-  readonly contentHash: string;
+  readonly contentHash: string;            // hash of the snapshot record (governance refs only)
   readonly snapshot: TSnapshot;
   readonly publishedAt: string;
   readonly publishedBy: string;
   readonly restoredFromVersion?: number;
 }
-export type FoundationVersion = VersionEnvelope<FoundationUnitManifest>; // type exists since T2
+// Whole-Foundation authoritative snapshot: ONE global Foundation version (v1, v2, v3…).
+// Stores governance refs/hashes ONLY — creative Markdown prose is NEVER duplicated into JSON.
+export interface FoundationPublishedSnapshot {
+  readonly unitRefs: ReadonlyArray<{
+    readonly unitId: string;
+    readonly contentRevision: number;
+    readonly approvedRevision: number;
+    readonly contentHash: string;
+  }>;
+  readonly changedUnitIds: ReadonlyArray<string>;
+  readonly humanResolutionIds: ReadonlyArray<string>;
+  readonly dependencyImpact: ReadonlyArray<string>;
+  readonly baseCanonRevision: number;
+}
+export type FoundationVersion = VersionEnvelope<FoundationPublishedSnapshot>;
+// READ-ONLY history access. Version WRITES are prepared here and COMMITTED only by the
+// Task 9 TransactionCoordinator — never appended standalone.
 export interface VersionStore {
-  readonly appendVersion: <T>(v: VersionEnvelope<T>) => Promise<VersionEnvelope<T>>;
+  readonly prepareVersionAppend: <T>(v: Omit<VersionEnvelope<T>, "publishedAt">) => PreparedVersionWrites;
+  readonly prepareCurrentVersionPointer: (artifactKind: string, unitId: string, version: number) => AtomicFileWrite;
   readonly readVersion: <T>(artifactKind: string, unitId: string, version: number) => Promise<VersionEnvelope<T> | null>;
   readonly readCurrentVersion: <T>(artifactKind: string, unitId: string) => Promise<VersionEnvelope<T> | null>;
   readonly listVersions: (artifactKind: string, unitId: string) => Promise<ReadonlyArray<number>>;
   readonly verifyIntegrity: (artifactKind: string, unitId: string) => Promise<ReadonlyArray<string>>;
+}
+export interface PreparedVersionWrites {
+  readonly writes: ReadonlyArray<AtomicFileWrite>;   // version record + journal entry, staged into the publication transaction
 }
 export interface RevisionCandidate<TSnapshot> {
   readonly artifactKind: "foundation" | "arc_plan";
@@ -505,10 +543,19 @@ export async function restoreVersionAsRevisionCandidate<T>(
 ): Promise<RevisionCandidate<T>>;
 ```
 
+Foundation history is `Foundation v1 → v2 → v3 …`, each version identifying the complete
+authoritative Foundation state; individual unit revisions are governed independently
+beneath that global version. The first Human Foundation Publish creates Foundation v1; a
+later revision changing two units creates Foundation v2 whose snapshot references the
+unchanged approved unit revisions plus the two new approved revisions.
+
 Scope discipline: Task 5 owns version/history semantics only. **`restoreVersionAsRevisionCandidate`
 produces a revision candidate — it MUST NOT append a new Published authority version,
 MUST NOT advance the authoritative current pointer, and MUST NOT bypass current
-Canon/dependency review.** Human Publish (Task 9) later creates the new immutable
+Canon/dependency review.** No pre-transaction append of a Published version:
+`prepareVersionAppend`/`prepareCurrentVersionPointer` return writes that are COMMITTED
+only inside Task 9's publication transaction together with capability-marker activation
+and dependency invalidation. Human Publish (Task 9) later creates the new immutable
 Published version. No `ArcPlanVersion` alias here — `ArcPlanSnapshot` does not exist
 until Task 12, which defines `type ArcPlanVersion = VersionEnvelope<ArcPlanSnapshot>`
 after introducing the snapshot type. After each Task's commit the repository must
@@ -516,15 +563,17 @@ typecheck (dependency-order rule).
 
 **Steps**
 
-- [ ] Write failing tests: append/read/current/list; immutability (a version record
-      cannot be mutated after append); **restore leaves the current published
-      authority unchanged** (readCurrentVersion identical before/after) and returns a
-      `RevisionCandidate` with `parentVersion` = current published, `restoredFromVersion`
-      = selected historical, `baseCanonRevision` = current Canon, status
-      draft/needs_review; integrity verification detects tampering.
+- [ ] Write failing tests: read/current/list round-trips; immutability (a version record
+      cannot be mutated after it is committed); **one Publish prepares exactly ONE new
+      Foundation version**; changing one unit still increments the global Foundation
+      version once (via a prepared append) while unchanged units keep their approved
+      revisions; **restore leaves the current published authority unchanged**
+      (readCurrentVersion identical before/after) and returns a `RevisionCandidate`;
+      integrity verification detects tampering; prepared writes are NOT committed by
+      `VersionStore` itself (no side effect until the coordinator commits them).
 - [ ] Implement `versions.ts`; targeted run → PASS.
 - [ ] Typecheck; run the Task Completion Gate using commit message
-      `feat(core): generic version and history primitives with restore-as-candidate`.
+      `feat(core): global foundation version history primitives with restore-as-candidate`.
 
 ## Task 6 — Conflict classification (two-layer) + Human Resolution Record
 
@@ -616,40 +665,41 @@ the Human review service (Task 8).
 - Create `packages/core/src/foundation/revision-service.ts`
 - Create `packages/core/src/__tests__/foundation-revision-service.test.ts`
 
-**Interfaces**
+**Interfaces** (Human says WHAT to approve; Core computes/verifies the trusted state —
+caller-supplied revisions/hashes are never truth)
 
 ```ts
-export type FoundationRevisionOperation =
-  | { op: "open"; unitIds: ReadonlyArray<string> }
-  | { op: "save_draft"; unitId: string; content: string }
-  | { op: "approve"; unitId: string; approvedRevision: number; contentHash: string }
-  | { op: "needs_revision"; unitId: string; reason: string }
-  | { op: "reapprove_stale"; unitId: string; approvedRevision: number; contentHash: string; resolutionId?: string }
-  | { op: "discard"; revisionId: string };
 export async function openFoundationRevision(bookDir: string, unitIds: ReadonlyArray<string>): Promise<{ revisionId: string }>;
 export async function loadFoundationRevision(bookDir: string, revisionId: string): Promise<FoundationRevisionDraft>;
 export async function saveFoundationUnitDraft(bookDir: string, revisionId: string, unitId: string, content: string): Promise<void>;
-export async function approveFoundationUnit(bookDir: string, revisionId: string, unitId: string, approvedRevision: number, contentHash: string): Promise<void>;
+export async function approveFoundationUnit(bookDir: string, revisionId: string, unitId: string): Promise<void>;
 export async function markFoundationUnitNeedsRevision(bookDir: string, revisionId: string, unitId: string, reason: string): Promise<void>;
-export async function reapproveStaleFoundationUnit(bookDir: string, revisionId: string, unitId: string, approvedRevision: number, contentHash: string, resolutionId?: string): Promise<void>;
+export async function reapproveStaleFoundationUnit(bookDir: string, revisionId: string, unitId: string, resolutionId?: string): Promise<void>;
 export async function discardFoundationRevision(bookDir: string, revisionId: string): Promise<void>;
 export async function approveFoundationUnitsBatch(bookDir: string, revisionId: string, unitIds: ReadonlyArray<string>): Promise<{ approved: ReadonlyArray<string>; rejected: ReadonlyArray<{ unitId: string; reason: string }> }>;
 ```
 
+Approval semantics: the Human call names the unit; **Core computes and verifies the
+current draft content revision, the content hash, the dependency declaration, and review
+eligibility, then persists the approval record bound to contentRevision/approvedRevision/
+hash/dependencies**. For stale reapproval Core itself verifies any required Human
+Resolution. `writeUnitManifest` remains an internal persistence primitive — it is NOT
+exposed as a public authority-transition API. No revision-service operation changes
+current Published authority.
+
 Rules (state-transition tests for each): approved Published content remains immutable;
 opening revision creates working state only; manual edit → `needs_review`; AI repair can
-never approve; only explicit Human action can approve/reapprove; approval binds
-contentRevision/approvedRevision/hash/dependencies; stale cannot silently become
-approved (requires the resolution record when applicable); batch approval only for
-clean eligible units; **no revision operation changes current Published authority**;
-Publish remains Task 9.
+never approve; only explicit Human action can approve/reapprove; stale cannot silently
+become approved (requires the resolution record when applicable); batch approval only for
+clean eligible units; Publish remains Task 9.
 
 **Steps**
 
 - [ ] Write failing tests: full state-transition table; approved-unit immutability;
       manual edit → needs_review; AI-repair-cannot-approve; stale
       reapproval-requires-resolution; batch approval rejects ineligible units; publish
-      authority unchanged by any revision op.
+      authority unchanged by any revision op; **a caller-fabricated hash or revision
+      cannot be approved (Core recomputes the hash and rejects mismatches)**.
 - [ ] Implement `revision-service.ts`; targeted → PASS; typecheck.
 - [ ] Run the Task Completion Gate using commit message
       `feat(core): foundation human review service with explicit approval transitions`.
@@ -678,8 +728,9 @@ export async function runTransaction(input: TransactionInput): Promise<Transacti
 
 export interface PublishGateInput {
   readonly bookDir: string;
-  readonly units: ReadonlyArray<FoundationUnitManifest>;
-  readonly resolutions: ReadonlyArray<HumanResolutionRecord>;
+  readonly revisionId: string;               // Human-reviewed revision (Task 8)
+  readonly humanActor: string;
+  readonly expectedBaseFoundationVersion: number;
   readonly expectedBaseCanonRevision: number;
 }
 export interface PublishGateResult {
@@ -691,16 +742,27 @@ export type PublishOutcome =
   | { status: "revision_base_stale" }
   | { status: "external_change_detected" };
 export async function checkFoundationPublishGate(input: PublishGateInput): Promise<PublishGateResult>;
-export async function publishFoundation(bookDir: string, gate: PublishGateInput): Promise<PublishOutcome>;
+export async function publishFoundation(input: PublishGateInput): Promise<PublishOutcome>;
 export async function handleExternalEdit(bookDir: string, unitId: string, action: "compare" | "adopt_into_revision" | "discard"): Promise<void>;
 ```
 
-Gate requires: required units ready, no canon conflicts, required uncertainties
-resolved, stale handled, graph valid, hashes valid, no unresolved external changes.
-Publish is deterministic and short; revalidation immediately before COMMIT;
-`REVISION_BASE_STALE` on base change; external content never inherits approval.
-`publishFoundation` is the ONLY operation that creates Foundation authority — invoked
-by the Human via Studio/CLI/API, never by the AI pipeline (Task 10).
+**Trusted Publish contract:** the caller requests Publish (bookDir, revisionId, humanActor,
+expected base versions) and does NOT supply authoritative unit states. Core loads from
+trusted persistence: the Task 8 `FoundationRevisionDraft` + approval records, current
+governed Markdown hashes, approved revisions, declared dependencies, Human Resolution
+records, external-change state, current Canon, and current Published Foundation — then
+evaluates the Publish Gate itself and builds the `FoundationPublishedSnapshot`. A caller
+fabricating an "approved" manifest, hash, or resolution list cannot Publish.
+
+Gate requires: required units ready (approval records), no canon conflicts, required
+uncertainties resolved, stale handled, graph valid, hashes valid (recomputed from
+Markdown), no unresolved external changes. Publish is deterministic and short;
+revalidation immediately before COMMIT; `REVISION_BASE_STALE` on base change; external
+content never inherits approval. `publishFoundation` is the ONLY operation that creates
+Foundation authority — invoked by the Human via Studio/CLI/API, never by the AI pipeline
+(Task 10). The committed atomic set includes: the prepared `VersionEnvelope`
+(Foundation vN snapshot, via T5 `prepareVersionAppend` + `prepareCurrentVersionPointer`),
+the capability-marker write, and required direct invalidations.
 
 **Atomic governance-mode activation (Foundation):** the FIRST successful Human
 Foundation V2 Publish atomically persists, in ONE transaction: Published Foundation v1
@@ -716,15 +778,17 @@ half authority.
 
 **Steps**
 
-- [ ] Write failing tests: gate truth for each failure class; stale-base rejection;
-      external-edit flow (compare/adopt/discard, adopt never auto-approves);
-      **atomic marker activation** (single transaction; both crash sides tested);
-      `publishFoundation` refuses when any unit is not approved; the full
-      fault-injection table; targeted → fail.
+- [ ] Write failing tests: gate truth for each failure class (evaluated over persisted
+      state, not caller manifests); stale-base rejection; external-edit flow
+      (compare/adopt/discard, adopt never auto-approves); **atomic marker activation**
+      (single transaction; both crash sides tested); **caller fabricating an approved
+      manifest cannot Publish**; **content changed after approval → Publish fails**;
+      **external edit after approval → Publish fails**; **one Publish creates exactly
+      ONE new Foundation version**; the full fault-injection table; targeted → fail.
 - [ ] Implement `transactions.ts` then `publish.ts`; targeted → PASS.
 - [ ] Regressions (`state-review-finalize` atomic tests), typecheck.
 - [ ] Run the Task Completion Gate using commit message
-      `feat(core): transactional foundation publish with atomic v2 marker activation`.
+      `feat(core): trusted transactional foundation publish with atomic v2 marker activation`.
 
 ## Task 10 — Foundation intelligence pipeline (stops at Human-reviewable Draft)
 
@@ -741,10 +805,10 @@ export interface AdaptiveIntakeResult {
 }
 export async function adaptiveIntake(bookDir: string, known: Record<string, string>): Promise<AdaptiveIntakeResult>;
 export type FoundationPipelineResult =
-  | { status: "ready_for_human_review"; revisionDraft: ReadonlyArray<FoundationUnitManifest>; findings: ReadonlyArray<FoundationFinding> }
+  | { status: "ready_for_human_review"; revisionId: string; findings: ReadonlyArray<FoundationFinding> }
   | { status: "needs_human_direction"; findings: ReadonlyArray<FoundationFinding>; remainingRounds: number }
   | { status: "generation_failed"; reasons: ReadonlyArray<string> };
-export async function runFoundationPipeline(bookDir: string): Promise<FoundationPipelineResult>;
+export async function runFoundationPipeline(bookDir: string, opts?: { upgradeCandidateId?: string }): Promise<FoundationPipelineResult>;
 ```
 
 Behavior: intake extracts known info first and asks only MUST-KNOW gaps (0–3); the
@@ -752,23 +816,37 @@ Architect may propose helpful material; generation runs once globally for cohere
 review runs globally; repair runs locally (Task 7 policy); no whole-Foundation
 regeneration for local issues; mechanical/schema retries separate from semantic rounds.
 
-**Authority boundary: the pipeline NEVER publishes.** It produces a Human-reviewable
-Revision Draft (`ready_for_human_review`), or `needs_human_direction`, or
-`generation_failed`. Architect → Reviewer → Repair → automatic Publish is forbidden;
-Human Publish is exclusively Task 9's `publishFoundation`. Tests assert no published
-version and no marker flip after any pipeline outcome.
+**Durable revision handoff:** the pipeline PERSISTS its Human-reviewable result through
+the Task 8 revision service — `ready_for_human_review` carries a durable `revisionId`
+(created via `openFoundationRevision`, drafts saved via `saveFoundationUnitDraft`).
+Studio later loads via `loadFoundationRevision(revisionId)` and approves/edits; it never
+reconstructs a revision from raw AI manifests.
+
+**Upgrade hand-off boundary:** `prepareFoundationV2Upgrade()` (Task 3) returns an
+ephemeral `UpgradeCandidate` (`status: "prepared"`); Task 10 consumes it via
+`runFoundationPipeline(bookDir, { upgradeCandidateId })`, runs AI preflight/repair over
+the legacy content, and persists the durable `revisionId`. The workflow is therefore:
+prepared candidate → AI preflight/repair → durable Foundation revisionId → Human review
+(Task 8) → Human Publish (Task 9). No missing hand-off boundary.
+
+**Authority boundary: the pipeline NEVER publishes.** Architect → Reviewer → Repair →
+automatic Publish is forbidden; Human Publish is exclusively Task 9's
+`publishFoundation`. Tests assert no published version and no marker flip after any
+pipeline outcome.
 
 **Steps**
 
 - [ ] Write failing tests (mocked `ArchitectAgent`/`FoundationReviewerAgent`): intake
       asks only unknown MUST-KNOW gaps and 0–3 of them; local issue triggers a local
       repair, not a global regeneration; every outcome ends with NO published version
-      and NO marker flip; clean run → `ready_for_human_review`; exhausted rounds →
-      `needs_human_direction`; generation failure → `generation_failed`.
+      and NO marker flip; clean run → `ready_for_human_review` WITH a durable
+      `revisionId` loadable via `loadFoundationRevision`; exhausted rounds →
+      `needs_human_direction`; generation failure → `generation_failed`; the upgrade
+      hand-off (`upgradeCandidateId` → revisionId) round-trips.
 - [ ] Implement `pipeline.ts`; targeted → PASS.
 - [ ] Regressions: `architect`/`foundation-reviewer` agent tests; typecheck.
 - [ ] Run the Task Completion Gate using commit message
-      `feat(core): adaptive foundation pipeline producing human-reviewable drafts`.
+      `feat(core): adaptive foundation pipeline producing durable human-reviewable revisions`.
 
 ## Task 11 — Human Direction + Authorization (pending → active) + Core NL parser
 
@@ -803,7 +881,17 @@ export type Authorization =
 export async function createAuthorization(bookDir: string, a: { decisionKind: AuthorDecisionKind; scope: AuthorizationScope; consumption: AuthorizationConsumption }): Promise<Extract<Authorization, { lifecycle: "pending" }>>;
 export async function confirmAuthorization(bookDir: string, id: string): Promise<Extract<Authorization, { lifecycle: "active" }>>;
 export function authorizationApplies(a: Extract<Authorization, { lifecycle: "active" }>, chapterNumber: number): boolean;
-export async function consumeAuthorizationIfCanonConfirmed(bookDir: string, id: string, canonRevision: number): Promise<"consumed" | "not_yet">;
+// PURE (non-writing) evidence evaluation — consumption is PERSISTED only by Task 20
+// inside the Canon settlement transaction. No standalone write path exists.
+export function evaluateAuthorizationAgainstEvidence(
+  a: Extract<Authorization, { lifecycle: "active" }>,
+  evidence: CanonSettlementEvidence,
+): { matches: boolean; reason: string };
+export function deriveEligibleAuthorizationConsumption(
+  authorizations: ReadonlyArray<Extract<Authorization, { lifecycle: "active" }>>,
+  finalizedReview: ActiveStateReviewArtifact,
+  evidence: CanonSettlementEvidence,
+): ReadonlyArray<{ authorizationId: string; decisionKind: AuthorDecisionKind }>;
 
 export type HumanDirectionScope =
   | { kind: "exact_chapter"; chapterNumber: number }
@@ -824,11 +912,13 @@ export async function parseHumanDirectionDraft(text: string, currentContext: { b
 Tests: pending Authorization/Direction can never be resolved as executable authority
 (`authorizationApplies` accepts only active; runtime guard rejects pending);
 confirmation is the only transition to active; direction conflicts explicit — no
-latest-wins, each choice exercised; lifecycle transitions;
-`consumeAuthorizationIfCanonConfirmed` is the ONLY consumption path and requires Canon
-evidence (plan/draft/failure never consume); `parseHumanDirectionDraft` returns a
-pending structured proposal with NO authority and resolves typed scope instances for
-all scope/condition kinds.
+latest-wins, each choice exercised; lifecycle transitions; the pure helpers
+(`evaluateAuthorizationAgainstEvidence`, `deriveEligibleAuthorizationConsumption`)
+NEVER persist `lifecycle: "consumed"` — **the ONLY ACTIVE → CONSUMED transition is the
+Phase 4 Final Confirm / Canon settlement transaction owned by Task 20** (direct
+non-settlement callers cannot consume; plan/draft/failure never consume);
+`parseHumanDirectionDraft` returns a pending structured proposal with NO authority and
+resolves typed scope instances for all scope/condition kinds.
 
 **Steps**
 
@@ -840,7 +930,7 @@ all scope/condition kinds.
 - [ ] Run the Task Completion Gate using commit message
       `feat(core): durable human direction and scoped authorization governance`.
 
-## Task 12 — Arc Plan storage + Major Beat authority (draft / publish / restore-candidate)
+## Task 12 — Arc Plan storage + Major Beat model (persistence/domain ONLY — no publish)
 
 **Files**
 - Create `packages/core/src/planning/arc-plan.ts`
@@ -848,9 +938,8 @@ all scope/condition kinds.
 - Create `packages/core/src/__tests__/planning-arc-plan.test.ts`
 - Create `packages/core/src/__tests__/planning-beats.test.ts`
 
-**Interfaces** (consumes the exact generic `VersionEnvelope` from Task 5 and
-`runTransaction` from Task 9 — no parallel implementation; `ArcPlanVersion` is defined
-HERE, after `ArcPlanSnapshot` exists)
+**Interfaces** (consumes the exact generic `VersionEnvelope` from Task 5 — no parallel
+implementation; `ArcPlanVersion` is defined HERE, after `ArcPlanSnapshot` exists)
 
 ```ts
 export interface ArcPlanSnapshot {
@@ -873,41 +962,44 @@ export interface BeatRef {
   readonly importance: Importance;
   readonly description: string;
 }
-export async function createArcPlanDraft(bookDir: string, arcId: string, foundationVersion: number, baseCanonRevision: number): Promise<ArcPlanSnapshot>;
-export async function loadArcPlanDraft(bookDir: string, arcId: string): Promise<ArcPlanSnapshot | null>;
-export async function publishArcPlan(bookDir: string, arcId: string, expectedBaseCanonRevision: number): Promise<ArcPlanVersion>;  // explicit Human Publish
-export async function loadPublishedArcPlan(bookDir: string, arcId: string): Promise<ArcPlanVersion | null>;
+export interface ArcPlanDraftRecord {
+  readonly draftId: string;
+  readonly snapshot: ArcPlanSnapshot;
+  readonly foundationVersion: number;
+  readonly baseCanonRevision: number;
+  readonly status: "draft" | "needs_review";
+}
+export async function saveArcPlanDraft(bookDir: string, record: ArcPlanDraftRecord): Promise<{ draftId: string }>;
+export async function loadArcPlanDraft(bookDir: string, arcId: string): Promise<ArcPlanDraftRecord | null>;
+export async function loadPublishedArcPlan(bookDir: string, arcId: string): Promise<ArcPlanVersion | null>;   // read-only history access
 export async function restoreArcPlanAsRevisionDraft(bookDir: string, arcId: string, fromVersion: number): Promise<RevisionCandidate<ArcPlanSnapshot>>; // NEVER publishes
 export type BeatEvidenceResult = { state: "satisfied" | "not_satisfied" } | { state: "uncertain"; reason: string };
 export async function evaluateBeatFromCanon(bookDir: string, beatId: string): Promise<BeatEvidenceResult>;
 ```
 
-Rules: Arc Plan is Draft until Human Publish (`publishArcPlan` — the ONLY Arc-authority
-boundary); published Arc versions immutable; **restore produces a revision candidate
-(`restoreArcPlanAsRevisionDraft`) based against current Foundation/Canon — the current
-published Arc authority is unchanged until `publishArcPlan` creates the next version**;
-Beat state comes from Canon evidence, never planning prediction; semantic uncertainty
-mid-Arc stays `in_progress` unless required for an authority decision; REQUIRED Beats
-cannot be silently superseded.
-
-**Atomic governance-mode activation (Planning):** the FIRST Arc Plan Publish under V2
-Foundation atomically flips `governance.planning = "v2"` in the same publish
-transaction; no competing legacy/V2 planning authority exists. Fault tests cover both
-commit sides.
+**Scope discipline: Task 12 is persistence/domain ONLY. There is NO authoritative
+`publishArcPlan` here** — after T12's commit there is no Core path capable of creating
+Arc authority. Draft creation happens through ONE path only: `saveArcPlanDraft` is the
+single persistence primitive; the AI pipeline (Task 13) calls it and never builds a
+competing draft store. Restore produces a revision candidate based against current
+Foundation/Canon; the current published Arc authority is unchanged. Beat state comes
+from Canon evidence, never planning prediction; semantic uncertainty mid-Arc stays
+`in_progress` unless required for an authority decision; REQUIRED Beats cannot be
+silently superseded.
 
 **Steps**
 
-- [ ] Write failing tests: `publishArcPlan` only boundary; PREFLIGHT_PASS draft still
-      NOT authoritative; published Arc versions immutable; **restore alone leaves the
-      current published Arc authority unchanged** (readCurrentVersion identical) and
-      yields a `RevisionCandidate`; beat evidence derives from Canon; semantic
-      uncertainty stays in_progress; required-beat supersede refused; atomic planning
-      marker activation (both crash sides).
+- [ ] Write failing tests: save/load draft round-trip; load Published Arc history
+      (read-only); **restore alone leaves the current published Arc authority
+      unchanged** (readCurrentVersion identical) and yields a `RevisionCandidate`;
+      beat evidence derives from Canon; semantic uncertainty stays in_progress;
+      required-beat supersede refused; **no publish operation exists in this module
+      (compile-time assertion / absent API)**.
 - [ ] Implement; targeted → PASS; typecheck.
 - [ ] Run the Task Completion Gate using commit message
-      `feat(core): arc plan authority and canon-evidence major beats`.
+      `feat(core): arc plan storage and canon-evidence major beats`.
 
-## Task 13 — Arc Planner + Arc preflight pipeline
+## Task 13 — Arc Planner + Arc preflight + Human Publish boundary
 
 **Files**
 - Create `packages/core/src/planning/arc-pipeline.ts`
@@ -926,26 +1018,39 @@ export interface ArcFinding {
   readonly involvesDecisionKind?: AuthorDecisionKind;
 }
 export type ArcPreflightResult =
-  | { outcome: "preflight_pass" }                       // still a DRAFT — no authority
+  | { outcome: "preflight_pass"; foundationVersion: number; baseCanonRevision: number; draftHash: string }
   | { outcome: "preflight_fail"; findings: ReadonlyArray<ArcFinding> };
-export async function generateArcPlanDraft(bookDir: string, arcId: string, foundationVersion: number, brief: string): Promise<ArcPlanSnapshot>;  // Arc Planner
-export async function runArcPreflight(bookDir: string, draft: ArcPlanSnapshot): Promise<ArcPreflightResult>;   // deterministic checks
-export async function reviewArcPlanDraft(bookDir: string, draft: ArcPlanSnapshot): Promise<ReadonlyArray<ArcFinding>>;  // semantic review
+export async function generateArcPlanDraft(bookDir: string, arcId: string, foundationVersion: number, brief: string): Promise<{ draftId: string }>;  // Arc Planner; calls Task 12 saveArcPlanDraft
+export async function runArcPreflight(bookDir: string, draftId: string): Promise<ArcPreflightResult>;   // deterministic checks over the PERSISTED draft
+export async function reviewArcPlanDraft(bookDir: string, draftId: string): Promise<ReadonlyArray<ArcFinding>>;  // semantic review
 export type ArcRepairOutcome =
-  | { status: "repaired"; round: number; draft: ArcPlanSnapshot }
+  | { status: "repaired"; round: number; draftId: string }
   | { status: "needs_human_direction"; round: number; findings: ReadonlyArray<ArcFinding> }
-  | { status: "clean"; draft: ArcPlanSnapshot };
-export async function repairArcPlanLocal(bookDir: string, draft: ArcPlanSnapshot, findings: ReadonlyArray<ArcFinding>, round: number): Promise<ArcRepairOutcome>;
-export async function verifyArcPlanRepair(bookDir: string, revised: ArcPlanSnapshot, findings: ReadonlyArray<ArcFinding>, round: number): Promise<ReadonlyArray<ArcFinding>>;
+  | { status: "clean"; draftId: string };
+export async function repairArcPlanLocal(bookDir: string, draftId: string, findings: ReadonlyArray<ArcFinding>, round: number): Promise<ArcRepairOutcome>;
+export async function verifyArcPlanRepair(bookDir: string, draftId: string, findings: ReadonlyArray<ArcFinding>, round: number): Promise<ReadonlyArray<ArcFinding>>;
+export async function publishArcPlan(bookDir: string, arcId: string, humanActor: string, expectedBaseCanonRevision: number): Promise<ArcPlanVersion>;  // explicit Human Publish
 ```
 
-Rules: the pipeline follows Published Foundation → Arc Planner → Arc Plan Draft →
-deterministic checks → semantic reviewer → bounded local repair → **Human Publish**
-(Task 12 `publishArcPlan`); max 2 semantic repair rounds then Human; LOCAL-only
-auto-repair; IMPORTANT+LOCAL requires separate targeted re-review; repair cannot
-broaden authority; MULTI_UNIT/AUTHOR_DECISION/CONFLICT never silently repaired;
-`verifyArcPlanRepair` is a separate invocation (no self-certification);
-`preflight_pass` stays Draft until Human Publish.
+Rules: pipeline = Published Foundation → Arc Planner → Arc Plan Draft (persisted via T12)
+→ deterministic preflight → semantic reviewer → bounded local repair → **Human Publish
+(`publishArcPlan`, defined HERE)**. Preflight state is **persisted and bound to the
+exact draft hash + Foundation/Canon bases**. `publishArcPlan` loads the persisted draft
+and revalidates: current Foundation version, current Canon revision, declared
+dependencies, preflight result corresponds to the CURRENT draft hash, no unresolved
+BLOCKING/AUTHOR_DECISION, required Human authorizations exist, no stale authority refs —
+then the shared TransactionCoordinator (Task 9) creates Arc authority. `preflight_pass`
+remains Draft until the explicit Human call. Restore flow: Published Arc v7 → Revision
+Draft from old content (T12) → current preflight again → Human Publish → v8; never
+restore→publish directly. Max 2 semantic repair rounds then Human; LOCAL-only
+auto-repair; IMPORTANT+LOCAL requires separate targeted re-review; repair cannot broaden
+authority; MULTI_UNIT/AUTHOR_DECISION/CONFLICT never silently repaired;
+`verifyArcPlanRepair` is a separate invocation (no self-certification).
+
+**Atomic governance-mode activation (Planning):** the FIRST valid Arc Plan Publish
+under V2 Foundation atomically flips `governance.planning = "v2"` in the same publish
+transaction; no competing legacy/V2 planning authority exists. Fault tests cover both
+commit sides.
 
 **Steps**
 
@@ -955,10 +1060,14 @@ broaden authority; MULTI_UNIT/AUTHOR_DECISION/CONFLICT never silently repaired;
       hard conflict); unauthorized major Author Decision → AUTHOR_DECISION finding;
       LOCAL repair + independent re-review; repair cannot broaden authority (attempted
       unauthorized decision rejected); exhausted 2 rounds → Human; `preflight_pass`
-      still not Published (no published Arc version created).
+      still not Published; **publish revalidates draft hash/base versions and refuses on
+      stale preflight**; **publish cannot be called before preflight exists (no
+      authority path in T12)**; restore→preflight→publish produces a new version and
+      never restore→publish directly; atomic planning marker activation (both crash
+      sides).
 - [ ] Implement `arc-pipeline.ts`; targeted → PASS; typecheck.
 - [ ] Run the Task Completion Gate using commit message
-      `feat(core): arc planner and preflight pipeline`.
+      `feat(core): arc planner, preflight and human publish boundary`.
 
 ## Task 14 — Rolling Lookahead lifecycle + typed selective invalidation
 
@@ -1274,18 +1383,30 @@ call this SAME Core operation — CLI/Studio are never the security boundary.
 missing-snapshot all result in zero Writer calls. SAFE + valid snapshot → exactly one
 chapter attempt. The Writer spy call count is the assertion vehicle.
 
+**Governance-mode write matrix (explicit, tested in THIS Task — legacy compatibility is
+intentional, not accidental):**
+
+| foundation | planning | write behavior |
+|---|---|---|
+| `legacy` | `legacy` | existing legacy write workflow remains available (unchanged path) |
+| `v2` | `legacy` | **TRANSITION STATE** — do NOT silently fall back to the old Planner/Writer path; require preparation + Human Publish of the appropriate V2 Arc Plan before V2 writing can continue (block with actionable readiness) |
+| `v2` | `v2` | full Phase 5 Planning Gate + Context + Snapshot + Writer path |
+| `legacy` | `v2` | **invalid/unsupported governance state** — fail closed / recovery required |
+
 **Steps**
 
 - [ ] Write failing tests that call the Core write entry directly (not via CLI):
       missing snapshot/gate → Writer spy call count 0; CONFLICT → 0;
       AUTHOR_DECISION → 0; UNCERTAIN requiring Human → 0; stale ContextBundle → 0;
       SAFE + valid snapshot → exactly one chapter attempt; one deliberate Write
-      produces at most one chapter.
-- [ ] Implement the gate inside `runner.ts`; targeted → PASS.
-- [ ] Regressions: `pipeline-runner.gated.test.ts`, `state-review-confirm` suite,
-      full Phase 4 suites; typecheck.
+      produces at most one chapter; **mode matrix**: untouched legacy/legacy book still
+      writes exactly through the existing path; v2/v2 uses the gate; v2/legacy cannot
+      bypass Planning V2 by invoking the legacy Writer path; legacy/v2 fails closed.
+- [ ] Implement the gate + mode dispatch inside `runner.ts`; targeted → PASS.
+- [ ] Regressions: `pipeline-runner.gated.test.ts`, `pipeline-runner.test.ts`,
+      `state-review-confirm` suite, full Phase 4 suites; typecheck.
 - [ ] Run the Task Completion Gate using commit message
-      `feat(core): enforce planning gate and execution snapshot in the write entry`.
+      `feat(core): enforce planning gate, execution snapshot and write mode matrix`.
 
 ## Task 20 — Phase 4 Canon settlement integration (evidence-derived consumption)
 
@@ -1326,7 +1447,9 @@ consumption succeed/fail as ONE logical transaction (both inside the single Phas
 `commitAtomicFileSet`). A crash/failure must NEVER expose "Canon event committed +
 Authorization still AVAILABLE". Fault-injection tests prove BOTH sides of the commit
 boundary. No second Canon transaction system is created — the existing Phase 4 atomic
-primitive is evolved in place.
+primitive is evolved in place. **This is the ONLY ACTIVE → CONSUMED transition in the
+system:** Task 11's `evaluateAuthorizationAgainstEvidence`/`deriveEligibleAuthorizationConsumption`
+are pure helpers and persist nothing; a direct non-settlement caller cannot consume.
 
 **Evidence verification tests:** caller supplies an active authorization ID but the
 confirmed Canon event does not match → NOT consumed; correct decision subject/scope/
@@ -1342,10 +1465,12 @@ unchanged.
 
 **Steps**
 
-- [ ] Write failing tests: non-consumption paths; evidence-derived consumption (all
-      four evidence cases); fault injection on both sides of the commit boundary; no
-      duplicate consumption; laggable effects never affect Canon correctness; full
-      Phase 4 suites green.
+- [ ] Write failing tests: non-consumption paths (Draft/Audit/Plan); **direct
+      non-settlement callers cannot consume**; evidence-derived consumption (all
+      four evidence cases); fault injection on both sides of the commit boundary
+      (before COMMIT → Canon unchanged + Authorization ACTIVE; after durable COMMIT →
+      Canon changed + CONSUMED); replay/double-consume fails closed; laggable effects
+      never affect Canon correctness; full Phase 4 suites green.
 - [ ] Implement `settlement-integration.ts` + the finalize atomic-set extension;
       targeted → PASS.
 - [ ] Regressions: `state-review-confirm`/`state-review-finalize` suites; typecheck.
@@ -1366,21 +1491,34 @@ export type ArcTransitionResult =
   | { outcome: "ready_to_close"; nextPublished: boolean; action: "auto_activate" | "prepare_next_before_transition" }
   | { outcome: "arc_completion_uncertain"; reason: string };
 export async function evaluateArcCompletion(bookDir: string, arcId: string): Promise<ArcTransitionResult>;
+export type ApplyArcTransitionResult =
+  | { status: "closed_and_activated"; currentArc: string; nextArc: string }
+  | { status: "not_applicable"; reason: string };
+export async function applyArcTransition(bookDir: string, currentArcId: string): Promise<ApplyArcTransitionResult>;
 ```
 
-Rules (explicit wording): if the current Arc is READY and the next Arc Plan is already
-Published → auto close/activate; if the next Arc is missing → automatically PREPARE the
-next Arc Draft if desired, then **STOP for Human Publish**; the current Arc remains
-`READY_TO_CLOSE` until that Publish. **Never auto-Publish an Arc Plan.**
+Rules (explicit wording): `evaluateArcCompletion` reports readiness; `applyArcTransition`
+performs the actual state change — and ONLY when: current Arc is `READY_TO_CLOSE`,
+required Beat evidence is Canon-confirmed, the next Arc Plan is already Published, and
+authority bases (Foundation version / Canon revision) are still current. The
+close-current / activate-next state change is consistent and, where multiple
+authoritative/materialized records change together, transactional (Task 9 coordinator).
+If the next Arc is missing: automatically PREPARE the next Arc Draft if desired, then
+**STOP for Human Publish** — do NOT call `applyArcTransition`; the current Arc remains
+`READY_TO_CLOSE` until that Publish. **Never auto-Publish an Arc Plan.** Tests verify the
+actual persisted current-Arc state, not only the evaluation return value.
 
 **Steps**
 
 - [ ] Write failing tests: not-ready with pending required beats; ready + published
-      next → auto activation; ready + missing next → prepare-before-transition AND no
-      auto-Publish (no published version created); completion-uncertain requires human.
+      next → `applyArcTransition` closes current and activates next (assert persisted
+      current-Arc records); ready + missing next → prepare-before-transition, no apply,
+      no auto-Publish (no published version created), current Arc stays
+      READY_TO_CLOSE; stale authority bases → apply refused; completion-uncertain
+      requires human.
 - [ ] Implement; targeted → PASS; typecheck.
 - [ ] Run the Task Completion Gate using commit message
-      `feat(core): evidence-driven arc completion and transition`.
+      `feat(core): evidence-driven arc completion and transition apply`.
 
 ## Task 22 — Studio Foundation governance surface
 
@@ -1548,7 +1686,7 @@ review state — never by this or any ordinary Task.
 - [ ] Write the acceptance test; run E2E scenarios; fix only genuine Phase 5
       regressions RED-first with narrow commits.
 - [ ] Run the full serial battery; record results; fill the verification doc.
-- [ ] `git diff --check`; review; run the Task Completion Gate; final commit
+- [ ] `git diff --check`; review; run the Task Completion Gate using commit message
       `test: phase 5 acceptance matrix verified`.
 
 ---
@@ -1617,15 +1755,16 @@ in T26.
 | §3 Human Resolution Record | T6 |
 | §3 Human review/approval state transitions | T8 |
 | §3 Publish gate + Chapter-1 readiness | T4, T9 |
-| §4 Planning artifacts + Arc Plan metadata/versions/restore-candidate | T12 |
+| §4 Planning artifacts + Arc Plan metadata/versions/restore-candidate | T12, T13 |
 | §4 Major Beats lifecycle/importance/categories/Canon evidence | T12, T20 |
+| §4 Arc Plan authority boundary (explicit Human Publish after preflight) | T13 |
 | §4 Rolling Lookahead lifecycle (advisory, 2–3 horizon, typed provenance) | T14 |
 | §4 Human Direction scopes/lifecycle/conflicts + Core NL parse | T11 |
 | §4 Author Decisions vocabulary + Authorization scopes/conditions/consumption | T1, T11, T20 |
 | §4 Detailed Chapter Plan (ChapterIntent/Memo evolution + bindings + immutability) | T15, T18 |
 | §4 Execution Attempt defects + 2 replans + durable attempts | T18 |
 | §4 Arc completion (never auto-Publish) | T21 |
-| §5 Arc flow (Planner → Draft → deterministic → semantic → repair → Human Publish) | T13 (+T12 publish) |
+| §5 Arc flow (Planner → Draft → deterministic → semantic → repair → Human Publish) | T13 |
 | §5 Detailed chapter flow (fresh after latest Canon) | T15, T16 |
 | §5 Planning Gate L1/L2 + truth table + SAFE semantics | T16 |
 | §5 bounded repair + PLAN_SCOPE_TOO_BROAD | T15, T16 |
@@ -1639,7 +1778,7 @@ in T26.
 | §7 crash semantics + journal + fault injection | T9, T18, T25, T26 |
 | §7 authority switch + dependency invalidation atomic | T9, T20 |
 | §7 Execution freeze + EXECUTION_PREPARE_FAILED + provider failures | T18 |
-| §7 authorization consumption with Canon settlement (evidence-derived, atomic) | T20 |
+| §7 authorization consumption with Canon settlement (single ACTIVE→CONSUMED path, evidence-derived, atomic) | T11 (pure), T20 |
 | §7 recovery truth priority + corruption detection + reuse primitives | T9, T25 |
 | §7 legacy compatibility + capability markers (atomic activation) + opt-in V2 + no competing authority | T1, T3, T9, T12, T25 |
 | §7 migrations forward-only/idempotent/recoverable | T25 |
