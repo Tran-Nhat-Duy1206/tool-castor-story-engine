@@ -18,9 +18,10 @@ attempt. Core owns authority, readiness, dependencies, conflicts, authorizations
 versions, transactions and provenance; AI proposes, Human authorizes, Canon records
 reality — reusing the existing Architect/Planner/Writer, Phase 4 State Review, atomic
 persistence, retrieval, Studio and CLI rather than building a parallel system. **AI
-execution NEVER creates authority: every authority artifact stops at a Human-reviewable
-Draft, and Human Publish (Foundation/Arc) or Human confirmation (Direction/
-Authorization) or Phase 4 Final Confirm (Canon) is the only boundary.**
+execution NEVER creates authority:** every authority artifact stops at a
+Human-reviewable Draft, restore produces revision candidates (never Published
+versions), and Human Publish (Foundation/Arc), Human confirmation (Direction/
+Authorization), or Phase 4 Final Confirm (Canon) is the only authority boundary.
 
 **Tech Stack:** TypeScript (ESM), pnpm workspace (`packages/core` / `packages/cli` /
 `packages/studio`), zod schemas with `z.infer` types (repo convention,
@@ -50,8 +51,8 @@ Verified current files this plan builds on (paths under `packages/`):
   `core/src/agents/planner-prompts.ts`, `core/src/models/input-governance.ts`
   (`ChapterIntentSchema`, `ChapterMemoSchema`), `core/src/pipeline/persisted-governed-plan.ts`
   (`savePersistedPlan`/`loadPersistedPlan`).
-- **Writer/pipeline:** `core/src/pipeline/runner.ts` (`writeNextChapter`, governed
-  proposal publication), `core/src/pipeline/chapter-review-cycle.ts`,
+- **Writer/pipeline:** `core/src/pipeline/runner.ts` (`writeNextChapter` — the production
+  Writer entry path; governed proposal publication), `core/src/pipeline/chapter-review-cycle.ts`,
   `core/src/pipeline/chapter-truth-validation.ts`, `core/src/agents/writer.ts`.
 - **Phase 4:** `core/src/state/state-review-{store,service,items,confirm,finalize,temporal}.ts`,
   `core/src/state/advancement-gate.ts`, `core/src/models/state-review.ts`; Studio
@@ -93,20 +94,26 @@ No `governance` capability/version markers exist yet anywhere (verified); they a
 - No lower layer expands higher authority.
 - Canon owns established past; Foundation/Arc authority requires **Human Publish** —
   AI execution NEVER auto-publishes; it produces Human-reviewable Drafts only.
+- Restore NEVER creates authority — it produces a revision candidate requiring Human
+  Publish.
 - Human Direction / Authorization require explicit Human confirmation.
 - Phase 4 Final Confirm remains the Canon settlement boundary.
 - Direct declared dependency invalidation only — no recursive cascade at change time.
 - Approved/published Foundation is AI-readable and AI-immutable.
-- Published versions immutable; restore-as-new-revision, never backward pointer moves.
+- Published versions immutable; never backward pointer moves.
 - No silent semantic `CANON_CONFLICT` classification by AI (deterministic Core only).
 - Lookahead is advisory only; scores are informational only.
-- Authorization consumes only on Canon evidence, atomically with Canon settlement.
-- Writer cannot run without a valid immutable Execution Snapshot.
+- Authorization consumes only on Canon evidence — derived and validated by Core, never
+  from a raw caller ID list — atomically with Canon settlement.
+- Writer cannot run without a valid immutable Execution Snapshot; the CORE production
+  write entry enforces this (CLI/Studio are not the security boundary).
 - One deliberate Write action produces at most one chapter.
 - P0 authority context is never silently dropped; no automatic model switching to
   escape the context budget.
 - Old InkOS-derived books keep working before V2 adoption; preserve `inkos.json`,
   `INKOS_*`, `.inkos/` compatibility unless a justified migration requires otherwise.
+- Governance capability markers flip atomically with the first Human Publish — never
+  before, never in a separate transaction.
 - No Phase 6 deep prose-autonomy leakage; no Phase 7 Story Intelligence leakage.
 - No production authority bypass flags (`--force`, `--ignore-canon`, `--skip-authority`).
 - No `v0.2.0` until the Phase 5 completion gate passes and the human accepts it.
@@ -120,78 +127,88 @@ New files (all under `packages/`; tests beside sources per repo convention
 
 | Path | Responsibility | Introduced by |
 |---|---|---|
-| `core/src/governance/contracts.ts` | Capability/version markers + ALL stable vocabularies (unit kinds, statuses, importance, character reasons, relationship tiers, hook lifecycle, authorization scopes/conditions, decision kinds, direction scopes/lifecycle, beat categories, finding severity/scope, conflict kinds, gate results) | T1 |
-| `core/src/models/book.ts` (modify) | Additive optional `governance` field to `BookConfigSchema` (`{foundation: legacy\|v2, planning: legacy\|v2}`, absent ⇒ legacy) — the persisted capability marker surface | T1 |
+| `core/src/governance/contracts.ts` | Capability/version markers + ALL stable vocabularies (unit kinds, statuses, importance, character reasons, relationship tiers, hook lifecycle, authorization scopes/conditions, decision kinds, direction scopes/lifecycle, beat categories, finding severity/scope, conflict kinds, gate results, `PlanningDependencyRef`) | T1 |
+| `core/src/models/book.ts` (modify) | Additive optional `governance` field to `BookConfigSchema` (absent ⇒ legacy) — the persisted capability marker surface | T1 |
 | `core/src/governance/readiness.ts` | `ReadinessEvaluator` — blockingReasons/warnings/nextRecommendedAction | T4 |
 | `core/src/governance/dependencies.ts` | `DependencyManager` — Core-owned dep semantics, concrete links, direct-only invalidation, graph validity | T4 |
 | `core/src/governance/conflicts.ts` | Two-layer conflict classifier (deterministic Core vs semantic AI) + Human Resolution Record | T6 |
-| `core/src/governance/authorizations.ts` | Author Decision vocabulary, pending→active Authorization, typed scopes/conditions, consumption | T10 |
-| `core/src/governance/versions.ts` | **Version/history primitives only**: generic `VersionEnvelope<T>`, version records, current-version metadata, lineage, restore-as-new-revision, historical reads, integrity. Provides primitives; never switches authority itself | T5 |
-| `core/src/governance/transactions.ts` | **Single authoritative `TransactionCoordinator`** (PREPARE/VALIDATE/STAGE/JOURNAL/COMMIT/MATERIALIZE/FINALIZE) over `atomic-file-set` | T8 |
-| `core/src/governance/provenance.ts` | Provenance recorder (version/evidence/resolution provenance records) | T6/T5 |
-| `core/src/foundation/manifest.ts` | Foundation V2 unit manifests with **logical content locators** (whole_file / section / rule), identity, kind, importance, status, deps, revision, approval, staleness, provenance | T2 |
-| `core/src/foundation/bootstrap.ts` | Governance-mode detection, legacy parse → `legacy_established`, opt-in **upgrade candidate preparation** (never publishes) | T3 |
+| `core/src/governance/authorizations.ts` | Author Decision vocabulary, pending→active Authorization, typed scopes/conditions, evidence-derived consumption, Core Human Direction NL parser | T11 |
+| `core/src/governance/versions.ts` | **Generic version/history primitives only**: `VersionEnvelope<T>`, `VersionStore`, `restoreVersionAsRevisionCandidate` (never publishes, never advances the current pointer) | T5 |
+| `core/src/governance/transactions.ts` | **Single authoritative `TransactionCoordinator`** (PREPARE/VALIDATE/STAGE/JOURNAL/COMMIT/MATERIALIZE/FINALIZE) over `atomic-file-set` | T9 |
+| `core/src/governance/provenance.ts` | Provenance recorder (version/evidence/resolution provenance records) | T5/T6 |
+| `core/src/foundation/manifest.ts` | Foundation V2 unit manifests with **logical content locators** (whole_file / section / rule / entry), identity, kind, importance, status, deps, revision, approval, staleness, provenance | T2 |
+| `core/src/foundation/bootstrap.ts` | Governance-mode detection, legacy parse → `legacy_established`, opt-in upgrade **candidate preparation** (`status: "prepared"` only, no preflight, never publishes) | T3 |
 | `core/src/foundation/review.ts` | Finding schema, reviewer-only diagnosis, bounded repair policy (2 rounds), verification invocation | T7 |
-| `core/src/foundation/publish.ts` | Foundation Publish **gate + explicit Human Publish** + external-edit Compare/Adopt/Discard, on the shared TransactionCoordinator | T8 |
-| `core/src/foundation/pipeline.ts` | Adaptive intake (0–3 MUST-KNOW gaps), global generate → global review → local repair; **stops at a Human-reviewable Revision Draft** | T9 |
-| `core/src/planning/arc-plan.ts` | Arc Plan draft/publish/restore interfaces (draft vs Published authority), consuming T5/T8 primitives | T11 |
-| `core/src/planning/beats.ts` | Major Beat lifecycle/importance/categories + Canon-evidence evaluation (deterministic + semantic) | T11 |
-| `core/src/planning/lookahead.ts` | Advisory Rolling Lookahead with full provenance + selective invalidation | T12 |
-| `core/src/planning/detailed-plan.ts` | Detailed Chapter Plan V2 evolving `ChapterIntent/ChapterMemo`, binding fields, PLAN_SCOPE_TOO_BROAD | T13 |
-| `core/src/planning/gate.ts` | Planning Gate L1 (deterministic) + L2 (semantic) + truth-table resolution | T14 |
-| `core/src/planning/repair.ts` | **Planning-specific bounded repair**: `PlanningFinding`, `reviewDetailedPlan`, `repairDetailedPlanLocal`, `verifyDetailedPlanRepair` | T14 |
-| `core/src/planning/transition.ts` | Arc completion outcomes + auto/blocked transition | T18 |
-| `core/src/context/composer.ts` | Authority Spine + dependency retrieval + continuity + semantic supplement; P0–P4 profiles | T15 |
-| `core/src/context/bundle.ts` | ContextBundle schema + provenance + staleness | T15 |
-| `core/src/context/budget.ts` | Budget policy (reserve output, deterministic projection, soft trim, semantic compression allowlist, no auto model switch, CONTEXT_BUDGET_EXCEEDED) | T15 |
-| `core/src/execution/snapshot.ts` | Atomic Execution Snapshot freeze + provenance + prepare-race failure | T16 |
-| `core/src/execution/attempt.ts` | Attempt lifecycle + defect routing (PROSE/PLAN/AUTHORITY/CANON) + 2-replan cap | T16 |
-| `core/src/state/settlement-integration.ts` | **Atomic settlement effects** (Canon + one-time Authorization consumption in ONE transaction) + **laggable post-commit effects** (semantic Beat evidence, Lookahead refresh, derived rebuild) | T17 |
-| `core/src/state/state-review-finalize.ts` (modify) | Authorization-consumption writes included in the SAME prepared atomic set as Canon writes (no post-commit hook for atomic effects) | T17 |
+| `core/src/foundation/revision-service.ts` | **Core Foundation Human review operations**: open/load/save draft, approve, mark-needs-revision, reapprove-stale, discard — the ONLY approval state transitions (never publishes) | T8 |
+| `core/src/foundation/publish.ts` | Foundation Publish gate + explicit Human Publish + atomic V2 marker activation + external-edit Compare/Adopt/Discard, on the shared TransactionCoordinator | T9 |
+| `core/src/foundation/pipeline.ts` | Adaptive intake (0–3 MUST-KNOW gaps), global generate → global review → local repair → **Human-reviewable Revision Draft** (never publishes) | T10 |
+| `core/src/planning/arc-plan.ts` | Arc Plan draft/restore-candidate/publish interfaces, `ArcPlanVersion = VersionEnvelope<ArcPlanSnapshot>`, consuming T5/T9 primitives | T12 |
+| `core/src/planning/arc-pipeline.ts` | **Arc Planner + Arc preflight pipeline**: generate Arc Draft, deterministic preflight, semantic review, Arc findings, LOCAL repair, verification, 2-round cap, AUTHOR_DECISION routing | T13 |
+| `core/src/planning/beats.ts` | Major Beat lifecycle/importance/categories + Canon-evidence evaluation (deterministic + semantic) | T12 |
+| `core/src/planning/lookahead.ts` | Advisory Rolling Lookahead with typed `PlanningDependencyRef` provenance + selective invalidation | T14 |
+| `core/src/planning/detailed-plan.ts` | Detailed Chapter Plan V2 evolving `ChapterIntent/ChapterMemo`, typed binding refs, PLAN_SCOPE_TOO_BROAD | T15 |
+| `core/src/planning/gate.ts` | Planning Gate L1 (deterministic) + L2 (semantic) + truth-table resolution | T16 |
+| `core/src/planning/repair.ts` | **Planning-specific bounded repair**: `PlanningFinding`, `PlanningRepairOutcome`, `reviewDetailedPlan`, `repairDetailedPlanLocal`, `verifyDetailedPlanRepair` | T16 |
+| `core/src/planning/transition.ts` | Arc completion outcomes + auto-close/activate (never auto-Publish) | T21 |
+| `core/src/context/composer.ts` | Authority Spine + dependency retrieval + continuity + semantic supplement; P0–P4 profiles | T17 |
+| `core/src/context/bundle.ts` | ContextBundle schema + **structured `ContextSourceProvenance`** + staleness | T17 |
+| `core/src/context/budget.ts` | Budget policy (reserve output, deterministic projection, soft trim, semantic compression allowlist, no auto model switch, CONTEXT_BUDGET_EXCEEDED) | T17 |
+| `core/src/execution/snapshot.ts` | Atomic Execution Snapshot freeze + provenance + prepare-race failure | T18 |
+| `core/src/execution/attempt-store.ts` | **Durable ExecutionAttempt persistence** (create/load/recordRunning/recordDrafted/recordFailure/abortForPlanDefect/accept) | T18 |
+| `core/src/execution/attempt.ts` | Attempt lifecycle + defect routing (PROSE/PLAN/AUTHORITY/CANON) + 2-replan cap | T18 |
+| `core/src/pipeline/runner.ts` (modify) | **Core production write gate**: resolve authority → fresh Detailed Plan → Planning Gate SAFE → Context Composer → budget check → Snapshot freeze → Writer; every Writer invocation requires a valid snapshot | T19 |
+| `core/src/state/settlement-integration.ts` | **Evidence-derived** authorization consumption (atomic with Canon) + laggable post-commit effects | T20 |
+| `core/src/state/state-review-finalize.ts` (modify) | Validated consumption writes inside the SAME prepared atomic set as Canon writes | T20 |
 | `core/src/index.ts` | Public barrel exports for new modules | T1+ |
-| `studio/src/lib/foundation-api.ts`, `planning-api.ts` | Typed clients (StateReviewPage precedent) | T19/T20 |
-| `studio/src/pages/FoundationPage.tsx` (+ `foundation-ui-state.ts`/`.test.ts`) | Foundation unit review/revision/Publish UI | T19 |
-| `studio/src/pages/PlanningPage.tsx` (+ `planning-ui-state.ts`/`.test.ts`) | Arc/Beat/Lookahead/detailed-plan UI | T20 |
-| `studio/src/api/server.ts` (modify) | Two route blocks (foundation base, planning base) consuming Core ops only | T19/T20 |
-| `cli/src/commands/foundation.ts`, `planning.ts`; modify `status.ts`, `write.ts` | Safe operational surface + readiness blockers; gates respected in `write next` | T21 |
+| `studio/src/lib/foundation-api.ts`, `planning-api.ts` | Typed clients (StateReviewPage precedent) | T22/T23 |
+| `studio/src/pages/FoundationPage.tsx` (+ `foundation-ui-state.ts`/`.test.ts`) | Foundation unit review/revision/Publish UI consuming Core ops | T22 |
+| `studio/src/pages/PlanningPage.tsx` (+ `planning-ui-state.ts`/`.test.ts`) | Arc/Beat/Lookahead/detailed-plan UI; Direction NL via Core parser | T23 |
+| `studio/src/api/server.ts` (modify) | Two route blocks (foundation base, planning base) consuming Core ops only | T22/T23 |
+| `cli/src/commands/foundation.ts`, `planning.ts`; modify `status.ts`, `write.ts` | Safe operational surface + readiness blockers; gates respected in `write next` | T24 |
 
-Justified split: none of the existing files are refactored; new modules live beside them.
-`state-review-finalize.ts` gains only the authorization-consumption writes inside its
-existing atomic set (Task 17); `models/book.ts` gains an additive optional field (Task 1).
+Justified split: none of the existing files are refactored except `runner.ts` (T19 adds
+the Core write gate inside the existing `writeNextChapter` orchestration) and
+`state-review-finalize.ts` (T20 adds validated consumption writes to its existing atomic
+set) and `models/book.ts` (T1 additive optional field).
 
 ---
 
 ## Expected implementation order (mapped to tasks)
 
 ```
-1  → T1    governance domain contracts / capability markers / vocabularies
+1  → T1    governance domain contracts / capability markers / vocabularies (+ PlanningDependencyRef)
 2  → T2    Foundation V2 unit manifests + logical content locators
-3  → T3    legacy bootstrap + upgrade candidate preparation (NO publish)
+3  → T3    legacy bootstrap + upgrade candidate preparation (prepared only; NO preflight, NO publish)
 4  → T4    readiness + dependencies + direct invalidation
-5  → T5    version/history primitives (no authority switch)
+5  → T5    generic version/history primitives (restore ⇒ revision candidate)
 6  → T6    conflict classification + Human Resolution
 7  → T7    foundation reviewer findings + bounded repair
-8  → T8    TransactionCoordinator + Foundation Human Publish + external edits
-9  → T9    Foundation AI pipeline (stops at Human-reviewable Draft)
-10 → T10   Human Direction + Authorization (pending→active, typed scopes)
-11 → T11   Arc Plan + Major Beat authority (draft/publish/restore)
-12 → T12   Rolling Lookahead lifecycle + selective invalidation
-13 → T13   Detailed Chapter Plan V2
-14 → T14   Planning Gate + planning-specific bounded repair
-15 → T15   Context Composer (spine/profiles/budget/provenance)
-16 → T16   Execution Snapshot + attempt lifecycle
-17 → T17   Phase 4 settlement integration (atomic + laggable split)
-18 → T18   Arc completion / transition
-19 → T19   Studio Foundation governance surface
-20 → T20   Studio Planning governance surface
-21 → T21   CLI safe operational integration
-22 → T22   legacy upgrade E2E / compatibility / recovery scenarios
-23 → T23   final Phase 5 acceptance (Definition of Done)
+8  → T8    Foundation revision/review service (Human approval state transitions)
+9  → T9    TransactionCoordinator + Foundation Human Publish + atomic V2 marker + external edits
+10 → T10   Foundation AI pipeline (stops at Human-reviewable Draft)
+11 → T11   Human Direction + Authorization (pending→active, typed scopes) + Core NL parser
+12 → T12   Arc Plan storage + Major Beat authority (draft/publish/restore-candidate)
+13 → T13   Arc Planner + Arc preflight pipeline (deterministic + semantic + repair)
+14 → T14   Rolling Lookahead lifecycle + typed selective invalidation
+15 → T15   Detailed Chapter Plan V2
+16 → T16   Planning Gate + planning-specific bounded repair
+17 → T17   Context Composer (structured provenance, budget, no auto model switch)
+18 → T18   Execution Snapshot + durable Execution Attempts
+19 → T19   Core Writer execution gate (runner.ts — every Writer call needs a valid snapshot)
+20 → T20   Phase 4 settlement integration (evidence-derived consumption, atomic + laggable)
+21 → T21   Arc completion / transition (never auto-Publish)
+22 → T22   Studio Foundation governance surface
+23 → T23   Studio Planning governance surface (Core NL parsing)
+24 → T24   CLI safe operational integration
+25 → T25   legacy upgrade E2E / compatibility / recovery scenarios (test-only)
+26 → T26   final Phase 5 acceptance (Definition of Done)
 ```
 
-This follows the spec's dependency direction. Post-review correction: Task 3 prepares
-an upgrade candidate and NEVER publishes — explicit Human Publish is Task 8's operation
-invoked later by Human/UI/API; Task 9 stops at a Revision Draft.
+Post-review corrections: restore produces revision candidates only (T5/T12); the Arc
+Planner/preflight pipeline is a real task (T13); the Core write gate lives in
+`runner.ts` (T19); Foundation Human approval is a dedicated Core service (T8); V2
+marker activation is atomic with first Human Publish (T9/T12); planning/context
+dependency refs share one typed vocabulary (T1).
 
 ---
 
@@ -206,7 +223,6 @@ invoked later by Human/UI/API; Task 9 stops at a Revision Draft.
 **Interfaces** (zod, repo convention)
 
 ```ts
-// capability/version markers — explicit marker wins; absence => legacy
 export const FoundationGovernanceModeSchema = z.enum(["legacy", "v2"]);
 export const PlanningGovernanceModeSchema = z.enum(["legacy", "v2"]);
 export const GovernanceMarkersSchema = z.object({
@@ -283,20 +299,32 @@ export const ArcCompletionOutcomeSchema = z.enum([
 export const AttemptDefectSchema = z.enum([
   "prose_defect", "plan_defect", "authority_defect", "canon_conflict",
 ]);
+// Typed dependency refs shared by Lookahead / Detailed Plan / Context (single vocabulary).
+export type PlanningDependencyRef =
+  | { kind: "foundation_unit"; unitId: string; revision: number }
+  | { kind: "canon_fact"; factKey: string; canonRevision: number }
+  | { kind: "hook"; hookId: string; authority: HookAuthorityLevelSchema }
+  | { kind: "relationship"; relationshipId: string }
+  | { kind: "timeline"; anchorId: string }
+  | { kind: "character_state"; characterId: string }
+  | { kind: "arc_beat"; beatId: string }
+  | { kind: "human_direction"; directionId: string }
+  | { kind: "authorization"; authorizationId: string };
 ```
 
 **Steps**
 
 - [ ] Write the failing test (schemas parse every canonical member; reject unknown
-      values; markers default to `legacy` when absent; explicit `"v2"` marker wins;
-      an unknown marker value fails closed; existing books without `governance` still
-      parse via `BookConfigSchema`). Run
+      values; markers default to `legacy` when absent; explicit `"v2"` marker wins; an
+      unknown marker value fails closed; existing books without `governance` still
+      parse; `PlanningDependencyRef` rejects unknown kinds and requires stable
+      IDs/revisions per kind). Run
       `pnpm --filter @actalk/inkos-core exec vitest run src/__tests__/governance-contracts.test.ts`
       and verify failure (module missing).
 - [ ] Implement `contracts.ts` + `BookConfigSchema` additive field; re-run targeted test → PASS.
 - [ ] Run `pnpm --filter @actalk/inkos-core exec vitest run src/__tests__/models.test.ts` (regression).
-- [ ] Run the Task Completion Gate (G1–G10 below).
-- [ ] Commit `feat(core): phase 5 governance domain contracts and vocabularies`.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): phase 5 governance domain contracts and vocabularies`.
 
 ## Task 2 — Foundation V2 unit manifests with logical content locators
 
@@ -307,16 +335,14 @@ export const AttemptDefectSchema = z.enum([
 **Interfaces**
 
 ```ts
-// A governed unit's content may live anywhere in the existing Markdown layout.
-// unitId is STABLE LOGICAL IDENTITY, never merely the source basename.
 export type FoundationContentLocator =
   | { readonly sourceRelPath: string; readonly contentKind: "whole_file" }
   | { readonly sourceRelPath: string; readonly contentKind: "section"; readonly sectionKey: string }
   | { readonly sourceRelPath: string; readonly contentKind: "rule"; readonly ruleId: string }
-  | { readonly sourceRelPath: string; readonly contentKind: "entry"; readonly entryKey: string }; // e.g. a role sheet or hook line
+  | { readonly sourceRelPath: string; readonly contentKind: "entry"; readonly entryKey: string };
 
 export interface FoundationUnitManifest {
-  readonly unitId: string;
+  readonly unitId: string;                  // stable logical identity, not basename
   readonly kind: FoundationUnitKind;
   readonly importance: Importance;
   readonly status: FoundationUnitStatus;
@@ -336,27 +362,25 @@ export async function extractGovernedContent(bookDir: string, locator: Foundatio
 
 Grounded locator mapping (existing layout): Story Frame = `story/outline/story_frame.md`
 with section keys `theme_tone | core_conflict | world_setting | ending_direction` —
-**four independent units sharing one file**; Book Rules = `story/book_rules.md` with
-per-rule IDs (one file, many governed units); Characters = `story/roles/<tier>/*.md`
-(whole-file per sheet); Hooks = `story/pending_hooks.md` (per-hook entry); Arc
-Direction = `story/outline/volume_map.md` (whole_file or per-volume entries as
-`entry`). Manifest files live under `story/foundation-v2/<unit-id>.gov.json`; Markdown
-remains creative content authority and JSON never duplicates prose.
+four independent units sharing one file; Book Rules = `story/book_rules.md` with
+per-rule IDs; Characters = `story/roles/<tier>/*.md` (whole-file per sheet); Hooks =
+`story/pending_hooks.md` (per-hook entry); Arc Direction = `story/outline/volume_map.md`
+(whole_file or per-volume `entry`). Manifest files live under
+`story/foundation-v2/<unit-id>.gov.json`; Markdown remains creative content authority
+and JSON never duplicates prose.
 
 **Steps**
 
 - [ ] Write failing tests: round-trip write/read; content hash computed over the
-      GOVERNED logical content (a section change changes only that unit's hash);
-      the four Story Frame units share `story_frame.md` and are governed
-      independently (approving one never approves the others); per-rule Book Rule
-      governance (one rule's status is independent of its siblings); unknown kind
-      rejected; manifest has no prose field.
+      GOVERNED logical content (a section change changes only that unit's hash); the
+      four Story Frame units share `story_frame.md` and are governed independently;
+      per-rule Book Rule governance; unknown kind rejected; manifest has no prose field.
 - [ ] Implement `manifest.ts`; targeted run → PASS.
 - [ ] Regressions (`outline-paths`/architect tests), typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): foundation v2 unit manifests with logical content locators`.
 
-## Task 3 — Legacy Foundation bootstrap + upgrade candidate preparation (NO publish)
+## Task 3 — Legacy Foundation bootstrap + upgrade candidate preparation (prepared only)
 
 **Files**
 - Create `packages/core/src/foundation/bootstrap.ts`
@@ -373,8 +397,8 @@ export interface BootstrapResult {
 export async function bootstrapFoundation(bookDir: string): Promise<BootstrapResult>;
 export interface UpgradeCandidate {
   readonly candidateId: string;
+  readonly status: "prepared";               // NEVER preflight/approved/published here
   readonly revisionDraft: ReadonlyArray<FoundationUnitManifest>;  // legacy_established source content
-  readonly preflightStatus: "ready_for_human_review" | "needs_human_direction";
   readonly canonRevision: number;
 }
 export async function prepareFoundationV2Upgrade(bookDir: string): Promise<UpgradeCandidate>;
@@ -382,22 +406,22 @@ export async function prepareFoundationV2Upgrade(bookDir: string): Promise<Upgra
 
 Rules: legacy books parse the existing layout into `legacy_established` units (NOT
 approved); books with existing chapters stay in compatibility mode; upgrade is opt-in;
-`prepareFoundationV2Upgrade` ONLY creates a Foundation Revision Draft / upgrade
-candidate. **It never publishes authority.** Actual V2 v1 authority requires:
-bootstrap candidate → AI preflight → current Canon check → Human review → explicit
-Human Publish (Task 8) → Foundation v1. Upgrade rewrites NO chapter prose or
-historical Canon (assert content hashes + `story/state/*.json` byte-identical).
+`prepareFoundationV2Upgrade` ONLY creates the candidate (`status: "prepared"`). **AI
+preflight, current-Canon check, repair, and Human-review readiness belong to the later
+pipeline orchestration (T7 findings + T10 pipeline) — not here. There is no hidden
+forward dependency.** Candidate creation never publishes, never flips markers, and never
+rewrites chapters/Canon (assert content hashes + `story/state/*.json` byte-identical).
 
 **Steps**
 
 - [ ] Write failing tests: legacy book → units `legacy_established`, none approved;
-      `prepareFoundationV2Upgrade` returns a draft candidate with zero authority side
-      effects (no published version exists, no `foundation` marker flipped to v2,
-      chapters/Canon byte-identical); explicit `"v2"` marker skips bootstrap; unknown
-      marker fails closed.
+      `prepareFoundationV2Upgrade` returns `status: "prepared"` with zero authority
+      side effects (no published version, no marker flip, chapters/Canon
+      byte-identical); explicit `"v2"` marker skips bootstrap; unknown marker fails
+      closed.
 - [ ] Implement `bootstrap.ts`; targeted run → PASS.
 - [ ] Regressions: `pipeline-runner.test.ts` bootstrap tests; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): legacy foundation bootstrap and v2 upgrade candidate preparation`.
 
 ## Task 4 — Foundation readiness, dependencies, direct invalidation
@@ -435,16 +459,16 @@ depends on them; protagonist always required; graph cycles rejected.
 - [ ] Write failing tests incl. the direct-only invalidation scenario (A→B→C) and
       optional-gating-when-depended; run targeted → fail.
 - [ ] Implement; targeted → PASS; regressions (`outline-paths`), typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): foundation readiness and direct dependency invalidation`.
 
-## Task 5 — Version/history primitives (no authority switch)
+## Task 5 — Generic version/history primitives (restore ⇒ revision candidate)
 
 **Files**
 - Create `packages/core/src/governance/versions.ts`
 - Create `packages/core/src/__tests__/governance-versions.test.ts`
 
-**Interfaces** (generic — supports Foundation AND Arc Plan snapshots)
+**Interfaces** (generic only — NO forward type references)
 
 ```ts
 export interface VersionEnvelope<TSnapshot> {
@@ -453,14 +477,13 @@ export interface VersionEnvelope<TSnapshot> {
   readonly version: number;
   readonly parentVersion: number | null;
   readonly baseCanonRevision: number;
-  readonly contentHash: string;            // hash of the authoritative logical content
-  readonly snapshot: TSnapshot;            // discriminated by artifactKind
+  readonly contentHash: string;
+  readonly snapshot: TSnapshot;
   readonly publishedAt: string;
   readonly publishedBy: string;
   readonly restoredFromVersion?: number;
 }
-export type FoundationVersion = VersionEnvelope<FoundationUnitManifest>;
-export type ArcPlanVersion = VersionEnvelope<ArcPlanSnapshot>;   // T11 defines ArcPlanSnapshot
+export type FoundationVersion = VersionEnvelope<FoundationUnitManifest>; // type exists since T2
 export interface VersionStore {
   readonly appendVersion: <T>(v: VersionEnvelope<T>) => Promise<VersionEnvelope<T>>;
   readonly readVersion: <T>(artifactKind: string, unitId: string, version: number) => Promise<VersionEnvelope<T> | null>;
@@ -468,26 +491,40 @@ export interface VersionStore {
   readonly listVersions: (artifactKind: string, unitId: string) => Promise<ReadonlyArray<number>>;
   readonly verifyIntegrity: (artifactKind: string, unitId: string) => Promise<ReadonlyArray<string>>;
 }
-export function restoreAsNewRevision<T>(store: VersionStore, artifactKind: string, unitId: string, fromVersion: number): Promise<VersionEnvelope<T>>;
+export interface RevisionCandidate<TSnapshot> {
+  readonly artifactKind: "foundation" | "arc_plan";
+  readonly unitId: string;
+  readonly parentVersion: number;          // = CURRENT published version
+  readonly restoredFromVersion: number;    // selected historical version
+  readonly baseCanonRevision: number;      // CURRENT Canon
+  readonly status: "draft" | "needs_review";
+  readonly snapshot: TSnapshot;
+}
+export async function restoreVersionAsRevisionCandidate<T>(
+  store: VersionStore, artifactKind: string, unitId: string, fromVersion: number, currentCanonRevision: number,
+): Promise<RevisionCandidate<T>>;
 ```
 
-Scope discipline: Task 5 owns **version/history semantics only** — immutable version
-records, current-version metadata, revision lineage, restore-as-new-revision (a NEW
-version record; never a pointer move), historical reads, version integrity. Task 5
-provides the `VersionStore` primitive consumed by Task 8, but **must not independently
-switch authority** — no Publish transaction, no journal, no authority materialization
-here. Version-history integrity tests stay in this Task; authoritative-Publish fault
-injection belongs to Task 8.
+Scope discipline: Task 5 owns version/history semantics only. **`restoreVersionAsRevisionCandidate`
+produces a revision candidate — it MUST NOT append a new Published authority version,
+MUST NOT advance the authoritative current pointer, and MUST NOT bypass current
+Canon/dependency review.** Human Publish (Task 9) later creates the new immutable
+Published version. No `ArcPlanVersion` alias here — `ArcPlanSnapshot` does not exist
+until Task 12, which defines `type ArcPlanVersion = VersionEnvelope<ArcPlanSnapshot>`
+after introducing the snapshot type. After each Task's commit the repository must
+typecheck (dependency-order rule).
 
 **Steps**
 
 - [ ] Write failing tests: append/read/current/list; immutability (a version record
-      cannot be mutated after append); restore produces a NEW version with
-      `restoredFromVersion` and current pointer advanced, old versions untouched;
-      integrity verification detects tampering (content hash mismatch).
+      cannot be mutated after append); **restore leaves the current published
+      authority unchanged** (readCurrentVersion identical before/after) and returns a
+      `RevisionCandidate` with `parentVersion` = current published, `restoredFromVersion`
+      = selected historical, `baseCanonRevision` = current Canon, status
+      draft/needs_review; integrity verification detects tampering.
 - [ ] Implement `versions.ts`; targeted run → PASS.
-- [ ] Typecheck; run the Task Completion Gate; commit
-      `feat(core): generic version and history primitives for foundation and arc plans`.
+- [ ] Typecheck; run the Task Completion Gate using commit message
+      `feat(core): generic version and history primitives with restore-as-candidate`.
 
 ## Task 6 — Conflict classification (two-layer) + Human Resolution Record
 
@@ -527,7 +564,7 @@ invalidated when its bound evidence or Canon revision changes.
 
 - [ ] Write failing tests for the negative guarantees; targeted → fail.
 - [ ] Implement; targeted → PASS; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): two-layer foundation conflict classification and human resolutions`.
 
 ## Task 7 — Foundation reviewer findings + bounded repair
@@ -561,18 +598,63 @@ Policy encoded and tested: MINOR+LOCAL auto-repairs; IMPORTANT+LOCAL auto-repair
 mandatory targeted re-review; MULTI_UNIT never silently repaired; AUTHOR_DECISION routes
 to human; BLOCKING unresolved blocks Publish; semantic repair capped at 2 rounds then
 `needs_human_direction`; repair writes are scoped — an approved sibling unit is never
-modified by a LOCAL repair; reviewer-only diagnosis vs repair-agent proposal are separate
-invocations (`verifyRepairs` is a distinct call — no self-certification).
+modified by a LOCAL repair; `verifyRepairs` is a separate invocation (no
+self-certification). **AI repair can never approve a unit** — approval is exclusively
+the Human review service (Task 8).
 
 **Steps**
 
-- [ ] Write failing tests incl. write-scope enforcement and the 2-round cap;
-      targeted → fail.
+- [ ] Write failing tests incl. write-scope enforcement and the 2-round cap; targeted
+      → fail.
 - [ ] Implement; targeted → PASS; regressions (`foundation-reviewer` agent tests).
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): foundation findings and bounded repair policy`.
 
-## Task 8 — TransactionCoordinator + Foundation Human Publish + external edits
+## Task 8 — Foundation revision/review service (Human approval state transitions)
+
+**Files**
+- Create `packages/core/src/foundation/revision-service.ts`
+- Create `packages/core/src/__tests__/foundation-revision-service.test.ts`
+
+**Interfaces**
+
+```ts
+export type FoundationRevisionOperation =
+  | { op: "open"; unitIds: ReadonlyArray<string> }
+  | { op: "save_draft"; unitId: string; content: string }
+  | { op: "approve"; unitId: string; approvedRevision: number; contentHash: string }
+  | { op: "needs_revision"; unitId: string; reason: string }
+  | { op: "reapprove_stale"; unitId: string; approvedRevision: number; contentHash: string; resolutionId?: string }
+  | { op: "discard"; revisionId: string };
+export async function openFoundationRevision(bookDir: string, unitIds: ReadonlyArray<string>): Promise<{ revisionId: string }>;
+export async function loadFoundationRevision(bookDir: string, revisionId: string): Promise<FoundationRevisionDraft>;
+export async function saveFoundationUnitDraft(bookDir: string, revisionId: string, unitId: string, content: string): Promise<void>;
+export async function approveFoundationUnit(bookDir: string, revisionId: string, unitId: string, approvedRevision: number, contentHash: string): Promise<void>;
+export async function markFoundationUnitNeedsRevision(bookDir: string, revisionId: string, unitId: string, reason: string): Promise<void>;
+export async function reapproveStaleFoundationUnit(bookDir: string, revisionId: string, unitId: string, approvedRevision: number, contentHash: string, resolutionId?: string): Promise<void>;
+export async function discardFoundationRevision(bookDir: string, revisionId: string): Promise<void>;
+export async function approveFoundationUnitsBatch(bookDir: string, revisionId: string, unitIds: ReadonlyArray<string>): Promise<{ approved: ReadonlyArray<string>; rejected: ReadonlyArray<{ unitId: string; reason: string }> }>;
+```
+
+Rules (state-transition tests for each): approved Published content remains immutable;
+opening revision creates working state only; manual edit → `needs_review`; AI repair can
+never approve; only explicit Human action can approve/reapprove; approval binds
+contentRevision/approvedRevision/hash/dependencies; stale cannot silently become
+approved (requires the resolution record when applicable); batch approval only for
+clean eligible units; **no revision operation changes current Published authority**;
+Publish remains Task 9.
+
+**Steps**
+
+- [ ] Write failing tests: full state-transition table; approved-unit immutability;
+      manual edit → needs_review; AI-repair-cannot-approve; stale
+      reapproval-requires-resolution; batch approval rejects ineligible units; publish
+      authority unchanged by any revision op.
+- [ ] Implement `revision-service.ts`; targeted → PASS; typecheck.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): foundation human review service with explicit approval transitions`.
+
+## Task 9 — TransactionCoordinator + Foundation Human Publish + atomic V2 marker + external edits
 
 **Files**
 - Create `packages/core/src/governance/transactions.ts`
@@ -583,8 +665,6 @@ invocations (`verifyRepairs` is a distinct call — no self-certification).
 **Interfaces**
 
 ```ts
-// SINGLE authoritative transaction owner (reused by Foundation Publish, Arc Publish,
-// Execution Snapshot freeze, and Phase 4 settlement integration).
 export type TransactionStage =
   | "prepare" | "validate" | "stage" | "journal" | "commit" | "materialize" | "finalize";
 export interface TransactionInput {
@@ -620,26 +700,33 @@ resolved, stale handled, graph valid, hashes valid, no unresolved external chang
 Publish is deterministic and short; revalidation immediately before COMMIT;
 `REVISION_BASE_STALE` on base change; external content never inherits approval.
 `publishFoundation` is the ONLY operation that creates Foundation authority — invoked
-by the Human via Studio/CLI/API, never by the AI pipeline (Task 9).
+by the Human via Studio/CLI/API, never by the AI pipeline (Task 10).
+
+**Atomic governance-mode activation (Foundation):** the FIRST successful Human
+Foundation V2 Publish atomically persists, in ONE transaction: Published Foundation v1
++ `governance.foundation = "v2"` + required direct invalidations. No marker flip before
+Publish; no marker flip after Publish in a separate transaction. Fault tests around
+marker activation: crash before COMMIT → marker stays `legacy` and no published v1;
+crash after durable COMMIT → marker `v2` with published v1 present.
 
 Fault injection (PRIMARY home for authoritative-Publish fault tests): before staging,
 after staging, before COMMIT, after durable COMMIT, current-materialization failure,
-journal finalization failure — the system exposes old authority or fully committed new
-authority, never half authority. Crash before COMMIT keeps old authority; crash after
-durable COMMIT keeps new committed authority and rebuilds materialization.
+journal finalization failure — old authority or fully committed new authority, never
+half authority.
 
 **Steps**
 
 - [ ] Write failing tests: gate truth for each failure class; stale-base rejection;
-      external-edit flow (compare/adopt/discard, adopt never auto-approves); the full
-      fault-injection table; `publishFoundation` refuses when any unit is not
-      `approved` or `legacy_established`-upgraded; targeted → fail.
+      external-edit flow (compare/adopt/discard, adopt never auto-approves);
+      **atomic marker activation** (single transaction; both crash sides tested);
+      `publishFoundation` refuses when any unit is not approved; the full
+      fault-injection table; targeted → fail.
 - [ ] Implement `transactions.ts` then `publish.ts`; targeted → PASS.
 - [ ] Regressions (`state-review-finalize` atomic tests), typecheck.
-- [ ] Run the Task Completion Gate; commit
-      `feat(core): transactional foundation publish gate and external edit handling`.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): transactional foundation publish with atomic v2 marker activation`.
 
-## Task 9 — Foundation intelligence pipeline (stops at Human-reviewable Draft)
+## Task 10 — Foundation intelligence pipeline (stops at Human-reviewable Draft)
 
 **Files**
 - Create `packages/core/src/foundation/pipeline.ts`
@@ -662,36 +749,35 @@ export async function runFoundationPipeline(bookDir: string): Promise<Foundation
 
 Behavior: intake extracts known info first and asks only MUST-KNOW gaps (0–3); the
 Architect may propose helpful material; generation runs once globally for coherence;
-review runs globally; repair runs locally (reusing Task 7 policy); no whole-Foundation
+review runs globally; repair runs locally (Task 7 policy); no whole-Foundation
 regeneration for local issues; mechanical/schema retries separate from semantic rounds.
 
 **Authority boundary: the pipeline NEVER publishes.** It produces a Human-reviewable
-Revision Draft (`ready_for_human_review`), or `needs_human_direction` after exhausted
-repair rounds, or `generation_failed`. Architect → Reviewer → Repair → **automatic
-Publish is forbidden**; Human Publish is exclusively Task 8's `publishFoundation`
-invoked later by Human/UI/API. Tests assert no published version exists after any
-pipeline outcome.
+Revision Draft (`ready_for_human_review`), or `needs_human_direction`, or
+`generation_failed`. Architect → Reviewer → Repair → automatic Publish is forbidden;
+Human Publish is exclusively Task 9's `publishFoundation`. Tests assert no published
+version and no marker flip after any pipeline outcome.
 
 **Steps**
 
-- [ ] Write failing tests (mocked `ArchitectAgent`/`FoundationReviewerAgent`):
-      intake asks only unknown MUST-KNOW gaps and 0–3 of them; local issue triggers a
-      local repair, not a global regeneration; every pipeline outcome ends with NO
-      published version (assert `readCurrentVersion` null for all units); clean run
-      → `ready_for_human_review`; exhausted rounds → `needs_human_direction`;
-      generation failure → `generation_failed`.
+- [ ] Write failing tests (mocked `ArchitectAgent`/`FoundationReviewerAgent`): intake
+      asks only unknown MUST-KNOW gaps and 0–3 of them; local issue triggers a local
+      repair, not a global regeneration; every outcome ends with NO published version
+      and NO marker flip; clean run → `ready_for_human_review`; exhausted rounds →
+      `needs_human_direction`; generation failure → `generation_failed`.
 - [ ] Implement `pipeline.ts`; targeted → PASS.
 - [ ] Regressions: `architect`/`foundation-reviewer` agent tests; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): adaptive foundation pipeline producing human-reviewable drafts`.
 
-## Task 10 — Human Direction + Authorization durable governance (pending → active)
+## Task 11 — Human Direction + Authorization (pending → active) + Core NL parser
 
 **Files**
 - Create `packages/core/src/governance/authorizations.ts`
 - Create `packages/core/src/__tests__/governance-authorizations.test.ts`
 
-**Interfaces** (discriminated scope instances; pending authority is un-resolvable)
+**Interfaces** (discriminated scope instances; pending authority is un-resolvable; NL
+parsing lives in Core)
 
 ```ts
 export type AuthorizationScope =
@@ -731,25 +817,30 @@ export type HumanDirection =
 export async function createHumanDirection(bookDir: string, draft: { text: string; scope: HumanDirectionScope }): Promise<Extract<HumanDirection, { lifecycle: "pending" }>>;
 export async function confirmHumanDirection(bookDir: string, directionId: string): Promise<Extract<HumanDirection, { lifecycle: "active" }>>;
 export async function resolveDirectionConflict(bookDir: string, ids: ReadonlyArray<string>, choice: "override" | "replace" | "keep" | "edit"): Promise<void>;
+// Core-owned NL parsing — Studio NEVER parses authority semantics.
+export async function parseHumanDirectionDraft(text: string, currentContext: { bookDir: string; canonRevision: number; arcPlanVersion: number | null }): Promise<{ directionId: string; proposedScope: HumanDirectionScope; confidence: "high" | "medium" | "low"; unresolved: ReadonlyArray<string> }>;
 ```
 
 Tests: pending Authorization/Direction can never be resolved as executable authority
-(`authorizationApplies` type signature accepts only `active`, and a runtime guard
-rejects pending); confirmation is the only transition to `active`; direction conflicts
-are explicit — no latest-wins, each choice exercised; lifecycle transitions;
+(`authorizationApplies` accepts only active; runtime guard rejects pending);
+confirmation is the only transition to active; direction conflicts explicit — no
+latest-wins, each choice exercised; lifecycle transitions;
 `consumeAuthorizationIfCanonConfirmed` is the ONLY consumption path and requires Canon
-evidence (plan/draft/failure never consume).
+evidence (plan/draft/failure never consume); `parseHumanDirectionDraft` returns a
+pending structured proposal with NO authority and resolves typed scope instances for
+all scope/condition kinds.
 
 **Steps**
 
 - [ ] Write failing tests (incl. "planning intent never consumes", "confirmation-gated
-      authority", "pending cannot resolve as authority", and scope-instance evaluation
-      for every typed scope/condition kind); targeted → fail.
+      authority", "pending cannot resolve as authority", scope-instance evaluation for
+      every typed scope/condition kind, NL parser outputs a pending proposal with no
+      authority); targeted → fail.
 - [ ] Implement; targeted → PASS; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): durable human direction and scoped authorization governance`.
 
-## Task 11 — Arc Plan + Major Beat authority (draft / publish / restore)
+## Task 12 — Arc Plan storage + Major Beat authority (draft / publish / restore-candidate)
 
 **Files**
 - Create `packages/core/src/planning/arc-plan.ts`
@@ -757,8 +848,9 @@ evidence (plan/draft/failure never consume).
 - Create `packages/core/src/__tests__/planning-arc-plan.test.ts`
 - Create `packages/core/src/__tests__/planning-beats.test.ts`
 
-**Interfaces** (consumes the exact `VersionEnvelope` from Task 5 and
-`runTransaction` from Task 8 — no parallel implementation)
+**Interfaces** (consumes the exact generic `VersionEnvelope` from Task 5 and
+`runTransaction` from Task 9 — no parallel implementation; `ArcPlanVersion` is defined
+HERE, after `ArcPlanSnapshot` exists)
 
 ```ts
 export interface ArcPlanSnapshot {
@@ -770,10 +862,11 @@ export interface ArcPlanSnapshot {
   readonly hookMovements: ReadonlyArray<string>;
   readonly timing: Record<string, unknown>;
   readonly authorizations: ReadonlyArray<string>;
-  readonly dependencies: ReadonlyArray<string>;
+  readonly dependencies: ReadonlyArray<PlanningDependencyRef>;
   readonly changedBeats: ReadonlyArray<string>;
   readonly changedAuthorizations: ReadonlyArray<string>;
 }
+export type ArcPlanVersion = VersionEnvelope<ArcPlanSnapshot>;
 export interface BeatRef {
   readonly beatId: string;
   readonly category: BeatCategory;
@@ -784,29 +877,90 @@ export async function createArcPlanDraft(bookDir: string, arcId: string, foundat
 export async function loadArcPlanDraft(bookDir: string, arcId: string): Promise<ArcPlanSnapshot | null>;
 export async function publishArcPlan(bookDir: string, arcId: string, expectedBaseCanonRevision: number): Promise<ArcPlanVersion>;  // explicit Human Publish
 export async function loadPublishedArcPlan(bookDir: string, arcId: string): Promise<ArcPlanVersion | null>;
-export async function restoreArcPlanAsRevision(bookDir: string, arcId: string, fromVersion: number): Promise<ArcPlanVersion>;
+export async function restoreArcPlanAsRevisionDraft(bookDir: string, arcId: string, fromVersion: number): Promise<RevisionCandidate<ArcPlanSnapshot>>; // NEVER publishes
 export type BeatEvidenceResult = { state: "satisfied" | "not_satisfied" } | { state: "uncertain"; reason: string };
 export async function evaluateBeatFromCanon(bookDir: string, beatId: string): Promise<BeatEvidenceResult>;
 ```
 
 Rules: Arc Plan is Draft until Human Publish (`publishArcPlan` — the ONLY Arc-authority
-boundary); published Arc versions immutable; restore produces a NEW revision against
-current Foundation/Canon; Beat state comes from Canon evidence, never planning
-prediction; semantic uncertainty mid-Arc stays `in_progress` unless required for an
-authority decision; REQUIRED Beats cannot be silently superseded.
+boundary); published Arc versions immutable; **restore produces a revision candidate
+(`restoreArcPlanAsRevisionDraft`) based against current Foundation/Canon — the current
+published Arc authority is unchanged until `publishArcPlan` creates the next version**;
+Beat state comes from Canon evidence, never planning prediction; semantic uncertainty
+mid-Arc stays `in_progress` unless required for an authority decision; REQUIRED Beats
+cannot be silently superseded.
+
+**Atomic governance-mode activation (Planning):** the FIRST Arc Plan Publish under V2
+Foundation atomically flips `governance.planning = "v2"` in the same publish
+transaction; no competing legacy/V2 planning authority exists. Fault tests cover both
+commit sides.
 
 **Steps**
 
-- [ ] Write failing tests: `publishArcPlan` only; PREFLIGHT_PASS draft still NOT
-      authoritative (a draft cannot gate Writer); published versions immutable;
-      restore → new revision (`restoredFromVersion` set, old versions intact); beat
-      evidence derives from Canon (planning prediction alone never sets satisfied);
-      semantic uncertainty stays in_progress; required-beat supersede refused.
+- [ ] Write failing tests: `publishArcPlan` only boundary; PREFLIGHT_PASS draft still
+      NOT authoritative; published Arc versions immutable; **restore alone leaves the
+      current published Arc authority unchanged** (readCurrentVersion identical) and
+      yields a `RevisionCandidate`; beat evidence derives from Canon; semantic
+      uncertainty stays in_progress; required-beat supersede refused; atomic planning
+      marker activation (both crash sides).
 - [ ] Implement; targeted → PASS; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): arc plan authority and canon-evidence major beats`.
 
-## Task 12 — Rolling Lookahead lifecycle + selective invalidation
+## Task 13 — Arc Planner + Arc preflight pipeline
+
+**Files**
+- Create `packages/core/src/planning/arc-pipeline.ts`
+- Create `packages/core/src/__tests__/planning-arc-pipeline.test.ts`
+
+**Interfaces** (reuses shared finding severity/repairScope vocabulary; NOT the Detailed
+Chapter Planning Gate)
+
+```ts
+export interface ArcFinding {
+  readonly findingId: string;
+  readonly severity: FindingSeverity;
+  readonly repairScope: RepairScope;
+  readonly evidence: string;
+  readonly suggestedAction: string;
+  readonly involvesDecisionKind?: AuthorDecisionKind;
+}
+export type ArcPreflightResult =
+  | { outcome: "preflight_pass" }                       // still a DRAFT — no authority
+  | { outcome: "preflight_fail"; findings: ReadonlyArray<ArcFinding> };
+export async function generateArcPlanDraft(bookDir: string, arcId: string, foundationVersion: number, brief: string): Promise<ArcPlanSnapshot>;  // Arc Planner
+export async function runArcPreflight(bookDir: string, draft: ArcPlanSnapshot): Promise<ArcPreflightResult>;   // deterministic checks
+export async function reviewArcPlanDraft(bookDir: string, draft: ArcPlanSnapshot): Promise<ReadonlyArray<ArcFinding>>;  // semantic review
+export type ArcRepairOutcome =
+  | { status: "repaired"; round: number; draft: ArcPlanSnapshot }
+  | { status: "needs_human_direction"; round: number; findings: ReadonlyArray<ArcFinding> }
+  | { status: "clean"; draft: ArcPlanSnapshot };
+export async function repairArcPlanLocal(bookDir: string, draft: ArcPlanSnapshot, findings: ReadonlyArray<ArcFinding>, round: number): Promise<ArcRepairOutcome>;
+export async function verifyArcPlanRepair(bookDir: string, revised: ArcPlanSnapshot, findings: ReadonlyArray<ArcFinding>, round: number): Promise<ReadonlyArray<ArcFinding>>;
+```
+
+Rules: the pipeline follows Published Foundation → Arc Planner → Arc Plan Draft →
+deterministic checks → semantic reviewer → bounded local repair → **Human Publish**
+(Task 12 `publishArcPlan`); max 2 semantic repair rounds then Human; LOCAL-only
+auto-repair; IMPORTANT+LOCAL requires separate targeted re-review; repair cannot
+broaden authority; MULTI_UNIT/AUTHOR_DECISION/CONFLICT never silently repaired;
+`verifyArcPlanRepair` is a separate invocation (no self-certification);
+`preflight_pass` stays Draft until Human Publish.
+
+**Steps**
+
+- [ ] Write failing tests (mocked agents): stale Foundation dependency → preflight
+      fail; stale Canon base → fail; hard Book Rule/timeline conflict → fail;
+      relationship/reveal pacing semantic concern → `uncertain`-style finding (never a
+      hard conflict); unauthorized major Author Decision → AUTHOR_DECISION finding;
+      LOCAL repair + independent re-review; repair cannot broaden authority (attempted
+      unauthorized decision rejected); exhausted 2 rounds → Human; `preflight_pass`
+      still not Published (no published Arc version created).
+- [ ] Implement `arc-pipeline.ts`; targeted → PASS; typecheck.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): arc planner and preflight pipeline`.
+
+## Task 14 — Rolling Lookahead lifecycle + typed selective invalidation
 
 **Files**
 - Create `packages/core/src/planning/lookahead.ts`
@@ -823,9 +977,7 @@ export interface RollingLookahead {
     readonly foundationVersion: number;
     readonly arcPlanVersion: number;
     readonly basedOnCanonRevision: number;
-    readonly dependencyUnitIds: ReadonlyArray<string>;
-    readonly directionIds: ReadonlyArray<string>;
-    readonly authorizationIds: ReadonlyArray<string>;
+    readonly dependencyRefs: ReadonlyArray<PlanningDependencyRef>;   // typed, spans all domains
   };
   readonly createdAt: string;
 }
@@ -834,21 +986,23 @@ export async function revalidateLookahead(bookDir: string, lookaheadId: string):
 ```
 
 Rules: advisory only — no `approved` state; default horizon 2–3 lightweight intentions;
-only the next chapter gets a Detailed Plan; selective invalidation is provenance-based.
-Tests: unrelated Canon/Foundation changes do NOT stale the Lookahead; a direct declared
-dependency change DOES; replacement produces `SUPERSEDED`; consumption transitions to
-`CONSUMED`; a Lookahead can never grant authorization (gate refuses it as authority).
+only the next chapter gets a Detailed Plan; selective invalidation is typed: an
+UNRELATED Canon/Foundation change must NOT stale the Lookahead, while a DIRECTLY
+REFERENCED Canon dependency (e.g. a `canon_fact` or `hook` ref) must. Tests:
+horizon outside 2–3 rejected; unrelated vs direct-dep change; replacement →
+`SUPERSEDED`; consumption → `CONSUMED`; Lookahead never grants authorization.
 
 **Steps**
 
-- [ ] Write failing tests: horizon outside 2–3 rejected; provenance-based selective
-      invalidation (unrelated vs direct-dep change); supersede/consume transitions;
-      lookahead never satisfies an authorization or gate requirement.
+- [ ] Write failing tests: horizon bounds; typed selective invalidation (unrelated
+      Canon delta no-stale vs directly referenced Canon dependency stale);
+      supersede/consume transitions; lookahead never satisfies an authorization or
+      gate requirement.
 - [ ] Implement; targeted → PASS; typecheck.
-- [ ] Run the Task Completion Gate; commit
-      `feat(core): advisory rolling lookahead with selective invalidation`.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): advisory rolling lookahead with typed selective invalidation`.
 
-## Task 13 — Detailed Chapter Plan V2
+## Task 15 — Detailed Chapter Plan V2
 
 **Files**
 - Create `packages/core/src/planning/detailed-plan.ts`
@@ -865,7 +1019,7 @@ export interface DetailedPlanBindings {
   readonly canonRevision: number;
   readonly humanDirectionIds: ReadonlyArray<string>;
   readonly authorizationIds: ReadonlyArray<string>;
-  readonly dependencyUnitIds: ReadonlyArray<string>;
+  readonly dependencyRefs: ReadonlyArray<PlanningDependencyRef>;   // shared typed vocabulary
   readonly ruleIds: ReadonlyArray<string>;
 }
 export async function buildDetailedPlan(bookDir: string, chapterNumber: number): Promise<{ intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings }>;
@@ -876,19 +1030,20 @@ export async function replanChapter(bookDir: string, chapterNumber: number, roun
 Rules: Detailed Plan is a mutable proposal until frozen by the Execution Snapshot;
 binds the six authority dimensions; `PLAN_SCOPE_TOO_BROAD` instead of silently dropping
 required context; maximum 2 automatic semantic replans per chapter (separate from Phase
-6 prose retry).
+6 prose retry); dependency refs reuse the Task 1 `PlanningDependencyRef` vocabulary.
 
 **Steps**
 
-- [ ] Write failing tests: bindings contract (all six dimensions present and typed);
-      scope-too-broad detection; 2-replan cap; plan mutability before snapshot (T16).
+- [ ] Write failing tests: bindings contract (all six dimensions, typed dependency
+      refs); scope-too-broad detection; 2-replan cap; plan mutability before snapshot
+      (T18).
 - [ ] Implement (evolving ChapterIntent/ChapterMemo, additive schema change);
       targeted → PASS.
 - [ ] Regressions: planner/persisted-governed-plan tests; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): detailed chapter plan v2 bindings and replan boundary`.
 
-## Task 14 — Planning Gate + planning-specific bounded repair
+## Task 16 — Planning Gate + planning-specific bounded repair
 
 **Files**
 - Create `packages/core/src/planning/gate.ts`
@@ -915,7 +1070,7 @@ export type PlanningGateResult =
   | { outcome: "conflict"; evidence: ReadonlyArray<string> };
 export async function evaluatePlanningGate(input: PlanningGateInput): Promise<PlanningGateResult>;
 
-// Planning-specific bounded repair (shared severity/repairScope vocabulary from T1)
+// Planning-specific bounded repair — OWN types, never Foundation RepairOutcome.
 export interface PlanningFinding {
   readonly findingId: string;
   readonly severity: FindingSeverity;
@@ -924,9 +1079,13 @@ export interface PlanningFinding {
   readonly suggestedAction: string;
   readonly involvesDecisionKind?: AuthorDecisionKind;
 }
-export async function reviewDetailedPlan(bookDir: string, plan: { intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings }): Promise<ReadonlyArray<PlanningFinding>>;
-export async function repairDetailedPlanLocal(bookDir: string, round: number): Promise<RepairOutcome>;
-export async function verifyDetailedPlanRepair(bookDir: string, round: number): Promise<ReadonlyArray<PlanningFinding>>;
+export type PlanningRepairOutcome =
+  | { status: "repaired"; round: number; plan: { intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings } }
+  | { status: "needs_human_direction"; round: number; findings: ReadonlyArray<PlanningFinding> }
+  | { status: "clean"; plan: { intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings } };
+export async function reviewDetailedPlan(context: { bookDir: string; canonRevision: number }, plan: { intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings }): Promise<ReadonlyArray<PlanningFinding>>;
+export async function repairDetailedPlanLocal(context: { bookDir: string; canonRevision: number }, plan: { intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings }, findings: ReadonlyArray<PlanningFinding>, round: number): Promise<PlanningRepairOutcome>;
+export async function verifyDetailedPlanRepair(context: { bookDir: string; canonRevision: number }, revisedPlan: { intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings }, findings: ReadonlyArray<PlanningFinding>, round: number): Promise<ReadonlyArray<PlanningFinding>>;
 ```
 
 Truth table (tests cover all 5 rows): deterministic clean + semantic clean + sufficient
@@ -935,28 +1094,27 @@ clean + new major decision + missing authority → AUTHOR_DECISION; hard determi
 violation → CONFLICT; major decision already authorized in correct scope → SAFE (no
 re-ask). L1 checks include stale deps, required units, hard Canon contradictions, Book
 Rules, hard Timeline constraints, direction conflicts, authorization validity/
-consumption, chapter sequence, unresolved state review. L2 checks (motivation,
-relationship progression, reveal timing, hook payoff readiness, scene causality, arc
-progression, pacing, author decisions) cannot create hard CONFLICT. SAFE never auto-runs
-Writer.
+consumption, chapter sequence, unresolved state review. L2 checks cannot create hard
+CONFLICT. SAFE never auto-runs Writer.
 
-Planning repair rules: LOCAL only auto-repair; IMPORTANT+LOCAL requires separate
+Planning repair rules: LOCAL-only auto-repair; IMPORTANT+LOCAL requires separate
 targeted re-review; repair cannot broaden authority; MULTI_UNIT/AUTHOR_DECISION/CONFLICT
-never silently repaired; maximum 2 semantic repair rounds; `verifyDetailedPlanRepair` is
-a separate invocation — the reviewer cannot self-certify its own repair.
+never silently repaired; max 2 semantic rounds; `verifyDetailedPlanRepair` is a separate
+invocation (no self-certification); repair operates on the explicit plan target —
+passing a different chapter/plan must be a no-op or error.
 
 **Steps**
 
 - [ ] Write failing tests: the 5-row truth table; "semantic cannot create hard
-      conflict"; "authorized-at-scope does not re-ask"; planning repair LOCAL-only
-      auto-repair; **negative test: a local planning repair attempting to introduce an
-      unauthorized major decision is rejected → AUTHOR_DECISION, never repaired into
-      SAFE**; 2-round cap; self-certification refusal.
+      conflict"; "authorized-at-scope does not re-ask"; LOCAL-only auto-repair;
+      **negative test: a local planning repair attempting to introduce an unauthorized
+      major decision is rejected → AUTHOR_DECISION, never repaired into SAFE**;
+      2-round cap; self-certification refusal; wrong-plan-target no-op.
 - [ ] Implement `gate.ts` + `repair.ts`; targeted → PASS; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): planning risk gate and planning-specific bounded repair`.
 
-## Task 15 — Context Composer: authority spine, profiles, budget, provenance
+## Task 17 — Context Composer: authority spine, profiles, budget, structured provenance
 
 **Files**
 - Create `packages/core/src/context/composer.ts`
@@ -965,11 +1123,26 @@ a separate invocation — the reviewer cannot self-certify its own repair.
 - Create `packages/core/src/__tests__/context-composer.test.ts`
 - Create `packages/core/src/__tests__/context-budget.test.ts`
 
-**Interfaces**
+**Interfaces** (structured provenance replaces weak strings)
 
 ```ts
 export type ContextProfile = "planner_context" | "writer_context" | "reviewer_context";
 export type ContextPriority = 0 | 1 | 2 | 3 | 4;
+export type ContextRepresentation = "full" | "projected" | "summary" | "excerpt";
+export interface ContextSourceProvenance {
+  readonly sourceType: "foundation_unit" | "arc_plan" | "canon" | "human_direction" | "authorization" | "book_rule" | "hook" | "relationship" | "timeline" | "character_state" | "chapter_summary" | "style_example" | "semantic_memory";
+  readonly sourceId: string;
+  readonly sourceRevision?: number;
+  readonly priority: ContextPriority;
+  readonly selectionReason: string;
+  readonly representation: ContextRepresentation;
+  readonly authoritative: boolean;
+}
+export interface BudgetOmission {
+  readonly sourceId: string;
+  readonly priority: ContextPriority;
+  readonly reason: string;              // e.g. "soft_trim" | "semantic_compression_unavailable" | "mandatory_fit_failure"
+}
 export interface ContextBundle {
   readonly bundleId: string;
   readonly profile: ContextProfile;
@@ -977,14 +1150,11 @@ export interface ContextBundle {
   readonly foundationVersion: number;
   readonly arcPlanVersion: number;
   readonly canonRevision: number;
-  readonly sections: ReadonlyArray<{ priority: ContextPriority; source: string; content: string; projection?: boolean }>;
-  readonly sourceProvenance: ReadonlyArray<string>;
-  readonly dependencyRefs: ReadonlyArray<string>;
-  readonly semanticRetrievalRefs: ReadonlyArray<string>;
+  readonly sections: ReadonlyArray<ContextSourceProvenance & { content: string }>;
   readonly budget: { readonly contextLimit: number; readonly reservedOutput: number; readonly estimatedInput: number };
   readonly tokenEstimates: Record<string, number>;
   readonly compactions: ReadonlyArray<string>;
-  readonly omittedDueToBudget: ReadonlyArray<string>;
+  readonly omittedDueToBudget: ReadonlyArray<BudgetOmission>;
 }
 export async function composeContext(bookDir: string, profile: ContextProfile, task: string): Promise<ContextBundle>;
 export async function isBundleStale(bookDir: string, bundle: ContextBundle): Promise<boolean>;
@@ -1001,23 +1171,27 @@ invariants / Execution Snapshot contract; retrieval excludes rejected/non-canoni
 Writer attempts; derived indexes are rebuildable, never authority; draft Foundation/Arc
 revisions never leak into production retrieval; per-call observability metadata
 (task/profile/bundleId/model/provider/estimated/actual input/output) retained as
-instrumentation only.
+instrumentation only. This is NOT a Phase 7 feature — provenance exists only for
+staleness/debugging.
 
 **Steps**
 
 - [ ] Write failing tests incl.: P0 preservation under pressure; budget-exceeded →
       zero LLM calls (spy on the provider client); no model-switch path; stale bundle
-      detection; false-memory exclusion (rejected attempt content never appears in a
-      bundle); compaction allowlist (hard Canon facts never semantically compressed).
+      detection via structured provenance (revision/source change); false-memory
+      exclusion (rejected attempt content never appears); compaction allowlist (hard
+      Canon facts never semantically compressed); omission records carry
+      source+priority+reason.
 - [ ] Implement `budget.ts` → `bundle.ts` → `composer.ts`; targeted → PASS.
 - [ ] Regressions: `context-filter`/`governed-context` tests; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): context composer authority spine and token governance`.
 
-## Task 16 — Execution Snapshot + attempt lifecycle
+## Task 18 — Execution Snapshot + durable Execution Attempts
 
 **Files**
 - Create `packages/core/src/execution/snapshot.ts`
+- Create `packages/core/src/execution/attempt-store.ts`
 - Create `packages/core/src/execution/attempt.ts`
 - Create `packages/core/src/__tests__/execution-snapshot.test.ts`
 - Create `packages/core/src/__tests__/execution-attempt.test.ts`
@@ -1035,6 +1209,28 @@ export interface ExecutionSnapshot {
 }
 export type FreezeResult = { status: "frozen"; snapshot: ExecutionSnapshot } | { status: "execution_prepare_failed"; reason: string };
 export async function freezeExecutionSnapshot(bookDir: string, plan: { intent: ChapterIntent; memo: ChapterMemo; bindings: DetailedPlanBindings }, bundle: ContextBundle): Promise<FreezeResult>;
+
+export type ExecutionAttemptStatus =
+  | "created" | "running" | "drafted" | "failed" | "aborted_for_plan_defect" | "accepted" | "rejected";
+export interface ExecutionAttempt {
+  readonly attemptId: string;
+  readonly chapterNumber: number;
+  readonly snapshotId: string;                 // immutable linkage
+  readonly status: ExecutionAttemptStatus;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+  readonly providerFailure?: { provider: string; model: string; message: string; at: string };
+  readonly draftArtifactRefs?: ReadonlyArray<string>;
+  readonly defect?: AttemptDefect;
+  readonly replanNumber: number;               // 0 = first attempt under this snapshot
+}
+export async function createExecutionAttempt(bookDir: string, snapshotId: string, chapterNumber: number, replanNumber: number): Promise<ExecutionAttempt>;
+export async function loadExecutionAttempt(bookDir: string, attemptId: string): Promise<ExecutionAttempt | null>;
+export async function recordAttemptRunning(bookDir: string, attemptId: string): Promise<void>;
+export async function recordAttemptDrafted(bookDir: string, attemptId: string, artifactRefs: ReadonlyArray<string>): Promise<void>;
+export async function recordAttemptFailure(bookDir: string, attemptId: string, failure: ExecutionAttempt["providerFailure"]): Promise<void>;
+export async function abortAttemptForPlanDefect(bookDir: string, attemptId: string): Promise<void>;
+export async function acceptAttempt(bookDir: string, attemptId: string): Promise<void>;
 export type AttemptOutcome =
   | { status: "prose_defect"; next: "revise_same_snapshot" }
   | { status: "plan_defect"; next: "fresh_plan_and_snapshot" }
@@ -1043,43 +1239,79 @@ export type AttemptOutcome =
 export function classifyAttemptDefect(attempt: unknown): AttemptOutcome;
 ```
 
-Rules: freeze revalidates authority/Canon/context atomically (via Task 8
+Rules: freeze revalidates authority/Canon/context atomically (via Task 9
 `runTransaction`); `EXECUTION_PREPARE_FAILED` when anything changed during freeze
 (prepare-race test); Writer never starts without a snapshot; the plan used by an attempt
-is immutable after freeze; defect routing per table; max 2 replans; provider failures
-record failure records and consume no authorizations; one chapter per deliberate run.
+is immutable after freeze; attempts are durable and snapshot-linked; defect routing per
+table; max 2 replans (each replan is a NEW attempt under a fresh snapshot); provider
+failures preserve failure records and consume no authorizations;
+**rejected/aborted-attempt prose is NON_CANON execution history and must never enter
+production memory** (asserted via retrieval exclusion, reinforced in T20).
 
 **Steps**
 
-- [ ] Write failing tests: freeze rejects stale bundle; prepare-race (authority changes
-      mid-freeze) → `execution_prepare_failed`; attempt immutability; defect routing;
-      provider failure consumes nothing.
+- [ ] Write failing tests: freeze rejects stale bundle; prepare-race →
+      `execution_prepare_failed`; attempt immutability of snapshot linkage; full
+      attempt-status persistence round-trips; defect routing; provider failure consumes
+      nothing and records metadata; rejected-attempt prose excluded from memory.
 - [ ] Implement; targeted → PASS; typecheck.
-- [ ] Run the Task Completion Gate; commit
-      `feat(core): immutable execution snapshots and attempt lifecycle`.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): immutable execution snapshots and durable execution attempts`.
 
-## Task 17 — Phase 4 Canon settlement integration (atomic + laggable split)
+## Task 19 — Core Writer execution gate (runner.ts)
+
+**Files**
+- Modify `packages/core/src/pipeline/runner.ts` (inside the existing
+  `writeNextChapter` orchestration: resolve current authority → obtain/build fresh
+  Detailed Plan → Planning Gate → SAFE only → Context Composer → budget check →
+  Execution Snapshot freeze → Writer)
+- Create `packages/core/src/__tests__/core-writer-gate.test.ts`
+
+**Rules:** the CORE production write entry enforces the full chain; **no Writer
+invocation may occur without a valid snapshot**; CLI (`castor write next`) and Studio
+call this SAME Core operation — CLI/Studio are never the security boundary.
+`CONFLICT`, `AUTHOR_DECISION`, `UNCERTAIN`-requiring-Human, stale ContextBundle, and
+missing-snapshot all result in zero Writer calls. SAFE + valid snapshot → exactly one
+chapter attempt. The Writer spy call count is the assertion vehicle.
+
+**Steps**
+
+- [ ] Write failing tests that call the Core write entry directly (not via CLI):
+      missing snapshot/gate → Writer spy call count 0; CONFLICT → 0;
+      AUTHOR_DECISION → 0; UNCERTAIN requiring Human → 0; stale ContextBundle → 0;
+      SAFE + valid snapshot → exactly one chapter attempt; one deliberate Write
+      produces at most one chapter.
+- [ ] Implement the gate inside `runner.ts`; targeted → PASS.
+- [ ] Regressions: `pipeline-runner.gated.test.ts`, `state-review-confirm` suite,
+      full Phase 4 suites; typecheck.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): enforce planning gate and execution snapshot in the write entry`.
+
+## Task 20 — Phase 4 Canon settlement integration (evidence-derived consumption)
 
 **Files**
 - Create `packages/core/src/state/settlement-integration.ts`
 - Create `packages/core/src/__tests__/settlement-integration.test.ts`
-- Modify `packages/core/src/state/state-review-finalize.ts` — authorization-consumption
-  writes are added to the SAME prepared atomic set as the Canon writes (extend the
-  `prepared` writes list before the single `commitAtomicFileSet`; NO post-commit hook
-  for atomic effects)
+- Modify `packages/core/src/state/state-review-finalize.ts` — validated consumption
+  writes are added to the SAME prepared atomic set as the Canon writes (NO post-commit
+  hook for atomic effects)
 
 **Interfaces**
 
 ```ts
-// Atomic settlement — runs INSIDE the Phase 4 finalize transaction.
+// Core DERIVES consumption from the finalized Phase 4 review + resulting Canon
+// evidence — a raw caller ID list is never trusted.
+export function deriveConsumedAuthorizations(
+  finalizedReview: ActiveStateReviewArtifact,   // post-decision artifact being settled
+  canonEvidence: CanonSettlementEvidence,       // subject/scope/event facts in the settled delta
+): ReadonlyArray<{ authorizationId: string; decisionKind: AuthorDecisionKind; canonRevision: number }>;
 export interface AtomicSettlementInput {
   readonly bookDir: string;
   readonly chapterNumber: number;
-  readonly canonRevision: number;              // resulting revision of this settlement
-  readonly eventAuthorizationIds: ReadonlyArray<string>; // one_time ids whose event this chapter confirmed
+  readonly canonRevision: number;
+  readonly derivedConsumptions: ReadonlyArray<{ authorizationId: string; decisionKind: AuthorDecisionKind }>;
 }
 export function buildSettlementWrites(input: AtomicSettlementInput): ReadonlyArray<AtomicFileWrite>;
-// Laggable post-commit effects — allowed to lag; reconstructable.
 export interface LaggableEffects {
   readonly beatEvidence: ReadonlyArray<{ beatId: string; state: "satisfied" | "not_satisfied" | "uncertain" }>;
   readonly lookaheadStatus: LookaheadStatus;
@@ -1089,35 +1321,38 @@ export interface LaggableEffects {
 export async function applyLaggableSettlementEffects(bookDir: string, chapterNumber: number, canonRevision: number): Promise<LaggableEffects>;
 ```
 
-**Atomicity contract:** Canon committed state + one-time Authorization consumption
-succeed/fail as ONE logical transaction (both inside the single Phase 4
+**Atomicity contract:** Canon committed state + validated one-time Authorization
+consumption succeed/fail as ONE logical transaction (both inside the single Phase 4
 `commitAtomicFileSet`). A crash/failure must NEVER expose "Canon event committed +
-Authorization still AVAILABLE" for the event that consumed it. Fault-injection tests
-prove BOTH sides of the commit boundary: injection before COMMIT → no Canon event and
-no consumption; injection after durable COMMIT → both Canon event and consumption
-committed; materialization failure → committed truth survives, materialization rebuilt.
-No second Canon transaction system is created — the existing Phase 4 atomic
-write/finalization primitive is evolved in place.
+Authorization still AVAILABLE". Fault-injection tests prove BOTH sides of the commit
+boundary. No second Canon transaction system is created — the existing Phase 4 atomic
+primitive is evolved in place.
+
+**Evidence verification tests:** caller supplies an active authorization ID but the
+confirmed Canon event does not match → NOT consumed; correct decision subject/scope/
+event evidence → consumed; the same one-time authorization already consumed → fail
+closed / no duplicate; an unauthorized/raw injected ID cannot be consumed.
 
 Post-commit MAY contain only laggable, reconstructable effects: semantic Beat
 evaluation, advisory Lookahead refresh, rebuildable derived projections. Canon
 correctness never depends on them. Tests prove Draft/Audit never consume, State Review
 proposals never consume, and Final Confirm settlement consumes exactly the confirmed
-event's one-time authorizations. Existing Phase 4 tests must remain green unchanged.
+event's validated one-time authorizations. Existing Phase 4 tests remain green
+unchanged.
 
 **Steps**
 
-- [ ] Write failing tests: non-consumption for Draft/Audit/State-Review-proposal paths;
-      consumption exactly on settlement; **fault injection on both sides of the commit
-      boundary** (no half-state possible); laggable effects never affect Canon
-      correctness; lookahead/arc revalidation; full Phase 4 suites green.
+- [ ] Write failing tests: non-consumption paths; evidence-derived consumption (all
+      four evidence cases); fault injection on both sides of the commit boundary; no
+      duplicate consumption; laggable effects never affect Canon correctness; full
+      Phase 4 suites green.
 - [ ] Implement `settlement-integration.ts` + the finalize atomic-set extension;
       targeted → PASS.
 - [ ] Regressions: `state-review-confirm`/`state-review-finalize` suites; typecheck.
-- [ ] Run the Task Completion Gate; commit
-      `feat(core): atomic phase 4 settlement integration for authorizations and beats`.
+- [ ] Run the Task Completion Gate using commit message
+      `feat(core): evidence-derived atomic settlement integration`.
 
-## Task 18 — Arc completion / transition
+## Task 21 — Arc completion / transition (never auto-Publish)
 
 **Files**
 - Create `packages/core/src/planning/transition.ts`
@@ -1133,25 +1368,27 @@ export type ArcTransitionResult =
 export async function evaluateArcCompletion(bookDir: string, arcId: string): Promise<ArcTransitionResult>;
 ```
 
-Rules: evidence-based completion (required beats from Canon); auto close/activate when
-the next Arc Plan is already published; prepare/publish the next plan before transition
-when missing.
+Rules (explicit wording): if the current Arc is READY and the next Arc Plan is already
+Published → auto close/activate; if the next Arc is missing → automatically PREPARE the
+next Arc Draft if desired, then **STOP for Human Publish**; the current Arc remains
+`READY_TO_CLOSE` until that Publish. **Never auto-Publish an Arc Plan.**
 
 **Steps**
 
 - [ ] Write failing tests: not-ready with pending required beats; ready + published
-      next → auto activation; ready + missing next → prepare-before-transition;
-      completion-uncertain requires human.
+      next → auto activation; ready + missing next → prepare-before-transition AND no
+      auto-Publish (no published version created); completion-uncertain requires human.
 - [ ] Implement; targeted → PASS; typecheck.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(core): evidence-driven arc completion and transition`.
 
-## Task 19 — Studio Foundation governance surface
+## Task 22 — Studio Foundation governance surface
 
 **Files**
 - Modify `packages/studio/src/api/server.ts` (foundation route block, base
-  `/api/v1/books/:id/foundation`: unit manifests, readiness report, revision draft
-  list, open-revision, revision save, publish — every action calls Core functions only)
+  `/api/v1/books/:id/foundation`: unit manifests, readiness report, revision
+  open/load/save/approve/needs-revision/reapprove-stale/discard/batch-approve —
+  consuming EXACTLY the Task 8 Core operations; publish action consuming Task 9)
 - Create `packages/studio/src/lib/foundation-api.ts` (typed client)
 - Create `packages/studio/src/pages/FoundationPage.tsx` + `foundation-ui-state.ts` +
   `foundation-ui-state.test.ts`
@@ -1166,26 +1403,27 @@ dependencies/findings/diffs/revision workspace/history/Publish boundary; approve
 read-only until explicit Open Revision; revision UI shows current Published authority,
 current Revision Draft, and which version production uses; diff-first review for later
 revisions; batch approval only for safe clean units. No duplicated readiness/authority
-logic — the UI renders Core's structured readiness.
+logic — the UI renders Core's structured readiness and calls Core's revision service.
 
 **Steps**
 
-- [ ] Write failing route tests (foundation read/units/readiness/revision/publish +
-      error mapping reusing `mapStateReviewError` style) and `foundation-ui-state.test.ts`
-      model tests; targeted → fail.
+- [ ] Write failing route tests (foundation read/units/readiness/revision lifecycle/
+      publish + error mapping reusing `mapStateReviewError` style) and
+      `foundation-ui-state.test.ts` model tests; targeted → fail.
 - [ ] Implement server route block + typed client + page; targeted → PASS.
 - [ ] Studio regressions: `state-review-route.test.ts`, full studio serial suite;
       typecheck; client build.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(studio): foundation v2 governance surface`.
 
-## Task 20 — Studio Planning governance surface
+## Task 23 — Studio Planning governance surface (Core NL parsing)
 
 **Files**
 - Modify `packages/studio/src/api/server.ts` (planning route block, base
   `/api/v1/books/:id/planning`: arc drafts/publish, published arc + beat progress,
-  lookahead show, detailed-plan gate report, direction create/confirm/conflict
-  resolution, authorization create/confirm)
+  lookahead show, detailed-plan gate report, direction parse/create/confirm/conflict
+  resolution via Core `parseHumanDirectionDraft`/`confirmHumanDirection`,
+  authorization create/confirm)
 - Create `packages/studio/src/lib/planning-api.ts` (typed client)
 - Create `packages/studio/src/pages/PlanningPage.tsx` + `planning-ui-state.ts` +
   `planning-ui-state.test.ts`
@@ -1193,23 +1431,25 @@ logic — the UI renders Core's structured readiness.
 
 Studio behavior (spec §8.3–8.5): Published Arc Plan, Major Beat progress, advisory
 Rolling Lookahead (no Approve button), next Detailed Plan; Arc Plan Publish is explicit;
-Human Direction NL parsed into structured scope, shown to Human, confirmed; direction
-conflicts require explicit resolution; Detailed Plan SAFE → no approval needed
-(View/Add Direction/Regenerate/Write Chapter); UNCERTAIN/AUTHOR_DECISION explain
-issue+evidence+authority+valid next actions; CONFLICT hard-blocks with no "Write
-Anyway". No duplicated governance logic.
+**Human Direction NL is parsed by the Core `parseHumanDirectionDraft` service** — the
+React layer only displays the pending structured proposal; confirmation via Core
+`confirmHumanDirection`; direction conflicts require explicit resolution; Detailed Plan
+SAFE → no approval needed (View/Add Direction/Regenerate/Write Chapter);
+UNCERTAIN/AUTHOR_DECISION explain issue+evidence+authority+valid next actions;
+CONFLICT hard-blocks with no "Write Anyway". No duplicated governance logic.
 
 **Steps**
 
-- [ ] Write failing route tests + `planning-ui-state.test.ts` model tests
-      (incl. lookahead has no approve action; publish is explicit; conflict
-      resolution); targeted → fail.
+- [ ] Write failing route tests + `planning-ui-state.test.ts` model tests (incl.
+      lookahead has no approve action; publish explicit; direction NL → pending
+      proposal displayed, authority only after confirm; conflict resolution); targeted
+      → fail.
 - [ ] Implement server route block + typed client + page; targeted → PASS.
 - [ ] Studio regressions: full studio serial suite; typecheck; client build.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(studio): planning v2 governance surface`.
 
-## Task 21 — CLI safe operational integration
+## Task 24 — CLI safe operational integration
 
 **Files**
 - Create `packages/cli/src/commands/foundation.ts` (status/inspect/units; no mutation
@@ -1218,8 +1458,8 @@ Anyway". No duplicated governance logic.
   report)
 - Modify `packages/cli/src/commands/status.ts` (readiness block summary:
   blockingReasons/warnings/nextRecommendedAction)
-- Modify `packages/cli/src/commands/write.ts` (write next respects the Planning Gate +
-  Execution Snapshot freeze; on `conflict` prints blockers and points to Studio;
+- Modify `packages/cli/src/commands/write.ts` (write next calls the SAME Core
+  write-entry gate from Task 19; on `conflict` prints blockers and points to Studio;
   `plan_defect` path surfaces replan)
 - Create `packages/cli/src/__tests__/foundation-command.test.ts`,
   `packages/cli/src/__tests__/planning-command.test.ts`; extend
@@ -1228,7 +1468,8 @@ Anyway". No duplicated governance logic.
 Rules: CLI is a safe operational surface; complex review routes users to Studio;
 **no** `--force`/`--ignore-canon`/`--skip-authority` flags; `castor write next` keeps
 working for healthy books and fails closed on gate violations with actionable messages;
-gates cannot be bypassed from the CLI (test proves a gate-CONFLICT book cannot write).
+the security boundary is the Core write gate (Task 19), and CLI tests additionally
+prove the CLI cannot bypass it.
 
 **Steps**
 
@@ -1237,10 +1478,10 @@ gates cannot be bypassed from the CLI (test proves a gate-CONFLICT book cannot w
       exists (parsing rejects unknown flags); healthy SAFE path still writes.
 - [ ] Implement; targeted → PASS.
 - [ ] CLI regressions: full CLI serial suite; typecheck; build.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `feat(cli): phase 5 governance status and gate-safe write integration`.
 
-## Task 22 — Legacy upgrade E2E, compatibility and recovery scenarios (test/E2E-only)
+## Task 25 — Legacy upgrade E2E, compatibility and recovery scenarios (test/E2E-only)
 
 **Files**
 - Create `packages/core/src/__tests__/legacy-v2-upgrade-e2e.test.ts`
@@ -1249,31 +1490,33 @@ gates cannot be bypassed from the CLI (test proves a gate-CONFLICT book cannot w
 This Task is **explicitly test/E2E-only: no new production migration glue is required**.
 The capability-marker persistence surface (additive `governance` field on
 `BookConfigSchema`, read/write via `state/manager.ts` `loadBookConfig`/`saveBookConfig`)
-is introduced and tested in Task 1/Task 3. Any defect found in that surface during this
-Task is fixed in its owning Task (T1/T3), not here.
+is introduced and tested in Task 1/Task 3; the atomic marker flip lives in Task 9/Task
+12. Any defect found in those surfaces during this Task is fixed in its owning Task,
+not here.
 
 Scenarios:
 - legacy book (existing `inkos.json`, `.inkos/`, Foundation files, ChapterIntent,
   ChapterMemo, chapters, Canon/state) remains fully usable without V2 upgrade
   (write-next + Phase 4 flow green);
-- opt-in upgrade candidate → Human Publish (Task 8) → V2 v1, preserving chapter prose
-  hashes and historical Canon byte-for-byte;
+- opt-in upgrade candidate → Human review (Task 8) → Human Publish (Task 9) → V2 v1,
+  preserving chapter prose hashes and historical Canon byte-for-byte, with the marker
+  flipping atomically in the publish transaction;
 - once V2 Foundation is Published, legacy Foundation is not run as competing authority;
-- fault-injection E2E across the Task 8/16 transaction stages verifying recovery truth
+- fault-injection E2E across the Task 9/18 transaction stages verifying recovery truth
   priority (committed history → current manifests → journals → drafts → derived);
 - immutable-history corruption is detected, never silently adopted;
 - schema migrations forward-only/idempotent/recoverable.
 
 **Steps**
 
-- [ ] Write the E2E tests; run → fail if production surfaces incomplete (report to
-      owning Task T1/T3 only if a real defect surfaces there; otherwise tests pass).
+- [ ] Write the E2E tests; run → fail only if a production surface defect exists
+      (report to its owning Task T1/T3/T9/T12; otherwise tests pass).
 - [ ] Run full core serial suite (expect exactly the 2 known Windows EPERM baselines);
       studio serial; CLI serial; typecheck; build.
-- [ ] Run the Task Completion Gate; commit
+- [ ] Run the Task Completion Gate using commit message
       `test(core): legacy-v2 upgrade compatibility and recovery e2e`.
 
-## Task 23 — Final Phase 5 acceptance (Definition of Done)
+## Task 26 — Final Phase 5 acceptance (Definition of Done)
 
 **Files**
 - Create `packages/core/src/__tests__/phase5-acceptance.test.ts` (scenarios A–F +
@@ -1295,7 +1538,8 @@ baselines), studio full, CLI full, typecheck, build, `git diff --check`; classif
 failure as regression/baseline/environmental per repo discipline. Verify: no new
 Critical/Important findings; legacy compatibility green; transaction/recovery fault
 tests green; Studio/CLI share Core logic; Phase 4 semantics intact; no AI-only execution
-path can create Human authority. Record the verdict in the verification doc.
+path can create Human authority; restore never creates Published authority; the Core
+write gate is the security boundary. Record the verdict in the verification doc.
 `v0.2.0` is created ONLY after the human accepts the completed Phase 5 verification/
 review state — never by this or any ordinary Task.
 
@@ -1309,7 +1553,7 @@ review state — never by this or any ordinary Task.
 
 ---
 
-## Task Completion Gates (every Task)
+## Task Completion Gates (every Task — exactly one commit)
 
 Every implementation Task ends with the SAME explicit gate, in order:
 
@@ -1322,27 +1566,32 @@ Every implementation Task ends with the SAME explicit gate, in order:
 - [ ] G6. Fix any valid Critical/Important findings (RED-first, minimal fix).
 - [ ] G7. Rerun targeted + regression suites.
 - [ ] G8. Re-review until APPROVE (Critical = 0, Important = 0).
-- [ ] G9. One focused commit with a clear message.
+- [ ] G9. **Perform exactly ONE focused commit using the Task's commit message.**
 - [ ] G10. **STOP AT THE HUMAN GATE — do not automatically proceed to the next Task.**
 
-If reviewer infrastructure is unavailable at G5/G8: report that fact honestly, do not
-claim independent approval, and stop for the human gate.
+Each Task states its commit message once, in the form
+"Run the Task Completion Gate using commit message X" — G9 performs that single commit.
+No Task performs a second commit. If reviewer infrastructure is unavailable at G5/G8:
+report that fact honestly, do not claim independent approval, and stop for the human
+gate.
 
 ## Studio/CLI rule
 
 UI and CLI consume Core governance operations only. Studio gets rich resolution/review
-UX (Tasks 19–20); CLI gets safe operational parity and clear blockers (Task 21). Neither
-implements readiness/authority logic; complex review may route users to Studio. Parity
-is tested (T19/T20/T21/T23).
+UX (Tasks 22–23); CLI gets safe operational parity and clear blockers (Task 24). Neither
+implements readiness/authority logic; complex review may route users to Studio. The
+security boundary is the Core write gate (Task 19); Studio and CLI call that same Core
+operation. Parity is tested (T22/T23/T24/T26).
 
 ## Phase 4 integration rule
 
 Phase 4 is an existing contract to preserve — not rewritten. Phase 5 integrates after/
-beside the Final Confirm boundary. Task 17 extends `state-review-finalize.ts` by adding
-authorization-consumption writes to its existing atomic set only. Tests prove Draft/Audit
-do not consume authorizations, State Review proposals do not consume authorizations, and
-Final Confirm settlement does — with fault injection on both sides of the commit
-boundary. The full Phase 4 suites must stay green in every task gate and in T23.
+beside the Final Confirm boundary. Task 20 extends `state-review-finalize.ts` by adding
+evidence-derived, validated consumption writes to its existing atomic set only. Tests
+prove Draft/Audit do not consume authorizations, State Review proposals do not consume
+authorizations, and Final Confirm settlement does — with fault injection on both sides
+of the commit boundary. The full Phase 4 suites must stay green in every task gate and
+in T26.
 
 ---
 
@@ -1350,56 +1599,58 @@ boundary. The full Phase 4 suites must stay green in every task gate and in T23.
 
 | Spec requirement | Task(s) |
 |---|---|
-| §1 authority ownership + conflict routes + invariants 1–10 | T1, T4, T5, T6, T8, T10, T16, T17 |
+| §1 authority ownership + conflict routes + invariants 1–10 | T1, T4, T5, T6, T8, T9, T11, T18, T20 |
 | §2 Foundation representation (Markdown + manifest, no prose in JSON) | T2 |
 | §2 unit statuses/importance/kinds/Story Frame 4 units | T1, T2, T4 |
 | §2 character policy + reasons | T1, T4 |
-| §2 relationship split + tiers | T1, T2, T11 |
-| §2 Arc Direction / Book Rules kinds | T1, T2, T11 |
-| §2 Foundation/Runtime Hooks + lifecycle + no escalation | T1, T11, T17 |
-| §2 Timeline split + constraint kinds | T1, T2, T14 |
+| §2 relationship split + tiers | T1, T2, T12 |
+| §2 Arc Direction / Book Rules kinds | T1, T2, T12 |
+| §2 Foundation/Runtime Hooks + lifecycle + no escalation | T1, T12, T20 |
+| §2 Timeline split + constraint kinds | T1, T2, T16 |
 | §2 dependencies direct-only | T4 |
-| §2 revision policy / published history / restore / external edits | T5, T8 |
-| §2 legacy books + upgrade (candidate, Human Publish) | T3, T8, T22 |
-| §3 pipeline + adaptive intake (ends at Human Review) | T9 |
-| §3 generation strategy + repair bounds + reviewer/repair separation | T7, T9 |
+| §2 revision policy / published history / restore-as-revision-candidate / external edits | T5, T8, T9 |
+| §2 legacy books + upgrade (candidate, Human review, Human Publish) | T3, T8, T9, T25 |
+| §3 pipeline + adaptive intake (ends at Human Review) | T10 |
+| §3 generation strategy + repair bounds + reviewer/repair separation | T7, T10 |
 | §3 finding schema + severity/scope policy + scores informational | T7 |
 | §3 conflict model (FUTURE_SAFE/UNCERTAIN/CANON_CONFLICT) + 2-layer | T6 |
 | §3 Human Resolution Record | T6 |
-| §3 Publish gate + Chapter-1 readiness | T4, T8 |
-| §4 Planning artifacts + Arc Plan metadata/versions/restore | T11 |
-| §4 Major Beats lifecycle/importance/categories/Canon evidence | T11, T17 |
-| §4 Rolling Lookahead lifecycle (advisory, 2–3 horizon, provenance) | T12 |
-| §4 Human Direction scopes/lifecycle/conflicts | T10 |
-| §4 Author Decisions vocabulary + Authorization scopes/conditions/consumption | T1, T10, T17 |
-| §4 Detailed Chapter Plan (ChapterIntent/Memo evolution + bindings + immutability) | T13, T16 |
-| §4 Execution Attempt defects + 2 replans | T16 |
-| §4 Arc completion | T18 |
-| §5 Arc flow + Draft-until-Publish | T11 |
-| §5 Detailed chapter flow (fresh after latest Canon) | T13, T14 |
-| §5 Planning Gate L1/L2 + truth table + SAFE semantics | T14 |
-| §5 bounded repair + PLAN_SCOPE_TOO_BROAD | T13, T14 |
-| §6 Composer architecture + profiles + priority P0–P4 | T15 |
-| §6 budget policy + reserve output + no auto model switch + CONTEXT_BUDGET_EXCEEDED | T15 |
-| §6 projection vs summary + compression allowlist/forbidden set | T15 |
-| §6 ContextBundle provenance + staleness | T15 |
-| §6 retrieval truth (exclude rejected attempts; derived indexes) | T15, T17 |
+| §3 Human review/approval state transitions | T8 |
+| §3 Publish gate + Chapter-1 readiness | T4, T9 |
+| §4 Planning artifacts + Arc Plan metadata/versions/restore-candidate | T12 |
+| §4 Major Beats lifecycle/importance/categories/Canon evidence | T12, T20 |
+| §4 Rolling Lookahead lifecycle (advisory, 2–3 horizon, typed provenance) | T14 |
+| §4 Human Direction scopes/lifecycle/conflicts + Core NL parse | T11 |
+| §4 Author Decisions vocabulary + Authorization scopes/conditions/consumption | T1, T11, T20 |
+| §4 Detailed Chapter Plan (ChapterIntent/Memo evolution + bindings + immutability) | T15, T18 |
+| §4 Execution Attempt defects + 2 replans + durable attempts | T18 |
+| §4 Arc completion (never auto-Publish) | T21 |
+| §5 Arc flow (Planner → Draft → deterministic → semantic → repair → Human Publish) | T13 (+T12 publish) |
+| §5 Detailed chapter flow (fresh after latest Canon) | T15, T16 |
+| §5 Planning Gate L1/L2 + truth table + SAFE semantics | T16 |
+| §5 bounded repair + PLAN_SCOPE_TOO_BROAD | T15, T16 |
+| §6 Composer architecture + profiles + priority P0–P4 | T17 |
+| §6 budget policy + reserve output + no auto model switch + CONTEXT_BUDGET_EXCEEDED | T17 |
+| §6 projection vs summary + compression allowlist/forbidden set | T17 |
+| §6 ContextBundle provenance (structured) + staleness | T17 |
+| §6 retrieval truth (exclude rejected attempts; derived indexes) | T17, T18, T20 |
 | §7 persistence layers + published current+history | T5 |
-| §7 Transaction Coordinator steps + revalidation + REVISION_BASE_STALE (single owner) | T8 |
-| §7 crash semantics + journal + fault injection | T8, T16, T22, T23 |
-| §7 authority switch + dependency invalidation atomic | T8, T17 |
-| §7 Execution freeze + EXECUTION_PREPARE_FAILED + provider failures | T16 |
-| §7 authorization consumption with Canon settlement (atomic) | T17 |
-| §7 recovery truth priority + corruption detection + reuse primitives | T8, T22 |
-| §7 legacy compatibility + capability markers + opt-in V2 + no competing authority | T1, T3, T22 |
-| §7 migrations forward-only/idempotent/recoverable | T22 |
-| §8 Studio workspace + Foundation UX + revision UI + batch approval | T19 |
-| §8 Arc UX + Lookahead no-approve + Direction parse/confirm/conflict | T20 |
-| §8 Detailed Plan states + Write action + one chapter | T20, T16, T21 |
-| §8 CLI safety (no bypass flags; write next respects gates) | T21 |
-| §9 testing layers + Foundation/Planning coverage + truth contract | T4–T18, T23 |
-| §9 Context tests + fault injection + half-authority invariant | T8, T15, T16, T17, T22, T23 |
-| §9 compatibility/parity + E2E A–F | T19, T20, T21, T22, T23 |
-| §9 security/path safety (AI IDs never become fs paths) | T2, T22 |
-| Scope boundary (no Phase 6/7, one chapter per run) | T16, T21, T23 |
-| Definition of Done | T23 |
+| §7 Transaction Coordinator steps + revalidation + REVISION_BASE_STALE (single owner) | T9 |
+| §7 crash semantics + journal + fault injection | T9, T18, T25, T26 |
+| §7 authority switch + dependency invalidation atomic | T9, T20 |
+| §7 Execution freeze + EXECUTION_PREPARE_FAILED + provider failures | T18 |
+| §7 authorization consumption with Canon settlement (evidence-derived, atomic) | T20 |
+| §7 recovery truth priority + corruption detection + reuse primitives | T9, T25 |
+| §7 legacy compatibility + capability markers (atomic activation) + opt-in V2 + no competing authority | T1, T3, T9, T12, T25 |
+| §7 migrations forward-only/idempotent/recoverable | T25 |
+| §8 Studio workspace + Foundation UX + revision UI + batch approval | T22 |
+| §8 Arc UX + Lookahead no-approve + Direction parse/confirm/conflict | T23 |
+| §8 Detailed Plan states + Write action + one chapter | T23, T18, T19, T24 |
+| §8 CLI safety (no bypass flags; write next respects gates) | T24 |
+| §9 testing layers + Foundation/Planning coverage + truth contract | T4–T18, T26 |
+| §9 Context tests + fault injection + half-authority invariant | T9, T17, T18, T20, T25, T26 |
+| §9 compatibility/parity + E2E A–F | T22, T23, T24, T25, T26 |
+| §9 security/path safety (AI IDs never become fs paths) | T2, T25 |
+| Core Writer gate (spec §8.5 + invariants 9) | T19 |
+| Scope boundary (no Phase 6/7, one chapter per run) | T18, T19, T24, T26 |
+| Definition of Done | T26 |
