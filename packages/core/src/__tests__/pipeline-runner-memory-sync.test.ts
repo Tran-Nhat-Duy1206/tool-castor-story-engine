@@ -1,8 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { BookConfig } from "../models/book.js";
+import { StateReviewArtifactSchema } from "../models/state-review.js";
+import { decideStateReviewItem } from "../state/state-review-service.js";
+import { confirmStateReview } from "../state/state-review-finalize.js";
 
 const ZERO_USAGE = {
   promptTokens: 0,
@@ -199,8 +202,21 @@ describe("PipelineRunner structured-state memory sync", () => {
     const bookDir = state.bookDir(bookId);
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
+    await mkdir(join(storyDir, "state"), { recursive: true });
     await mkdir(join(bookDir, "chapters"), { recursive: true });
+    // Seed valid v2 structured Canon (chapter 0) so governed publication has an
+    // authoritative semantic head to defer against.
+    const canonSeed: Record<string, string> = {
+      "manifest.json": JSON.stringify({
+        schemaVersion: 2, language: "en", lastAppliedChapter: 0, projectionVersion: 1, migrationWarnings: [],
+      }, null, 2),
+      "current_state.json": JSON.stringify({ chapter: 0, facts: [] }, null, 2),
+      "hooks.json": JSON.stringify({ hooks: [] }, null, 2),
+      "chapter_summaries.json": JSON.stringify({ rows: [] }, null, 2),
+    };
     await Promise.all([
+      ...Object.entries(canonSeed).map(([name, content]) =>
+        writeFile(join(storyDir, "state", name), content, "utf-8")),
       writeFile(join(storyDir, "current_state.md"), createStateCard({
         chapter: 0,
         location: "Shrine outskirts",
@@ -302,8 +318,13 @@ describe("PipelineRunner structured-state memory sync", () => {
       output,
       numericalSystem,
       language,
+      // Phase 4 (Task 6/7): the runner passes the governed options object as
+      // the 5th argument ({deferStateApplication, stateReviewJson}). Dropping
+      // it here would silently route the fixture through the FORBIDDEN legacy
+      // live-apply path and mutate Canon before Final Confirm.
+      options,
     ) {
-      await originalSaveChapter.call(this, bookDirArg, output, numericalSystem, language);
+      await originalSaveChapter.call(this, bookDirArg, output, numericalSystem, language, options);
       await Promise.all([
         writeFile(
           join(bookDirArg, "story", "pending_hooks.md"),
@@ -333,21 +354,71 @@ describe("PipelineRunner structured-state memory sync", () => {
     const narrativeStore = FakeMemoryDB.stores.get(bookDir);
     expect(await readFile(join(storyDir, "pending_hooks.md"), "utf-8")).toContain("markdown-drift-hook");
     expect(await readFile(join(storyDir, "chapter_summaries.md"), "utf-8")).toContain("Markdown Drift Summary");
-    expect(narrativeStore?.hooks).toEqual([
+
+    // Phase 4 governed publication: the structured delta is DEFERRED into an
+    // ACTIVE State Review proposal — it must NOT reach narrative memory before
+    // the human confirms (Invariant 2: proposals never become Writer context).
+    expect(narrativeStore?.hooks).toEqual([]);
+    expect(narrativeStore?.summaries).toEqual([]);
+
+    // The structured proposal survives verbatim in the review artifact…
+    const artifact = StateReviewArtifactSchema.parse(
+      JSON.parse(await readFile(join(bookDir, "story", "runtime", "chapter-0001.state-review.json"), "utf-8")),
+    );
+    if (artifact.status !== "active") throw new Error("expected an ACTIVE review");
+    expect(artifact.items.some((item) =>
+      item.proposal.type === "hook-upsert" && item.proposal.hook.hookId === "structured-hook",
+    )).toBe(true);
+
+    // …and after the human decides every item and Final Confirms, the
+    // POST-COMMIT derived sync rebuilds memory.db from canonical state, so
+    // the structured data wins over the drifted markdown at the GOVERNED time.
+    let revision = artifact.reviewRevision;
+    for (const item of artifact.items) {
+      const updated = await decideStateReviewItem({
+        bookDir,
+        chapter: 1,
+        itemId: item.id,
+        decision: "accept",
+        expectedReviewRevision: revision,
+      });
+      revision = updated.reviewRevision;
+    }
+    const confirmResult = await confirmStateReview({
+      bookDir,
+      chapter: 1,
+      reviewId: artifact.reviewId,
+      expectedReviewRevision: revision,
+    });
+    expect(confirmResult.status).toBe("resolved");
+
+    // Governed end state: canonical JSON authority holds ONLY the structured
+    // data accepted through review; the drifted markdown writer output stays
+    // confined to its legacy projection files and never reaches authority.
+    const canonicalHooks = JSON.parse(
+      await readFile(join(storyDir, "state", "hooks.json"), "utf-8"),
+    ) as { hooks: Array<{ hookId: string }> };
+    expect(canonicalHooks.hooks).toEqual([
       expect.objectContaining({
         hookId: "structured-hook",
         notes: "Structured hook should win.",
       }),
     ]);
-    expect(narrativeStore?.summaries).toEqual([
+    const canonicalSummaries = JSON.parse(
+      await readFile(join(storyDir, "state", "chapter_summaries.json"), "utf-8"),
+    ) as { rows: Array<{ chapter: number; title: string; events: string }> };
+    expect(canonicalSummaries.rows).toEqual([
       expect.objectContaining({
         chapter: 1,
         title: "Structured Summary",
         events: "Lin Yue follows the debt into the watchtower archive.",
       }),
     ]);
+    expect(JSON.stringify(canonicalHooks)).not.toContain("markdown-drift-hook");
+    expect(JSON.stringify(canonicalSummaries)).not.toContain("Markdown Drift Summary");
+
     // Heavy end-to-end test (full writeNextChapter pipeline + sqlite memory.db +
-    // structured-state projections). The 5s default is too tight for this under
-    // parallel-suite CPU contention; give it explicit headroom.
+    // structured-state projections + decisions + confirm derived sync). The 5s
+    // default is too tight under parallel-suite CPU contention; give it headroom.
   }, 20000);
 });

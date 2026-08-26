@@ -242,16 +242,27 @@ describe("agent deterministic writing tools", () => {
 
     await expect(readFile(join(state.bookDir("harbor"), "chapters", "0003_Storm.md"), "utf-8"))
       .resolves.toContain("完整新正文");
-    await expect(state.loadChapterIndex("harbor")).resolves.toEqual([
+    // Phase 4 (Task 9): a manual whole-chapter replacement is state-relevant,
+    // so the edit transaction publishes the new prose AND lands the lifecycle
+    // on needs-state-review inside one atomic set — no post-transaction
+    // saveChapterIndex, no fabricated audit-failed marker. The prior review
+    // artifact is replaced by a non-confirmable rebuild_required shell.
+    const indexOnDisk = JSON.parse(
+      await readFile(join(state.bookDir("harbor"), "chapters", "index.json"), "utf-8"),
+    ) as Array<{ number: number; status: string; auditIssues: string[] }>;
+    expect(indexOnDisk).toEqual([
       expect.objectContaining({
         number: 3,
-        status: "audit-failed",
+        status: "needs-state-review",
         wordCount: expect.any(Number),
-        auditIssues: expect.arrayContaining([
-          expect.stringContaining("Manual chapter replacement requires review"),
-        ]),
+        auditIssues: [],
       }),
     ]);
+    const shell = JSON.parse(
+      await readFile(join(state.bookDir("harbor"), "story", "runtime", "chapter-0003.state-review.json"), "utf-8"),
+    ) as { status: string; sourceChapter: number };
+    expect(shell.status).toBe("rebuild_required");
+    expect(shell.sourceChapter).toBe(3);
   });
 
   it("resyncs derived chapter state and returns the fresh audit result without rewriting prose", async () => {

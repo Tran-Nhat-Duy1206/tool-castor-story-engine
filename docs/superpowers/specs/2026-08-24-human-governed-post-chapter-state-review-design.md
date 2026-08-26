@@ -182,7 +182,7 @@ ReviewItem {
   - `new-hook-candidate` (accept ⇒ promote through the existing candidate path)
   - `chapter-summary` (author-facing summary row)
   - `note` (informational, zero effective change — e.g. unmappable legacy remnants)
-  
+
   Raw JSON-patch operations are forbidden. Kinds unsupported by the reducer are NOT
   invented (§10); gaps discovered against the architecture audit are recorded as
   explicit V1 limitations in the implementation plan, not smuggled in as new kinds.
