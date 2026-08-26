@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Date | 2026-08-27 |
-| Status | **AUTHORITATIVE DESIGN — human-approved section-by-section. Implementation NOT begun; no implementation plan created yet.** |
+| Status | **DESIGN SPEC — section decisions approved; consolidated written spec pending human approval. Implementation NOT begun; no implementation plan created yet.** |
 | Product | Tool Castor Story Engine (CLI: `castor`) |
 | Branch | `feature/human-controlled-story-state-v1` (standalone repository `Tran-Nhat-Duy1206/tool-castor-story-engine`) |
 | Builds on | Phase 4 Human-Governed Post-Chapter State Review (spec `2026-08-24-human-governed-post-chapter-state-review-design.md`, technically complete at tag `v0.1.0`) · existing Architect / Foundation Reviewer / Planner / ChapterIntent / ChapterMemo / Writer integration · atomic persistence and recovery primitives · local retrieval/index infrastructure · Studio · CLI |
@@ -25,10 +25,19 @@ Human authorizes.
 Canon records reality.
 ```
 
-The authority ladder is strict:
+The authority model is layered, not a simple total-order ladder:
 
 ```
-Foundation → Arc Plan → Human Direction → Execution Snapshot → Writer
+Authority layers (own truth):
+  Canon                 = established reality
+  Published Foundation  = long-range authority
+  Published Arc Plan    = medium-range authority
+  Human Direction + Author Authorization = scoped Human Authority (inputs to execution)
+
+Execution inputs:
+  Detailed Chapter Plan = proposal (mutable)
+  Execution Snapshot    = frozen execution contract
+  Writer                = execution
 ```
 
 **No lower layer may expand authority not granted by a higher layer.**
@@ -94,13 +103,13 @@ implementation-planning decision):
 1. **Proposal ≠ Authority.** Nothing AI proposes becomes truth until the owning layer authorizes it.
 2. **Approved content is AI-readable but AI-immutable.** Approved/published units are inputs to AI, never silently rewritten by AI.
 3. **Canon owns the past.** No revision rewrites established Canon or written chapters.
-4. **Publish is the authority boundary.** Only the transactional Publish action creates authority.
+4. **Publish is the authority boundary for versioned Foundation and Arc Plan authority.** Foundation Revision becomes Foundation authority only through **Human Publish**; Arc Plan Draft becomes Arc authority only through **Human Publish**; Human Direction and Author Authorization become scoped Human Authority only after **explicit Human confirmation**; Canon changes only through the **Phase 4 Canon settlement / Final Confirm workflow**. Invariant 1 (Proposal ≠ Authority) is never weakened.
 5. **Published versions are immutable.** Changes produce a new immutable version; the authority pointer never moves backwards.
 6. **Dependency invalidation is direct and declared.** A change to A marks only A's **direct** dependents stale immediately; transitive staleness follows only when the intermediate authoritative content actually changes.
 7. **Human Authority cannot be silently overridden.** No `--force`-style bypass for Writer authority; no automatic override of human decisions.
 8. **Advisory artifacts never grant authority.** Lookahead, scores, and semantic suggestions are never sufficient for execution.
 9. **Writer requires a valid immutable Execution Snapshot.** No Writer attempt starts without a frozen snapshot bound to current authority/Canon/context.
-10. **Authority publication is transactional.** A crash mid-Publish leaves the old authority fully in force (see §7).
+10. **Authority publication is transactional.** A crash/failure **BEFORE COMMIT** leaves the old authority authoritative; a crash/failure **AFTER durable COMMIT** leaves the new committed authority authoritative, with incomplete current materializations/indexes/caches rebuilt during recovery. The system never exposes half authority (see §7).
 
 ---
 
@@ -163,7 +172,24 @@ Ending Direction
 
 - Protagonist is always `required`.
 - AI proposes importance for other characters using **typed reasons**; human can override.
-- `optional` characters do not block initial Foundation readiness **unless** an authoritative downstream artifact requires them.
+- Core owns the reason vocabulary:
+
+```
+PROTAGONIST
+CO_PROTAGONIST
+CORE_CONFLICT_PARTICIPANT
+PRIMARY_ANTAGONIST
+CENTRAL_RELATIONSHIP
+ARC_REQUIRED
+SUPPORTING
+FUTURE_ONLY
+MINOR
+```
+
+  AI proposes a classification/reason; Human may override.
+- `optional` characters do not block initial Foundation readiness **unless** an
+  authoritative downstream Arc/Plan actually depends on the character — then the
+  dependency makes that character gating.
 
 **Relationship split (no duplication of Canon):**
 
@@ -172,6 +198,11 @@ Ending Direction
 | Foundation | Relationship **Intent** |
 | Canon / runtime | Actual current Relationship **State** |
 | Arc Plan | Target movement during the current Arc |
+
+Relationship Intent importance tiers (Core-owned): `CENTRAL | ARC_RELEVANT | RUNTIME_ONLY`.
+AI proposes a tier; Human may override. Foundation owns Relationship Intent **only** —
+actual current Relationship State stays in Canon and is never duplicated into Foundation,
+and the Arc Plan owns current-Arc target movement.
 
 **Arc Direction:** Foundation owns macro Arc/Volume destination. Detailed Major Beats and
 chapter planning belong to Planning V2 (§4).
@@ -198,7 +229,15 @@ RUNTIME_HOOK      — arises during writing; becomes authoritative only through
                     Phase 4 Human State Review
 ```
 
-Runtime Hooks **cannot silently escalate** into Foundation-level direction.
+Core-owned hook lifecycle: `PROPOSED | ACTIVE | ADVANCED | DORMANT | READY_FOR_PAYOFF |
+RESOLVED | DEFERRED | ABANDONED`.
+
+- Hook state follows **Canon evidence**, never Planning's own prediction.
+- A REQUIRED Foundation Hook cannot be silently `ABANDONED` by AI.
+- Runtime hooks become authoritative only through Phase 4 Human State Review.
+- Runtime hooks cannot silently escalate into central Foundation direction.
+- Payoff windows integrate with Scoped Authorization: where a payoff constitutes an
+  author-level decision, it requires the corresponding authorization.
 
 **Timeline split:**
 
@@ -566,7 +605,22 @@ CONDITION
 FROM_ARC
 ```
 
-and consumption semantics:
+`CONDITION` uses **Core-owned typed condition kinds** such as:
+
+```
+after_hook_advanced
+after_hook_resolved
+after_arc_started
+after_arc_climax
+after_chapter
+after_relationship_state
+after_fact_exists
+```
+
+Core owns condition semantics. AI may bind concrete subjects/instances but may not invent
+arbitrary condition kinds.
+
+Consumption semantics (unchanged):
 
 ```
 ONE_TIME
@@ -768,6 +822,10 @@ P4 — Stylistic History
 ```
 
 - **Do not call the LLM after a hard context-budget failure.**
+- **No automatic model switch to escape budget.** If the configured model cannot safely
+  fit mandatory context, Context Composer must not silently switch providers/models — it
+  uses the normal configured provider/model routing policy. If mandatory context still
+  cannot fit after safe compaction → `CONTEXT_BUDGET_EXCEEDED`.
 - Reserve model output tokens **BEFORE** calculating available input budget.
 - Budget considers: model context limit, reserved output, system/tool overhead, safety
   margin, tokenization/counting strategy. Do not assume every provider/model shares limits.
@@ -819,6 +877,23 @@ omittedDueToBudget
   retrieval while older Published authority remains active.
 - ContextBundle becomes **stale** if bound authority/Canon/dependencies change before
   Execution Snapshot creation.
+
+### 6.6 Token / call observability (instrumentation only)
+
+Each production LLM call retains usage/provenance metadata where available, conceptually:
+
+```
+task
+contextProfile
+contextBundleId
+model
+provider
+estimatedInputTokens
+actualInputTokens   (when provider reports it)
+outputTokens        (when provider reports it)
+```
+
+This is instrumentation only. Phase 5 does **not** expand into a cost-dashboard project.
 
 ---
 
