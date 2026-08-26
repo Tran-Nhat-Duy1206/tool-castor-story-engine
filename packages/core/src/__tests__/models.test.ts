@@ -297,6 +297,7 @@ describe("ChapterStatusSchema", () => {
     "audit-failed",
     "state-degraded",
     "revising",
+    "needs-state-review",
     "ready-for-review",
     "approved",
     "rejected",
@@ -308,8 +309,11 @@ describe("ChapterStatusSchema", () => {
     expect(ChapterStatusSchema.parse(value)).toBe(value);
   });
 
-  it("has exactly 13 valid statuses", () => {
-    expect(ChapterStatusSchema.options).toHaveLength(13);
+  // Phase 4 added "needs-state-review" to the governed lifecycle
+  // (commit ecec4c82): prose generation halts for human State Review before
+  // ready-for-review. The count pin must track the enum, not freeze history.
+  it("has exactly 14 valid statuses", () => {
+    expect(ChapterStatusSchema.options).toHaveLength(14);
   });
 
   it("rejects unknown status", () => {
