@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GovernanceMarkersSchema } from "../governance/contracts.js";
 
 export const PlatformSchema = z.enum(["tomato", "feilu", "qidian", "other"]);
 export type Platform = z.infer<typeof PlatformSchema>;
@@ -65,6 +66,7 @@ export const BookConfigSchema = z.object({
   updatedAt: z.string().datetime(),
   parentBookId: z.string().optional(),
   fanficMode: FanficModeSchema.optional(),
+  governance: GovernanceMarkersSchema.optional(),
   writing: z.object({
     reviewMode: z.enum(["auto", "manual"]).optional(),
     revisionGate: z.enum(["strict", "lenient", "always"]).optional(),
