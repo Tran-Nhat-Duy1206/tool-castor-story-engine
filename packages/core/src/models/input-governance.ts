@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PlanningDependencyRefSchema } from "../governance/contracts.js";
 
 export const ChapterMemoSchema = z.object({
   chapter: z.number().int().min(1),
@@ -6,6 +7,8 @@ export const ChapterMemoSchema = z.object({
   isGoldenOpening: z.boolean().default(false),
   body: z.string().min(1),
   threadRefs: z.array(z.string()).default([]),
+  governanceRevision: z.string().optional(),
+  planHash: z.string().optional(),
 });
 
 export type ChapterMemo = z.infer<typeof ChapterMemoSchema>;
@@ -18,6 +21,12 @@ export const ChapterIntentSchema = z.object({
   mustKeep: z.array(z.string()).default([]),
   mustAvoid: z.array(z.string()).default([]),
   styleEmphasis: z.array(z.string()).default([]),
+  foundationVersion: z.number().int().min(0).optional(),
+  arcPlanVersion: z.number().int().min(0).optional(),
+  canonRevision: z.number().int().min(0).optional(),
+  humanDirectionIds: z.array(z.string()).optional(),
+  authorizationIds: z.array(z.string()).optional(),
+  dependencyRefs: z.array(PlanningDependencyRefSchema).optional(),
 });
 
 export type ChapterIntent = z.infer<typeof ChapterIntentSchema>;
