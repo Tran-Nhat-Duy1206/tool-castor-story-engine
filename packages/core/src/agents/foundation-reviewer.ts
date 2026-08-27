@@ -1,6 +1,15 @@
 import { BaseAgent } from "./base.js";
 import type { ArchitectOutput } from "./architect.js";
 
+export interface FoundationReviewFindingProposal {
+  readonly unitId: string;
+  readonly category: string;
+  readonly severity: "minor" | "important" | "blocking";
+  readonly repairScope: "local" | "multi_unit" | "author_decision";
+  readonly evidence: string;
+  readonly suggestedAction: string;
+}
+
 export interface FoundationReviewResult {
   readonly passed: boolean;
   readonly totalScore: number;
@@ -10,6 +19,12 @@ export interface FoundationReviewResult {
     readonly feedback: string;
   }>;
   readonly overallFeedback: string;
+  /**
+   * Optional during legacy compatibility. Task 10 labels every review excerpt
+   * with durable unit ids and consumes these structured proposals through Core
+   * validation; scores remain informational and never fabricate findings.
+   */
+  readonly findings?: ReadonlyArray<FoundationReviewFindingProposal>;
 }
 
 export class FoundationReviewParseError extends Error {
@@ -34,6 +49,8 @@ export class FoundationReviewerAgent extends BaseAgent {
     readonly styleGuide?: string;
     readonly language: "zh" | "en";
     readonly targetChapters?: number;
+    /** Task 10 requires a durable exact-unit findings payload; legacy callers may omit it. */
+    readonly structuredFindings?: boolean;
   }): Promise<FoundationReviewResult> {
     const canonBlock = params.sourceCanon
       ? `\n## 原作正典参照\n${params.sourceCanon}\n`
@@ -57,7 +74,7 @@ export class FoundationReviewerAgent extends BaseAgent {
       { role: "user", content: userPrompt },
     ], { temperature: 0.3 });
 
-    return this.parseReviewResult(response.content, dimensions);
+    return this.parseReviewResult(response.content, dimensions, params.structuredFindings === true);
   }
 
   private originalDimensions(language: "zh" | "en", targetChapters?: number): ReadonlyArray<string> {
@@ -132,6 +149,10 @@ ${dimensions.map((dim, i) => `${i + 1}. ${dim}`).join("\n")}
 
 ...（每个维度一个 block）
 
+=== FINDINGS_JSON ===
+[{"unitId":"输入中的精确 unitId","category":"story_core|character|relationship|world|structure|pacing_feasibility|hook|timeline|book_rule|dependency|internal_consistency|author_intent_alignment","severity":"minor|important|blocking","repairScope":"local|multi_unit|author_decision","evidence":"该单元中唯一且完全一致的原文片段","suggestedAction":"可直接替换 evidence 的完整文本"}]
+若没有具体问题，输出 []。不要仅因分数低而虚构 finding；LOCAL finding 必须给出单一单元内可精确替换的 evidence 和 suggestedAction。
+
 === OVERALL ===
 总分：{加权平均}
 通过：{是/否}
@@ -168,6 +189,10 @@ Feedback: {specific feedback}
 
 ...
 
+=== FINDINGS_JSON ===
+[{"unitId":"exact unitId from the input","category":"story_core|character|relationship|world|structure|pacing_feasibility|hook|timeline|book_rule|dependency|internal_consistency|author_intent_alignment","severity":"minor|important|blocking","repairScope":"local|multi_unit|author_decision","evidence":"one unique exact excerpt from that unit","suggestedAction":"complete replacement text for evidence"}]
+Output [] when there is no specific finding. Never fabricate a finding from score alone; a LOCAL finding requires exact single-unit replacement evidence and action.
+
 === OVERALL ===
 Total: {weighted average}
 Passed: {yes/no}
@@ -186,6 +211,7 @@ Be strict. 80 means "ready to write without changes."`;
   private parseReviewResult(
     content: string,
     dimensions: ReadonlyArray<string>,
+    requireStructuredFindings: boolean,
   ): FoundationReviewResult {
     const parsedDimensions: Array<{ readonly name: string; readonly score: number; readonly feedback: string }> = [];
     const missingDimensions: number[] = [];
@@ -221,6 +247,40 @@ Be strict. 80 means "ready to write without changes."`;
     );
     const overallFeedback = overallMatch ? overallMatch[1]!.trim() : "(parse failed)";
 
-    return { passed, totalScore, dimensions: parsedDimensions, overallFeedback };
+    const findingsMatch = content.match(/=== FINDINGS_JSON ===\s*([\s\S]*?)(?==== OVERALL ===|$)/);
+    if (requireStructuredFindings && !findingsMatch) {
+      throw new Error("Foundation reviewer output is missing required FINDINGS_JSON");
+    }
+    let findings: ReadonlyArray<FoundationReviewFindingProposal> | undefined;
+    if (findingsMatch) {
+      const jsonText = findingsMatch[1]!
+        .trim()
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/, "");
+      const parsed = JSON.parse(jsonText) as unknown;
+      if (!Array.isArray(parsed)) throw new Error("Foundation reviewer FINDINGS_JSON must be an array");
+      findings = parsed.map((item, index) => {
+        if (typeof item !== "object" || item === null) {
+          throw new Error(`Foundation reviewer finding ${index} must be an object`);
+        }
+        const value = item as Record<string, unknown>;
+        const stringFields = ["unitId", "category", "severity", "repairScope", "evidence", "suggestedAction"] as const;
+        for (const field of stringFields) {
+          if (typeof value[field] !== "string" || value[field].trim().length === 0) {
+            throw new Error(`Foundation reviewer finding ${index} has invalid ${field}`);
+          }
+        }
+        return {
+          unitId: value.unitId as string,
+          category: value.category as string,
+          severity: value.severity as FoundationReviewFindingProposal["severity"],
+          repairScope: value.repairScope as FoundationReviewFindingProposal["repairScope"],
+          evidence: value.evidence as string,
+          suggestedAction: value.suggestedAction as string,
+        };
+      });
+    }
+
+    return { passed, totalScore, dimensions: parsedDimensions, overallFeedback, findings };
   }
 }

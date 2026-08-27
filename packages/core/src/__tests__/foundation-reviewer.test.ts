@@ -133,6 +133,95 @@ describe("FoundationReviewerAgent", () => {
     expect(messages[1]?.content).toContain("PENDING_HOOKS_TAIL_MARKER");
   });
 
+  it("parses Task 10 structured exact-unit findings without deriving them from scores", async () => {
+    const agent = new FoundationReviewerAgent({
+      client: TEST_CLIENT,
+      model: "test-model",
+      projectRoot: process.cwd(),
+    });
+    vi.spyOn(
+      agent as unknown as { chat: (...args: unknown[]) => Promise<unknown> },
+      "chat",
+    ).mockResolvedValue({
+      content: [
+        ...[1, 2, 3, 4, 5].flatMap((number) => [
+          `=== DIMENSION: ${number} ===`,
+          "Score: 90",
+          "Feedback: informational",
+        ]),
+        "=== FINDINGS_JSON ===",
+        JSON.stringify([{
+          unitId: "sf-theme-tone",
+          category: "story_core",
+          severity: "minor",
+          repairScope: "local",
+          evidence: "Weak premise",
+          suggestedAction: "Focused premise",
+        }]),
+        "=== OVERALL ===",
+        "Total: 90",
+        "Passed: yes",
+        "Summary: one exact local finding",
+      ].join("\n"),
+      usage: ZERO_USAGE,
+    });
+
+    const result = await agent.review({
+      language: "en",
+      mode: "original",
+      structuredFindings: true,
+      foundation: {
+        storyBible: "[unitId=sf-theme-tone] Weak premise",
+        volumeOutline: "volume",
+        bookRules: "rules",
+        currentState: "",
+        pendingHooks: "hooks",
+      },
+    });
+    expect(result.findings).toEqual([expect.objectContaining({
+      unitId: "sf-theme-tone",
+      repairScope: "local",
+      evidence: "Weak premise",
+    })]);
+  });
+
+  it("fails closed when Task 10 requires structured findings but the model omits them", async () => {
+    const agent = new FoundationReviewerAgent({
+      client: TEST_CLIENT,
+      model: "test-model",
+      projectRoot: process.cwd(),
+    });
+    vi.spyOn(
+      agent as unknown as { chat: (...args: unknown[]) => Promise<unknown> },
+      "chat",
+    ).mockResolvedValue({
+      content: [
+        ...[1, 2, 3, 4, 5].flatMap((number) => [
+          `=== DIMENSION: ${number} ===`,
+          "Score: 90",
+          "Feedback: informational",
+        ]),
+        "=== OVERALL ===",
+        "Total: 90",
+        "Passed: yes",
+        "Summary: omitted structured findings",
+      ].join("\n"),
+      usage: ZERO_USAGE,
+    });
+    await expect(agent.review({
+      language: "en",
+      mode: "original",
+      structuredFindings: true,
+      foundation: {
+        storyBible: "story",
+        volumeOutline: "volume",
+        bookRules: "rules",
+        currentState: "",
+        pendingHooks: "hooks",
+      },
+    })).rejects.toThrow(/missing required FINDINGS_JSON/i);
+  });
+
   it("does not turn a malformed review into fake 50-point quality scores", async () => {
     const agent = new FoundationReviewerAgent({
       client: TEST_CLIENT,

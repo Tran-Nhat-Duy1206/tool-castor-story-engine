@@ -20,6 +20,8 @@ export { FoundationRevisionStatusSchema, FoundationUnitDraftStateSchema, Foundat
 // Phase 5 TransactionCoordinator & Foundation Human Publish (Task 9)
 export { type TransactionStage, type TransactionInput, type TransactionResult, type TransactionJournal, TransactionJournalSchema, runTransaction, recoverTransaction } from "./governance/transactions.js";
 export { type PublishGateInput, type PublishGateResult, type PublishOutcome, checkFoundationPublishGate, publishFoundation, handleExternalEdit } from "./foundation/publish.js";
+// Phase 5 Foundation intelligence pipeline (Task 10)
+export { adaptiveIntake, runFoundationPipeline, type AdaptiveIntakeResult, type FoundationPipelineResult, type FoundationPipelineOptions } from "./foundation/pipeline.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
