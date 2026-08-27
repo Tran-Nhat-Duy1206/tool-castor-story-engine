@@ -6,6 +6,9 @@ export { type FoundationGovernanceMode, type PlanningGovernanceMode, type Govern
 export { type SafeRelPath, type StoryFrameSectionKey, type FoundationSourceKey, type FoundationContentLocator, type FoundationUnitManifest, type FoundationUnitProvenance, SafeRelPathSchema, StoryFrameSectionKeySchema, FoundationSourceKeySchema, FoundationContentLocatorSchema, FoundationUnitManifestSchema, FoundationUnitProvenanceSchema, isUnitApproved, unitContentEdited, governedContentHash, writeUnitManifest, readUnitManifests, extractGovernedContent } from "./foundation/manifest.js";
 // Phase 5 Foundation legacy bootstrap + upgrade candidates (Task 3)
 export { type BootstrapResult, type UpgradeCandidate, UpgradeCandidateSchema, bootstrapFoundation, prepareFoundationV2Upgrade, loadUpgradeCandidate, deleteUpgradeCandidate } from "./foundation/bootstrap.js";
+// Phase 5 Foundation readiness + dependencies (Task 4)
+export { type ReadinessReport, isUnitReady, evaluateFoundationReadiness, evaluateChapter1Readiness } from "./governance/readiness.js";
+export { type DependencyDeclaration, declareDependency, validateDependencyGraph, invalidateDirectDependents } from "./governance/dependencies.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
