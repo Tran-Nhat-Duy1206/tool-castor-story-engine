@@ -9,6 +9,8 @@ export { type BootstrapResult, type UpgradeCandidate, UpgradeCandidateSchema, bo
 // Phase 5 Foundation readiness + dependencies (Task 4)
 export { type ReadinessReport, isUnitReady, evaluateFoundationReadiness, evaluateChapter1Readiness } from "./governance/readiness.js";
 export { type DependencyDeclaration, declareDependency, validateDependencyGraph, invalidateDirectDependents } from "./governance/dependencies.js";
+// Phase 5 generic version/history primitives (Task 5)
+export { type VersionEnvelope, type FoundationUnitRef, type FoundationPublishedSnapshot, type FoundationVersion, type RevisionCandidate, type PreparedVersionWrites, type VersionStore, createVersionStore, restoreVersionAsRevisionCandidate } from "./governance/versions.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
