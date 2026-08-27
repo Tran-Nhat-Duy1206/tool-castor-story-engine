@@ -125,6 +125,84 @@ No `governance` capability/version markers exist yet anywhere (verified); they a
 
 ---
 
+## Book-scoped coordination / locking (global contract)
+
+**All authority-changing operations are book-scoped and lock-protected.** Reuse the
+existing Castor book-lock abstraction (`core/src/state/manager.ts` — the same primitive
+Phase 4 uses; `withBookMutationLock`-style ownership). Do NOT introduce a second hidden
+lock system.
+
+Required semantics for EVERY operation below:
+
+```
+acquire book lock
+→ re-read current authority/state INSIDE the lock
+→ validate expected revisions/bases against the freshly-read state
+→ prepare
+→ commit
+→ release in finally
+```
+
+Never perform: check revision → THEN acquire lock → commit stale state
+(check-then-lock-then-commit is forbidden).
+
+Operation → locking assignment (exact):
+
+| Operation | Lock owner Task |
+|---|---|
+| Foundation Human Publish (`publishFoundation`) | T9 (inside `runTransaction`) |
+| Arc Human Publish (`publishArcPlan`) | T13 (inside the shared `runTransaction`) |
+| Human Direction confirmation / conflict-resolution mutation | T11 |
+| Authorization confirmation / lifecycle authority mutation | T11 |
+| Phase 4 Final Confirm settlement integration (Canon + consumption writes) | T20 (reuse the existing Phase 4 finalize lock ownership) |
+| Arc close/activate transition (`applyArcTransition`) | T21 |
+| Execution Snapshot prepare where authority race matters (`freezeExecutionSnapshot`) | T18 |
+
+Concurrency guarantee: **no last-write-wins** for concurrent Studio/CLI authority
+changes. Tests must cover at least one concurrent Studio/CLI or two-Core-call race (the
+primary home is T9's publish fault/concurrency tests, mirrored in T13/T20): one
+operation wins; the other receives a TYPED conflict/stale result (`REVISION_BASE_STALE`
+or the operation-specific conflict code); never half authority, never silent overwrite.
+
+---
+
+## Foundation revision content isolation (working content model)
+
+**Published Foundation Markdown remains production-readable authority. Revision Draft
+content is isolated working Markdown/content. Planner/Writer continue reading Published
+Foundation until Human Publish.**
+
+Explicit working content model:
+
+```
+revisionId
+→ revision-scoped working content root (working Markdown/content, NOT Published paths)
+→ FoundationRevisionDraft + manifests/approval records point to that working content
+  (contentHash computed over the WORKING content)
+```
+
+- `saveFoundationUnitDraft` writes ONLY into the revision-scoped working root — it MUST
+  NOT overwrite current Published Markdown.
+- Two concurrent Revision Drafts may hold DIFFERENT content for the same unit (each has
+  its own working root).
+- Human Publish (T9) atomically MATERIALIZES the approved revision as the new current
+  Published Foundation and records immutable version history — only then does
+  production-readable Foundation change.
+- `discardFoundationRevision` removes only the working root; Published content is
+  unchanged.
+- External edits to Published Markdown remain distinguishable from edits inside an
+  explicit Revision Draft: external-change detection compares the Published Markdown
+  hash against the approved revision (T9 `external_change_detected`), never against
+  working content.
+- Creative prose is NEVER duplicated into governance JSON.
+
+Tests (owned by T8/T9): open revision + edit → Published Markdown hash/content
+unchanged; Planner/Writer still read the old Published content; two Revision Drafts hold
+different content for the same unit; Publish of the selected revision is the ONLY moment
+current materialized Foundation changes; discard revision → Published content unchanged.
+
+---
+
 ## Planned File / Responsibility Map
 
 New files (all under `packages/`; tests beside sources per repo convention
@@ -148,6 +226,7 @@ New files (all under `packages/`; tests beside sources per repo convention
 | `core/src/foundation/publish.ts` | Foundation Publish gate (evaluated over trusted persisted state) + explicit Human Publish + atomic V2 marker activation + external-edit Compare/Adopt/Discard, on the shared TransactionCoordinator | T9 |
 | `core/src/foundation/pipeline.ts` | Adaptive intake (0–3 MUST-KNOW gaps), global generate → global review → local repair → **durable Human-reviewable revisionId** (never publishes) | T10 |
 | `core/src/planning/arc-plan.ts` | Arc Plan **storage/domain only**: `ArcPlanSnapshot`, `ArcPlanDraftRecord` (keyed by draftId), `saveArcPlanDraft`/`loadArcPlanDraft`, read-only Published history, `restoreArcPlanAsRevisionDraft` (persists Draft C into the same store), Beat model/evidence — NO publish, NO preflight record (T13) | T12 |
+| `core/src/planning/invalidation-registry.ts` | **Generic future-planning artifact registry**: `registerPlanningArtifact`/`unregisterPlanningArtifact`/`listPlanningArtifactsDirectlyDependingOn`/`invalidateDirectPlanningDependents` over `PlanningArtifactKind` — introduced in T12 so Arc Publish (T13) invalidates without T14/T15 types; Lookahead (T14) and Detailed Plan (T15) participate in the SAME mechanism | T12 |
 | `core/src/planning/arc-pipeline.ts` | **Arc Planner + Arc preflight + Human Publish boundary**: generate Arc Draft (via T12 save), persisted preflight bound to draft hash + Foundation/Canon bases, semantic review (typed findings), LOCAL repair, verification, `publishArcPlan` (by draftId, with full rejection set), atomic planning V2 marker + direct future-planning invalidation | T13 |
 | `core/src/planning/beats.ts` | Major Beat lifecycle/importance/categories + Canon-evidence evaluation (deterministic + semantic) | T12 |
 | `core/src/planning/lookahead.ts` | Advisory Rolling Lookahead with typed `PlanningDependencyRef` provenance + selective invalidation | T14 |
@@ -348,6 +427,11 @@ export const FoundationDependencyRefSchema = z.object({
   observedRevision: z.union([z.number(), z.string()]).optional(),
 });
 export type FoundationDependencyRef = z.infer<typeof FoundationDependencyRefSchema>;
+
+// Generic future-planning artifact kinds for the PlanningInvalidationRegistry (T12):
+// Arc Publish (T13) invalidates these generically WITHOUT importing T14/T15 types.
+export const PlanningArtifactKindSchema = z.enum(["lookahead", "detailed_plan"]);
+export type PlanningArtifactKind = z.infer<typeof PlanningArtifactKindSchema>;
 
 // The observed token is a revision number or a stable hash depending on the existing
 // store; the artifact MUST carry enough information to detect a direct change without
@@ -807,7 +891,11 @@ clean eligible units; Publish remains Task 9.
       reapproval-requires-resolution; batch approval rejects ineligible units; publish
       authority unchanged by any revision op; **a caller-fabricated hash or revision
       cannot be approved (Core recomputes the hash and rejects mismatches)**;
-      **approval records carry `approvedBy` from the explicit humanActor**.
+      **approval records carry `approvedBy` from the explicit humanActor**;
+      **content isolation: open revision + edit → Published Markdown hash/content
+      unchanged and Planner/Writer still read the old Published content; two Revision
+      Drafts hold different content for the same unit; discard revision → Published
+      content unchanged**.
 - [ ] Implement `revision-service.ts`; targeted → PASS; typecheck.
 - [ ] Run the Task Completion Gate using commit message
       `feat(core): foundation human review service with explicit approval transitions`.
@@ -895,7 +983,10 @@ half authority.
       manifest cannot Publish**; **a unit with `approvedRevision !== contentRevision`
       cannot Publish**; **content changed after approval → Publish fails**;
       **external edit after approval → Publish fails**; **one Publish creates exactly
-      ONE new Foundation version**; the full fault-injection table; targeted → fail.
+      ONE new Foundation version**; the full fault-injection table; **book-scoped
+      concurrency race: two concurrent Publish calls (Studio/CLI or two Core calls) —
+      one wins, the other receives a typed `REVISION_BASE_STALE`/conflict result, no
+      last-write-wins, no half authority**; targeted → fail.
 - [ ] Implement `transactions.ts` then `publish.ts`; targeted → PASS.
 - [ ] Regressions (`state-review-finalize` atomic tests), typecheck.
 - [ ] Run the Task Completion Gate using commit message
@@ -1111,13 +1202,33 @@ before activating; typed scope instances resolve for all scope/condition kinds.
 **Files**
 - Create `packages/core/src/planning/arc-plan.ts`
 - Create `packages/core/src/planning/beats.ts`
+- Create `packages/core/src/planning/invalidation-registry.ts`   (generic future-planning artifact registry — introduced HERE so T13 can invalidate without T14/T15 types)
 - Create `packages/core/src/__tests__/planning-arc-plan.test.ts`
 - Create `packages/core/src/__tests__/planning-beats.test.ts`
+- Create `packages/core/src/__tests__/planning-invalidation-registry.test.ts`
 
 **Interfaces** (consumes the exact generic `VersionEnvelope` from Task 5 — no parallel
 implementation; `ArcPlanVersion` is defined HERE, after `ArcPlanSnapshot` exists)
 
 ```ts
+// Generic registry of future-planning artifacts and their DECLARED dependency refs.
+// Lookahead (T14) and Detailed Plan (T15) stores register through it; Arc Publish (T13)
+// invalidates direct dependents GENERICALLY (PlanningArtifactKind only) — no T14/T15
+// imports, no duplicate invalidation subsystem, per-Task typecheck preserved.
+export interface RegisteredPlanningArtifact {
+  readonly artifactKind: PlanningArtifactKind;   // "lookahead" | "detailed_plan" (T1 vocab)
+  readonly artifactId: SafeGovernanceId;
+  readonly dependencyRefs: ReadonlyArray<PlanningDependencyRef>;
+  readonly registeredAt: string;
+}
+export async function registerPlanningArtifact(bookDir: string, entry: RegisteredPlanningArtifact): Promise<void>;
+export async function unregisterPlanningArtifact(bookDir: string, artifactKind: PlanningArtifactKind, artifactId: string): Promise<void>;
+export async function listPlanningArtifactsDirectlyDependingOn(bookDir: string, dependencyKey: string): Promise<ReadonlyArray<{ artifactKind: PlanningArtifactKind; artifactId: string }>>;
+export async function invalidateDirectPlanningDependents(bookDir: string, dependencyKey: string): Promise<ReadonlyArray<{ artifactKind: PlanningArtifactKind; artifactId: string }>>;
+// DIRECT-only: only artifacts whose declared refs point at the changed key become stale;
+// transitive invalidation follows only when the intermediate artifact's own authoritative
+// content actually changes (same rule as Foundation dependencies).
+```
 export interface ArcPlanSnapshot {
   readonly arcId: string;
   readonly goal: string;
@@ -1178,7 +1289,10 @@ authority decision; REQUIRED Beats cannot be silently superseded.
       published Arc authority unchanged** and yields a persisted Draft C that loads via
       `loadArcPlanDraft(draftId)`; beat evidence derives from Canon; semantic
       uncertainty stays in_progress; required-beat supersede refused; **no publish
-      operation exists in this module (compile-time assertion / absent API)**.
+      operation exists in this module (compile-time assertion / absent API)**;
+      **registry tests**: register/unregister; `invalidateDirectPlanningDependents`
+      stales ONLY direct dependents (transitive follows only when the intermediate
+      artifact's content changes); generic kinds need no T14/T15 types.
 - [ ] Implement; targeted → PASS; typecheck.
 - [ ] Run the Task Completion Gate using commit message
       `feat(core): arc plan storage and canon-evidence major beats`.
@@ -1268,11 +1382,15 @@ the same publish transaction; no competing legacy/V2 planning authority exists. 
 existing Published Arc Plan is revised, the publication transaction includes, as ONE
 logical change: the new Arc Plan version + current Arc authority pointer/materialization
 + planning-v2 marker on first activation (if applicable) + **direct dependency
-impact/invalidation for affected future Lookahead/Detailed Plans**. Historical
-chapters/Canon remain untouched. Fault tests: Arc v2 replaces v1; a directly dependent
-Lookahead becomes STALE atomically; an unrelated artifact stays CURRENT; crash before
-COMMIT = old Arc + old validity; crash after COMMIT = new Arc + affected planning cannot
-be treated valid.
+invalidation through the Task 12 `PlanningInvalidationRegistry`**
+(`invalidateDirectPlanningDependents` over the changed Arc dependency key) — the
+registry is GENERIC (`PlanningArtifactKind` only), so T13 implements and tests atomic
+future-planning invalidation WITHOUT importing T14/T15 types; Lookahead (T14) and
+Detailed Plan (T15) stores register their artifacts through that same registry — one
+invalidation mechanism, no duplicates**. Historical chapters/Canon remain untouched.
+Fault tests: Arc v2 replaces v1; a directly dependent Lookahead becomes STALE atomically;
+an unrelated artifact stays CURRENT; crash before COMMIT = old Arc + old validity; crash
+after COMMIT = new Arc + affected planning cannot be treated valid.
 
 **Steps**
 
@@ -1325,7 +1443,10 @@ export async function revalidateLookahead(bookDir: string, lookaheadId: string):
 Rules: advisory only — no `approved` state; default horizon 2–3 lightweight intentions;
 only the next chapter gets a Detailed Plan; selective invalidation is typed: an
 UNRELATED Canon/Foundation change must NOT stale the Lookahead, while a DIRECTLY
-REFERENCED Canon dependency (e.g. a `canon_fact` or `hook` ref) must. Tests:
+REFERENCED Canon dependency (e.g. a `canon_fact` or `hook` ref) must. **Each generated
+Lookahead registers itself through the Task 12 `PlanningInvalidationRegistry`
+(`registerPlanningArtifact`, artifactKind `lookahead`) so Arc Publish (T13) can
+invalidate it directly through the SAME mechanism.** Tests:
 horizon outside 2–3 rejected; unrelated vs direct-dep change; replacement →
 `SUPERSEDED`; consumption → `CONSUMED`; Lookahead never grants authorization.
 
@@ -1387,6 +1508,9 @@ the Task 1 `PlanningDependencyRef` vocabulary.
 **The Planning Gate evaluates the persisted plan identity/hash; the Execution Snapshot
 freezes the exact `planId` + `planHash` that passed the gate.** A restart between
 planning and Write does not require reconstructing an unprovable in-memory plan.
+**Each persisted Detailed Plan registers itself through the Task 12
+`PlanningInvalidationRegistry` (`registerPlanningArtifact`, artifactKind
+`detailed_plan`) — the same mechanism Arc Publish uses.**
 Compatibility with existing ChapterIntent/ChapterMemo artifacts is preserved.
 
 **Steps**
@@ -2134,6 +2258,9 @@ in T26.
 | §6 ContextBundle subject identity (bundle ↔ persisted plan) | T17, T18 |
 | §7 Execution Snapshot freezes exact planId + planHash | T18 |
 | §7 two automatic replans AFTER the initial attempt | T15, T18, T19 |
+| §7 book-scoped coordination/locking on every authority-changing operation (no last-write-wins) | T9, T11, T13, T18, T20, T21 |
+| §7 Foundation revision content isolation (working root; Published untouched until Publish) | T8, T9 |
+| §7 Arc publication direct future-planning invalidation via generic PlanningInvalidationRegistry | T12, T13, T14, T15 |
 | Core Writer gate (spec §8.5 + invariants 9) | T19 |
 | Scope boundary (no Phase 6/7, one chapter per run) | T18, T19, T24, T26 |
 | Definition of Done | T26 |
