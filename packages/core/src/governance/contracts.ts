@@ -62,6 +62,18 @@ export const SafeGovernanceIdSchema = z
   .refine(
     (value) => !value.startsWith("/") && !value.startsWith("\\"),
     "governance id must not be an absolute path",
+  )
+  .refine(
+    (value) => !/[<>:"|?*]/.test(value),
+    "governance id must not contain Windows-invalid filename characters",
+  )
+  .refine(
+    (value) => !value.endsWith(" ") && !value.endsWith("."),
+    "governance id must not end with a space or a dot",
+  )
+  .refine(
+    (value) => !/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\..*)?$/i.test(value),
+    "governance id must not be a reserved Windows device name",
   );
 export type SafeGovernanceId = z.infer<typeof SafeGovernanceIdSchema>;
 
@@ -127,7 +139,7 @@ export const FoundationDependencyRefSchema = z.object({
   kind: FoundationDependencyKindSchema,
   targetUnitId: SafeGovernanceIdSchema,
   observedRevision: z.union([z.number(), z.string()]).optional(),
-});
+}).strict(); // nested persisted governance data fails closed — unknown keys never silently stripped
 export type FoundationDependencyRef = z.infer<typeof FoundationDependencyRefSchema>;
 
 // ---------------------------------------------------------------------------

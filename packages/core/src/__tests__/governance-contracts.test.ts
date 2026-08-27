@@ -260,6 +260,19 @@ describe("SafeGovernanceIdSchema", () => {
     }
   });
 
+  it("rejects Windows-invalid filename characters and reserved device names", () => {
+    const unsafeWindows = [
+      "a:b", "a<b", "a>b", 'a"b', "a|b", "a?b", "a*b",
+      "trailing ", "trailing.", "trailing  .",
+      "CON", "con", "PRN", "prn", "AUX", "aux", "NUL", "nul",
+      "COM1", "com1", "COM9", "com9", "LPT1", "lpt1", "LPT9", "lpt9",
+      "CON.txt", "nul.json", "COM3.log", "LPT2.bin", "NUL.",
+    ] as const;
+    for (const value of unsafeWindows) {
+      expect(SafeGovernanceIdSchema.safeParse(value).success, JSON.stringify(value)).toBe(false);
+    }
+  });
+
   it("governed IDs inside dependency schemas use the validated contract", () => {
     // An unsafe targetUnitId must fail FoundationDependencyRefSchema too.
     expect(FoundationDependencyRefSchema.safeParse({ kind: "uses_hook", targetUnitId: "../../etc" }).success).toBe(false);

@@ -469,8 +469,15 @@ export type PlanningArtifactKind = z.infer<typeof PlanningArtifactKindSchema>;
 export type FoundationContentLocator =
   | { readonly sourceRelPath: string; readonly contentKind: "whole_file" }
   | { readonly sourceRelPath: string; readonly contentKind: "section"; readonly sectionKey: string }
-  | { readonly sourceRelPath: string; readonly contentKind: "rule"; readonly ruleId: string }
+  | { readonly sourceRelPath: string; readonly contentKind: "rule"; readonly ruleId: FoundationSourceKey }
   | { readonly sourceRelPath: string; readonly contentKind: "entry"; readonly entryKey: string };
+
+// Two DIFFERENT identities for the `rule` locator (implementation-discovered):
+//   unitId = SafeGovernanceId  — stable, Windows/path-safe governed identity.
+//   ruleId = FoundationSourceKey — bounded selector for the EXISTING Markdown H2
+//     heading text (e.g. "数值/资源规则" CONTAINS "/" because the real book_rules
+//     card heading does). ruleId is NEVER used as a filesystem path component and
+//     is NOT SafeGovernanceId; the manifest unitId remains path-safe.
 
 export interface FoundationUnitManifest {
   readonly unitId: SafeGovernanceId;         // stable logical identity, not basename
@@ -484,7 +491,9 @@ export interface FoundationUnitManifest {
   readonly dependencies: ReadonlyArray<FoundationDependencyRef>;  // Core-owned kinds only (T1)
   readonly approvedAt?: string;
   readonly approvedBy?: string;
-  readonly provenance?: Record<string, unknown>;
+  readonly provenance?: FoundationUnitProvenance;  // STRICT RESERVED EMPTY envelope — NO free-form
+  // payload. Governance JSON is metadata only (no-shadow-prose invariant): z.record/
+  // arbitrary blobs/free-form prose fields must never be reintroduced here.
 }
 export function isUnitApproved(manifest: FoundationUnitManifest): boolean;
 // approved means: status === "approved" && approvedRevision === contentRevision && all
