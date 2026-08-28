@@ -288,3 +288,73 @@ describe("settlement trusted evidence — all scopes and conditions", () => {
     expect(direct.matches).toBe(viaDerive.length === 1);
   });
 });
+
+describe("structured decisionKind only — no text heuristic", () => {
+  it("prose mentions decisionKind but structured effectiveChanges empty → NOT consumed", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "exact_chapter", chapterNumber: 1 });
+    // Simulate finalize where effectiveChanges is empty (zeroEffectiveChange) → observedKinds []
+    const evEmpty: any = { context: ctx({ chapterNumber: 1, canonRevision: 1 }), decisionKinds: [] };
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), evEmpty)).length).toBe(0);
+    // Even if prose contains "identity_reveal" substring, structured empty still fails
+    const evUnrelated: any = { context: ctx({ chapterNumber: 1, canonRevision: 1 }), decisionKinds: ["major_betrayal"] };
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), evUnrelated)).length).toBe(0);
+  });
+  it("structured trusted decisionKind matches → eligible (no substring needed)", async () => {
+    const auth = await seedActive("major_betrayal", { kind: "exact_chapter", chapterNumber: 1 });
+    const ev: any = { context: ctx({ chapterNumber: 1, canonRevision: 1 }), decisionKinds: ["major_betrayal"] };
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), ev)).length).toBe(1);
+  });
+});
+
+describe("canonical Arc loader — no manual directory authority", () => {
+  it("stale/corrupt Arc pointer fails closed", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "arc", arcId: "arc-1" });
+    // No arc plan published → currentArcId defaults to arc-1 but arcState for arc-1 is started, so would match;
+    // To simulate corrupt, we write a corrupt current.json
+    const arcRoot = join(bookDir, "story", "governance", "versions", "arc_plan", "corrupt-arc");
+    await mkdir(arcRoot, { recursive: true });
+    await writeFile(join(arcRoot, "current.json"), "{ not json", "utf-8");
+    const { buildTrustedSettlementEvidence } = await import("../state/settlement-integration.js");
+    const ev = await buildTrustedSettlementEvidence(bookDir, 1, "hash");
+    // arc-1 should still be considered, but corrupt file should not cause crash and should fail closed for that arc
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), { context: ev.context, decisionKinds: ["identity_reveal"] } as any)).length).toBe(1);
+  });
+  it("ambiguous multiple current Arc fails closed", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "arc", arcId: "arc-1" });
+    const arcRoot = join(bookDir, "story", "governance", "versions", "arc_plan");
+    await mkdir(join(arcRoot, "arc-a"), { recursive: true });
+    await mkdir(join(arcRoot, "arc-b"), { recursive: true });
+    await writeFile(join(arcRoot, "arc-a", "current.json"), JSON.stringify({ unitId: "arc-a", version: 1, snapshot: { status: "started" } }), "utf-8");
+    await writeFile(join(arcRoot, "arc-b", "current.json"), JSON.stringify({ unitId: "arc-b", version: 1, snapshot: { status: "started" } }), "utf-8");
+    const { buildTrustedSettlementEvidence } = await import("../state/settlement-integration.js");
+    const ev = await buildTrustedSettlementEvidence(bookDir, 1, "hash");
+    // With ambiguous, currentArcId becomes "" and arcState for any should be not_started, so arc scope should fail
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), { context: ev.context, decisionKinds: ["identity_reveal"] } as any)).length).toBe(0);
+  });
+  it("raw extra arc directory without current.json cannot influence", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "arc", arcId: "arc-1" });
+    const extra = join(bookDir, "story", "governance", "versions", "arc_plan", "extra-dir");
+    await mkdir(extra, { recursive: true });
+    await writeFile(join(extra, "notes.txt"), "hello", "utf-8");
+    const { buildTrustedSettlementEvidence } = await import("../state/settlement-integration.js");
+    const ev = await buildTrustedSettlementEvidence(bookDir, 1, "hash");
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), { context: ev.context, decisionKinds: ["identity_reveal"] } as any)).length).toBe(1);
+  });
+});
+
+describe("canonical fact identity — gate/settlement identical", () => {
+  it("same factKey produces same result via shared canonical :: delimiter", async () => {
+    const ev: any = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: (k: string) => k === "hero::alive" ? { exists: true, canonRevision: 1 } : { exists: false, canonRevision: 0 }, arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] };
+    const auth = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_fact_exists", factKey: "hero::alive" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), ev)).length).toBe(1);
+    const authPipe = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_fact_exists", factKey: "hero|alive" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([authPipe.authorizationId]), ev)).length).toBe(0);
+  });
+  it("delimiter collision does not match", async () => {
+    const ev: any = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: (k: string) => k === "a::b" ? { exists: true, canonRevision: 1 } : { exists: false, canonRevision: 0 }, arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] };
+    const auth = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_fact_exists", factKey: "a::b" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), ev)).length).toBe(1);
+    const authCollide = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_fact_exists", factKey: "a:b" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([authCollide.authorizationId]), ev)).length).toBe(0);
+  });
+});

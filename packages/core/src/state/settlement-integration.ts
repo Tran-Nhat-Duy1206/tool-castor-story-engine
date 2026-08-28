@@ -5,6 +5,10 @@ import { AuthorizationRecordSchema, evaluateAuthorizationAgainstEvidence, type C
 import type { AuthorDecisionKind } from "../governance/contracts.js";
 import type { AtomicFileWrite } from "../utils/atomic-file-set.js";
 
+function canonicalFactKey(fact: { readonly subject: string; readonly predicate: string }): string {
+  return `${fact.subject}::${fact.predicate}`;
+}
+
 /**
  * Task 20 — evidence-derived atomic settlement integration.
  * Core loads trusted ACTIVE authorization records; caller IDs are never trusted.
@@ -17,23 +21,31 @@ export async function buildTrustedSettlementEvidence(
   resultingCanonRevision: string,
 ): Promise<CanonSettlementEvidence> {
   const { readLiveRuntimeStateSnapshot } = await import("./state-review-store.js");
-  const { createVersionStore } = await import("../governance/versions.js");
   const live = await readLiveRuntimeStateSnapshot(bookDir).catch(() => null);
-  const store = createVersionStore(bookDir);
-  // Derive currentArcId from latest published Arc Plan if any
   let currentArcId = "arc-1";
+  let arcAmbiguous = false;
+  const arcStatusCache = new Map<string, { status: "not_started" | "started" | "climaxed" | "closed"; revision: string }>();
   try {
     const { readdir, readFile } = await import("node:fs/promises");
     const { join } = await import("node:path");
     const versionsRoot = join(bookDir, "story", "governance", "versions", "arc_plan");
-    const unitDirs = await readdir(versionsRoot).catch(() => [] as string[]);
-    // pick first found current.json
+    const unitDirs = (await readdir(versionsRoot).catch(() => [] as string[])).sort();
+    const found: string[] = [];
     for (const d of unitDirs) {
       try {
         const cur = JSON.parse(await readFile(join(versionsRoot, d, "current.json"), "utf-8"));
-        if (cur?.unitId) { currentArcId = cur.unitId; break; }
+        if (cur?.unitId && typeof cur?.version === "number") {
+          found.push(cur.unitId);
+          const status = cur.snapshot?.status ?? "started";
+          const safeStatus = ["started", "climaxed", "closed"].includes(status) ? status : "not_started";
+          arcStatusCache.set(cur.unitId, { status: safeStatus as any, revision: String(cur.version) });
+        } else if (cur?.unitId) {
+          found.push(cur.unitId);
+        }
       } catch {}
     }
+    if (found.length === 1) currentArcId = found[0]!;
+    else if (found.length > 1) { arcAmbiguous = true; currentArcId = ""; arcStatusCache.clear(); }
   } catch {}
 
   const hookMap = new Map<string, { status: string; lifecycleRevision: string }>();
@@ -48,31 +60,11 @@ export async function buildTrustedSettlementEvidence(
   const factRevision = new Map<string, number>();
   if (live?.currentState?.facts) {
     for (const f of (live.currentState as any).facts) {
-      const key = `${f.subject}|${f.predicate}|${f.object}`;
+      const key = canonicalFactKey(f);
       factSet.add(key);
       factRevision.set(key, f.validFromChapter ?? effectiveChapter);
     }
   }
-
-  // Use VersionStore for arc state where possible
-  const arcStatusCache = new Map<string, { status: "not_started" | "started" | "climaxed" | "closed"; revision: string }>();
-  try {
-    const { readdir, readFile } = await import("node:fs/promises");
-    const { join } = await import("node:path");
-    const arcVersionsRoot = join(bookDir, "story", "governance", "versions", "arc_plan");
-    const arcUnits = await readdir(arcVersionsRoot).catch(() => [] as string[]);
-    for (const unit of arcUnits) {
-      try {
-        const curRaw = await readFile(join(arcVersionsRoot, unit, "current.json"), "utf-8");
-        const cur = JSON.parse(curRaw);
-        if (cur?.unitId && cur?.version) {
-          // For hardening, treat published arc as started; closed/climaxed would be derived from arc plan status field if present
-          const status = cur.snapshot?.status ?? "started";
-          arcStatusCache.set(cur.unitId, { status: status as any, revision: String(cur.version) });
-        }
-      } catch {}
-    }
-  } catch {}
 
   return {
     context: {

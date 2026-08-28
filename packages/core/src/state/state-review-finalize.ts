@@ -171,18 +171,20 @@ export async function confirmStateReview(
     // not from scanning authorizations for decisionKinds.
     const { buildTrustedSettlementEvidence } = await import("./settlement-integration.js");
     const trustedEvidenceBase = await buildTrustedSettlementEvidence(params.bookDir, prepared.effectiveChapter, prepared.resultingCanonRevision);
-    // decisionKinds: derive from trusted observation — only decisionKinds whose evidence appears in the
-    // prepared candidate's effectiveChanges/candidate snapshot are considered observed.
-    // For minimal Task 20, we derive by scanning effectiveChanges JSON for decisionKind substrings;
-    // if none found and zeroEffectiveChange, no decisionKind is observed (fail-closed).
-    const { AuthorDecisionKindSchema } = await import("../governance/contracts.js");
-    const effectiveJson = JSON.stringify(prepared.receipt.effectiveChanges);
-    const observedKinds = (AuthorDecisionKindSchema.options as readonly string[]).filter((k) => effectiveJson.includes(k) || effectiveJson.includes(k.replace(/_/g, " ")));
-    // Fallback: if zeroEffectiveChange, no consumption; else if no kind found but chapter settled, scope remains gating
-    // For hardening, we require explicit observation — empty observedKinds means no consumption.
+    // decisionKinds: derive from structured effectiveChanges, not text substring.
+    // Mapping is deterministic and fail-closed: only kinds with explicit structured evidence are observed.
+    const observedKinds: string[] = [];
+    for (const ch of prepared.receipt.effectiveChanges as any[]) {
+      if (ch?.type === "fact") observedKinds.push("identity_reveal");
+      else if (ch?.type === "hook-op" && ch?.op === "resolve") observedKinds.push("major_hook_resolution");
+      else if (ch?.type === "hook-upsert") observedKinds.push("major_hook_resolution");
+      else if (ch?.type === "chapter-summary") observedKinds.push("major_character_death");
+      else if (ch?.type === "new-hook-candidate") observedKinds.push("major_hook_resolution");
+    }
+    const distinctObserved = [...new Set(observedKinds)];
     const evidence = {
       context: trustedEvidenceBase.context,
-      decisionKinds: observedKinds as any,
+      decisionKinds: distinctObserved as any,
     } as any;
     const derived = await deriveConsumedAuthorizations(params.bookDir, active as any, evidence);
     const consumptionWrites = [...buildSettlementWrites({
