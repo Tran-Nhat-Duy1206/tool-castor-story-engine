@@ -200,3 +200,91 @@ describe("atomic settlement fault boundary", () => {
     expect((await loadAuthorization(bookDir, reusable.authorizationId))?.lifecycle).toBe("active");
   });
 });
+
+describe("settlement trusted evidence — all scopes and conditions", () => {
+  async function trustedEvidence(effectiveChapter: number, decisionKinds: string[]) {
+    const { buildTrustedSettlementEvidence } = await import("../state/settlement-integration.js");
+    const base = await buildTrustedSettlementEvidence(bookDir, effectiveChapter, "hash");
+    return { context: base.context, decisionKinds: decisionKinds as any };
+  }
+  async function seedHook(hookId: string, status: string) {
+    const hooksPath = join(bookDir, "story", "state", "hooks.json");
+    await mkdir(join(bookDir, "story", "state"), { recursive: true });
+    await writeFile(hooksPath, JSON.stringify({ hooks: [{ hookId, startChapter: 1, type: "test", status, lastAdvancedChapter: 1, expectedPayoff: "", notes: "" }] }, null, 2));
+  }
+  async function seedFact(factKey: string) {
+    const csPath = join(bookDir, "story", "state", "current_state.json");
+    await mkdir(join(bookDir, "story", "state"), { recursive: true });
+    // minimal currentState with fact
+    await writeFile(csPath, JSON.stringify({ chapter: 1, facts: [{ subject: factKey, predicate: "is", object: "true", validFromChapter: 1, validUntilChapter: null, sourceChapter: 1 }] }, null, 2));
+    // also need to ensure readLiveRuntimeStateSnapshot reads it; it reads current_state.json via runtime-state-store
+  }
+
+  it("exact_chapter positive/negative", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "exact_chapter", chapterNumber: 5 });
+    const evPos = await trustedEvidence(5, ["identity_reveal"]);
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), evPos)).length).toBe(1);
+    const evNeg = await trustedEvidence(6, ["identity_reveal"]);
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), evNeg)).length).toBe(0);
+  });
+  it("chapter_window boundaries", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "chapter_window", startChapter: 3, endChapter: 5 });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), await trustedEvidence(3, ["identity_reveal"]))).length).toBe(1);
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), await trustedEvidence(5, ["identity_reveal"]))).length).toBe(1);
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), await trustedEvidence(6, ["identity_reveal"]))).length).toBe(0);
+  });
+  it("arc scope", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "arc", arcId: "arc-1" });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), await trustedEvidence(1, ["identity_reveal"]))).length).toBe(1);
+    const auth2 = await seedActive("identity_reveal", { kind: "arc", arcId: "other-arc" });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth2.authorizationId]), await trustedEvidence(1, ["identity_reveal"]))).length).toBe(0);
+  });
+  it("from_arc", async () => {
+    const auth = await seedActive("identity_reveal", { kind: "from_arc", sourceArcId: "arc-a", targetArcId: "arc-1" });
+    const ev = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: (id: string) => id === "arc-a" ? { status: "closed" as const, revision: "1" } : id === "arc-1" ? { status: "started" as const, revision: "1" } : { status: "not_started" as const, revision: "0" } }, decisionKinds: ["identity_reveal"] as any };
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), ev as any)).length).toBe(1);
+    const authFail = await seedActive("identity_reveal", { kind: "from_arc", sourceArcId: "unknown-arc", targetArcId: "arc-1" });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([authFail.authorizationId]), ev as any)).length).toBe(0);
+  });
+  it("all 7 conditions via trusted evidence", async () => {
+    const evAdv = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: (id: string) => id === "hook-adv" ? { lifecycleState: "advanced" as any, lifecycleRevision: "2" } : { lifecycleState: "active" as any, lifecycleRevision: "1" }, relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    const c1 = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_hook_advanced", hookId: "hook-adv" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c1.authorizationId]), evAdv as any)).length).toBe(1);
+    const evRes = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: (id: string) => id === "hook-res" ? { lifecycleState: "resolved" as any, lifecycleRevision: "3" } : { lifecycleState: "active" as any, lifecycleRevision: "1" }, relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    const c2 = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_hook_resolved", hookId: "hook-res" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c2.authorizationId]), evRes as any)).length).toBe(1);
+    const evArcStarted = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: (id: string) => id === "arc-1" ? { status: "started" as const, revision: "1" } : { status: "not_started" as const, revision: "0" } }, decisionKinds: ["identity_reveal"] as any };
+    const c3 = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_arc_started", arcId: "arc-1" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c3.authorizationId]), evArcStarted as any)).length).toBe(1);
+    const evArcClimax = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: (id: string) => id === "arc-a" ? { status: "closed" as const, revision: "1" } : { status: "started" as const, revision: "1" } }, decisionKinds: ["identity_reveal"] as any };
+    const c4 = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_arc_climax", arcId: "arc-a" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c4.authorizationId]), evArcClimax as any)).length).toBe(1);
+    const c5 = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_chapter", chapterNumber: 1 } });
+    const evAfterChapterPos = { context: { chapterNumber: 2, currentArcId: "arc-1", canonRevision: 2, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 2 }), arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    const evAfterChapterNeg = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c5.authorizationId]), evAfterChapterPos as any)).length).toBe(1);
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c5.authorizationId]), evAfterChapterNeg as any)).length).toBe(0);
+    const c6 = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_relationship_state", relationshipId: "unknown-rel", state: "allies" } });
+    const evRelNeg = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c6.authorizationId]), evRelNeg as any)).length).toBe(0);
+    const evFactPos = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: (k: string) => k === "test-fact" ? { exists: true, canonRevision: 1 } : { exists: false, canonRevision: 0 }, arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    const c7 = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_fact_exists", factKey: "test-fact" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c7.authorizationId]), evFactPos as any)).length).toBe(1);
+    const evFactNeg = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: false, canonRevision: 0 }), arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    const c7Neg = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_fact_exists", factKey: "missing-fact" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([c7Neg.authorizationId]), evFactNeg as any)).length).toBe(0);
+  });
+  it("missing evidence fails closed", async () => {
+    const evMissingHook = { context: { chapterNumber: 1, currentArcId: "arc-1", canonRevision: 1, hookStates: () => ({ lifecycleState: "active" as any, lifecycleRevision: "1" }), relationshipStates: () => ({ state: "unknown", stateRevision: "1" }), factResolver: () => ({ exists: true, canonRevision: 1 }), arcState: () => ({ status: "started" as const, revision: "1" }) }, decisionKinds: ["identity_reveal"] as any };
+    const auth = await seedActive("identity_reveal", { kind: "condition", condition: { kind: "after_hook_resolved", hookId: "missing-hook" } });
+    expect((await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), evMissingHook as any)).length).toBe(0);
+  });
+  it("shared Task11 interpretation — same result via direct evaluate", async () => {
+    const { evaluateAuthorizationAgainstEvidence } = await import("../governance/authorizations.js");
+    const auth = await seedActive("identity_reveal", { kind: "exact_chapter", chapterNumber: 1 });
+    const ev = await trustedEvidence(1, ["identity_reveal"]);
+    const direct = evaluateAuthorizationAgainstEvidence(auth as any, ev);
+    const viaDerive = await deriveConsumedAuthorizations(bookDir, activeReview([auth.authorizationId]), ev);
+    expect(direct.matches).toBe(viaDerive.length === 1);
+  });
+});

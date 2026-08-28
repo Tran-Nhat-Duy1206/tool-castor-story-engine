@@ -169,46 +169,22 @@ export async function confirmStateReview(
     // This is the ONLY ACTIVE->CONSUMED path; pure helpers persist nothing.
     // Evidence is derived from the PREPARED candidate Canon (effectiveChapter) and live state,
     // not from scanning authorizations for decisionKinds.
-    // Evidence context is derived from the prepared candidate's effective chapter and
-    // live validated snapshot where available. For minimal Task 20, we derive decisionKinds
-    // as all enum values (so scope/condition remain gating) and resolvers that reflect
-    // live-like state (hook/relationship/fact/arc) rather than constants.
-    const liveForEvidence = await readLiveRuntimeStateSnapshot(params.bookDir).catch(() => null);
-    const dummyEvidence = {
-      context: {
-        chapterNumber: prepared.effectiveChapter,
-        currentArcId: "arc-1",
-        canonRevision: prepared.effectiveChapter,
-        hookStates: (hookId: string) => {
-          const found = (liveForEvidence as any)?.hooks?.hooks?.find((h: any) => h.hookId === hookId);
-          if (found?.lifecycleState) return { lifecycleState: found.lifecycleState, lifecycleRevision: String(found.lifecycleRevision ?? "1") };
-          if (hookId === "resolved") return { lifecycleState: "resolved" as const, lifecycleRevision: "3" };
-          if (hookId === "advanced") return { lifecycleState: "advanced" as const, lifecycleRevision: "2" };
-          return { lifecycleState: "active" as const, lifecycleRevision: "1" };
-        },
-        relationshipStates: (relationshipId: string) => {
-          if (relationshipId === "rivals") return { state: "allies", stateRevision: "7" };
-          return { state: "unknown", stateRevision: "1" };
-        },
-        factResolver: (factKey: string) => {
-          if (factKey === "identity-known") return { exists: true, canonRevision: prepared.effectiveChapter };
-          // best-effort: check live snapshot currentState for fact existence
-          const exists = !!(liveForEvidence as any)?.currentState?.[factKey];
-          return { exists, canonRevision: exists ? prepared.effectiveChapter : 0 };
-        },
-        arcState: (arcId: string) => {
-          if (arcId === "arc-1") return { status: "started" as const, revision: "1" };
-          if (arcId === "arc-a") return { status: "closed" as const, revision: "1" };
-          return { status: "not_started" as const, revision: "1" };
-        },
-      },
-      decisionKinds: [] as any,
-    };
-    {
-      const { AuthorDecisionKindSchema } = await import("../governance/contracts.js");
-      (dummyEvidence as any).decisionKinds = AuthorDecisionKindSchema.options as any;
-    }
-    const derived = await deriveConsumedAuthorizations(params.bookDir, active as any, dummyEvidence as any);
+    const { buildTrustedSettlementEvidence } = await import("./settlement-integration.js");
+    const trustedEvidenceBase = await buildTrustedSettlementEvidence(params.bookDir, prepared.effectiveChapter, prepared.resultingCanonRevision);
+    // decisionKinds: derive from trusted observation — only decisionKinds whose evidence appears in the
+    // prepared candidate's effectiveChanges/candidate snapshot are considered observed.
+    // For minimal Task 20, we derive by scanning effectiveChanges JSON for decisionKind substrings;
+    // if none found and zeroEffectiveChange, no decisionKind is observed (fail-closed).
+    const { AuthorDecisionKindSchema } = await import("../governance/contracts.js");
+    const effectiveJson = JSON.stringify(prepared.receipt.effectiveChanges);
+    const observedKinds = (AuthorDecisionKindSchema.options as readonly string[]).filter((k) => effectiveJson.includes(k) || effectiveJson.includes(k.replace(/_/g, " ")));
+    // Fallback: if zeroEffectiveChange, no consumption; else if no kind found but chapter settled, scope remains gating
+    // For hardening, we require explicit observation — empty observedKinds means no consumption.
+    const evidence = {
+      context: trustedEvidenceBase.context,
+      decisionKinds: observedKinds as any,
+    } as any;
+    const derived = await deriveConsumedAuthorizations(params.bookDir, active as any, evidence);
     const consumptionWrites = [...buildSettlementWrites({
       bookDir: params.bookDir,
       chapterNumber: prepared.effectiveChapter,
