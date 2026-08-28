@@ -41,6 +41,10 @@ export { PlanningFindingSchema, reviewDetailedPlan, repairDetailedPlanLocal, ver
 export { ContextSourceTypeSchema, isBundleStale, type ContextProfile, type ContextPriority, type ContextRepresentation, type ContextSourceType, type ContextSourceProvenance, type BudgetOmission, type ContextSubject, type ContextSection, type ContextBundle } from "./context/bundle.js";
 export { estimateTokens, applyBudgetPolicy, type BudgetResult } from "./context/budget.js";
 export { composeContext, type ComposeContextRequest } from "./context/composer.js";
+// Phase 5 Execution Snapshot + durable Execution Attempts (Task 18)
+export { ExecutionSnapshotSchema, saveExecutionSnapshot, loadExecutionSnapshot, freezeExecutionSnapshot, type ExecutionSnapshot, type FreezeResult } from "./execution/snapshot.js";
+export { ExecutionAttemptStatusSchema, ExecutionAttemptSchema, createExecutionAttempt, loadExecutionAttempt, recordAttemptRunning, recordAttemptDrafted, recordAttemptFailure, abortAttemptForPlanDefect, acceptAttempt, classifyAttemptDefect, type ExecutionAttemptStatus, type ExecutionAttempt, type AttemptOutcome } from "./execution/attempt.js";
+export { saveExecutionAttempt, listExecutionAttempts } from "./execution/attempt-store.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
