@@ -915,9 +915,9 @@ export async function getPlanningGateReport(params: {
   const result = await evaluatePlanningGate({ bookDir, planId }).catch(() => ({ outcome: "conflict" as const, evidence: ["gate evaluation failed"] }));
   const verdictMap: Record<string, string> = { safe: "SAFE", uncertain: "UNCERTAIN", author_decision: "AUTHOR_DECISION", conflict: "CONFLICT" };
   const verdict = verdictMap[(result as { outcome?: string }).outcome ?? "conflict"] ?? "CONFLICT";
-  const evidence = (result as { evidence?: unknown }).evidence ?? (result as { reasons?: unknown }).reasons ?? (result as { blockers?: unknown }).blockers ?? (result as { concerns?: unknown }).concerns ?? [];
+  const evidence = (result as unknown as { evidence?: unknown }).evidence ?? (result as unknown as { reasons?: unknown }).reasons ?? (result as unknown as { blockers?: unknown }).blockers ?? (result as unknown as { concerns?: unknown }).concerns ?? [];
   const reasons = Array.isArray(evidence) ? evidence : [evidence];
-  const blockers = Array.isArray((result as { blockers?: unknown }).blockers) ? (result as { blockers: unknown[] }).blockers : reasons;
+  const blockers = Array.isArray((result as unknown as { blockers?: unknown }).blockers) ? (result as unknown as { blockers: unknown[] }).blockers : reasons;
   return { verdict, canWrite: verdict === "SAFE", raw: result, planId, bookId: params.bookId, reasons, evidence: reasons, blockers, warnings: (result as { warnings?: unknown }).warnings ?? [], nextRecommendedAction: (result as { nextRecommendedAction?: unknown }).nextRecommendedAction ?? (result as { nextAction?: unknown }).nextAction ?? null };
 }
 
