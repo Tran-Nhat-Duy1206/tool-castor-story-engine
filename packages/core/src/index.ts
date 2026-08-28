@@ -45,6 +45,8 @@ export { composeContext, type ComposeContextRequest } from "./context/composer.j
 export { ExecutionSnapshotSchema, saveExecutionSnapshot, loadExecutionSnapshot, freezeExecutionSnapshot, type ExecutionSnapshot, type FreezeResult } from "./execution/snapshot.js";
 export { ExecutionAttemptStatusSchema, ExecutionAttemptSchema, createExecutionAttempt, loadExecutionAttempt, recordAttemptRunning, recordAttemptDrafted, recordAttemptFailure, abortAttemptForPlanDefect, acceptAttempt, classifyAttemptDefect, type ExecutionAttemptStatus, type ExecutionAttempt, type AttemptOutcome } from "./execution/attempt.js";
 export { saveExecutionAttempt, listExecutionAttempts } from "./execution/attempt-store.js";
+// Phase 5 Canon settlement integration + evidence-derived Authorization consumption (Task 20)
+export { deriveConsumedAuthorizations, buildSettlementWrites, buildValidatedSettlementWrites, applyLaggableSettlementEffects, type AtomicSettlementInput, type LaggableEffects } from "./state/settlement-integration.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
