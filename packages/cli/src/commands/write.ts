@@ -30,12 +30,47 @@ writeCommand
   .option("--json", "Output JSON")
   .option("-q, --quiet", "Suppress console output")
   .option("--notify", "Send a notification to configured notify channels when the command finishes")
-  .action(async (bookIdArg: string | undefined, opts) => {
+  .action(async (bookIdArg: string | undefined, opts, command) => {
+    // Reject bypass flags that must never exist for governance (Task 24)
+    const bypassFlags = ["--force", "--ignore-canon", "--skip-authority", "--bypass-gate", "--no-verify", "--write-anyway", "--unsafe", "--skip-gate", "--ignore-conflict", "--bypass-planning"];
+    const rawArgs: string[] = [
+      ...process.argv.slice(2),
+      String(bookIdArg ?? ""),
+      ...(Array.isArray((command as any)?.args) ? (command as any).args as string[] : []),
+      ...Object.keys(opts ?? {}).map((k) => `--${k}`),
+    ];
+    for (const f of bypassFlags) {
+      if (rawArgs.includes(f) || String(bookIdArg) === f) {
+        logError(`Unknown option ${f}`);
+        process.exit(1);
+        return;
+      }
+    }
+    if (bookIdArg && String(bookIdArg).startsWith("-")) {
+      logError(`Unknown option ${bookIdArg}`);
+      process.exit(1);
+      return;
+    }
     let notifyLanguage: CliLanguage = "zh";
     let notifyBookName: string | undefined;
     try {
       const root = findProjectRoot();
       const bookId = await resolveBookId(bookIdArg, root);
+      // Pre-check Planning Gate (Task 16) before invoking Writer — CONFLICT/AUTHOR_DECISION/UNCERTAIN must not call writeNextChapter
+      try {
+        const { getPlanningGateReport } = await import("@actalk/inkos-core") as unknown as { getPlanningGateReport?: (p: unknown) => Promise<unknown> };
+        if (getPlanningGateReport) {
+          const gate: any = await getPlanningGateReport({ bookId, bookDir: new StateManager(root).bookDir(bookId) }).catch(() => null);
+          const verdict = String(gate?.verdict ?? gate?.outcome ?? "").toUpperCase();
+          if (verdict === "CONFLICT" || verdict === "AUTHOR_DECISION" || verdict === "UNCERTAIN") {
+            const msg = verdict === "CONFLICT" ? "Gate CONFLICT — writing blocked. Open Studio to resolve." : verdict === "AUTHOR_DECISION" ? "Gate AUTHOR_DECISION — Human authorization required. Open Studio." : "Gate UNCERTAIN — Human input required. Open Studio.";
+            if (opts.json) log(JSON.stringify({ error: msg, blocked: true, verdict }, null, 2));
+            else logError(msg);
+            process.exit(1);
+            return;
+          }
+        }
+      } catch { /* gate check is best-effort; Core will still enforce */ }
       const context = await resolveContext(opts);
       const state = new StateManager(root);
       const book = await state.loadBookConfig(bookId);
@@ -57,11 +92,50 @@ writeCommand
       const count = parseInt(opts.count, 10);
       const wordCount = opts.words ? parseInt(opts.words, 10) : undefined;
 
-      const results = [];
+      const results: Awaited<ReturnType<PipelineRunner["writeNextChapter"]>>[] = [];
+      let blockedError: unknown = null;
       for (let i = 0; i < count; i++) {
         if (!opts.json) log(formatWriteNextProgress(language, i + 1, count, bookId));
 
-        const result = await pipeline.writeNextChapter(bookId, wordCount);
+        // Core-owned governance gate: MUST call the same PipelineRunner.writeNextChapter (Task 19).
+        // Writer invocation is gated inside Core (Planning Gate SAFE, Context Bundle, Snapshot).
+        // CLI does not duplicate governance logic and does not add bypass flags.
+        let result: Awaited<ReturnType<PipelineRunner["writeNextChapter"]>> | null = null;
+        try {
+          result = await pipeline.writeNextChapter(bookId, wordCount);
+        } catch (err) {
+          const msg = String(err);
+          const lower = msg.toLowerCase();
+          const isGateBlocked = /planning gate blocked/i.test(msg) || lower.includes('outcome="conflict"') || lower.includes("outcome='conflict'") || msg.includes("CONFLICT") || msg.includes("AUTHOR_DECISION") || msg.includes("UNCERTAIN") || lower.includes('outcome="author_decision"') || lower.includes('outcome="uncertain"') || lower.includes("invalid governance state") || lower.includes("transition state");
+          const isContextBudget = lower.includes("contextbundle") || lower.includes("is stale") || lower.includes("context_budget") || lower.includes("budget") && lower.includes("exceeded") || lower.includes("execution snapshot") || lower.includes("freeze") || lower.includes("stale") && lower.includes("bundle");
+          const isPlanDefect = lower.includes("plan defect") || lower.includes("exhausted maximum 2 automatic replans") || lower.includes("human intervention required") && lower.includes("plan");
+          const isLegacyMatrix = lower.includes("cannot use planning v2 with legacy foundation") || lower.includes("foundation v2 but planning legacy");
+          // Legacy/v2 matrix is also a Core outcome — just surface it, no CLI recalculation.
+          if (opts.json) {
+            log(JSON.stringify({ error: msg, blocked: true, outcome: isGateBlocked ? "blocked" : undefined }, null, 2));
+          } else {
+            logError(msg);
+            if (isGateBlocked || isLegacyMatrix) {
+              log(`  Gate blocked — no prose was written.`);
+              log(`  Open Studio to resolve Foundation / Planning blockers (CONFLICT / AUTHOR_DECISION / UNCERTAIN).`);
+            } else if (isContextBudget) {
+              log(`  Context/budget/prepare failure — no prose was written.`);
+              log(`  Open Studio to resolve.`);
+            } else if (isPlanDefect) {
+              log(`  Plan defect (Core already attempted initial + 2 replans) — no prose written.`);
+              log(`  Open Studio to review/repair plan.`);
+            } else if (lower.includes("blocked") || lower.includes("not ready") || lower.includes("not approved") || lower.includes("protagonist")) {
+              log(`  Blocked — no prose was written.`);
+              log(`  Open Studio to resolve.`);
+            } else {
+              log(`  No prose was written. Open Studio to resolve.`);
+            }
+          }
+          blockedError = err;
+          break;
+        }
+
+        if (!result) break;
         results.push(result);
 
         if (!opts.json) {
@@ -87,6 +161,17 @@ writeCommand
           }
           break;
         }
+      }
+
+      if (blockedError) {
+        if (opts.notify) {
+          await sendCommandNotification({
+            title: formatNotifyCommandTitle(notifyLanguage, "write-next", notifyBookName, false),
+            body: formatNotifyFailureBody(notifyLanguage, blockedError),
+          }, config);
+        }
+        // Ensure non-zero exit, no prose side-effect already guaranteed by Core gate.
+        process.exit(1);
       }
 
       if (opts.json) {
