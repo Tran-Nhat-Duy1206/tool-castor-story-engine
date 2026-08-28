@@ -4,9 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   freezeExecutionSnapshot,
+  freezeExecutionSnapshotUnderLock,
   loadExecutionSnapshot,
   type ExecutionSnapshot,
 } from "../execution/snapshot.js";
+import { StateManager } from "../state/manager.js";
 import {
   buildDetailedPlan,
   loadDetailedPlan,
@@ -260,6 +262,58 @@ describe("Execution Snapshot Freeze & Immutability", () => {
       const loadedSnapshot = await loadExecutionSnapshot(bookDir, originalSnapshot.snapshotId);
       expect(loadedSnapshot?.planHash).toBe(originalSnapshot.planHash);
       expect(loadedSnapshot?.bindings).toEqual(originalSnapshot.bindings);
+    }
+  });
+
+  it("freezeExecutionSnapshotUnderLock fails closed when book lock is not held", async () => {
+    const { planId } = await buildDetailedPlan(bookDir, 5, {
+      intent: sampleIntent(5),
+      memo: sampleMemo(5),
+    });
+    const plan = (await loadDetailedPlan(bookDir, planId))!;
+
+    const bundle = await composeContext({
+      bookDir,
+      profile: "writer_context",
+      subject: { kind: "detailed_plan", planId, planHash: plan.planHash },
+    });
+
+    const forgedRelease = async () => undefined;
+    const res = await freezeExecutionSnapshotUnderLock(bookDir, planId, bundle, forgedRelease);
+    expect(res.status).toBe("execution_prepare_failed");
+    if (res.status === "execution_prepare_failed") {
+      expect(res.reason).toContain("without valid lock ownership");
+    }
+  });
+
+  it("public freeze cannot bypass an existing lock, while the exact lock owner can use the internal path", async () => {
+    const { planId } = await buildDetailedPlan(bookDir, 5, {
+      intent: sampleIntent(5),
+      memo: sampleMemo(5),
+    });
+    const plan = (await loadDetailedPlan(bookDir, planId))!;
+
+    const bundle = await composeContext({
+      bookDir,
+      profile: "writer_context",
+      subject: { kind: "detailed_plan", planId, planHash: plan.planHash },
+    });
+
+    const manager = new StateManager(root);
+    const releaseLock = await manager.acquireBookLock("demo-book");
+    try {
+      const publicResult = await freezeExecutionSnapshot(bookDir, planId, bundle);
+      expect(publicResult.status).toBe("execution_prepare_failed");
+
+      const ownerResult = await freezeExecutionSnapshotUnderLock(
+        bookDir,
+        planId,
+        bundle,
+        releaseLock,
+      );
+      expect(ownerResult.status).toBe("frozen");
+    } finally {
+      await releaseLock();
     }
   });
 });

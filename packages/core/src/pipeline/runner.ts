@@ -89,7 +89,7 @@ import {
 import { evaluatePlanningGate } from "../planning/gate.js";
 import { composeContext } from "../context/composer.js";
 import { isBundleStale } from "../context/bundle.js";
-import { freezeExecutionSnapshot } from "../execution/snapshot.js";
+import { freezeExecutionSnapshotUnderLock } from "../execution/snapshot.js";
 import {
   createExecutionAttempt,
   recordAttemptRunning,
@@ -1857,6 +1857,7 @@ export class PipelineRunner {
         wordCount,
         temperatureOverride,
         externalContext ?? this.config.externalContext,
+        releaseLock,
       );
     } finally {
       await releaseLock();
@@ -1954,6 +1955,7 @@ export class PipelineRunner {
           options.wordCount,
           options.temperatureOverride,
           options.externalContext ?? this.config.externalContext,
+          releaseLock,
         );
         results.push(result);
         options.onChapterComplete?.(result, results.length, chapterCount);
@@ -2003,9 +2005,10 @@ export class PipelineRunner {
 
   private async _writeNextChapterLocked(
     bookId: string,
-    wordCount?: number,
-    temperatureOverride?: number,
-    externalContext?: string,
+    wordCount: number | undefined,
+    temperatureOverride: number | undefined,
+    externalContext: string | undefined,
+    bookLockOwner: () => Promise<void>,
   ): Promise<ChapterPipelineResult> {
     const book = await this.state.loadBookConfig(bookId);
     const bookDir = this.state.bookDir(bookId);
@@ -2039,6 +2042,7 @@ export class PipelineRunner {
         wordCount,
         temperatureOverride,
         externalContext,
+        bookLockOwner,
       );
       const chapterPrefix = `${paddedChapter}_`;
       const chapterFile = (await readdir(join(bookDir, "chapters")))
@@ -2097,9 +2101,10 @@ export class PipelineRunner {
 
   private async _executeNextChapterLocked(
     bookId: string,
-    wordCount?: number,
-    temperatureOverride?: number,
-    externalContext?: string,
+    wordCount: number | undefined,
+    temperatureOverride: number | undefined,
+    externalContext: string | undefined,
+    bookLockOwner: () => Promise<void>,
   ): Promise<ChapterPipelineResult> {
     this.throwIfOperationAborted();
     await this.state.ensureControlDocuments(bookId);
@@ -2195,7 +2200,7 @@ export class PipelineRunner {
           throw new Error("ContextBundle is stale before execution snapshot freeze");
         }
 
-        const freezeRes = await freezeExecutionSnapshot(bookDir, planId, bundle, { skipLock: true });
+        const freezeRes = await freezeExecutionSnapshotUnderLock(bookDir, planId, bundle, bookLockOwner);
         if (freezeRes.status !== "frozen") {
           throw new Error(`Execution snapshot freeze failed: ${freezeRes.reason}`);
         }

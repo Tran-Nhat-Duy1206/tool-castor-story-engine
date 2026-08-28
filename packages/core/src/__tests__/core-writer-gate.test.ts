@@ -406,7 +406,7 @@ describe("Task 19 — Planning Gate and Zero-Writer Conditions", () => {
 
   it("blocks and ensures Writer=0 when execution snapshot freeze fails", async () => {
     const writerSpy = vi.spyOn(WriterAgent.prototype, "writeChapter");
-    vi.spyOn(snapshotModule, "freezeExecutionSnapshot").mockResolvedValue({
+    vi.spyOn(snapshotModule, "freezeExecutionSnapshotUnderLock").mockResolvedValue({
       status: "execution_prepare_failed",
       reason: "Mock snapshot prepare error",
     });

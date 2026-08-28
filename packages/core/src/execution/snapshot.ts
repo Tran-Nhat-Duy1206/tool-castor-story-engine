@@ -85,33 +85,11 @@ export async function loadExecutionSnapshot(
   }
 }
 
-export interface FreezeExecutionSnapshotOptions {
-  readonly skipLock?: boolean;
-}
-
-export async function freezeExecutionSnapshot(
+async function executeSnapshotFreeze(
   bookDir: string,
   planId: SafeGovernanceId,
   contextBundle: ContextBundle,
-  options?: FreezeExecutionSnapshotOptions,
 ): Promise<FreezeResult> {
-  const projectRoot = dirname(dirname(normalize(bookDir)));
-  const bookId = basename(normalize(bookDir));
-  const manager = new StateManager(projectRoot);
-
-  let releaseLock: (() => Promise<void>) | null = null;
-  if (!options?.skipLock) {
-    try {
-      releaseLock = await manager.acquireBookLock(bookId);
-    } catch (error) {
-      // If book is busy, return prepare failed
-      return {
-        status: "execution_prepare_failed",
-        reason: `Could not acquire book lock for "${bookId}": ${(error as Error).message}`,
-      };
-    }
-  }
-
   try {
     // 1. Load exact persisted plan inside lock
     const plan = await loadDetailedPlan(bookDir, planId);
@@ -236,6 +214,60 @@ export async function freezeExecutionSnapshot(
       status: "execution_prepare_failed",
       reason: err instanceof Error ? err.message : String(err),
     };
+  }
+}
+
+/**
+ * Freezes execution snapshot when caller has already proven and acquired
+ * the exclusive book lock for the target book. Fails closed if the lock is
+ * not held by the current process.
+ */
+export async function freezeExecutionSnapshotUnderLock(
+  bookDir: string,
+  planId: SafeGovernanceId,
+  contextBundle: ContextBundle,
+  lockOwner: () => Promise<void>,
+): Promise<FreezeResult> {
+  const projectRoot = dirname(dirname(normalize(bookDir)));
+  const bookId = basename(normalize(bookDir));
+  const manager = new StateManager(projectRoot);
+
+  if (!manager.isBookLockOwnedByRelease(bookId, lockOwner)) {
+    return {
+      status: "execution_prepare_failed",
+      reason: `freezeExecutionSnapshotUnderLock called without valid lock ownership for "${bookId}"`,
+    };
+  }
+
+  return executeSnapshotFreeze(bookDir, planId, contextBundle);
+}
+
+/**
+ * Public execution snapshot freeze entry point. Always acquires the exclusive
+ * book lock. Nested lock avoidance is an internal path requiring the exact,
+ * unforgeable release capability returned by StateManager.acquireBookLock.
+ */
+export async function freezeExecutionSnapshot(
+  bookDir: string,
+  planId: SafeGovernanceId,
+  contextBundle: ContextBundle,
+): Promise<FreezeResult> {
+  const projectRoot = dirname(dirname(normalize(bookDir)));
+  const bookId = basename(normalize(bookDir));
+  const manager = new StateManager(projectRoot);
+
+  let releaseLock: (() => Promise<void>) | null = null;
+  try {
+    releaseLock = await manager.acquireBookLock(bookId);
+  } catch (error) {
+    return {
+      status: "execution_prepare_failed",
+      reason: `Could not acquire book lock for "${bookId}": ${(error as Error).message}`,
+    };
+  }
+
+  try {
+    return await executeSnapshotFreeze(bookDir, planId, contextBundle);
   } finally {
     if (releaseLock) {
       await releaseLock().catch(() => {});

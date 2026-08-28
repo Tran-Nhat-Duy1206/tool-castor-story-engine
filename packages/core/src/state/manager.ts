@@ -27,6 +27,8 @@ interface ProcessBookLock {
 // Studio creates a PipelineRunner per request. Lock ownership therefore has to
 // be shared by every StateManager in this process, not stored on one instance.
 const processBookLocks = new Map<string, ProcessBookLock>();
+type BookLockRelease = () => Promise<void>;
+const bookLockReleaseProofs = new WeakMap<BookLockRelease, { readonly lockKey: string; readonly token: string }>();
 
 export class BookWriteLockError extends Error {
   readonly code = "BOOK_BUSY";
@@ -191,9 +193,10 @@ export class StateManager {
 
       this.startLockHeartbeat(lockPath, lockKey, owner);
       let released = false;
-      return async () => {
+      const release: BookLockRelease = async () => {
         if (released) return;
         released = true;
+        bookLockReleaseProofs.delete(release);
         if (owner.heartbeatTimer) clearInterval(owner.heartbeatTimer);
         await owner.heartbeatTask;
         if (processBookLocks.get(lockKey)?.metadata.token === owner.metadata.token) {
@@ -211,12 +214,23 @@ export class StateManager {
           }
         }
       };
+      bookLockReleaseProofs.set(release, { lockKey, token: owner.metadata.token });
+      return release;
     } catch (error) {
       if (processBookLocks.get(lockKey)?.metadata.token === owner.metadata.token) {
         processBookLocks.delete(lockKey);
       }
       throw error;
     }
+  }
+
+  isBookLockOwnedByRelease(bookId: string, release: () => Promise<void>): boolean {
+    const lockPath = join(this.bookDir(bookId), ".write.lock");
+    const lockKey = this.normalizeLockKey(lockPath);
+    const proof = bookLockReleaseProofs.get(release);
+    const owner = processBookLocks.get(lockKey);
+    return proof?.lockKey === lockKey
+      && proof.token === owner?.metadata.token;
   }
 
   private normalizeLockKey(lockPath: string): string {
