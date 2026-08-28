@@ -47,6 +47,8 @@ export { ExecutionAttemptStatusSchema, ExecutionAttemptSchema, createExecutionAt
 export { saveExecutionAttempt, listExecutionAttempts } from "./execution/attempt-store.js";
 // Phase 5 Canon settlement integration + evidence-derived Authorization consumption (Task 20)
 export { deriveConsumedAuthorizations, buildSettlementWrites, buildValidatedSettlementWrites, applyLaggableSettlementEffects, type AtomicSettlementInput, type LaggableEffects } from "./state/settlement-integration.js";
+// Phase 5 Arc completion / transition (Task 21)
+export { evaluateArcCompletion, applyArcTransition, type ArcTransitionResult, type ApplyArcTransitionResult } from "./planning/transition.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
