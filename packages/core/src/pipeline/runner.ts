@@ -80,6 +80,24 @@ import {
   createRangeObservation,
   writeProductionRunSnapshot,
 } from "../production/harness.js";
+import { resolveGovernanceMarkers } from "../governance/contracts.js";
+import {
+  buildDetailedPlan,
+  loadDetailedPlan,
+  replanChapter,
+} from "../planning/detailed-plan.js";
+import { evaluatePlanningGate } from "../planning/gate.js";
+import { composeContext } from "../context/composer.js";
+import { isBundleStale } from "../context/bundle.js";
+import { freezeExecutionSnapshot } from "../execution/snapshot.js";
+import {
+  createExecutionAttempt,
+  recordAttemptRunning,
+  recordAttemptDrafted,
+  recordAttemptFailure,
+  abortAttemptForPlanDefect,
+  classifyAttemptDefect,
+} from "../execution/attempt.js";
 
 const SEQUENCE_LEVEL_CATEGORIES = new Set([
   "Pacing Monotony", "节奏单调",
@@ -2092,6 +2110,14 @@ export class PipelineRunner {
     // Phase 4 (Task 7): THE advancement gate. Runs after next-chapter
     // resolution and BEFORE any generation LLM work or authoritative write.
     await assertCanAdvanceStory(bookDir, chapterNumber);
+    const markers = resolveGovernanceMarkers(book);
+    if (markers.foundation === "legacy" && markers.planning === "v2") {
+      throw new Error("Invalid governance state: cannot use planning v2 with legacy foundation.");
+    }
+    if (markers.foundation === "v2" && markers.planning === "legacy") {
+      throw new Error("Transition state: book has foundation v2 but planning legacy. A V2 Arc Plan must be published before writing can proceed.");
+    }
+
     const stageLanguage = await this.resolveBookLanguage(book);
     this.logStage(stageLanguage, { zh: "准备章节输入", en: "preparing chapter inputs" });
     const writeInput = await this.prepareWriteInput(
@@ -2121,100 +2147,288 @@ export class PipelineRunner {
     const { readBookRules } = await import("../agents/rules-reader.js");
     const parsedBookRules = (await readBookRules(bookDir))?.rules ?? null;
 
-    // 1. Write chapter
     const writer = new WriterAgent(this.agentCtxFor("writer", bookId));
     this.logStage(stageLanguage, { zh: "撰写章节草稿", en: "writing chapter draft" });
-    const output = await writer.writeChapter({
-      book,
-      bookDir,
-      chapterNumber,
-      ...writeInput,
-      lengthSpec,
-      ...(wordCount ? { wordCountOverride: wordCount } : {}),
-      ...(temperatureOverride ? { temperatureOverride } : {}),
-      // Governed next-chapter flow (Task 7): publication of this run is
-      // proposal-based and FAILS CLOSED — the writer's settlement delta is
-      // source-oriented proposal material and must never be applied against
-      // the LIVE semantic head during generation (critical when historical
-      // corrections put the confirmed head ahead of the prose prefix).
-      deferStateApplication: true,
-    });
-    this.throwIfOperationAborted();
-    const writerCount = countChapterLength(output.content, lengthSpec.countingMode);
 
-    // Token usage accumulator
-    let totalUsage: TokenUsageSummary = output.tokenUsage ?? { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+    let output: WriteChapterOutput;
+    let totalUsage: TokenUsageSummary;
     let finalContent: string;
     let finalWordCount: number;
     let revised: boolean;
     let auditResult: AuditResult;
     let postReviseCount: number;
     let repairApplied: boolean;
+    let writerCount = 0;
 
-    if ((this.config.chapterReviewMode ?? "auto") === "manual") {
-      // C4a: write-only checkpoint. Stop right after the draft — skip the
-      // automatic audit→revise loop (which silently doubled chapter time when it
-      // fired). The user drives review / revise / accept afterwards.
-      this.logStage(stageLanguage, { zh: "写完即停（手动审查模式）", en: "draft written — stopping for manual review" });
-      finalContent = normalizePostWriteSurface(output.content, pipelineLang);
-      this.assertChapterContentNotEmpty(finalContent, chapterNumber, "manual write");
-      finalWordCount = countChapterLength(finalContent, lengthSpec.countingMode);
-      revised = false;
-      postReviseCount = 0;
-      repairApplied = false;
-      auditResult = {
-        passed: false,
-        issues: [],
-        summary: pipelineLang === "en"
-          ? "Not reviewed yet (manual mode: stopped after writing — run review when ready)."
-          : "尚未审查（手动模式：写完即停，需要时点“审查”）。",
+    if (markers.foundation === "v2" && markers.planning === "v2") {
+      // Phase 5 V2 Governed Write Chain
+      const prepareV2Execution = async (planId: string, replanNumber: number) => {
+        const gateResult = await evaluatePlanningGate({ bookDir, planId });
+        if (gateResult.outcome !== "safe") {
+          const details = gateResult.outcome === "conflict"
+            ? gateResult.evidence.join("; ")
+            : gateResult.outcome === "author_decision"
+              ? `missing author decision for: ${gateResult.missing.join(", ")}`
+              : gateResult.concerns.join("; ");
+          throw new Error(
+            `Planning Gate blocked execution: outcome="${gateResult.outcome}", details=${details}`,
+          );
+        }
+
+        const loadedPlan = await loadDetailedPlan(bookDir, planId);
+        if (!loadedPlan) {
+          throw new Error(`Detailed chapter plan "${planId}" not found`);
+        }
+
+        const bundle = await composeContext({
+          bookDir,
+          profile: "writer_context",
+          subject: {
+            kind: "detailed_plan",
+            planId: loadedPlan.planId,
+            planHash: loadedPlan.planHash,
+          },
+        });
+
+        const isStale = await isBundleStale(bookDir, bundle);
+        if (isStale) {
+          throw new Error("ContextBundle is stale before execution snapshot freeze");
+        }
+
+        const freezeRes = await freezeExecutionSnapshot(bookDir, planId, bundle, { skipLock: true });
+        if (freezeRes.status !== "frozen") {
+          throw new Error(`Execution snapshot freeze failed: ${freezeRes.reason}`);
+        }
+
+        const attempt = await createExecutionAttempt(
+          bookDir,
+          freezeRes.snapshot.snapshotId,
+          chapterNumber,
+          replanNumber,
+        );
+        await recordAttemptRunning(bookDir, attempt.attemptId);
+
+        return {
+          planId,
+          snapshotId: freezeRes.snapshot.snapshotId,
+          attemptId: attempt.attemptId,
+        };
       };
+
+      const executeWriterPass = async (attemptId: string) => {
+        try {
+          const writerOutput = await writer.writeChapter({
+            book,
+            bookDir,
+            chapterNumber,
+            ...writeInput,
+            lengthSpec,
+            ...(wordCount ? { wordCountOverride: wordCount } : {}),
+            ...(temperatureOverride ? { temperatureOverride } : {}),
+            deferStateApplication: true,
+          });
+          const padded = String(chapterNumber).padStart(4, "0");
+          const draftArtifact = join("chapters", `${padded}_${writerOutput.title}.md`);
+          await recordAttemptDrafted(bookDir, attemptId, [draftArtifact]);
+          return writerOutput;
+        } catch (writerError) {
+          await recordAttemptFailure(bookDir, attemptId, {
+            provider: (this.config as unknown as { provider?: string }).provider ?? "unknown",
+            model: this.config.model ?? "unknown",
+            message: writerError instanceof Error ? writerError.message : String(writerError),
+            at: new Date().toISOString(),
+          }).catch(() => {});
+          throw writerError;
+        }
+      };
+
+      const initialPlan = await buildDetailedPlan(bookDir, chapterNumber, {
+        intent: writeInput.chapterIntentData,
+        memo: writeInput.chapterMemo,
+      });
+
+      let currentExec = await prepareV2Execution(initialPlan.planId, 0);
+      output = await executeWriterPass(currentExec.attemptId);
+      this.throwIfOperationAborted();
+      writerCount = countChapterLength(output.content, lengthSpec.countingMode);
+
+      totalUsage = output.tokenUsage ?? { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+
+      if ((this.config.chapterReviewMode ?? "auto") === "manual") {
+        this.logStage(stageLanguage, { zh: "写完即停（手动审查模式）", en: "draft written — stopping for manual review" });
+        finalContent = normalizePostWriteSurface(output.content, pipelineLang);
+        this.assertChapterContentNotEmpty(finalContent, chapterNumber, "manual write");
+        finalWordCount = countChapterLength(finalContent, lengthSpec.countingMode);
+        revised = false;
+        postReviseCount = 0;
+        repairApplied = false;
+        auditResult = {
+          passed: false,
+          issues: [],
+          summary: pipelineLang === "en"
+            ? "Not reviewed yet (manual mode: stopped after writing — run review when ready)."
+            : "尚未审查（手动模式：写完即停，需要时点“审查”）。",
+        };
+      } else {
+        const auditor = new ContinuityAuditor(this.agentCtxFor("auditor", bookId));
+        const executeReview = async (curOutput: WriteChapterOutput) => {
+          return runChapterReviewCycle({
+            book: { genre: book.genre },
+            bookDir,
+            chapterNumber,
+            initialOutput: curOutput,
+            reducedControlInput,
+            lengthSpec,
+            initialUsage: totalUsage,
+            createReviser: () => new ReviserAgent(this.agentCtxFor("reviser", bookId)),
+            auditor,
+            normalizePostWriteSurface: (chapterContent) =>
+              normalizePostWriteSurface(chapterContent, pipelineLang),
+            assertChapterContentNotEmpty: (content, stage) =>
+              this.assertChapterContentNotEmpty(content, chapterNumber, stage),
+            addUsage: PipelineRunner.addUsage,
+            analyzeAITells: (content) => analyzeAITells(content, pipelineLang),
+            analyzeSensitiveWords: (content) => analyzeSensitiveWords(content, undefined, pipelineLang),
+            runPostWriteChecks: (content) => {
+              const baseIssues = postWriteValidate(content, gp, parsedBookRules, pipelineLang)
+                .filter((v) => v.severity === "error")
+                .map((v) => ({
+                  severity: "critical" as const,
+                  category: v.rule,
+                  description: v.description,
+                  suggestion: v.suggestion,
+                }));
+              const memoBody = writeInput.chapterMemo?.body ?? "";
+              const ledgerIssues = memoBody
+                ? validateHookLedger(memoBody, content)
+                : [];
+              return [...baseIssues, ...ledgerIssues];
+            },
+            maxReviewIterations: this.config.writingReviewRetries,
+            logWarn: (message) => this.logWarn(pipelineLang, message),
+            logStage: (message) => this.logStage(stageLanguage, message),
+          });
+        };
+
+        let reviewResult = await executeReview(output);
+        let defectClass = classifyAttemptDefect(reviewResult.auditResult);
+        let replanRound = 0;
+
+        while (defectClass.status === "plan_defect") {
+          await abortAttemptForPlanDefect(
+            bookDir,
+            currentExec.attemptId,
+            reviewResult.auditResult.issues.find((i) => i.category === "plan_defect" || i.repairScope === "structural")?.description
+              ?? reviewResult.auditResult.summary,
+          );
+
+          replanRound++;
+          if (replanRound > 2) {
+            throw new Error(
+              `Exhausted maximum 2 automatic replans for chapter ${chapterNumber} due to persistent plan defects; human intervention required.`,
+            );
+          }
+
+          const replanPlan = await replanChapter(bookDir, chapterNumber, replanRound, {
+            intent: writeInput.chapterIntentData,
+            memo: writeInput.chapterMemo,
+          });
+
+          currentExec = await prepareV2Execution(replanPlan.planId, replanRound);
+          output = await executeWriterPass(currentExec.attemptId);
+          this.throwIfOperationAborted();
+          writerCount = countChapterLength(output.content, lengthSpec.countingMode);
+
+          reviewResult = await executeReview(output);
+          defectClass = classifyAttemptDefect(reviewResult.auditResult);
+        }
+
+        totalUsage = reviewResult.totalUsage;
+        finalContent = reviewResult.finalContent;
+        finalWordCount = reviewResult.finalWordCount;
+        revised = reviewResult.revised;
+        auditResult = reviewResult.auditResult;
+        postReviseCount = reviewResult.postReviseCount;
+        repairApplied = reviewResult.repairApplied;
+      }
     } else {
-      const auditor = new ContinuityAuditor(this.agentCtxFor("auditor", bookId));
-      const reviewResult = await runChapterReviewCycle({
-        book: { genre: book.genre },
+      // Legacy Write Chain
+      output = await writer.writeChapter({
+        book,
         bookDir,
         chapterNumber,
-        initialOutput: output,
-        reducedControlInput,
+        ...writeInput,
         lengthSpec,
-        initialUsage: totalUsage,
-        createReviser: () => new ReviserAgent(this.agentCtxFor("reviser", bookId)),
-        auditor,
-        normalizePostWriteSurface: (chapterContent) =>
-          normalizePostWriteSurface(chapterContent, pipelineLang),
-        assertChapterContentNotEmpty: (content, stage) =>
-          this.assertChapterContentNotEmpty(content, chapterNumber, stage),
-        addUsage: PipelineRunner.addUsage,
-        analyzeAITells: (content) => analyzeAITells(content, pipelineLang),
-        analyzeSensitiveWords: (content) => analyzeSensitiveWords(content, undefined, pipelineLang),
-        runPostWriteChecks: (content) => {
-          const baseIssues = postWriteValidate(content, gp, parsedBookRules, pipelineLang)
-            .filter((v) => v.severity === "error")
-            .map((v) => ({
-              severity: "critical" as const,
-              category: v.rule,
-              description: v.description,
-              suggestion: v.suggestion,
-            }));
-          // Phase 9-3: verify the draft acts on every hook the memo committed to.
-          const memoBody = writeInput.chapterMemo?.body ?? "";
-          const ledgerIssues = memoBody
-            ? validateHookLedger(memoBody, content)
-            : [];
-          return [...baseIssues, ...ledgerIssues];
-        },
-        maxReviewIterations: this.config.writingReviewRetries,
-        logWarn: (message) => this.logWarn(pipelineLang, message),
-        logStage: (message) => this.logStage(stageLanguage, message),
+        ...(wordCount ? { wordCountOverride: wordCount } : {}),
+        ...(temperatureOverride ? { temperatureOverride } : {}),
+        deferStateApplication: true,
       });
-      totalUsage = reviewResult.totalUsage;
-      finalContent = reviewResult.finalContent;
-      finalWordCount = reviewResult.finalWordCount;
-      revised = reviewResult.revised;
-      auditResult = reviewResult.auditResult;
-      postReviseCount = reviewResult.postReviseCount;
-      repairApplied = reviewResult.repairApplied;
+      this.throwIfOperationAborted();
+      writerCount = countChapterLength(output.content, lengthSpec.countingMode);
+
+      totalUsage = output.tokenUsage ?? { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+
+      if ((this.config.chapterReviewMode ?? "auto") === "manual") {
+        this.logStage(stageLanguage, { zh: "写完即停（手动审查模式）", en: "draft written — stopping for manual review" });
+        finalContent = normalizePostWriteSurface(output.content, pipelineLang);
+        this.assertChapterContentNotEmpty(finalContent, chapterNumber, "manual write");
+        finalWordCount = countChapterLength(finalContent, lengthSpec.countingMode);
+        revised = false;
+        postReviseCount = 0;
+        repairApplied = false;
+        auditResult = {
+          passed: false,
+          issues: [],
+          summary: pipelineLang === "en"
+            ? "Not reviewed yet (manual mode: stopped after writing — run review when ready)."
+            : "尚未审查（手动模式：写完即停，需要时点“审查”）。",
+        };
+      } else {
+        const auditor = new ContinuityAuditor(this.agentCtxFor("auditor", bookId));
+        const reviewResult = await runChapterReviewCycle({
+          book: { genre: book.genre },
+          bookDir,
+          chapterNumber,
+          initialOutput: output,
+          reducedControlInput,
+          lengthSpec,
+          initialUsage: totalUsage,
+          createReviser: () => new ReviserAgent(this.agentCtxFor("reviser", bookId)),
+          auditor,
+          normalizePostWriteSurface: (chapterContent) =>
+            normalizePostWriteSurface(chapterContent, pipelineLang),
+          assertChapterContentNotEmpty: (content, stage) =>
+            this.assertChapterContentNotEmpty(content, chapterNumber, stage),
+          addUsage: PipelineRunner.addUsage,
+          analyzeAITells: (content) => analyzeAITells(content, pipelineLang),
+          analyzeSensitiveWords: (content) => analyzeSensitiveWords(content, undefined, pipelineLang),
+          runPostWriteChecks: (content) => {
+            const baseIssues = postWriteValidate(content, gp, parsedBookRules, pipelineLang)
+              .filter((v) => v.severity === "error")
+              .map((v) => ({
+                severity: "critical" as const,
+                category: v.rule,
+                description: v.description,
+                suggestion: v.suggestion,
+              }));
+            const memoBody = writeInput.chapterMemo?.body ?? "";
+            const ledgerIssues = memoBody
+              ? validateHookLedger(memoBody, content)
+              : [];
+            return [...baseIssues, ...ledgerIssues];
+          },
+          maxReviewIterations: this.config.writingReviewRetries,
+          logWarn: (message) => this.logWarn(pipelineLang, message),
+          logStage: (message) => this.logStage(stageLanguage, message),
+        });
+        totalUsage = reviewResult.totalUsage;
+        finalContent = reviewResult.finalContent;
+        finalWordCount = reviewResult.finalWordCount;
+        revised = reviewResult.revised;
+        auditResult = reviewResult.auditResult;
+        postReviseCount = reviewResult.postReviseCount;
+        repairApplied = reviewResult.repairApplied;
+      }
     }
 
     this.throwIfOperationAborted();

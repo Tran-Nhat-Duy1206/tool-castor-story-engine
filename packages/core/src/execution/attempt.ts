@@ -209,11 +209,29 @@ export type AttemptOutcome =
   | { status: "canon_conflict"; next: "hard_stop" };
 
 export function classifyAttemptDefect(defectOrAttempt: unknown): AttemptOutcome {
-  const defectKind = typeof defectOrAttempt === "object" && defectOrAttempt !== null && "kind" in defectOrAttempt
-    ? (defectOrAttempt as { kind: string }).kind
-    : typeof defectOrAttempt === "object" && defectOrAttempt !== null && "defect" in defectOrAttempt && typeof (defectOrAttempt as any).defect === "object"
-    ? (defectOrAttempt as any).defect?.kind
-    : "prose_defect";
+  let defectKind = "prose_defect";
+
+  if (typeof defectOrAttempt === "string") {
+    defectKind = defectOrAttempt;
+  } else if (typeof defectOrAttempt === "object" && defectOrAttempt !== null) {
+    const obj = defectOrAttempt as Record<string, any>;
+    if (typeof obj.kind === "string") {
+      defectKind = obj.kind;
+    } else if (typeof obj.defect === "string") {
+      defectKind = obj.defect;
+    } else if (typeof obj.defect === "object" && obj.defect !== null && typeof obj.defect.kind === "string") {
+      defectKind = obj.defect.kind;
+    } else if (Array.isArray(obj.issues)) {
+      const issues = obj.issues as Array<{ category?: string; repairScope?: string }>;
+      if (issues.some((i) => i.category === "canon_conflict" || i.category === "canon_contradiction")) {
+        defectKind = "canon_conflict";
+      } else if (issues.some((i) => i.category === "authority_defect" || i.category === "missing_authority")) {
+        defectKind = "authority_defect";
+      } else if (issues.some((i) => i.category === "plan_defect" || i.repairScope === "structural" || i.category === "major_beat_contradiction" || i.category === "arc_turn_violation")) {
+        defectKind = "plan_defect";
+      }
+    }
+  }
 
   switch (defectKind) {
     case "plan_defect":

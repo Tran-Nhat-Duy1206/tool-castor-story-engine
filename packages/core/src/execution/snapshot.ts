@@ -85,24 +85,31 @@ export async function loadExecutionSnapshot(
   }
 }
 
+export interface FreezeExecutionSnapshotOptions {
+  readonly skipLock?: boolean;
+}
+
 export async function freezeExecutionSnapshot(
   bookDir: string,
   planId: SafeGovernanceId,
   contextBundle: ContextBundle,
+  options?: FreezeExecutionSnapshotOptions,
 ): Promise<FreezeResult> {
   const projectRoot = dirname(dirname(normalize(bookDir)));
   const bookId = basename(normalize(bookDir));
   const manager = new StateManager(projectRoot);
 
   let releaseLock: (() => Promise<void>) | null = null;
-  try {
-    releaseLock = await manager.acquireBookLock(bookId);
-  } catch (error) {
-    // If book is busy, return prepare failed
-    return {
-      status: "execution_prepare_failed",
-      reason: `Could not acquire book lock for "${bookId}": ${(error as Error).message}`,
-    };
+  if (!options?.skipLock) {
+    try {
+      releaseLock = await manager.acquireBookLock(bookId);
+    } catch (error) {
+      // If book is busy, return prepare failed
+      return {
+        status: "execution_prepare_failed",
+        reason: `Could not acquire book lock for "${bookId}": ${(error as Error).message}`,
+      };
+    }
   }
 
   try {
