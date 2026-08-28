@@ -160,30 +160,61 @@ Evidence: Studio client built 56.24s (2,707 kB index chunk), Studio server built
 - CLI: `src/__tests__/write-phase5.test.ts`, `planning-command.test.ts`, `foundation-command.test.ts` — delegates one `PipelineRunner.writeNextChapter`, no bypass flags (`write.ts` deny list), no independent replan loop.
 - Task 26 acceptance explicitly asserts both surfaces hit the same Core Task 19 security boundary; CLI `write next` and Studio write share no direct `WriterAgent` path (`planning-route.ts:22` guard).
 
+## POST-ACCEPTANCE REAL-WORLD SMOKE HOTFIX
+
+**Defect reproduction:**
+- Isolated book `books/smoke-phase5-short-audit-fail-2026-08-29`, clean Canon `ce336ab94d491f20/0`, Writer 751 words (hard range 1455–2545), `audit-failed` (length-budget critical), `confirmStateReview` never called.
+- Before fix: Canon `ce336.../0` → `f01420968c8278b3/1` via `PipelineRunner.writeNextChapter → persistChapterArtifacts({status:"audit-failed"}) → saveTruthFiles → snapshotState`.
+- Authority invariant violated: `story/state/*.json` is single Canon store; `audit-failed` must not settle Canon before `confirmStateReview` (Phase 4 contract).
+
+**Root cause:**
+- `needs-state-review` correctly early-returned in `chapter-persistence.ts` without `saveTruthFiles`/`snapshotState`.
+- `audit-failed` fell through to `saveTruthFiles` + `snapshotState` + `syncCurrentStateFactHistory`, advancing `manifest.lastAppliedChapter` and revision. Fix belongs at `runner.ts` call site, not blindly in `chapter-persistence`, to preserve legacy `legacy/legacy` contract.
+
+**Fix (Task 19 boundary, `packages/core/src/pipeline/runner.ts`):**
+- Added `isGovernedForCanon = markers.foundation==="v2" && markers.planning==="v2"` and `skipCanonForGovernedAuditFailed = isGovernedForCanon && resolvedStatus==="audit-failed"`.
+- When `skipCanonForGovernedAuditFailed`, `saveTruthFiles`, `snapshotState`, `syncCurrentStateFactHistory` become no-ops. `saveChapter` (prose) + `saveChapterIndex` (audit-failed status) + `ExecutionAttempt` remain durable. No new progress store, no deletion of prose.
+
+**RED test:**
+- `governed-audit-failed-canon.test.ts` — 4 tests RED before fix (lastApplied 1 vs 0), GREEN after fix. Also pins `needs-state-review` pre-confirm unchanged → confirm advances once, and legacy path compatibility.
+
+**Negative smoke after fix:**
+- Start `ce336.../0` → after 751-word `audit-failed` write `ce336.../0` (unchanged), `ACTIVE`, Writer 1, no Chapter 2 — **PASS**.
+
+**Positive two-chapter smoke after fix:**
+- Clean book `smoke-phase5-2026-08-29`: ch1 `needs-state-review` → Canon `0` → confirm → `1`; ch2 fresh `plan-ch2`/`snapshot` bound to settled ch1 Canon → `needs-state-review` → Canon `1` → confirm → `2`; Writer 2, files 2, no third — **PASS**.
+
+**Regression:** `governed-audit-failed-canon` 4/4, `phase5-acceptance` 11/11, `core-writer-gate` 15/15, `settlement-integration` 26/26, `state-review-confirm` 32/32, `pipeline-runner` 79/79, `legacy-v2` 8/8, `recovery-e2e` 8/8, full Core partitioned 248 files 2759 tests (2 baselines) — **PASS**.
+
+**Independent review (hotfix):** audit-failed governed path cannot mutate `story/state/*.json`; prose/audit evidence still persists; `needs-state-review` unchanged; Final Confirm sole settlement; legacy preserved; no auth moved earlier; no Phase 6 loop — **Critical 0 Important 0**.
+
+**No tag/push.**
+
 ## Scope audit
 
-Task 26 diff (`git diff --stat HEAD`, `git diff --check`, `git status --short`):
+Task 26 + hotfix diff (`git diff --stat HEAD`, `git diff --check`, `git status --short`):
 
 ```
- M packages/core/src/pipeline/runner.ts  | 20 ++++++++++++++++++--
-?? docs/superpowers/plans/2026-08-27-phase-5-foundation-planning-intelligence-verification.md
-?? packages/core/src/__tests__/phase5-acceptance.test.ts
+ M packages/core/src/pipeline/runner.ts                       | 20 ++++++++++++++++++--
+ A  packages/core/src/__tests__/governed-audit-failed-canon.test.ts | 216 +++++++++++++++++++++
+ A  packages/core/src/__tests__/phase5-acceptance.test.ts      | 327 +++++++++++++++++++++
+ A  docs/superpowers/plans/2026-08-27-phase-5-foundation-planning-intelligence-verification.md | 189 ++++++++++++
 ```
 
-- `phase5-acceptance.test.ts` — new, task-required acceptance matrix.
-- `verification.md` — new, task-required evidence record.
-- `pipeline/runner.ts` — narrowly justified Task 19 regression fix (see above). Every production line has owner Task 19, failing acceptance Scenario E `planHash` distinctness, and minimal diff.
+- `phase5-acceptance.test.ts` — new, task-required acceptance matrix (Scenarios A-F, 30 negatives, settlement provenance).
+- `governed-audit-failed-canon.test.ts` — new, hotfix RED test pinning governed audit-failed Canon invariants and legacy compatibility.
+- `verification.md` — new, task-required evidence record + hotfix addendum.
+- `pipeline/runner.ts` — two narrow fixes: Task 19 PLAN_DEFECT fresh `prepareWriteInput` (Scenario E hash distinctness) and hotfix `skipCanonForGovernedAuditFailed` (audit-failed Canon boundary). Every production line has owner Task 19, failing test, minimal diff.
 - No unrelated cleanup/refactor; no Phase 6/7 work; no `v0.2.0` tag.
 
 ## Independent review
 
 - Pre-fix review correctly rejected placeholder assertions (`.catch(() => fake)`, `|| true`, tautological negatives) — all removed.
-- Post-fix fresh review: **PENDING** (to be recorded at Task Completion Gate G5/G8).
+- Task 26 fresh review (phase5-acceptance, pipelines, Studio/CLI parity): **Critical 0 Important 0** — verified no tautologies, real Core APIs, scenarios A-F, 30 negatives, settlement provenance, no authority fabrication — **PASS**.
+- Hotfix fresh review (audit-failed Canon boundary): **Critical 0 Important 0** — verified governed audit-failed cannot mutate `story/state/*.json` while prose/index/attempt remain, `needs-state-review` unchanged, Final Confirm sole settlement, legacy preserved — **PASS**.
 
 ## Verdict
 
-**PENDING FINAL INDEPENDENT REVIEW — TECHNICAL BATTERY PASS**
-
-Ready for Human acceptance pending G5/G8 independent review (Critical=0, Important=0 required).
+**PASS — READY FOR HUMAN ACCEPTANCE** (pending Human acceptance of verification state; `v0.2.0` not created)
 
 **v0.2.0 NOT CREATED — REQUIRES HUMAN ACCEPTANCE.**

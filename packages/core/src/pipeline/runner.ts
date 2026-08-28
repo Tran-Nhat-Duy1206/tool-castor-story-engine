@@ -2736,6 +2736,8 @@ export class PipelineRunner {
       ?? (publishablePassedAudit && stateReviewJson !== undefined
         ? "needs-state-review"
         : (auditResult.passed ? "ready-for-review" : "audit-failed"));
+    const isGovernedForCanon = markers.foundation === "v2" && markers.planning === "v2";
+    const skipCanonForGovernedAuditFailed = isGovernedForCanon && resolvedStatus === "audit-failed";
     await persistChapterArtifacts({
       chapterNumber,
       chapterTitle: persistenceOutput.title,
@@ -2773,7 +2775,7 @@ export class PipelineRunner {
             ? { deferStateApplication: true as const }
             : undefined,
       ),
-      saveTruthFiles: async () => {
+      saveTruthFiles: skipCanonForGovernedAuditFailed ? async () => {} : async () => {
         await this.syncLegacyStructuredStateFromMarkdown(bookDir, chapterNumber, persistenceOutput);
         this.logStage(stageLanguage, { zh: "同步记忆索引", en: "syncing memory indexes" });
         await this.syncNarrativeMemoryIndex(bookId);
@@ -2786,8 +2788,8 @@ export class PipelineRunner {
         issues,
         language: stageLanguage,
       }).catch(() => undefined),
-      snapshotState: () => this.state.snapshotState(bookId, chapterNumber),
-      syncCurrentStateFactHistory: () => this.syncCurrentStateFactHistory(bookId, chapterNumber),
+      snapshotState: skipCanonForGovernedAuditFailed ? async () => {} : () => this.state.snapshotState(bookId, chapterNumber),
+      syncCurrentStateFactHistory: skipCanonForGovernedAuditFailed ? async () => {} : () => this.syncCurrentStateFactHistory(bookId, chapterNumber),
       logSnapshotStage: () =>
         this.logStage(stageLanguage, { zh: "更新章节索引与快照", en: "updating chapter index and snapshots" }),
     });
