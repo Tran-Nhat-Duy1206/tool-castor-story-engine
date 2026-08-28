@@ -2125,13 +2125,13 @@ export class PipelineRunner {
 
     const stageLanguage = await this.resolveBookLanguage(book);
     this.logStage(stageLanguage, { zh: "准备章节输入", en: "preparing chapter inputs" });
-    const writeInput = await this.prepareWriteInput(
+    let writeInput = await this.prepareWriteInput(
       book,
       bookDir,
       chapterNumber,
       externalContext,
     );
-    const reducedControlInput = {
+    let reducedControlInput = {
       chapterIntent: writeInput.chapterIntent,
       chapterMemo: writeInput.chapterMemo,
       chapterIntentData: writeInput.chapterIntentData,
@@ -2334,6 +2334,22 @@ export class PipelineRunner {
             );
           }
 
+          // Task 19: a PLAN_DEFECT requires a genuinely fresh Planner proposal,
+          // not merely a new ID wrapped around the original intent/memo. Refresh
+          // the governed write input before rebuilding Gate/Context/Snapshot.
+          writeInput = await this.prepareWriteInput(
+            book,
+            bookDir,
+            chapterNumber,
+            externalContext,
+          );
+          reducedControlInput = {
+            chapterIntent: writeInput.chapterIntent,
+            chapterMemo: writeInput.chapterMemo,
+            chapterIntentData: writeInput.chapterIntentData,
+            contextPackage: writeInput.contextPackage,
+            ruleStack: writeInput.ruleStack,
+          };
           const replanPlan = await replanChapter(bookDir, chapterNumber, replanRound, {
             intent: writeInput.chapterIntentData,
             memo: writeInput.chapterMemo,
