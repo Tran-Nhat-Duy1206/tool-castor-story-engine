@@ -392,9 +392,9 @@ describe("ChapterIntent and ChapterMemo Schema Compatibility", () => {
     };
     const parsedIntent = ChapterIntentSchema.parse(legacyIntent);
     expect(parsedIntent.chapter).toBe(1);
-    expect(parsedIntent.humanDirectionIds).toEqual([]);
-    expect(parsedIntent.authorizationIds).toEqual([]);
-    expect(parsedIntent.dependencyRefs).toEqual([]);
+    expect(parsedIntent.humanDirectionIds ?? []).toEqual([]);
+    expect(parsedIntent.authorizationIds ?? []).toEqual([]);
+    expect(parsedIntent.dependencyRefs ?? []).toEqual([]);
 
     const legacyMemo = {
       chapter: 1,

@@ -34,6 +34,9 @@ export { ArcFindingSchema, ArcPreflightRecordSchema, saveArcPreflightRecord, loa
 export { LookaheadHorizonItemSchema, RollingLookaheadProvenanceSchema, RollingLookaheadSchema, saveLookahead, loadLookahead, listLookaheads, generateLookahead, revalidateLookahead, consumeLookahead, type LookaheadHorizonItem, type RollingLookaheadProvenance, type RollingLookahead, type GenerateLookaheadOptions, type RevalidateLookaheadResolvers } from "./planning/lookahead.js";
 // Phase 5 Detailed Chapter Plan V2 (Task 15)
 export { DetailedPlanBindingsSchema, DetailedChapterPlanRecordSchema, planScopeTooBroad, saveDetailedPlanRecord, loadDetailedPlan, buildDetailedPlan, replanChapter, type DetailedPlanBindings, type DetailedChapterPlanRecord, type BuildDetailedPlanOptions } from "./planning/detailed-plan.js";
+// Phase 5 Planning Gate + planning-specific bounded repair (Task 16)
+export { PlanningGateInputSchema, evaluatePlanningGate, type PlanningGateInput, type PlanningGateResult, type PlanningGateOptions } from "./planning/gate.js";
+export { PlanningFindingSchema, reviewDetailedPlan, repairDetailedPlanLocal, verifyDetailedPlanRepair, type PlanningFinding, type PlanningRepairOutcome } from "./planning/repair.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
