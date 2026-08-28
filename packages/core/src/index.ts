@@ -37,6 +37,10 @@ export { DetailedPlanBindingsSchema, DetailedChapterPlanRecordSchema, planScopeT
 // Phase 5 Planning Gate + planning-specific bounded repair (Task 16)
 export { PlanningGateInputSchema, evaluatePlanningGate, type PlanningGateInput, type PlanningGateResult, type PlanningGateOptions } from "./planning/gate.js";
 export { PlanningFindingSchema, reviewDetailedPlan, repairDetailedPlanLocal, verifyDetailedPlanRepair, type PlanningFinding, type PlanningRepairOutcome } from "./planning/repair.js";
+// Phase 5 Context Composer: authority spine, profiles, budget, structured provenance (Task 17)
+export { ContextSourceTypeSchema, isBundleStale, type ContextProfile, type ContextPriority, type ContextRepresentation, type ContextSourceType, type ContextSourceProvenance, type BudgetOmission, type ContextSubject, type ContextSection, type ContextBundle } from "./context/bundle.js";
+export { estimateTokens, applyBudgetPolicy, type BudgetResult } from "./context/budget.js";
+export { composeContext, type ComposeContextRequest } from "./context/composer.js";
 export { type ChapterMeta, type ChapterStatus, ChapterMetaSchema, ChapterStatusSchema } from "./models/chapter.js";
 export { type ProjectConfig, type LLMConfig, type NotifyChannel, type DetectionConfig, type QualityGates, type FoundationConfig, type WritingConfig, type AgentLLMOverride, type ResearchSearchConfig, ProjectConfigSchema, LLMConfigSchema, AgentLLMOverrideSchema, DetectionConfigSchema, QualityGatesSchema, FoundationConfigSchema, WritingConfigSchema, ResearchSearchConfigSchema } from "./models/project.js";
 export { type CurrentState, type ParticleLedger, type PendingHooks, type PendingHook, type LedgerEntry } from "./models/state.js";
