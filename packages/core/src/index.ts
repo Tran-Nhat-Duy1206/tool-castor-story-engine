@@ -828,6 +828,12 @@ export { createVersionStore } from "./governance/versions.js";
 export { openFoundationRevision, loadFoundationRevision, saveFoundationUnitDraft, approveFoundationUnit, markFoundationUnitNeedsRevision, reapproveStaleFoundationUnit, discardFoundationRevision, approveFoundationUnitsBatch } from "./foundation/revision-service.js";
 export { publishFoundation, checkFoundationPublishGate, handleExternalEdit } from "./foundation/publish.js";
 
+// Phase 5 Human Direction + scoped Authorization governance (Task 11)
+export { AuthorizationConditionSchema, AuthorizationScopeSchema, AuthorizationRecordSchema, HumanDirectionScopeSchema, HumanDirectionRecordSchema, PendingHumanDirectionProposalSchema, createAuthorization, confirmAuthorization, cancelAuthorization, loadAuthorization, authorizationApplies, directionApplies, evaluateAuthorizationAgainstEvidence, deriveEligibleAuthorizationConsumption, createHumanDirection, confirmHumanDirection, loadHumanDirection, loadPendingHumanDirectionProposal, resolveDirectionConflict, parseHumanDirectionDraft, type AuthorizationCondition, type AuthorizationScope, type AuthorizationRecord, type PendingAuthorization, type ActiveAuthorization, type TerminalAuthorization, type HumanDirectionScope, type HumanDirectionRecord, type PendingHumanDirection, type ActiveHumanDirection, type PendingHumanDirectionProposal, type AuthorizationEvaluationContext, type CanonSettlementEvidence, type AuthorizationConsumptionReview, type DirectionConflictChoice } from "./governance/authorizations.js";
+
+// Phase 5 Arc preflight/publish pipeline (Task 13)
+export { ArcFindingSchema, ArcPreflightRecordSchema, saveArcPreflightRecord, loadArcPreflightRecord, generateArcPlanDraft, reviewArcPlanDraft, runArcPreflight, repairArcPlanLocal, verifyArcPlanRepair, publishArcPlan, type ArcFinding, type ArcPreflightRecord, type ArcPreflightResult, type ArcRepairOutcome, type PublishArcPlanInput } from "./planning/arc-pipeline.js";
+
 // ---------------------------------------------------------------------------
 // Planning read-only exports — for CLI `castor planning` (read-only advisory)
 // ---------------------------------------------------------------------------

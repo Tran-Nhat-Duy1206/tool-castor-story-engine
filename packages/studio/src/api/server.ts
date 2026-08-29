@@ -144,25 +144,23 @@ import {
   discardFoundationRevision,
   approveFoundationUnitsBatch,
   publishFoundation,
-  // Planning — Task 23 (Studio delegates to exact Core governance entries)
+  // Planning — Task 23 (Studio delegates to exact Core governance entries).
+  // Entries without a Core implementation are resolved through the
+  // dynamic-import fallbacks at each route; they must not be statically
+  // imported or Node ESM crashes the server at startup.
   getPublishedArcPlan,
-  listArcDrafts,
   generateArcDraft,
-  getArcDraft,
   getArcPreflight,
   publishArcPlan,
   getBeatProgress,
   getLookahead,
-  getDetailedPlan,
   getPlanningGateReport,
   evaluatePlanningGate,
   parseHumanDirectionDraft,
-  getHumanDirections,
   confirmHumanDirection,
   resolveDirectionConflict,
   createAuthorization,
   confirmAuthorization,
-  listAuthorizations,
   createTranslationProjectFromFile,
   loadTranslationChapter,
   loadTranslationManifest,
