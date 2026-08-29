@@ -10,7 +10,7 @@ import {
   brightCyan, brightGreen, brightWhite,
 } from "./ansi.js";
 import { resolveTuiLocale, type TuiLocale } from "./i18n.js";
-import { resolveGlobalEnvPath, loadConfig } from "../utils.js";
+import { GLOBAL_ENV_PATH, resolveGlobalEnvPath, loadConfig } from "../utils.js";
 import { ensureProjectGitignore } from "../project-bootstrap.js";
 
 const PROVIDERS = ["openai", "anthropic", "kkaiapi", "custom"] as const;
@@ -239,7 +239,9 @@ export async function interactiveLlmSetup(
     ].join("\n");
 
     if (useGlobal) {
-      const globalEnvPath = await resolveGlobalEnvPath();
+      // Writers always target the canonical path; resolveGlobalEnvPath may
+      // fall back to the legacy file for reads, which must never be rewritten.
+      const globalEnvPath = GLOBAL_ENV_PATH;
       const globalDir = join(globalEnvPath, "..");
       await mkdir(globalDir, { recursive: true });
       await writeFile(globalEnvPath, envContent + "\n", "utf-8");
