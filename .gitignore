@@ -22,6 +22,8 @@ docs/*
 # Approved phase design specs (whitelisted subtree)
 !docs/superpowers/
 !docs/superpowers/specs/
+# Castor identity migration deliverables (inventory, migration docs)
+!docs/migrations/
 novel-to-comic-research.docx
 .pnpm-store/
 tmp/
