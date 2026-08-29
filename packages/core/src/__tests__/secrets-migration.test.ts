@@ -21,7 +21,7 @@ describe("loadSecrets legacy service id migration", () => {
   }
 
   async function readSecretsRaw(): Promise<any> {
-    return JSON.parse(await readFile(join(root, ".inkos", "secrets.json"), "utf-8"));
+    return JSON.parse(await readFile(join(root, ".castor", "secrets.json"), "utf-8"));
   }
 
   it("siliconflow -> siliconcloud 重命名（目标 id 不存在）", async () => {

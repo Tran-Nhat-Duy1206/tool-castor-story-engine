@@ -33,7 +33,7 @@ describe("config migration", () => {
 
     expect(result.migrated).toBe(true);
 
-    const raw = await readFile(join(root, "inkos.json"), "utf-8");
+    const raw = await readFile(join(root, "castor.json"), "utf-8");
     const config = JSON.parse(raw);
     expect(config.llm.services).toHaveLength(1);
     expect(config.llm.services[0].service).toBe("moonshot");
@@ -75,7 +75,7 @@ describe("config migration", () => {
 
     await migrateConfig(root);
 
-    const raw = await readFile(join(root, "inkos.json"), "utf-8");
+    const raw = await readFile(join(root, "castor.json"), "utf-8");
     const config = JSON.parse(raw);
     expect(config.llm.services[0].service).toBe("deepseek");
   });
@@ -93,7 +93,7 @@ describe("config migration", () => {
 
     await migrateConfig(root);
 
-    const raw = await readFile(join(root, "inkos.json"), "utf-8");
+    const raw = await readFile(join(root, "castor.json"), "utf-8");
     const config = JSON.parse(raw);
     expect(config.llm.services[0].service).toBe("custom");
     expect(config.llm.services[0].baseUrl).toBe("https://llm.internal.corp/v1");

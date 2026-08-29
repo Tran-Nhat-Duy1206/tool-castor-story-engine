@@ -330,6 +330,11 @@ vi.mock("@actalk/castor-core", async (importOriginal) => {
     chatCompletion: chatCompletionMock,
     runWorkerAgent: runWorkerAgentMock,
     loadProjectConfig: loadProjectConfigMock,
+    loadProjectConfigFile: actual.loadProjectConfigFile,
+    saveProjectConfigFile: actual.saveProjectConfigFile,
+    hasProjectConfigFile: actual.hasProjectConfigFile,
+    resolveGlobalEnvPath: actual.resolveGlobalEnvPath,
+    castorEnv: actual.castorEnv,
     processProjectInteractionRequest: processProjectInteractionRequestMock,
     createInteractionToolsFromDeps: createInteractionToolsFromDepsMock,
     deleteLatestChapter: deleteLatestChapterMock,
@@ -410,6 +415,7 @@ vi.mock("@actalk/castor-core", async (importOriginal) => {
     probeModelsFromUpstream: probeModelsFromUpstreamMock,
     fetchWithProxy: vi.fn((input: Parameters<typeof fetch>[0], init?: RequestInit) => fetch(input, init)),
     GLOBAL_ENV_PATH: join(tmpdir(), "inkos-global.env"),
+    resolveGlobalEnvPath: async () => join(tmpdir(), "inkos-global.env"),
     SessionKindSchema: actual.SessionKindSchema,
     DetectionConfigSchema: actual.DetectionConfigSchema,
     normalizeActionSource: actual.normalizeActionSource,
@@ -488,7 +494,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
   beforeEach(async () => {
     root = await mkdtemp(join(tmpdir(), "inkos-studio-server-"));
-    await writeFile(join(root, "inkos.json"), JSON.stringify(projectConfig, null, 2), "utf-8");
+    await writeFile(join(root, "castor.json"), JSON.stringify(projectConfig, null, 2), "utf-8");
     schedulerStartMock.mockReset();
     initBookMock.mockReset();
     initBookMock.mockImplementation(async (book: { id: string; title: string }) => {
@@ -643,7 +649,7 @@ describe("createStudioServer daemon lifecycle", () => {
     });
     resolveSessionActiveBookMock.mockResolvedValue(undefined);
     loadProjectConfigMock.mockImplementation(async () => {
-      const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8")) as Record<string, unknown>;
+      const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8")) as Record<string, unknown>;
       return {
         ...cloneProjectConfig(),
         ...raw,
@@ -902,8 +908,8 @@ describe("createStudioServer daemon lifecycle", () => {
     });
   });
 
-  it("returns a structured config error when inkos.json is corrupt", async () => {
-    await writeFile(join(root, "inkos.json"), "{ this is not valid json", "utf-8");
+  it("returns a structured config error when castor.json is corrupt", async () => {
+    await writeFile(join(root, "castor.json"), "{ this is not valid json", "utf-8");
 
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -912,7 +918,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(response.status).toBe(500);
     const body = await response.json() as { error: { code: string; message: string } };
     expect(body.error.code).toBe("PROJECT_CONFIG_INVALID");
-    expect(body.error.message).toContain("inkos.json");
+    expect(body.error.message).toContain("castor.json");
   });
 
   it("reloads latest llm config for doctor checks without restarting the studio server", async () => {
@@ -1129,7 +1135,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("returns all bank services with group fields and custom services", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -1190,7 +1196,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("merges persisted discovered/user models ahead of the static fallback catalog", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         ...projectConfig.llm,
@@ -1237,7 +1243,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("returns custom model groups through the slow probe path", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -1388,7 +1394,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("merges service config patches instead of overwriting existing services", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -1418,7 +1424,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(save.status).toBe(200);
 
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.services).toEqual([
       { service: "moonshot", temperature: 0.5, apiFormat: "responses", stream: false, models: ["kimi-k3-preview"] },
       { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
@@ -1426,7 +1432,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("refreshes top-level llm mirror when switching from custom baseUrl to a preset service", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         provider: "openai",
@@ -1460,7 +1466,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(save.status).toBe(200);
 
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.service).toBe("kkaiapi");
     expect(raw.llm.defaultModel).toBe("deepseek-v4-flash");
     expect(raw.llm.model).toBe("deepseek-v4-flash");
@@ -1469,7 +1475,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("deletes a custom service config and stored secret", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         service: "custom:内网GPT",
@@ -1495,7 +1501,7 @@ describe("createStudioServer daemon lifecycle", () => {
     });
 
     expect(response.status).toBe(200);
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.services).toEqual([
       { service: "moonshot", temperature: 1, apiFormat: "chat", stream: true },
     ]);
@@ -1521,7 +1527,7 @@ describe("createStudioServer daemon lifecycle", () => {
       "CASTOR_LLM_MODEL=gpt-4o",
       "CASTOR_LLM_API_KEY=sk-global",
     ].join("\n"), "utf-8");
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         ...projectConfig.llm,
@@ -1585,7 +1591,7 @@ describe("createStudioServer daemon lifecycle", () => {
       },
     });
 
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm).toMatchObject({
       service: "kkaiapi",
       defaultModel: "deepseek-v4-flash",
@@ -1599,7 +1605,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("allows switching config source without overwriting services", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -1621,7 +1627,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(save.status).toBe(200);
 
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.configSource).toBe("studio");
     expect(raw.llm.services).toEqual([
       { service: "moonshot", temperature: 1 },
@@ -1630,7 +1636,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("returns the saved default service and model for Studio chat selection", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -1670,7 +1676,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("tests and lists models for custom services using baseUrl and stored config", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -1719,7 +1725,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("does not probe stale global fallback models for custom services when /models is unavailable", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         configSource: "env",
@@ -1775,7 +1781,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("returns English probe errors when the project language is en", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       language: "en",
       llm: {
@@ -1815,7 +1821,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("returns an English empty-API-key error when the project language is en", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       language: "en",
     }, null, 2), "utf-8");
@@ -1837,7 +1843,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("falls back to the detected/default model when custom /models is unavailable", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         defaultModel: "MiniMax-M2.7",
@@ -1902,7 +1908,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("uses the MiniMax OpenAI-compatible preset during service probe", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -1955,7 +1961,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("uses the bank endpoint check model before the global default during service probe", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -2129,7 +2135,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("uses discovered Ollama models without requiring an API key or the built-in check model", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -2169,7 +2175,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("does not fall back to the global default model when a bank endpoint probe fails", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -2212,7 +2218,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("returns a Google-specific diagnostic when Gemini probe returns 400", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -2256,7 +2262,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("does not return OpenAI-compatible Bailian models from the Anthropic channel connection test", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -2330,7 +2336,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("keys cached model lists by baseUrl so custom endpoints do not leak stale results", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -2371,7 +2377,7 @@ describe("createStudioServer daemon lifecycle", () => {
       models: [{ id: "model-a", name: "model-a" }],
     });
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         services: [
@@ -2440,7 +2446,7 @@ describe("createStudioServer daemon lifecycle", () => {
     });
     expect(saveConfig.status).toBe(200);
 
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.cover).toEqual({
       service: "kkaiapi",
       model: "gpt-image-2",
@@ -2486,7 +2492,7 @@ describe("createStudioServer daemon lifecycle", () => {
     await expect(response.json()).resolves.toMatchObject({
       error: expect.stringContaining("Base URL"),
     });
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.cover).toBeUndefined();
   });
 
@@ -2747,7 +2753,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("creates books with Studio Ollama config without requiring an API key", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         configSource: "studio",
@@ -3328,7 +3334,7 @@ describe("createStudioServer daemon lifecycle", () => {
       },
       {
         intent: "continuation_import",
-        payload: { continuationImport: { title: "雾港续章", sourcePath: ".inkos/uploads/novel.txt" } },
+        payload: { continuationImport: { title: "雾港续章", sourcePath: ".castor/uploads/novel.txt" } },
         factory: createContinuationImportToolMock,
         tool: "continuation_import",
         bookId: "雾港续章",
@@ -5192,7 +5198,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
   it("passes configured long-form writing review retries into Studio write-next", async () => {
     await writeFile(
-      join(root, "inkos.json"),
+      join(root, "castor.json"),
       JSON.stringify({
         ...cloneProjectConfig(),
         writing: { reviewRetries: 3 },
@@ -5490,7 +5496,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("allows /api/agent to use explicit service+model when Studio config has no defaultModel", async () => {
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         configSource: "studio",
@@ -5500,7 +5506,7 @@ describe("createStudioServer daemon lifecycle", () => {
       },
     }, null, 2), "utf-8");
     loadProjectConfigMock.mockImplementation(async () => {
-      const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8")) as Record<string, unknown>;
+      const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8")) as Record<string, unknown>;
       return {
         ...cloneProjectConfig(),
         ...raw,
@@ -5561,7 +5567,7 @@ describe("createStudioServer daemon lifecycle", () => {
       contextWindow: 0,
       maxTokens: 16384,
     };
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         configSource: "studio",
@@ -5652,7 +5658,7 @@ describe("createStudioServer daemon lifecycle", () => {
       contextWindow: 0,
       maxTokens: 16384,
     };
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
         configSource: "studio",
@@ -6501,7 +6507,7 @@ describe("createStudioServer daemon lifecycle", () => {
       defaultModel: "deepseek-v4-flash",
     });
 
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.service).toBe("kkaiapi");
     expect(raw.llm.defaultModel).toBe("deepseek-v4-flash");
     expect(raw.llm.model).toBe("deepseek-v4-flash");
@@ -6688,7 +6694,7 @@ describe("createStudioServer daemon lifecycle", () => {
     });
     expect(upload.status).toBe(200);
     const uploaded = await upload.json() as { storedPath: string };
-    expect(uploaded.storedPath).toMatch(/^\.inkos\/uploads\/translation\//);
+    expect(uploaded.storedPath).toMatch(/^\.castor\/uploads\/translation\//);
 
     const create = await app.request("http://localhost/api/v1/translations/create", {
       method: "POST",

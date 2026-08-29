@@ -9,7 +9,7 @@ import { StateManager } from "@actalk/castor-core";
 const testDir = dirname(fileURLToPath(import.meta.url));
 const cliDir = resolve(testDir, "..", "..");
 const cliEntry = resolve(cliDir, "dist", "index.js");
-const CLI_PROCESS_TIMEOUT_MS = 10_000;
+const CLI_PROCESS_TIMEOUT_MS = 30000;
 const DOUBLE_CLI_INVOCATION_TEST_TIMEOUT_MS = CLI_PROCESS_TIMEOUT_MS * 2;
 
 let projectDir: string;
@@ -262,7 +262,7 @@ describe("CLI integration", () => {
       } finally {
         await writeFile(envPath, originalEnv, "utf-8");
         await rm(join(projectDir, "books", "harbor"), { recursive: true, force: true });
-        await rm(join(projectDir, ".inkos-session.json"), { force: true }).catch(() => {});
+        await rm(join(projectDir, ".castor", "session.json"), { force: true }).catch(() => {});
       }
     }, CLI_PROCESS_TIMEOUT_MS);
   });

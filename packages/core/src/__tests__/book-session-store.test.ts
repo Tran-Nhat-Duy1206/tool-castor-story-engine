@@ -110,7 +110,7 @@ describe("book-session-store", () => {
           { role: "assistant", content: "好的", thinking: "旧思考" },
         ],
       });
-      await expect(readFile(join(tempDir, ".inkos", "sessions", "legacy-1.jsonl"), "utf-8"))
+      await expect(readFile(join(tempDir, ".castor", "sessions", "legacy-1.jsonl"), "utf-8"))
         .resolves
         .toContain("request_committed");
     });
@@ -147,10 +147,10 @@ describe("book-session-store", () => {
       const session = await createAndPersistBookSession(tempDir, "book-a", "123456-abcdef");
 
       expect(session.sessionId).toBe("123456-abcdef");
-      await expect(readFile(join(tempDir, ".inkos", "sessions", "123456-abcdef.jsonl"), "utf-8"))
+      await expect(readFile(join(tempDir, ".castor", "sessions", "123456-abcdef.jsonl"), "utf-8"))
         .resolves
         .toContain("session_created");
-      await expect(readFile(join(tempDir, ".inkos", "sessions", "123456-abcdef.json"), "utf-8"))
+      await expect(readFile(join(tempDir, ".castor", "sessions", "123456-abcdef.json"), "utf-8"))
         .rejects
         .toThrow();
     });

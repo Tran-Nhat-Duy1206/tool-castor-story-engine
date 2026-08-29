@@ -1,6 +1,8 @@
 import { readdir, unlink } from "node:fs/promises";
+import { join } from "node:path";
 import { createBookSession } from "./session.js";
 import type { BookSession, PlayMode, SessionKind } from "./session.js";
+import { LEGACY_CASTOR_RUNTIME_DIRNAME } from "../config/product-identity.js";
 import {
   appendTranscriptEvents,
   legacyBookSessionPath,
@@ -139,15 +141,16 @@ export async function listBookSessions(
   bookId: string | null,
 ): Promise<ReadonlyArray<BookSessionSummary>> {
   const dir = sessionsDir(projectRoot);
-  let files: string[];
-  try {
-    files = await readdir(dir);
-  } catch {
-    return [];
-  }
+  // Legacy sessions (pre-rename legacy runtime dir) stay discoverable as a
+  // read-only view; reading one migrates it into the canonical tree.
+  const legacyDir = join(projectRoot, LEGACY_CASTOR_RUNTIME_DIRNAME, "sessions");
+  const [canonical, legacy] = await Promise.all([
+    readdir(dir).catch(() => [] as string[]),
+    readdir(legacyDir).catch(() => [] as string[]),
+  ]);
 
   const sessionIds = new Set<string>();
-  for (const file of files) {
+  for (const file of [...canonical, ...legacy]) {
     if (file.endsWith(".jsonl")) {
       sessionIds.add(file.slice(0, -".jsonl".length));
     } else if (file.endsWith(".json")) {

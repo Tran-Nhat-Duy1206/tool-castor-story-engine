@@ -33,13 +33,13 @@ async function setupBook(bookId: string): Promise<string> {
 const fixedClock = (iso: string) => () => new Date(iso);
 
 describe("book backup module", () => {
-  it("snapshots the whole book directory into .inkos/backups/<bookId>/<stamp>/", async () => {
+  it("snapshots the whole book directory into .castor/backups/<bookId>/<stamp>/", async () => {
     const bookDir = await setupBook("backbook");
 
     const result = await createBookBackup(projectRoot, "backbook", { now: fixedClock("2026-07-15T08:12:33Z") });
 
     expect(result.backupId).toBe("20260715-081233");
-    const backupDir = join(projectRoot, ".inkos", "backups", "backbook", "20260715-081233");
+    const backupDir = join(projectRoot, ".castor", "backups", "backbook", "20260715-081233");
     await expect(readFile(join(backupDir, "chapters", "0001_起风.md"), "utf-8")).resolves.toBe("第一章原文。");
     await expect(readFile(join(backupDir, "story", "current_state.md"), "utf-8")).resolves.toBe("原始状态");
     // The original book stays in place.
@@ -92,7 +92,7 @@ describe("book backup module", () => {
     await expect(exists(join(bookDir, "chapters", "0002_多余.md"))).resolves.toBe(false);
 
     // The pre-restore auto-backup preserves the botched state.
-    const preRestoreDir = join(projectRoot, ".inkos", "backups", "restorebook", "20260715-090000-pre-restore");
+    const preRestoreDir = join(projectRoot, ".castor", "backups", "restorebook", "20260715-090000-pre-restore");
     await expect(readFile(join(preRestoreDir, "chapters", "0001_起风.md"), "utf-8")).resolves.toBe("改坏了的第一章。");
     await expect(readFile(join(preRestoreDir, "chapters", "0002_多余.md"), "utf-8")).resolves.toBe("多写的一章。");
   });

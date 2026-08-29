@@ -48,7 +48,7 @@ describe("material retrieval", () => {
     expect(results).toHaveLength(1);
     expect(results[0]?.title).toBe("cold");
     expect(results[0]?.excerpt).toContain("赔偿款");
-    expect(results[0]?.markdownPath).toMatch(/^\.inkos\/materials\//);
+    expect(results[0]?.markdownPath).toMatch(/^\.castor\/materials\//);
     expect(results[0]?.charStart).toBeGreaterThanOrEqual(0);
     expect(results[0]?.charEnd).toBeGreaterThan(results[0]?.charStart ?? 0);
   });

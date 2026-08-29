@@ -12,13 +12,13 @@ describe("Castor agent trajectory metadata", () => {
   it("uses an opaque stable conversation id", () => {
     const first = opaqueConversationId("session-with-user-visible-name");
     expect(first).toBe(opaqueConversationId("session-with-user-visible-name"));
-    expect(first).toMatch(/^inkos-[0-9a-f]{32}$/);
+    expect(first).toMatch(/^castor-[0-9a-f]{32}$/);
     expect(first).not.toContain("user-visible-name");
   });
 
   it("keeps one run while assigning roles and preserving the parent Pi turn", async () => {
     await runWithAgentTrajectory({
-      conversationId: "inkos-conversation",
+      conversationId: "castor-conversation",
       runId: "run-1",
       agentRole: "main",
     }, async () => {
@@ -52,7 +52,7 @@ describe("Castor agent trajectory metadata", () => {
 
   it("emits metadata only for kkaiapi endpoints", () => {
     const trace = runWithAgentTrajectory({
-      conversationId: "inkos-conversation",
+      conversationId: "castor-conversation",
       runId: "run-1",
       agentRole: "main",
     }, () => beginAgentModelCall());
@@ -63,8 +63,8 @@ describe("Castor agent trajectory metadata", () => {
       budgetTokens: 4096,
     })).toMatchObject({
       "X-Castor-Trace-Version": "1",
-      "X-Castor-Scaffold": "pi-inkos",
-      "X-Castor-Conversation-ID": "inkos-conversation",
+      "X-Castor-Scaffold": "pi-castor",
+      "X-Castor-Conversation-ID": "castor-conversation",
       "X-Castor-Run-ID": "run-1",
       "X-Castor-Agent-Role": "main",
       "X-Castor-Pi-Turn-Index": "1",

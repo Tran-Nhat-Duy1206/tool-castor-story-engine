@@ -37,7 +37,7 @@ async function residuePaths(): Promise<string[]> {
     for (const entry of await readdir(dir, { withFileTypes: true })) {
       const p = join(dir, entry.name);
       if (entry.isDirectory()) {
-        if (entry.name.startsWith(".inkos-file-txn-")) hits.push(p);
+        if (entry.name.startsWith(".castor-file-txn-")) hits.push(p);
         else await walk(p);
       }
     }
@@ -175,7 +175,7 @@ describe("commitCanonEdits (single atomic integrity transaction)", () => {
         { edits: [SET_EDIT], expectedRevision: (await readStoryCanon(bookDir)).revision },
         {
           renameFile: async (from, to) => {
-            if (from.endsWith(join("story", "state", "current_state.json")) && !from.includes(".inkos-file-txn-")) {
+            if (from.endsWith(join("story", "state", "current_state.json")) && !from.includes(".castor-file-txn-")) {
               throw new Error("injected backup failure");
             }
             await realRename(from, to);
@@ -202,7 +202,7 @@ describe("commitCanonEdits (single atomic integrity transaction)", () => {
           // delegate to the REAL rename.
           renameFile: async (from, to) => {
             if (
-              from.includes(".inkos-file-txn-")
+              from.includes(".castor-file-txn-")
               && to.includes(join("snapshots", "12"))
               && to.endsWith("current_state.md")
             ) {

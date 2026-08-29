@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { BookSessionSchema, type BookSession } from "./session.js";
 import {
   appendTranscriptEvents,
@@ -20,12 +21,22 @@ export async function readLegacyBookSession(
   projectRoot: string,
   sessionId: string,
 ): Promise<BookSession | null> {
-  try {
-    const raw = await readFile(legacyBookSessionPath(projectRoot, sessionId), "utf-8");
-    return BookSessionSchema.parse(JSON.parse(raw));
-  } catch {
-    return null;
+  // Legacy-format .json session: check the canonical tree first, then the
+  // pre-rename legacy runtime-dir location (read-only compatibility view).
+  const { LEGACY_CASTOR_RUNTIME_DIRNAME } = await import("../config/product-identity.js");
+  const legacyDir = join(projectRoot, LEGACY_CASTOR_RUNTIME_DIRNAME, "sessions");
+  for (const path of [
+    legacyBookSessionPath(projectRoot, sessionId),
+    join(legacyDir, `${sessionId}.json`),
+  ]) {
+    try {
+      const raw = await readFile(path, "utf-8");
+      return BookSessionSchema.parse(JSON.parse(raw));
+    } catch {
+      // try the next location
+    }
   }
+  return null;
 }
 
 export async function migrateLegacyBookSessionToTranscript(

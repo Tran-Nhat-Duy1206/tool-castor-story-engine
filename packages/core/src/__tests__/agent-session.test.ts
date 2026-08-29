@@ -550,7 +550,7 @@ describe("runAgentSession cache — bookId switch", () => {
     const headers = streamCalls.at(-1)?.options?.headers;
     expect(headers).toMatchObject({
       "X-Castor-Trace-Version": "1",
-      "X-Castor-Scaffold": "pi-inkos",
+      "X-Castor-Scaffold": "pi-castor",
       "X-Castor-Conversation-ID": opaqueConversationId("trace-session"),
       "X-Castor-Agent-Role": "main",
       "X-Castor-Pi-Turn-Index": "1",
