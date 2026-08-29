@@ -9,29 +9,29 @@ import {
 } from "../progress-text.js";
 
 describe("CLI progress text", () => {
-  it("formats Chinese write progress lines", () => {
-    expect(formatWriteStartLine("zh", 1, 3, "demo-book")).toBe('[1/3] 为「demo-book」撰写章节...');
-    expect(formatWriteCompletionLines("zh", {
+  it("formats Vietnamese write progress lines", () => {
+    expect(formatWriteStartLine("vi", 1, 3, "demo-book")).toBe('[1/3] Đang viết chương cho "demo-book"...');
+    expect(formatWriteCompletionLines("vi", {
       chapterNumber: 7,
-      title: "潮声夜渡",
+      title: "Triều Thanh Đêm Qua",
       wordCount: 2345,
       passedAudit: false,
       revised: true,
       status: "audit-failed",
       issues: [
-        { severity: "warning", category: "continuity", description: "时间线略有跳变" },
+        { severity: "warning", category: "continuity", description: "dòng thời gian hơi lệch" },
       ],
     })).toEqual([
-      "  第7章：潮声夜渡",
-      "  字数：2345字",
-      "  审计：需复核",
-      "  自动修正：已执行（已修复关键问题）",
-      "  状态：audit-failed",
-      "  问题：",
-      "    [warning] continuity: 时间线略有跳变",
+      "  Chương 7: Triều Thanh Đêm Qua",
+      "  Độ dài: 2345 words",
+      "  Kiểm tra: CẦN XEM LẠI",
+      "  Tự động chỉnh sửa: CÓ (đã sửa các lỗi nghiêm trọng)",
+      "  Trạng thái: audit-failed",
+      "  Vấn đề:",
+      "    [warning] continuity: dòng thời gian hơi lệch",
       "",
     ]);
-    expect(formatWriteDoneLine("zh")).toBe("完成。");
+    expect(formatWriteDoneLine("vi")).toBe("Hoàn tất.");
   });
 
   it("formats English write progress lines", () => {
@@ -54,21 +54,21 @@ describe("CLI progress text", () => {
     expect(formatWriteDoneLine("en")).toBe("Done.");
   });
 
-  it("formats Chinese import progress lines", () => {
-    expect(formatImportDiscoveryLine("zh", 12, "demo-book")).toBe('发现 12 章，准备导入到「demo-book」。');
-    expect(formatImportResumeLine("zh", 8)).toBe("从第 8 章继续导入。");
-    expect(formatImportCompletionLines("zh", {
+  it("formats Vietnamese import progress lines", () => {
+    expect(formatImportDiscoveryLine("vi", 12, "demo-book")).toBe('Tìm thấy 12 chương, chuẩn bị nhập vào "demo-book".');
+    expect(formatImportResumeLine("vi", 8)).toBe("Tiếp tục nhập từ chương 8.");
+    expect(formatImportCompletionLines("vi", {
       importedCount: 12,
       totalCountLabel: "24000字",
       nextChapter: 13,
       bookId: "demo-book",
     })).toEqual([
-      "导入完成：",
-      "  已导入章节：12",
-      "  总长度：24000字",
-      "  下一章编号：13",
-      '',
-      '运行 "castor write next demo-book" 继续写作。',
+      "Nhập chương hoàn tất:",
+      "  Đã nhập chương: 12",
+      "  Tổng độ dài: 24000字",
+      "  Số chương tiếp theo: 13",
+      "",
+      'Chạy "castor write next demo-book" để tiếp tục viết.',
     ]);
   });
 

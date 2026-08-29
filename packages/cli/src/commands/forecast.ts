@@ -24,7 +24,7 @@ forecastCommand
   .command("create")
   .description("Create a narrative forecast (2-5 isolated candidate branches) from the current canon")
   .argument("[book-id]", "Book ID (auto-detected if only one book)")
-  .requiredOption("--divergence <text>", "Divergence point to branch on, e.g. \"主角是否接受对手的合作提议\"")
+  .requiredOption("--divergence <text>", "Divergence point to branch on, e.g. \"nhân vật chính có nhận lời hợp tác của đối thủ không\"")
   .option("--branches <n>", `Number of isolated candidate branches (${FORECAST_MIN_BRANCHES}-${FORECAST_MAX_BRANCHES})`, String(FORECAST_DEFAULT_BRANCHES))
   .option("--horizon <n>", `Future chapters each branch covers (${FORECAST_MIN_HORIZON}-${FORECAST_MAX_HORIZON})`, String(FORECAST_DEFAULT_HORIZON))
   .option("--model <model>", "Override the forecast model")

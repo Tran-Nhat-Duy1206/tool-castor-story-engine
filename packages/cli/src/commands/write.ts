@@ -51,7 +51,7 @@ writeCommand
       process.exit(1);
       return;
     }
-    let notifyLanguage: CliLanguage = "zh";
+    let notifyLanguage: CliLanguage = "vi";
     let notifyBookName: string | undefined;
     try {
       const root = findProjectRoot();
@@ -157,7 +157,7 @@ writeCommand
           if (!opts.json) {
             log(language === "en"
               ? "State repair required before continuing. Stopping batch."
-              : "需要先修复 state，已停止后续连写。");
+              : "Cần sửa lại state trước khi tiếp tục, đã dừng viết hàng loạt các chương sau.");
           }
           break;
         }
@@ -222,7 +222,7 @@ writeCommand
   .option("--json", "Output JSON")
   .option("--notify", "Send a notification to configured notify channels when the command finishes")
   .action(async (args: ReadonlyArray<string>, opts) => {
-    let notifyLanguage: CliLanguage = "zh";
+    let notifyLanguage: CliLanguage = "vi";
     let notifyBookName: string | undefined;
     try {
       const root = findProjectRoot();

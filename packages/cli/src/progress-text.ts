@@ -67,19 +67,19 @@ export function formatImportCompletionLines(
   },
 ): string[] {
   return [
-    language === "en" ? "Import complete:" : "导入完成：",
+    language === "en" ? "Import complete:" : "Nhập chương hoàn tất:",
     language === "en"
       ? `  Chapters imported: ${result.importedCount}`
-      : `  已导入章节：${result.importedCount}`,
+      : `  Đã nhập chương: ${result.importedCount}`,
     language === "en"
       ? `  Total length: ${result.totalCountLabel}`
-      : `  总长度：${result.totalCountLabel}`,
+      : `  Tổng độ dài: ${result.totalCountLabel}`,
     language === "en"
       ? `  Next chapter number: ${result.nextChapter}`
-      : `  下一章编号：${result.nextChapter}`,
+      : `  Số chương tiếp theo: ${result.nextChapter}`,
     "",
     language === "en"
       ? `Run "castor write next ${result.bookId}" to continue writing.`
-      : `运行 "castor write next ${result.bookId}" 继续写作。`,
+      : `Chạy "castor write next ${result.bookId}" để tiếp tục viết.`,
   ];
 }

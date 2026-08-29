@@ -31,6 +31,7 @@ vi.mock("../utils.js", () => ({
   buildPipelineConfig: buildPipelineConfigMock,
   findProjectRoot: vi.fn(() => "/project"),
   resolveBookId: vi.fn(async (bookId?: string) => bookId ?? "auto-book"),
+  castorEnv: (key: string, env: NodeJS.ProcessEnv = {}) => env[key],
   log: logMock,
   logError: logErrorMock,
 }));

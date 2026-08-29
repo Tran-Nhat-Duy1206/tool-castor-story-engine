@@ -154,14 +154,14 @@ describe("ink dashboard", () => {
     expect(frame).toContain("│");
   });
 
-  it("defaults dashboard chrome to Chinese when locale is zh-CN", async () => {
+  it("defaults dashboard chrome to Vietnamese when locale is vi-VN", async () => {
     const mod = await import("../tui/dashboard.js");
 
     const { lastFrame } = render(
       <mod.InkTuiDashboard
-        locale="zh-CN"
+        locale="vi-VN"
         projectName="castor-demo"
-        activeBookTitle="夜港回声"
+        activeBookTitle="Tiếng Vọng Cảng Đêm"
         modelLabel="gpt-5.4 (openai)"
         session={createSession()}
         inputValue=""
@@ -170,10 +170,10 @@ describe("ink dashboard", () => {
     );
 
     const frame = lastFrame() ?? "";
-    expect(frame).toContain("项目 castor-demo");
-    expect(frame).toContain("作品 夜港回声");
-    expect(frame).toContain("深度 标准");
-    expect(frame).toContain("项目");
+    expect(frame).toContain("Dự án castor-demo");
+    expect(frame).toContain("Tác phẩm Tiếng Vọng Cảng Đêm");
+    expect(frame).toContain("Độ sâu tiêu chuẩn");
+    expect(frame).toContain("Dự án");
   });
 
   it("surfaces the shared creation draft when no active book exists yet", async () => {
@@ -204,7 +204,7 @@ describe("ink dashboard", () => {
 
     const { lastFrame } = render(
       <mod.InkTuiDashboard
-        locale="zh-CN"
+        locale="vi-VN"
         projectName="castor-demo"
         modelLabel="gpt-5.4 (openai)"
         session={draftSession}
@@ -214,6 +214,7 @@ describe("ink dashboard", () => {
     );
 
     const frame = lastFrame() ?? "";
-    expect(frame).toContain("草稿 夜港账本");
+    expect(frame).toContain("Bản nháp");
+    expect(frame).toContain("夜港账本");
   });
 });

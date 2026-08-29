@@ -108,32 +108,32 @@ export function buildInteractiveSetupCopy(locale: TuiLocale): InteractiveSetupCo
   }
 
   return {
-    title: "模型配置",
-    subtitle: "配置模型服务后即可开始使用。",
+    title: "Cấu hình Model",
+    subtitle: "Sau khi cấu hình dịch vụ model là có thể bắt đầu sử dụng.",
     steps: {
-      provider: "服务提供方",
-      baseUrl: "接口地址",
-      apiKey: "API 密钥",
-      model: "模型",
-      scope: "保存范围",
+      provider: "Nhà cung cấp",
+      baseUrl: "Địa chỉ API",
+      apiKey: "API Key",
+      model: "Model",
+      scope: "Phạm vi lưu",
     },
     hints: {
-      provider: "openai / anthropic / kkaiapi / custom（兼容 OpenAI 的代理）",
-      baseUrl: "你的 API 入口地址",
-      apiKey: "粘贴所选服务商的 API Key",
-      model: "例如 gpt-5.4、claude-sonnet-4-20250514、deepseek-chat",
-      scope: "global = 所有项目，project = 仅当前目录",
+      provider: "openai / anthropic / kkaiapi / custom (proxy tương thích OpenAI)",
+      baseUrl: "Địa chỉ API của bạn",
+      apiKey: "Dán API Key của nhà cung cấp đã chọn",
+      model: "Ví dụ gpt-5.4、claude-sonnet-4-20250514、deepseek-chat",
+      scope: "global = mọi dự án, project = chỉ thư mục hiện tại",
     },
     defaults: {
       provider: "openai",
-      baseUrl: "（默认）",
+      baseUrl: "(mặc định)",
       scope: "[global]",
     },
     scopeChoices: {
-      global: "所有项目",
-      project: "当前目录",
+      global: "mọi dự án",
+      project: "thư mục hiện tại",
     },
-    savedTo: "已保存到",
+    savedTo: "Đã lưu vào",
   };
 }
 
@@ -151,9 +151,9 @@ export function buildAutoInitMessages(projectName: string, locale: TuiLocale): {
   }
 
   return {
-    initializing: `正在初始化项目：${projectName}/ ...`,
-    initialized: "项目已初始化",
-    envTemplateHeader: "# LLM 配置 —— 运行 castor tui 进行交互式配置",
+    initializing: `Đang khởi tạo dự án: ${projectName}/ ...`,
+    initialized: "Đã khởi tạo dự án",
+    envTemplateHeader: "# Cấu hình LLM —— chạy castor tui để cấu hình tương tác",
   };
 }
 

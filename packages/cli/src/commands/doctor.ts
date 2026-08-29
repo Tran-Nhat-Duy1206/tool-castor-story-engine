@@ -108,7 +108,7 @@ export const doctorCommand = new Command("doctor")
     const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
     const root = findProjectRoot();
     // doctor is not scoped to a book, so the language comes from the environment
-    // (CASTOR_LOCALE -> LC_ALL/LC_MESSAGES/LANG, default zh).
+    // (CASTOR_LOCALE -> LC_ALL/LC_MESSAGES/LANG, default vi).
     const language = resolveCliLanguage();
 
     if (opts.repairNodeRuntime) {

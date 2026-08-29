@@ -24,7 +24,7 @@ export const initCommand = new Command("init")
       const exampleCreateLines = isEnglish
         ? ["  castor book create --title 'My Novel' --genre progression --platform royalroad --lang en"]
         : [
-          "  castor book create --title '我的小说' --genre xuanhuan --platform tomato",
+          "  castor book create --title 'Tiểu thuyết của tôi' --genre xuanhuan --platform tomato",
           "  # English project? Re-run with: castor init --lang en",
         ];
       if (global) {

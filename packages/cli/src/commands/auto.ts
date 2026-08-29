@@ -23,7 +23,7 @@ export const autoCommand = new Command("auto")
   .option("-q, --quiet", "Suppress console output")
   .option("--notify", "Send a notification to configured notify channels when the command finishes")
   .action(async (args: ReadonlyArray<string>, opts) => {
-    let notifyLanguage: CliLanguage = "zh";
+    let notifyLanguage: CliLanguage = "vi";
     let notifyBookName: string | undefined;
     try {
       const root = findProjectRoot();

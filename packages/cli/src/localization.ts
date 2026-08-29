@@ -1,7 +1,7 @@
 import { formatLengthCount, resolveLengthCountingMode } from "@actalk/castor-core";
 import { castorEnv } from "./utils.js";
 
-export type CliLanguage = "zh" | "en";
+export type CliLanguage = "vi" | "en";
 
 type WriteIssue = {
   readonly severity: string;
@@ -27,8 +27,8 @@ type ImportResultShape = {
   readonly continueBookId: string;
 };
 
-function localize(language: CliLanguage, messages: { zh: string; en: string }): string {
-  return language === "en" ? messages.en : messages.zh;
+function localize(language: CliLanguage, messages: { vi: string; en: string }): string {
+  return language === "en" ? messages.en : messages.vi;
 }
 
 function normalizeCliLanguageTag(value: string | undefined): CliLanguage | undefined {
@@ -40,9 +40,10 @@ function normalizeCliLanguageTag(value: string | undefined): CliLanguage | undef
   if (normalized.startsWith("en")) {
     return "en";
   }
-  if (normalized.startsWith("zh")) {
-    return "zh";
+  if (normalized.startsWith("vi")) {
+    return "vi";
   }
+  // Legacy product locale "zh" falls back to the Vietnamese default (spec §21.5).
   return undefined;
 }
 
@@ -61,7 +62,16 @@ export function resolveCliLanguage(
   }
 
   const detected = normalizeCliLanguageTag(env.LC_ALL ?? env.LC_MESSAGES ?? env.LANG);
-  return detected ?? "zh";
+  return detected ?? "vi";
+}
+
+/**
+ * Vietnamese is counted in words (space-separated script), like English.
+ * This is display-only: chapter word counts for a book still follow the
+ * book's own language through resolveLengthCountingMode(book.language).
+ */
+function displayLengthCount(count: number): string {
+  return formatLengthCount(count, resolveLengthCountingMode("en"));
 }
 
 export function formatBookCreateCreating(
@@ -71,35 +81,35 @@ export function formatBookCreateCreating(
   platform: string,
 ): string {
   return localize(language, {
-    zh: `创建书籍 "${title}"（${genre} / ${platform}）...`,
+    vi: `Đang tạo sách "${title}" (${genre} / ${platform})...`,
     en: `Creating book "${title}" (${genre} / ${platform})...`,
   });
 }
 
 export function formatBookCreateCreated(language: CliLanguage, bookId: string): string {
   return localize(language, {
-    zh: `已创建书籍：${bookId}`,
+    vi: `Đã tạo sách: ${bookId}`,
     en: `Book created: ${bookId}`,
   });
 }
 
 export function formatBookCreateLocation(language: CliLanguage, bookId: string): string {
   return localize(language, {
-    zh: `  位置：books/${bookId}/`,
+    vi: `  Vị trí: books/${bookId}/`,
     en: `  Location: books/${bookId}/`,
   });
 }
 
 export function formatBookCreateFoundationReady(language: CliLanguage): string {
   return localize(language, {
-    zh: "  故事圣经、大纲和书籍规则已生成。",
+    vi: "  Đã tạo xong kinh thánh truyện, đại cương và quy tắc sách.",
     en: "  Story bible, outline, book rules generated.",
   });
 }
 
 export function formatBookCreateNextStep(language: CliLanguage, bookId: string): string {
   return localize(language, {
-    zh: `下一步：castor write next ${bookId}`,
+    vi: `Bước tiếp theo: castor write next ${bookId}`,
     en: `Next: castor write next ${bookId}`,
   });
 }
@@ -111,7 +121,7 @@ export function formatWriteNextProgress(
   bookId: string,
 ): string {
   return localize(language, {
-    zh: `[${current}/${total}] 为「${bookId}」撰写章节...`,
+    vi: `[${current}/${total}] Đang viết chương cho "${bookId}"...`,
     en: `[${current}/${total}] Writing chapter for "${bookId}"...`,
   });
 }
@@ -121,37 +131,37 @@ export function formatWriteNextResultLines(
   result: WriteResultShape,
 ): string[] {
   const auditPassed = result.auditPassed ?? result.passedAudit ?? false;
-  const lengthLabel = formatLengthCount(result.wordCount, resolveLengthCountingMode(language));
+  const lengthLabel = displayLengthCount(result.wordCount);
   const lines = [
     localize(language, {
-      zh: `  第${result.chapterNumber}章：${result.title}`,
+      vi: `  Chương ${result.chapterNumber}: ${result.title}`,
       en: `  Chapter ${result.chapterNumber}: ${result.title}`,
     }),
     localize(language, {
-      zh: `  字数：${lengthLabel}`,
+      vi: `  Độ dài: ${lengthLabel}`,
       en: `  Length: ${lengthLabel}`,
     }),
     localize(language, {
-      zh: `  审计：${auditPassed ? "通过" : "需复核"}`,
+      vi: `  Kiểm tra: ${auditPassed ? "ĐẠT" : "CẦN XEM LẠI"}`,
       en: `  Audit: ${auditPassed ? "PASSED" : "NEEDS REVIEW"}`,
     }),
   ];
 
   if (result.revised) {
     lines.push(localize(language, {
-      zh: "  自动修正：已执行（已修复关键问题）",
+      vi: "  Tự động chỉnh sửa: CÓ (đã sửa các lỗi nghiêm trọng)",
       en: "  Auto-revised: YES (critical issues were fixed)",
     }));
   }
 
   lines.push(localize(language, {
-    zh: `  状态：${result.status}`,
+    vi: `  Trạng thái: ${result.status}`,
     en: `  Status: ${result.status}`,
   }));
 
   if (result.issues.length > 0) {
     lines.push(localize(language, {
-      zh: "  问题：",
+      vi: "  Vấn đề:",
       en: "  Issues:",
     }));
     for (const issue of result.issues) {
@@ -164,7 +174,7 @@ export function formatWriteNextResultLines(
 
 export function formatWriteNextComplete(language: CliLanguage): string {
   return localize(language, {
-    zh: "完成。",
+    vi: "Hoàn tất.",
     en: "Done.",
   });
 }
@@ -176,7 +186,7 @@ export function formatAutoWriteStart(
   targetChapter: number,
 ): string {
   return localize(language, {
-    zh: `自动写作「${bookId}」：从第${startChapter}章连续写到第${targetChapter}章...`,
+    vi: `Tự động viết "${bookId}": từ chương ${startChapter} đến chương ${targetChapter}...`,
     en: `Auto-writing "${bookId}": chapter ${startChapter} through chapter ${targetChapter}...`,
   });
 }
@@ -188,19 +198,19 @@ export function formatAutoWriteAlreadyComplete(
   targetChapter: number,
 ): string {
   return localize(language, {
-    zh: `「${bookId}」已写到第${writtenChapters}章（目标第${targetChapter}章），无需继续。`,
+    vi: `"${bookId}" đã viết ${writtenChapters} chương (mục tiêu chương ${targetChapter}), không cần tiếp tục.`,
     en: `"${bookId}" already has ${writtenChapters} chapter(s) written (target: chapter ${targetChapter}). Nothing to do.`,
   });
 }
 
 export type NotifyCommandAction = "write-next" | "write-rewrite" | "revise" | "audit" | "auto";
 
-const NOTIFY_ACTION_LABELS: Record<NotifyCommandAction, { zh: string; en: string }> = {
-  "write-next": { zh: "写作", en: "Write" },
-  "write-rewrite": { zh: "重写", en: "Rewrite" },
-  revise: { zh: "修订", en: "Revise" },
-  audit: { zh: "审计", en: "Audit" },
-  auto: { zh: "自动连写", en: "Auto-write" },
+const NOTIFY_ACTION_LABELS: Record<NotifyCommandAction, { vi: string; en: string }> = {
+  "write-next": { vi: "Viết", en: "Write" },
+  "write-rewrite": { vi: "Viết lại", en: "Rewrite" },
+  revise: { vi: "Chỉnh sửa", en: "Revise" },
+  audit: { vi: "Kiểm tra", en: "Audit" },
+  auto: { vi: "Tự động viết liên tiếp", en: "Auto-write" },
 };
 
 export function formatNotifyCommandTitle(
@@ -212,10 +222,10 @@ export function formatNotifyCommandTitle(
   const label = localize(language, NOTIFY_ACTION_LABELS[action]);
   const book = bookName === undefined
     ? ""
-    : localize(language, { zh: `《${bookName}》`, en: `: ${bookName}` });
+    : localize(language, { vi: `: ${bookName}`, en: `: ${bookName}` });
   return succeeded
-    ? localize(language, { zh: `✅ ${label}完成${book}`, en: `✅ ${label} complete${book}` })
-    : localize(language, { zh: `❌ ${label}失败${book}`, en: `❌ ${label} failed${book}` });
+    ? localize(language, { vi: `✅ ${label} hoàn tất${book}`, en: `✅ ${label} complete${book}` })
+    : localize(language, { vi: `❌ ${label} thất bại${book}`, en: `❌ ${label} failed${book}` });
 }
 
 export function formatNotifyBatchWriteBody(
@@ -231,13 +241,13 @@ export function formatNotifyBatchWriteBody(
   const last = chapters[chapters.length - 1]!;
   const lines = [
     localize(language, {
-      zh: `本次完成 ${chapters.length} 章（第${first.chapterNumber}章到第${last.chapterNumber}章）`,
+      vi: `Hoàn thành ${chapters.length} chương (từ chương ${first.chapterNumber} đến chương ${last.chapterNumber})`,
       en: `${chapters.length} chapter(s) written (chapter ${first.chapterNumber} to ${last.chapterNumber})`,
     }),
     ...chapters.map((ch) => {
-      const lengthLabel = formatLengthCount(ch.wordCount, resolveLengthCountingMode(language));
+      const lengthLabel = displayLengthCount(ch.wordCount);
       return localize(language, {
-        zh: `第${ch.chapterNumber}章 ${ch.title} | ${lengthLabel} | ${ch.auditPassed ? "审计通过" : "需复核"}`,
+        vi: `Chương ${ch.chapterNumber} ${ch.title} | ${lengthLabel} | ${ch.auditPassed ? "kiểm tra đạt" : "cần xem lại"}`,
         en: `Chapter ${ch.chapterNumber} ${ch.title} | ${lengthLabel} | ${ch.auditPassed ? "audit passed" : "needs review"}`,
       });
     }),
@@ -255,7 +265,7 @@ export function formatNotifyAuditBody(
   },
 ): string {
   const head = localize(language, {
-    zh: `第${result.chapterNumber}章审计${result.passed ? "通过" : "未通过"}（${result.issueCount} 个问题）`,
+    vi: `Kiểm tra chương ${result.chapterNumber} ${result.passed ? "đạt" : "không đạt"} (${result.issueCount} vấn đề)`,
     en: `Chapter ${result.chapterNumber} audit ${result.passed ? "passed" : "failed"} (${result.issueCount} issue(s))`,
   });
   return result.summary ? `${head}\n${result.summary}` : head;
@@ -273,13 +283,13 @@ export function formatNotifyReviseBody(
 ): string {
   if (!result.applied) {
     return localize(language, {
-      zh: `第${result.chapterNumber}章保留原稿${result.skippedReason ? `：${result.skippedReason}` : ""}`,
+      vi: `Chương ${result.chapterNumber} giữ nguyên bản gốc${result.skippedReason ? `: ${result.skippedReason}` : ""}`,
       en: `Chapter ${result.chapterNumber} kept original draft${result.skippedReason ? `: ${result.skippedReason}` : ""}`,
     });
   }
-  const lengthLabel = formatLengthCount(result.wordCount, resolveLengthCountingMode(language));
+  const lengthLabel = displayLengthCount(result.wordCount);
   return localize(language, {
-    zh: `第${result.chapterNumber}章已修订 | ${lengthLabel} | 修复 ${result.fixedCount} 个问题`,
+    vi: `Chương ${result.chapterNumber} đã chỉnh sửa | ${lengthLabel} | đã sửa ${result.fixedCount} vấn đề`,
     en: `Chapter ${result.chapterNumber} revised | ${lengthLabel} | ${result.fixedCount} issue(s) fixed`,
   });
 }
@@ -287,7 +297,7 @@ export function formatNotifyReviseBody(
 export function formatNotifyFailureBody(language: CliLanguage, error: unknown): string {
   const detail = error instanceof Error ? error.message : String(error);
   return localize(language, {
-    zh: `错误：${detail}`,
+    vi: `Lỗi: ${detail}`,
     en: `Error: ${detail}`,
   });
 }
@@ -298,7 +308,7 @@ export function formatImportChaptersDiscovery(
   bookId: string,
 ): string {
   return localize(language, {
-    zh: `发现 ${chapterCount} 章，准备导入到「${bookId}」。`,
+    vi: `Tìm thấy ${chapterCount} chương, chuẩn bị nhập vào "${bookId}".`,
     en: `Found ${chapterCount} chapters to import into "${bookId}".`,
   });
 }
@@ -308,7 +318,7 @@ export function formatImportChaptersResume(
   resumeFrom: number,
 ): string {
   return localize(language, {
-    zh: `从第 ${resumeFrom} 章继续导入。`,
+    vi: `Tiếp tục nhập từ chương ${resumeFrom}.`,
     en: `Resuming from chapter ${resumeFrom}.`,
   });
 }
@@ -317,27 +327,27 @@ export function formatImportChaptersComplete(
   language: CliLanguage,
   result: ImportResultShape,
 ): string[] {
-  const lengthLabel = formatLengthCount(result.totalWords, resolveLengthCountingMode(language));
+  const lengthLabel = displayLengthCount(result.totalWords);
   return [
     localize(language, {
-      zh: "导入完成：",
+      vi: "Nhập hoàn tất:",
       en: "Import complete:",
     }),
     localize(language, {
-      zh: `  已导入章节：${result.importedCount}`,
+      vi: `  Số chương đã nhập: ${result.importedCount}`,
       en: `  Chapters imported: ${result.importedCount}`,
     }),
     localize(language, {
-      zh: `  总长度：${lengthLabel}`,
+      vi: `  Tổng độ dài: ${lengthLabel}`,
       en: `  Total length: ${lengthLabel}`,
     }),
     localize(language, {
-      zh: `  下一章编号：${result.nextChapter}`,
+      vi: `  Số chương kế tiếp: ${result.nextChapter}`,
       en: `  Next chapter number: ${result.nextChapter}`,
     }),
     "",
     localize(language, {
-      zh: `运行 "castor write next ${result.continueBookId}" 继续写作。`,
+      vi: `Chạy "castor write next ${result.continueBookId}" để tiếp tục viết.`,
       en: `Run "castor write next ${result.continueBookId}" to continue writing.`,
     }),
   ];
@@ -349,7 +359,7 @@ export function formatImportCanonStart(
   targetBookId: string,
 ): string {
   return localize(language, {
-    zh: `把 "${parentBookId}" 的正典导入到 "${targetBookId}"...`,
+    vi: `Đang nhập chính thống từ "${parentBookId}" vào "${targetBookId}"...`,
     en: `Importing canon from "${parentBookId}" into "${targetBookId}"...`,
   });
 }
@@ -357,11 +367,11 @@ export function formatImportCanonStart(
 export function formatImportCanonComplete(language: CliLanguage): string[] {
   return [
     localize(language, {
-      zh: "正典已导入：story/parent_canon.md",
+      vi: "Đã nhập chính thống: story/parent_canon.md",
       en: "Canon imported: story/parent_canon.md",
     }),
     localize(language, {
-      zh: "Writer 和 auditor 会在番外模式下自动识别这个文件。",
+      vi: "Writer và auditor sẽ tự động nhận diện file này ở chế độ ngoại truyện.",
       en: "Writer and auditor will auto-detect this file for spinoff mode.",
     }),
   ];
@@ -369,7 +379,7 @@ export function formatImportCanonComplete(language: CliLanguage): string[] {
 
 export function formatListModelsEmpty(language: CliLanguage, service: string): string {
   return localize(language, {
-    zh: `${service} 没有可用模型（可能需要 --api-key 和 --base-url）`,
+    vi: `${service} không có model khả dụng (có thể cần --api-key và --base-url)`,
     en: `No models available for ${service} (you may need --api-key and --base-url)`,
   });
 }
@@ -380,49 +390,49 @@ export function formatListModelsHeader(
   count: number,
 ): string {
   return localize(language, {
-    zh: `${service}：${count} 个模型`,
+    vi: `${service}: ${count} model`,
     en: `${service}: ${count} model(s)`,
   });
 }
 
 export function formatDoctorHintQuota(language: CliLanguage): string {
   return localize(language, {
-    zh: "检查 API Key 是否正确、模型是否可用，以及账号余额或配额是否足够。",
+    vi: "Kiểm tra API Key có đúng không, model có khả dụng không, và tài khoản còn đủ số dư hoặc hạn mức không.",
     en: "Check that the API key is valid, the model is available, and the account has enough balance or quota.",
   });
 }
 
 export function formatDoctorHintOpenAiProbeExhausted(language: CliLanguage): string {
   return localize(language, {
-    zh: "当前已自动尝试 chat/responses 与流式开关组合；如果仍失败，问题更可能在模型名、baseUrl 路径或服务商兼容性本身。",
+    vi: "Đã tự động thử tất cả tổ hợp chat/responses và bật/tắt stream; nếu vẫn lỗi, nguyên nhân nhiều khả năng nằm ở tên model, đường dẫn baseUrl hoặc khả năng tương thích của nhà cung cấp.",
     en: "All chat/responses and stream on/off combinations were already probed; if it still fails, the problem is more likely the model name, the baseUrl path, or provider compatibility itself.",
   });
 }
 
 export function formatDoctorHintBaseUrl(language: CliLanguage): string {
   return localize(language, {
-    zh: "baseUrl 可能不正确，检查 CASTOR_LLM_BASE_URL 是否包含完整路径（如 /v1）",
+    vi: "baseUrl có thể sai; kiểm tra CASTOR_LLM_BASE_URL đã chứa đầy đủ đường dẫn chưa (ví dụ /v1)",
     en: "The baseUrl may be wrong. Check that CASTOR_LLM_BASE_URL includes the full path (e.g. /v1).",
   });
 }
 
 export function formatDoctorHintStreamRequirement(language: CliLanguage): string {
   return localize(language, {
-    zh: "检查提供方文档，确认该接口要求 stream=true、stream=false，还是根本不支持 stream",
+    vi: "Xem tài liệu nhà cung cấp để xác nhận endpoint yêu cầu stream=true, stream=false hay không hỗ trợ stream",
     en: "Check the provider docs to confirm whether the endpoint requires stream=true, stream=false, or does not support streaming at all.",
   });
 }
 
 export function formatDoctorHintModelName(language: CliLanguage): string {
   return localize(language, {
-    zh: "检查模型名称是否正确（CASTOR_LLM_MODEL）",
+    vi: "Kiểm tra tên model đã đúng chưa (CASTOR_LLM_MODEL)",
     en: "Check that the model name is correct (CASTOR_LLM_MODEL).",
   });
 }
 
 export function formatDoctorHintInvalidApiKey(language: CliLanguage): string {
   return localize(language, {
-    zh: "API Key 无效，检查 CASTOR_LLM_API_KEY",
+    vi: "API Key không hợp lệ; kiểm tra CASTOR_LLM_API_KEY",
     en: "The API key is invalid. Check CASTOR_LLM_API_KEY.",
   });
 }
@@ -430,24 +440,24 @@ export function formatDoctorHintInvalidApiKey(language: CliLanguage): string {
 // Fanfic errors are intentionally bilingual in a single string: they can surface
 // through `--json` output or be rethrown before any book language is known.
 export function formatFanficInvalidModeError(mode: string): string {
-  return `Invalid fanfic mode: "${mode}". Valid modes: canon, au, ooc, cp（无效的同人模式："${mode}"，可选 canon、au、ooc、cp）`;
+  return `Invalid fanfic mode: "${mode}". Valid modes: canon, au, ooc, cp (Chế độ fanfic không hợp lệ: "${mode}", chọn canon、au、ooc、cp)`;
 }
 
 export function formatFanficSourceTooShortError(length: number): string {
-  return `Source material too short (${length} chars); provide at least 100 chars（源素材内容过短，仅 ${length} 字符，请提供至少 100 字符的原作素材）`;
+  return `Source material too short (${length} chars); provide at least 100 chars (Nguyên liệu quá ngắn, chỉ ${length} ký tự, cần ít nhất 100 ký tự)`;
 }
 
 export function formatFanficCanonMissingError(): string {
-  return "No fanfic canon found for this book. Create one with `castor fanfic init`（该书没有同人正典文件，用 castor fanfic init 创建同人书）";
+  return "No fanfic canon found for this book. Create one with `castor fanfic init` (Chưa có file chính thống fanfic cho sách này; dùng castor fanfic init để tạo)";
 }
 
 export function formatFanficSourceDirEmptyError(sourcePath: string): string {
-  return `No .txt or .md files found in ${sourcePath}（目录 ${sourcePath} 中没有 .txt 或 .md 文件）`;
+  return `No .txt or .md files found in ${sourcePath} (Không có file .txt hoặc .md nào trong thư mục ${sourcePath})`;
 }
 
 export function formatChapterSyncNoChanges(language: CliLanguage, checked: number): string {
   return localize(language, {
-    zh: `已核对 ${checked} 章，index.json 字数无需修正。`,
+    vi: `Đã đối chiếu ${checked} chương; số từ trong index.json đã khớp với file.`,
     en: `Checked ${checked} chapter(s); index.json word counts already match the files.`,
   });
 }
@@ -460,21 +470,21 @@ export function formatChapterSyncChange(
   const from = formatLengthCount(change.previousWordCount, countingMode);
   const to = formatLengthCount(change.wordCount, countingMode);
   return localize(language, {
-    zh: `  第${change.number}章 ${change.title}：${from} → ${to}`,
+    vi: `  Chương ${change.number} ${change.title}: ${from} → ${to}`,
     en: `  Chapter ${change.number} ${change.title}: ${from} → ${to}`,
   });
 }
 
 export function formatChapterSyncSummary(language: CliLanguage, changed: number, checked: number): string {
   return localize(language, {
-    zh: `已核对 ${checked} 章，修正了 ${changed} 章的 index.json 字数。`,
+    vi: `Đã đối chiếu ${checked} chương, sửa số từ trong index.json cho ${changed} chương.`,
     en: `Checked ${checked} chapter(s); corrected ${changed} index.json word count(s).`,
   });
 }
 
 export function formatChapterSyncMissingFiles(language: CliLanguage, numbers: ReadonlyArray<number>): string {
   return localize(language, {
-    zh: `警告：index.json 中的第 ${numbers.join("、")} 章找不到对应的章节文件，已跳过。`,
+    vi: `Cảnh báo: các chương ${numbers.join(", ")} có trong index.json nhưng không tìm thấy file chương tương ứng; đã bỏ qua.`,
     en: `Warning: chapter(s) ${numbers.join(", ")} exist in index.json but have no chapter file on disk; skipped.`,
   });
 }
@@ -484,8 +494,8 @@ export function formatChapterDeleteConfirm(
   params: { bookTitle: string; bookId: string; number: number; title: string },
 ): string {
   return localize(language, {
-    zh: `将删除《${params.bookTitle}》(${params.bookId}) 的最新章：第${params.number}章 ${params.title}。`
-      + `章节文件会移入 chapters/.trash/，索引和故事状态回滚到第${params.number - 1}章。确认删除？(y/N) `,
+    vi: `Sẽ xóa chương mới nhất của "${params.bookTitle}" (${params.bookId}): chương ${params.number} ${params.title}. `
+      + `File chương sẽ chuyển vào chapters/.trash/, chỉ mục và trạng thái truyện quay lại chương ${params.number - 1}. Xác nhận xóa? (y/N) `,
     en: `Delete the latest chapter of "${params.bookTitle}" (${params.bookId}): chapter ${params.number} ${params.title}? `
       + `The chapter file moves to chapters/.trash/ and the index and story state roll back to chapter ${params.number - 1}. (y/N) `,
   });
@@ -493,7 +503,7 @@ export function formatChapterDeleteConfirm(
 
 export function formatChapterDeleteCancelled(language: CliLanguage): string {
   return localize(language, {
-    zh: "已取消。",
+    vi: "Đã hủy.",
     en: "Cancelled.",
   });
 }
@@ -504,23 +514,23 @@ export function formatChapterDeleteDone(
 ): string {
   const trashNote = params.trashedFiles.length > 0
     ? params.trashedFiles.join(", ")
-    : localize(language, { zh: "（章节文件已不存在，未移动）", en: "(chapter file was already gone; nothing moved)" });
+    : localize(language, { vi: "(file chương không còn tồn tại, không di chuyển gì)", en: "(chapter file was already gone; nothing moved)" });
   return localize(language, {
-    zh: `已删除第${params.number}章 ${params.title}：章节文件保留在 ${trashNote}，索引和故事状态已回滚到第${params.rolledBackTo}章。`,
+    vi: `Đã xóa chương ${params.number} ${params.title}: file chương lưu tại ${trashNote}; chỉ mục và trạng thái truyện đã quay lại chương ${params.rolledBackTo}.`,
     en: `Deleted chapter ${params.number} ${params.title}: chapter file kept at ${trashNote}; index and story state rolled back to chapter ${params.rolledBackTo}.`,
   });
 }
 
 export function formatBookBackupCreated(language: CliLanguage, bookId: string, backupId: string): string {
   return localize(language, {
-    zh: `已备份 ${bookId} → .castor/backups/${bookId}/${backupId}/`,
+    vi: `Đã sao lưu ${bookId} → .castor/backups/${bookId}/${backupId}/`,
     en: `Backed up ${bookId} → .castor/backups/${bookId}/${backupId}/`,
   });
 }
 
 export function formatBookBackupListEmpty(language: CliLanguage, bookId: string): string {
   return localize(language, {
-    zh: `${bookId} 还没有备份。用 castor book backup ${bookId} 创建一份。`,
+    vi: `${bookId} chưa có bản sao lưu nào. Tạo bằng: castor book backup ${bookId}`,
     en: `No backups for ${bookId} yet. Create one with: castor book backup ${bookId}`,
   });
 }
@@ -531,15 +541,15 @@ export function formatBookRestoreDone(
 ): string {
   const preNote = params.preRestoreBackupId
     ? localize(language, {
-        zh: `恢复前的状态已自动备份为 ${params.preRestoreBackupId}。`,
+        vi: `Trạng thái trước khi khôi phục đã được tự động sao lưu thành ${params.preRestoreBackupId}.`,
         en: `The pre-restore state was automatically backed up as ${params.preRestoreBackupId}.`,
       })
     : localize(language, {
-        zh: "书目录当时不存在，未创建恢复前备份。",
+        vi: "Thư mục sách khi đó chưa tồn tại nên không tạo bản sao lưu trước khôi phục.",
         en: "The book directory did not exist, so no pre-restore backup was created.",
       });
   return localize(language, {
-    zh: `已把 ${params.bookId} 恢复到备份 ${params.backupId}。${preNote}`,
+    vi: `Đã khôi phục ${params.bookId} về bản sao lưu ${params.backupId}. ${preNote}`,
     en: `Restored ${params.bookId} to backup ${params.backupId}. ${preNote}`,
   });
 }

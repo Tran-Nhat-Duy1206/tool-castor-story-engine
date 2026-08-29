@@ -91,7 +91,7 @@ function buildProjectEnvTemplate(globalConfigured: boolean): string {
     return [
       "# Project-level LLM overrides (optional)",
       "# Global config at ~/.castor/.env will be used by default.",
-      "# Switch Studio to 'Use Studio config' (使用 Studio 配置) if you want per-project service settings.",
+      "# Switch Studio to 'Use Studio config' (dùng cấu hình Studio) if you want per-project service settings.",
       "# Uncomment below to override for this project only:",
       "# CASTOR_LLM_PROVIDER=openai",
       "# CASTOR_LLM_BASE_URL=",

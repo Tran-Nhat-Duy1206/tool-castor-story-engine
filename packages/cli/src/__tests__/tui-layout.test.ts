@@ -9,21 +9,21 @@ afterEach(() => {
 describe("tui layout", () => {
   it("renders a codex-like single-column workspace preview", () => {
     const frame = renderTuiFrame({
-      locale: "zh-CN",
+      locale: "vi-VN",
       projectName: "castor-demo",
       activeBookTitle: undefined,
       automationMode: "semi",
       status: "idle",
     });
 
-    expect(frame).toContain("项目 castor-demo");
-    expect(frame).toContain("阶段 就绪");
-    expect(frame).toContain("模式 半自动");
+    expect(frame).toContain("Dự án castor-demo");
+    expect(frame).toContain("Giai đoạn Sẵn sàng");
+    expect(frame).toContain("Chế độ bán tự động");
     expect(frame).not.toContain("Header");
     expect(frame).not.toContain("Conversation");
     expect(frame).not.toContain("Status");
     expect(frame).not.toContain("Composer");
-    expect(frame).toContain("告诉 Castor");
+    expect(frame).toContain("Nói cho Castor");
   });
 
   it("keeps the two-line status strip above the composer preview", () => {

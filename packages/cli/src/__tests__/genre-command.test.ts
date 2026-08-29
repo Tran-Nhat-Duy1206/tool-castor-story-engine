@@ -12,14 +12,14 @@ describe("genre template scaffold", () => {
     era: true,
   } as const;
 
-  it("defaults to the Chinese template", () => {
+  it("defaults to the Vietnamese template", () => {
     const template = buildGenreTemplate(params);
 
     expect(template).toContain("name: Sci-Fi");
     expect(template).toContain("id: scifi");
-    expect(template).toContain('chapterTypes: ["推进章", "布局章", "过渡章", "回收章"]');
-    expect(template).toContain("## 题材禁忌");
-    expect(template).toContain("## 叙事指导");
+    expect(template).toContain('chapterTypes: ["chương tiến triển", "chương dựng nền", "chương chuyển tiếp", "chương thu hoạch"]');
+    expect(template).toContain("## Cấm kỵ thể loại");
+    expect(template).toContain("## Hướng dẫn tự sự");
     expect(template).toContain("numericalSystem: true");
     expect(template).toContain("powerScaling: false");
     expect(template).toContain("eraResearch: true");
@@ -49,7 +49,7 @@ describe("genre template scaffold", () => {
     };
 
     expect(extractKeys(buildGenreTemplate(params, "en"))).toEqual(
-      extractKeys(buildGenreTemplate(params, "zh")),
+      extractKeys(buildGenreTemplate(params, "vi")),
     );
   });
 });

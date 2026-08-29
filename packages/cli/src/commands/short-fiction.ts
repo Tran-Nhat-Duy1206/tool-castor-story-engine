@@ -33,7 +33,7 @@ export const shortCommand = new Command("short")
 shortCommand
   .command("run")
   .description("Run a short fiction chain from a direction")
-  .requiredOption("--direction <text>", "Story direction, e.g. \"女频短篇 婚姻背叛 证据反杀\" or \"female-lead short: marriage betrayal, evidence payback\"")
+  .requiredOption("--direction <text>", "Story direction, e.g. \"truyện ngắn dẫn nữ chính: phản bội hôn nhân, bằng chứng phản kích\" or \"female-lead short: marriage betrayal, evidence payback\"")
   .option("--reference <path>", "Optional reference notes/text")
   .option("--story-id <id>", "Output story id under shorts/")
   .option("--out-dir <path>", "Output directory", "shorts")

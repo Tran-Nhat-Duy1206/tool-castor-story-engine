@@ -293,18 +293,18 @@ export function intentToBadge(intent: string, locale: TuiLocale = resolveTuiLoca
         edit_truth: " TRUTH ",
       }
     : {
-        write_next: " 写作 ",
-        revise_chapter: " 修订 ",
-        rewrite_chapter: " 重写 ",
-        update_focus: " 焦点 ",
-        explain_status: " 状态 ",
-        explain_failure: " 调试 ",
-        pause_book: " 暂停 ",
-        list_books: " 作品 ",
-        select_book: " 选择 ",
-        rename_entity: " 改名 ",
-        patch_chapter_text: " 修补 ",
-        edit_truth: " 真相 ",
+        write_next: " VIẾT ",
+        revise_chapter: " CHỈNH SỬA ",
+        rewrite_chapter: " VIẾT LẠI ",
+        update_focus: " TRỌNG TÂM ",
+        explain_status: " TRẠNG THÁI ",
+        explain_failure: " DEBUG ",
+        pause_book: " TẠM DỪNG ",
+        list_books: " TÁC PHẨM ",
+        select_book: " CHỌN ",
+        rename_entity: " ĐỔI TÊN ",
+        patch_chapter_text: " VÁ ",
+        edit_truth: " SỰ THẬT ",
       };
   const backgrounds: Record<string, string> = {
     write_next: bgMagenta,
@@ -476,31 +476,31 @@ export function buildStyledHelpSections(locale: TuiLocale = resolveTuiLocale()):
 
   return [
     {
-      title: "写作",
+      title: "Viết",
       commands: [
-        ["/write", "完整跑一轮下一章写作"],
-        ["/rewrite <n>", "从头重写第 N 章"],
+        ["/write", "Chạy trọn vẹn một vòng viết chương tiếp theo"],
+        ["/rewrite <n>", "Viết lại chương N từ đầu"],
       ],
     },
     {
-      title: "导航",
+      title: "Điều hướng",
       commands: [
-        ["/books", "让 agent 列出作品"],
-        ["/status", "查看当前状态"],
+        ["/books", "Yêu cầu agent liệt kê các tác phẩm"],
+        ["/status", "Xem trạng thái hiện tại"],
       ],
     },
     {
-      title: "控制",
+      title: "Điều khiển",
       commands: [
-        ["/focus <text>", "更新当前焦点"],
+        ["/focus <text>", "Cập nhật trọng tâm hiện tại"],
       ],
     },
     {
-      title: "会话",
+      title: "Phiên làm việc",
       commands: [
-        ["/clear", "清空当前屏幕"],
-        ["/help", "显示帮助"],
-        ["/quit", "退出 Castor TUI"],
+        ["/clear", "Xóa màn hình hiện tại"],
+        ["/help", "Hiển thị trợ giúp"],
+        ["/quit", "Thoát Castor TUI"],
       ],
     },
   ];
@@ -515,8 +515,8 @@ function buildHelpFooter(locale: TuiLocale): { readonly title: string; readonly 
   }
 
   return {
-    title: "执行动作请使用 slash 命令：",
-    examples: ['"/write" "/rewrite 3" "/pause" "/rename 林烬 => 张三"'],
+    title: "Dùng slash command để thực hiện hành động:",
+    examples: ['"/write" "/rewrite 3" "/pause" "/rename Linh Vu => Tran Sam"'],
   };
 }
 
@@ -526,13 +526,13 @@ function localizeThemeLabel(label: string, locale: TuiLocale): string {
   }
 
   const labels: Record<string, string> = {
-    thinking: "思考中",
-    writing: "写作中",
-    auditing: "审计中",
-    revising: "修订中",
-    planning: "规划中",
-    composing: "生成中",
-    loading: "加载中",
+    thinking: "Đang suy nghĩ",
+    writing: "Đang viết",
+    auditing: "Đang kiểm tra",
+    revising: "Đang chỉnh sửa",
+    planning: "Đang lên kế hoạch",
+    composing: "Đang tạo",
+    loading: "Đang tải",
   };
   return labels[label] ?? label;
 }

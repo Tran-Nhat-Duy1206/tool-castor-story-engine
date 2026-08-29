@@ -174,7 +174,7 @@ export function resolveTuiAgentRoute(
   if (/^\/confirm$/i.test(input)) {
     const pending = session.pendingProposedAction;
     if (!pending) {
-      return localConfirmationRoute(currentKind, input, language === "en" ? "There is no pending action." : "没有待确认的动作。");
+      return localConfirmationRoute(currentKind, input, language === "en" ? "There is no pending action." : "Không có hành động nào đang chờ xác nhận.");
     }
     const requestedIntent = RequestedIntentSchema.safeParse(pending.action);
     const actionPayload = pending.actionPayload === undefined
@@ -186,7 +186,7 @@ export function resolveTuiAgentRoute(
         input,
         language === "en"
           ? "This pending action is no longer valid. Please propose it again."
-          : "这条待确认动作已失效，请重新提出需求。",
+          : "Hành động chờ xác nhận này đã hết hiệu lực, vui lòng đề xuất lại.",
       );
     }
     return {
@@ -207,8 +207,8 @@ export function resolveTuiAgentRoute(
       currentKind,
       input,
       session.pendingProposedAction
-        ? language === "en" ? "Pending action cancelled." : "已取消待确认动作。"
-        : language === "en" ? "There is no pending action." : "没有待确认的动作。",
+        ? language === "en" ? "Pending action cancelled." : "Đã hủy hành động chờ xác nhận."
+        : language === "en" ? "There is no pending action." : "Không có hành động nào đang chờ xác nhận.",
     );
   }
 
@@ -325,5 +325,5 @@ function extractProposedAction(messages: ReadonlyArray<unknown>): PendingPropose
 function formatProposedAction(action: PendingProposedAction, language: "zh" | "en"): string {
   return language === "en"
     ? [action.title ?? "Confirm action", action.summary ?? "Confirm to continue.", "", action.instruction, "", "Type /confirm to continue, or /cancel to cancel."].join("\n")
-    : [action.title ?? "确认执行", action.summary ?? "确认后继续执行。", "", action.instruction, "", "输入 /confirm 继续，或 /cancel 取消。"].join("\n");
+    : [action.title ?? "Xác nhận thực hiện", action.summary ?? "Xác nhận để tiếp tục thực hiện.", "", action.instruction, "", "Nhập /confirm để tiếp tục, hoặc /cancel để hủy."].join("\n");
 }

@@ -19,7 +19,7 @@ export const reviseCommand = new Command("revise")
   .option("--json", "Output JSON")
   .option("--notify", "Send a notification to configured notify channels when the command finishes")
   .action(async (bookIdArg: string | undefined, chapterStr: string | undefined, opts) => {
-    let notifyLanguage: CliLanguage = "zh";
+    let notifyLanguage: CliLanguage = "vi";
     let notifyBookName: string | undefined;
     try {
       const config = await loadConfig();

@@ -1,27 +1,27 @@
 import type { CliLanguage } from "../localization.js";
 
-const SLASH_COMMAND_VARIANTS: ReadonlyArray<{ zh: string; en: string }> = [
-  { zh: "/new 输入你的想法", en: "/new describe your idea" },
-  { zh: "/short 输入短篇方向", en: "/short describe the short" },
-  { zh: "/play [open|guided] 输入互动世界开局", en: "/play [open|guided] describe the opening" },
-  { zh: "/cover 输入封面方向", en: "/cover describe the cover" },
-  { zh: "/write", en: "/write" },
-  { zh: "/confirm", en: "/confirm" },
-  { zh: "/cancel", en: "/cancel" },
-  { zh: "/model <model>", en: "/model <model>" },
-  { zh: "/help", en: "/help" },
-  { zh: "/status", en: "/status" },
-  { zh: "/clear", en: "/clear" },
-  { zh: "/depth <light|normal|deep>", en: "/depth <light|normal|deep>" },
-  { zh: "/quit", en: "/quit" },
-  { zh: "/exit", en: "/exit" },
+const SLASH_COMMAND_VARIANTS: ReadonlyArray<{ vi: string; en: string }> = [
+  { vi: "/new mô tả ý tưởng của bạn", en: "/new describe your idea" },
+  { vi: "/short mô tả hướng truyện ngắn", en: "/short describe the short" },
+  { vi: "/play [open|guided] mô tả màn mở đầu thế giới tương tác", en: "/play [open|guided] describe the opening" },
+  { vi: "/cover mô tả hướng bìa truyện", en: "/cover describe the cover" },
+  { vi: "/write", en: "/write" },
+  { vi: "/confirm", en: "/confirm" },
+  { vi: "/cancel", en: "/cancel" },
+  { vi: "/model <model>", en: "/model <model>" },
+  { vi: "/help", en: "/help" },
+  { vi: "/status", en: "/status" },
+  { vi: "/clear", en: "/clear" },
+  { vi: "/depth <light|normal|deep>", en: "/depth <light|normal|deep>" },
+  { vi: "/quit", en: "/quit" },
+  { vi: "/exit", en: "/exit" },
 ];
 
-export function buildSlashCommands(language: CliLanguage = "zh"): readonly string[] {
-  return SLASH_COMMAND_VARIANTS.map((variant) => (language === "en" ? variant.en : variant.zh));
+export function buildSlashCommands(language: CliLanguage = "vi"): readonly string[] {
+  return SLASH_COMMAND_VARIANTS.map((variant) => (language === "en" ? variant.en : variant.vi));
 }
 
-export const SLASH_COMMANDS = buildSlashCommands("zh");
+export const SLASH_COMMANDS = buildSlashCommands("vi");
 
 export type SlashNavigationDirection = "up" | "down";
 

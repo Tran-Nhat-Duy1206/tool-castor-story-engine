@@ -37,7 +37,7 @@ describe("tui slash autocomplete", () => {
     const en = buildSlashCommands("en");
 
     expect(zh).toEqual(SLASH_COMMANDS);
-    expect(zh[0]).toBe("/new 输入你的想法");
+    expect(zh[0]).toBe("/new mô tả ý tưởng của bạn");
     expect(en[0]).toBe("/new describe your idea");
     expect(en).toHaveLength(zh.length);
     expect(en.map((c) => c.match(/^\/\S+/)?.[0])).toEqual(zh.map((c) => c.match(/^\/\S+/)?.[0]));

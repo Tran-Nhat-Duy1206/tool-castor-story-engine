@@ -1,7 +1,7 @@
 import type { ChatDepth } from "./chat-depth.js";
 import { castorEnv } from "../utils.js";
 
-export type TuiLocale = "zh-CN" | "en";
+export type TuiLocale = "vi-VN" | "en";
 
 export interface TuiCopy {
   readonly locale: TuiLocale;
@@ -60,74 +60,74 @@ export interface TuiCopy {
   readonly depthLabels: Record<ChatDepth, string>;
 }
 
-const ZH_CN: TuiCopy = {
-  locale: "zh-CN",
+const VI_VN: TuiCopy = {
+  locale: "vi-VN",
   labels: {
-    project: "项目",
-    book: "作品",
-    depth: "深度",
-    session: "会话",
-    messageCount: (count) => `${count} 条消息`,
-    stage: "阶段",
-    mode: "模式",
-    model: "模型",
-    error: "错误",
-    recent: "最近",
-    pending: "待确认",
-    draft: "草稿",
-    ready: "就绪",
-    none: "无",
-    notConfigured: "未配置",
-    unknown: "未知",
+    project: "Dự án",
+    book: "Tác phẩm",
+    depth: "Độ sâu",
+    session: "Phiên",
+    messageCount: (count) => `${count} tin nhắn`,
+    stage: "Giai đoạn",
+    mode: "Chế độ",
+    model: "Model",
+    error: "Lỗi",
+    recent: "Gần đây",
+    pending: "Chờ xác nhận",
+    draft: "Bản nháp",
+    ready: "Sẵn sàng",
+    none: "Không",
+    notConfigured: "chưa cấu hình",
+    unknown: "không rõ",
   },
   modeLabels: {
-    auto: "自动",
-    semi: "半自动",
-    manual: "手动",
+    auto: "tự động",
+    semi: "bán tự động",
+    manual: "thủ công",
   },
   composer: {
-    placeholder: "告诉 Castor 要写什么、修改什么，或解释什么…",
-    emptyConversation: "先告诉 Castor 你要做什么。",
-    helper: "回车发送 • /new • /short • /play • /cover • /write • /confirm • /model • /depth • /help",
-    submitting: "处理中…",
-    failed: "上次请求失败",
-    ready: "就绪",
+    placeholder: "Nói cho Castor biết cần viết gì, sửa gì hoặc giải thích gì…",
+    emptyConversation: "Hãy bắt đầu bằng việc nói cho Castor biết bạn muốn làm gì.",
+    helper: "Enter để gửi • /new • /short • /play • /cover • /write • /confirm • /model • /depth • /help",
+    submitting: "Đang xử lý…",
+    failed: "Lần yêu cầu trước thất bại",
+    ready: "Sẵn sàng",
   },
   notes: {
-    help: "可用命令：/new（建书）、/short（短篇）、/play（互动世界）、/cover（封面）、/write（写下一章）、/confirm、/cancel、/model [模型名]、/status、/clear、/depth、/quit。其他讨论和创作要求直接使用自然语言。",
-    status: (stage, mode) => `当前状态：${stage}（${mode}）。`,
-    config: "当前 Ink 仪表盘里还不支持交互式 /config。请使用 castor config set-global。",
-    depthSet: (depthLabel) => `思考深度已切换为 ${depthLabel}。`,
-    modelCurrent: (modelLabel) => `当前模型：${modelLabel}。`,
-    modelSet: (model) => `当前 TUI 会话模型已切换为 ${model}。`,
-    newBookGuide: "开始构思新书。直接描述你的想法——题材、世界观、主角、核心冲突都可以。AI 会逐步引导，信息足够时会直接调用建书能力。",
-    noLlmConfig: "未发现 LLM 配置。",
-    setupProvider: "先配置 API 提供方。",
+    help: "Lệnh khả dụng: /new (tạo sách), /short (truyện ngắn), /play (thế giới tương tác), /cover (bìa), /write (viết chương kế), /confirm, /cancel, /model [tên model], /status, /clear, /depth, /quit. Các yêu cầu thảo luận và sáng tạo khác dùng ngôn ngữ tự nhiên.",
+    status: (stage, mode) => `Trạng thái hiện tại: ${stage} (${mode}).`,
+    config: "Bảng điều khiển Ink chưa hỗ trợ /config tương tác. Hãy dùng castor config set-global.",
+    depthSet: (depthLabel) => `Đã đổi độ sâu suy luận thành ${depthLabel}.`,
+    modelCurrent: (modelLabel) => `Model hiện tại: ${modelLabel}.`,
+    modelSet: (model) => `Model của phiên TUI hiện tại đã đổi thành ${model}.`,
+    newBookGuide: "Bắt đầu phác thảo sách mới. Hãy mô tả ý tưởng của bạn — thể loại, thế giới quan, nhân vật chính, xung đột cốt lõi đều được. AI sẽ hướng dẫn từng bước và tự gọi năng lực tạo sách khi thông tin đã đủ.",
+    noLlmConfig: "Chưa tìm thấy cấu hình LLM.",
+    setupProvider: "Hãy cấu hình nhà cung cấp API trước.",
   },
   roles: {
-    user: "你",
+    user: "Bạn",
     assistant: "Castor",
-    system: "系统",
+    system: "Hệ thống",
   },
   activity: {
-    thinking: "思考中",
-    checking: "检查中",
-    writing: "写作中",
-    reviewing: "审阅中",
-    updating: "更新中",
+    thinking: "đang suy nghĩ",
+    checking: "đang kiểm tra",
+    writing: "đang viết",
+    reviewing: "đang duyệt",
+    updating: "đang cập nhật",
   },
   stageLabels: {
-    completed: "已完成",
-    failed: "失败",
-    blocked: "已阻塞",
-    waitingHuman: "等待你的决定",
-    pausedByUser: "已由用户暂停",
-    readyToContinue: "可继续执行",
+    completed: "hoàn thành",
+    failed: "thất bại",
+    blocked: "bị chặn",
+    waitingHuman: "chờ bạn quyết định",
+    pausedByUser: "bị tạm dừng bởi người dùng",
+    readyToContinue: "có thể tiếp tục",
   },
   depthLabels: {
-    light: "轻量",
-    normal: "标准",
-    deep: "深入",
+    light: "nhẹ",
+    normal: "tiêu chuẩn",
+    deep: "sâu",
   },
 };
 
@@ -217,11 +217,11 @@ export function resolveTuiLocale(
   }
 
   const detected = normalizeLocale(env.LC_ALL ?? env.LC_MESSAGES ?? env.LANG);
-  return detected ?? "zh-CN";
+  return detected ?? "vi-VN";
 }
 
 export function getTuiCopy(locale: TuiLocale): TuiCopy {
-  return locale === "en" ? EN : ZH_CN;
+  return locale === "en" ? EN : VI_VN;
 }
 
 export function normalizeStageLabel(label: string, copy: TuiCopy): string {
@@ -273,8 +273,9 @@ function normalizeLocale(value: string | undefined): TuiLocale | undefined {
     return undefined;
   }
 
-  if (normalized.startsWith("zh")) {
-    return "zh-CN";
+  // Legacy product locale "zh" falls back to the Vietnamese default (spec §21.5).
+  if (normalized.startsWith("vi")) {
+    return "vi-VN";
   }
 
   if (normalized.startsWith("en")) {

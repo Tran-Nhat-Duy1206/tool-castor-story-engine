@@ -113,7 +113,7 @@ describe("inkos chapter sync", () => {
 
     expect(logErrorMock).not.toHaveBeenCalled();
     const printed = logMock.mock.calls.map((call) => call[0] as string).join("\n");
-    expect(printed).toContain("无需修正");
+    expect(printed).toContain("Đã đối chiếu 1 chương");
   });
 });
 

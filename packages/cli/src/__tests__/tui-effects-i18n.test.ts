@@ -4,26 +4,26 @@ import { buildStyledHelpSections, formatStyledStatusLines, intentToBadge } from 
 
 describe("tui effects i18n", () => {
   it("builds localized help sections", () => {
-    const zhSections = buildStyledHelpSections("zh-CN");
+    const viSections = buildStyledHelpSections("vi-VN");
     const enSections = buildStyledHelpSections("en");
 
-    expect(zhSections[0]?.title).toBe("写作");
-    expect(zhSections[1]?.commands[0]?.[1]).toContain("列出");
+    expect(viSections[0]?.title).toBe("Viết");
+    expect(viSections[1]?.commands[0]?.[1]).toContain("liệt kê");
     expect(enSections[0]?.title).toBe("Writing");
   });
 
   it("localizes intent badges and status labels", () => {
-    expect(stripAnsi(intentToBadge("write_next", "zh-CN"))).toContain("写作");
+    expect(stripAnsi(intentToBadge("write_next", "vi-VN"))).toContain("VIẾT");
 
-    const zhLines = formatStyledStatusLines("zh-CN", {
+    const viLines = formatStyledStatusLines("vi-VN", {
       mode: "semi",
       bookId: "harbor",
       status: "writing",
       events: [{ kind: "task.started", detail: "Preparing chapter 3.", status: "running" }],
     });
 
-    expect(zhLines.join("\n")).toContain("模式");
-    expect(zhLines.join("\n")).toContain("半自动");
-    expect(zhLines.join("\n")).toContain("作品");
+    expect(viLines.join("\n")).toContain("Chế độ");
+    expect(viLines.join("\n")).toContain("bán tự động");
+    expect(viLines.join("\n")).toContain("Tác phẩm");
   });
 });

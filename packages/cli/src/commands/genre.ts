@@ -13,7 +13,7 @@ export function buildGenreTemplate(
     readonly power: boolean;
     readonly era: boolean;
   },
-  language: CliLanguage = "zh",
+  language: CliLanguage = "vi",
 ): string {
   if (language === "en") {
     return `---
@@ -42,23 +42,23 @@ auditDimensions: [1,2,3,6,7,8,9,10,13,14,15,16,17,18,19]
   return `---
 name: ${params.name}
 id: ${params.id}
-chapterTypes: ["推进章", "布局章", "过渡章", "回收章"]
-fatigueWords: ["震惊", "不可思议", "难以置信"]
+chapterTypes: ["chương tiến triển", "chương dựng nền", "chương chuyển tiếp", "chương thu hoạch"]
+fatigueWords: ["chấn động", "không thể tin nổi", "khó tin"]
 numericalSystem: ${params.numerical}
 powerScaling: ${params.power}
 eraResearch: ${params.era}
-pacingRule: "每2-3章有一个明确的进展或反馈"
-satisfactionTypes: ["目标达成", "困难克服", "真相揭示"]
+pacingRule: "Mỗi 2-3 chương có một bước tiến triển hoặc thu hoạch rõ ràng"
+satisfactionTypes: ["mục tiêu đạt được", "vượt qua khó khăn", "sự thật được hé lộ"]
 auditDimensions: [1,2,3,6,7,8,9,10,13,14,15,16,17,18,19]
 ---
 
-## 题材禁忌
+## Cấm kỵ thể loại
 
-- (根据题材添加禁忌)
+- (thêm các cấm kỵ cho thể loại này)
 
-## 叙事指导
+## Hướng dẫn tự sự
 
-(根据题材描述叙事重心和风格要求)
+(mô tả trọng tâm tự sự và yêu cầu phong cách cho thể loại này)
 `;
 }
 
@@ -132,7 +132,7 @@ genreCommand
   .option("--numerical", "Enable numerical system", false)
   .option("--power", "Enable power scaling", false)
   .option("--era", "Enable era research", false)
-  .option("--lang <language>", "Template language: zh or en (defaults to CASTOR_LOCALE/LANG, then zh)")
+  .option("--lang <language>", "Template language: vi or en (defaults to CASTOR_LOCALE/LANG, then vi)")
   .action(async (id: string, opts) => {
     try {
       const root = findProjectRoot();

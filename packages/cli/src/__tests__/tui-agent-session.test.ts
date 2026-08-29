@@ -264,7 +264,7 @@ describe("tui agent session bridge", () => {
       input: "把这个故事做成互动影游",
       session: createProjectSession(projectRoot),
     });
-    expect(proposed.responseText).toContain("输入 /confirm");
+    expect(proposed.responseText).toContain("Nhập /confirm");
     expect(proposed.session.pendingProposedAction).toEqual(expect.objectContaining({
       action: "interactive_film_create",
       targetSessionKind: "interactive-film",
