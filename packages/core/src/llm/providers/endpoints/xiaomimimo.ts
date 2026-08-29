@@ -7,9 +7,9 @@
  *
  * MiMo 是小米自研模型系列，除小米官方 /v1 外，也在 PPIO / 百炼等第三方平台开放。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const XIAOMI_MIMO: InkosEndpoint = {
+export const XIAOMI_MIMO: ProviderEndpoint = {
   id: "xiaomimimo",
   label: "小米 MiMo",
   group: "china",

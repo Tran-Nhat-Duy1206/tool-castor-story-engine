@@ -264,7 +264,7 @@ describe("public short-fiction chain", () => {
     const root = await mkdtemp(join(tmpdir(), "inkos-cover-tool-"));
     const originalFetch = globalThis.fetch;
     const controller = new AbortController();
-    process.env.INKOS_TEST_COVER_KEY = "sk-cover";
+    process.env.CASTOR_TEST_COVER_KEY = "sk-cover";
     try {
       const fetchMock = vi.fn(async (_url: unknown, _init?: { readonly body?: unknown }) => new Response(JSON.stringify({
         data: [{ b64_json: "ZmFrZQ==" }],
@@ -280,7 +280,7 @@ describe("public short-fiction chain", () => {
         outputDir: "covers/demo",
         coverEndpoint: "https://images.example.test/v1/images/generations",
         coverModel: "gpt-image-2",
-        coverApiKeyEnv: "INKOS_TEST_COVER_KEY",
+        coverApiKeyEnv: "CASTOR_TEST_COVER_KEY",
         signal: controller.signal,
       });
 
@@ -305,7 +305,7 @@ describe("public short-fiction chain", () => {
       expect(body).not.toContain("固定模板");
     } finally {
       globalThis.fetch = originalFetch;
-      delete process.env.INKOS_TEST_COVER_KEY;
+      delete process.env.CASTOR_TEST_COVER_KEY;
       await rm(root, { recursive: true, force: true });
     }
   });

@@ -34,6 +34,19 @@ export const PATH_ALLOWLIST = [
   { bucket: "HISTORICAL-PROVENANCE", pattern: /^docs\/(ARCHITECTURE_AUDIT|IMPLEMENTATION_PLAN|V1_SPEC|PROJECT_VISION)\.md$/ },
   { bucket: "LEGACY-COMPAT", pattern: /^test-project\// },
   { bucket: "HISTORICAL-PROVENANCE", pattern: /^\.gate0-|^\.smoke-|^\.studio-/ },
+  // Explicit legacy-compatibility adapter modules: these OWN the legacy
+  // names/files/keys they migrate and cannot describe them without naming
+  // them (plan Task 1.2 allowlist: "explicit legacy migration modules").
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/utils\/llm-env\.ts$/ },
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/config\/product-identity\.ts$/ },
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/config\/project-config-file\.ts$/ },
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/config\/runtime-dir\.ts$/ },
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/cli\/src\/book-backup\.ts$/ },
+  { bucket: "LEGACY-COMPAT", pattern: /^scripts\/audit-castor-identity\.mjs$/ },
+  // Must keep ignoring legacy-named runtime artifacts created by older versions.
+  { bucket: "LEGACY-COMPAT", pattern: /^\.gitignore$/ },
+  // E2E seeder for the legacy test-project fixture (reads legacy .inkos data).
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/studio\/e2e\/fixtures\// },
 ];
 
 /** Attribution-line exception (spec §2): the derived-project notice itself. */
@@ -109,7 +122,7 @@ export function runAudit({ root, files, read }) {
       continue; // binary or unreadable — filename check below still applies
     }
     summary.scanned += 1;
-    if (isLegacyFilename(relPosix)) summary.legacyFilenames.push(relPosix);
+    if (isLegacyFilename(relPosix) && !classifyPath(relPosix).allowed) summary.legacyFilenames.push(relPosix);
     const result = scanContent(relPosix, content);
     summary.allowedOccurrences += result.allowedCount;
     summary.attributionLines += result.attributionLines;

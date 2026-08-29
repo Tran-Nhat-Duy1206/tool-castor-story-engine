@@ -7,9 +7,9 @@
  * - API 文档：https://docs.bigmodel.cn/cn/api/normal-model/glm-4
  * - 模型列表：https://open.bigmodel.cn/dev/howuse/model
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const ZHIPU: InkosEndpoint = {
+export const ZHIPU: ProviderEndpoint = {
   id: "zhipu",
   label: "智谱 GLM",
   group: "china",

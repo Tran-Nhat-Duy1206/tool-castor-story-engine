@@ -4,9 +4,9 @@
  * - 官网：https://longcat.chat/
  * - API 文档：https://longcat.chat/platform/docs
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const LONGCAT: InkosEndpoint = {
+export const LONGCAT: ProviderEndpoint = {
   id: "longcat",
   label: "美团 LongCat",
   group: "china",

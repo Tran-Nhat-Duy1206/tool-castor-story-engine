@@ -9,11 +9,11 @@
  *
  * 讯飞星辰 MaaS 针对编程场景的订阅套餐。订阅包里的底层模型由用户在控制台切换，
  * 对外统一 id 是 astron-code-latest（无需根据底层模型改配置）。
- * inkos 走 Anthropic 协议接入（和 Claude Code 一致），agent 场景工具调用更稳。
+ * castor 走 Anthropic 协议接入（和 Claude Code 一致），agent 场景工具调用更稳。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const ASTRON_CODING_PLAN: InkosEndpoint = {
+export const ASTRON_CODING_PLAN: ProviderEndpoint = {
   id: "astronCodingPlan",
   label: "讯飞星辰 Astron Coding Plan",
   group: "codingPlan",

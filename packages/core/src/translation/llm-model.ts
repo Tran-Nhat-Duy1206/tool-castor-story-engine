@@ -17,7 +17,7 @@ export function createLLMTranslationModel(input: {
         {
           role: "system",
           content: [
-            "You are InkOS Translation Agent.",
+            "You are Castor Translation Agent.",
             "Translate faithfully between the requested languages.",
             "Preserve paragraph order, scene meaning, names, tone, and terminology.",
             "Do not summarize. Do not add commentary outside JSON.",
@@ -49,7 +49,7 @@ export function createLLMTranslationModel(input: {
         {
           role: "system",
           content: [
-            "You are InkOS Translation Review Agent.",
+            "You are Castor Translation Review Agent.",
             "Check fidelity, omissions, terminology, pronouns, names, and target-language readability.",
             "Return JSON only: {\"passed\":true,\"summary\":\"...\",\"issues\":[\"...\"]}.",
           ].join("\n"),

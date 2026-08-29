@@ -10,9 +10,9 @@
  * 聚合所有主流家 (Anthropic / OpenAI / Google / xAI / Meta 等) 的统一入口。
  * 350+ 模型，bank 只列最常用的；完整清单用户侧 live /models probe。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const OPENROUTER: InkosEndpoint = {
+export const OPENROUTER: ProviderEndpoint = {
   id: "openrouter",
   label: "OpenRouter",
   group: "aggregator",

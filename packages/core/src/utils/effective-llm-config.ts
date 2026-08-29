@@ -104,7 +104,7 @@ export async function resolveEffectiveLLMConfig(
     throw new Error(
       configMode === "studio-project"
         ? "Studio LLM API key not set. Open Studio services and save an API key for the selected service."
-        : "CASTOR_LLM_API_KEY not set. Run 'inkos config set-global' or add it to project .env file.",
+        : "CASTOR_LLM_API_KEY not set. Run 'castor config set-global' or add it to project .env file.",
     );
   }
 

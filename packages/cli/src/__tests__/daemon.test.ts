@@ -84,7 +84,7 @@ describe("daemon command", () => {
       upCommand.parseAsync(["node", "up", "--quiet"]),
     ).rejects.toMatchObject({ code: 1 });
 
-    const pidPath = join("/project", "inkos.pid");
+    const pidPath = join("/project", "castor.pid");
     expect(writeFileMock).toHaveBeenCalledWith(pidPath, expect.any(String), "utf-8");
     expect(unlinkMock).toHaveBeenCalledWith(pidPath);
 

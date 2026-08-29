@@ -35,12 +35,12 @@ describe("fill_node tool (stubbed LLM)", () => {
 
   it("fills a node from stubbed LLM text and persists it", async () => {
     const tool = createFillNodeTool(root, "p", filmDeps({
-      skillIds: () => ["inkos-interactive-film"],
+      skillIds: () => ["castor-interactive-film"],
     }));
     const result = await tool.execute("call-1", { nodeId: "n1", instruction: "写抉择场景" } as never);
     const g = await loadStoryGraph(root, "p");
     expect(g?.nodes.find(n => n.id === "n1")?.dialogue?.[0].speaker).toBe("阿梅");
-    expect(result.details).toMatchObject({ skillIds: ["inkos-interactive-film"] });
+    expect(result.details).toMatchObject({ skillIds: ["castor-interactive-film"] });
   });
 
   it("loads interactive-film script prompt-pack overrides and reports skill details", async () => {

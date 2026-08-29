@@ -397,7 +397,7 @@ describe("agent play tools", () => {
     const pipeline = pipelineStub();
     const playSkill = {
       skill: {
-        id: "inkos-play-world",
+        id: "castor-play-world",
         name: "Interactive world play",
         description: "Play method.",
         body: "Advance one adjacent dramatic beat.",
@@ -418,7 +418,7 @@ describe("agent play tools", () => {
     );
     expect(result.details).toMatchObject({
       kind: "play_turn_advanced",
-      skillIds: ["inkos-play-world"],
+      skillIds: ["castor-play-world"],
     });
   });
 

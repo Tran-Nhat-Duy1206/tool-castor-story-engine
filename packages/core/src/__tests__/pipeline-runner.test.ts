@@ -1413,7 +1413,7 @@ describe("PipelineRunner", () => {
         kind: "long-fiction",
         status: "needs-review",
         stage: "chapter-1",
-        skillIds: ["inkos-long-writing"],
+        skillIds: ["castor-long-writing"],
       });
       expect(run.artifacts).toEqual(expect.arrayContaining([
         expect.stringMatching(/^chapters\/0001_/),

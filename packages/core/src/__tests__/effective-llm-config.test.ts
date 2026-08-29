@@ -57,7 +57,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.diagnostics.warnings.join("\n")).toContain("旧顶层");
   });
 
-  it("CLI consumer 允许 INKOS_LLM_SERVICE 切换服务，并从 provider bank 推导 baseUrl", async () => {
+  it("CLI consumer 允许 CASTOR_LLM_SERVICE 切换服务，并从 provider bank 推导 baseUrl", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -75,8 +75,8 @@ describe("resolveEffectiveLLMConfig", () => {
       envLayers: {
         global: {},
         project: {
-          INKOS_LLM_SERVICE: "moonshot",
-          INKOS_LLM_MODEL: "kimi-k2.5",
+          CASTOR_LLM_SERVICE: "moonshot",
+          CASTOR_LLM_MODEL: "kimi-k2.5",
         },
         process: {},
       },
@@ -90,7 +90,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.diagnostics.modelSource).toBe("env");
   });
 
-  it("CLI consumer 兼容旧 env：没有 INKOS_LLM_SERVICE 时从 baseUrl 反推 service", async () => {
+  it("CLI consumer 兼容旧 env：没有 CASTOR_LLM_SERVICE 时从 baseUrl 反推 service", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -104,10 +104,10 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {
-          INKOS_LLM_PROVIDER: "custom",
-          INKOS_LLM_BASE_URL: "https://api.moonshot.cn/v1",
-          INKOS_LLM_MODEL: "kimi-k2.5",
-          INKOS_LLM_API_KEY: "sk-env-moon",
+          CASTOR_LLM_PROVIDER: "custom",
+          CASTOR_LLM_BASE_URL: "https://api.moonshot.cn/v1",
+          CASTOR_LLM_MODEL: "kimi-k2.5",
+          CASTOR_LLM_API_KEY: "sk-env-moon",
         },
         project: {},
         process: {},
@@ -135,19 +135,19 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {
-          INKOS_LLM_SERVICE: "moonshot",
-          INKOS_LLM_MODEL: "kimi-k2.5",
-          INKOS_LLM_API_KEY: "sk-global-moon",
+          CASTOR_LLM_SERVICE: "moonshot",
+          CASTOR_LLM_MODEL: "kimi-k2.5",
+          CASTOR_LLM_API_KEY: "sk-global-moon",
         },
         project: {
-          INKOS_LLM_SERVICE: "deepseek",
-          INKOS_LLM_MODEL: "deepseek-chat",
-          INKOS_LLM_API_KEY: "sk-project-deepseek",
+          CASTOR_LLM_SERVICE: "deepseek",
+          CASTOR_LLM_MODEL: "deepseek-chat",
+          CASTOR_LLM_API_KEY: "sk-project-deepseek",
         },
         process: {
-          INKOS_LLM_SERVICE: "zhipu",
-          INKOS_LLM_MODEL: "glm-4-flash",
-          INKOS_LLM_API_KEY: "sk-process-zhipu",
+          CASTOR_LLM_SERVICE: "zhipu",
+          CASTOR_LLM_MODEL: "glm-4-flash",
+          CASTOR_LLM_API_KEY: "sk-process-zhipu",
         },
       },
       requireApiKey: true,
@@ -175,10 +175,10 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {
-          INKOS_LLM_PROVIDER: "custom",
-          INKOS_LLM_BASE_URL: "https://api.example.com/v1",
-          INKOS_LLM_MODEL: "legacy-model",
-          INKOS_LLM_API_KEY: "sk-env",
+          CASTOR_LLM_PROVIDER: "custom",
+          CASTOR_LLM_BASE_URL: "https://api.example.com/v1",
+          CASTOR_LLM_MODEL: "legacy-model",
+          CASTOR_LLM_API_KEY: "sk-env",
         },
         project: {},
         process: {},
@@ -206,10 +206,10 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {
-          INKOS_LLM_PROVIDER: "custom",
-          INKOS_LLM_BASE_URL: "https://api.moonshot.cn/v1",
-          INKOS_LLM_MODEL: "kimi-k2.5",
-          INKOS_LLM_API_KEY: "sk-moon",
+          CASTOR_LLM_PROVIDER: "custom",
+          CASTOR_LLM_BASE_URL: "https://api.moonshot.cn/v1",
+          CASTOR_LLM_MODEL: "kimi-k2.5",
+          CASTOR_LLM_API_KEY: "sk-moon",
         },
         project: {},
         process: {
@@ -245,12 +245,12 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {
-          INKOS_LLM_PROVIDER: "openai",
-          INKOS_LLM_BASE_URL: "https://api.example.com/v1",
-          INKOS_LLM_MODEL: "legacy-model",
-          INKOS_LLM_API_KEY: "sk-env",
-          INKOS_LLM_API_FORMAT: "chat",
-          INKOS_LLM_STREAM: "true",
+          CASTOR_LLM_PROVIDER: "openai",
+          CASTOR_LLM_BASE_URL: "https://api.example.com/v1",
+          CASTOR_LLM_MODEL: "legacy-model",
+          CASTOR_LLM_API_KEY: "sk-env",
+          CASTOR_LLM_API_FORMAT: "chat",
+          CASTOR_LLM_STREAM: "true",
         },
         project: {},
         process: {},
@@ -266,7 +266,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.stream).toBe(false);
   });
 
-  it("保留旧 INKOS_LLM_EXTRA_* 和 INKOS_DEFAULT_LANGUAGE 行为", async () => {
+  it("保留旧 CASTOR_LLM_EXTRA_* 和 CASTOR_DEFAULT_LANGUAGE 行为", async () => {
     await writeProject({
       configSource: "env",
       provider: "openai",
@@ -280,9 +280,9 @@ describe("resolveEffectiveLLMConfig", () => {
       envLayers: {
         global: {},
         project: {
-          INKOS_LLM_API_KEY: "sk-env",
-          INKOS_LLM_EXTRA_top_p: "0.9",
-          INKOS_DEFAULT_LANGUAGE: "en",
+          CASTOR_LLM_API_KEY: "sk-env",
+          CASTOR_LLM_EXTRA_top_p: "0.9",
+          CASTOR_DEFAULT_LANGUAGE: "en",
         },
         process: {},
       },
@@ -306,7 +306,7 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {},
-        project: { INKOS_LLM_SERVICE: "google", INKOS_LLM_MODEL: "gemini-2.5-pro" },
+        project: { CASTOR_LLM_SERVICE: "google", CASTOR_LLM_MODEL: "gemini-2.5-pro" },
         process: {},
       },
       cli: { service: "zhipu", model: "glm-4-flash" },
@@ -333,10 +333,10 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {
-          INKOS_LLM_PROVIDER: "custom",
-          INKOS_LLM_BASE_URL: "https://api.moonshot.cn/v1",
-          INKOS_LLM_MODEL: "kimi-k2.5",
-          INKOS_LLM_API_KEY: "sk-env-moon",
+          CASTOR_LLM_PROVIDER: "custom",
+          CASTOR_LLM_BASE_URL: "https://api.moonshot.cn/v1",
+          CASTOR_LLM_MODEL: "kimi-k2.5",
+          CASTOR_LLM_API_KEY: "sk-env-moon",
         },
         project: {},
         process: {},
@@ -368,7 +368,7 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {},
-        project: { INKOS_LLM_MODEL: "kimi-k2.5" },
+        project: { CASTOR_LLM_MODEL: "kimi-k2.5" },
         process: {},
       },
     })).rejects.toThrow(/模型.*kimi-k2\.5.*不属于.*google/);
@@ -409,7 +409,7 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {},
-        project: { INKOS_LLM_MODEL: "z-ai/glm-4.7" },
+        project: { CASTOR_LLM_MODEL: "z-ai/glm-4.7" },
         process: {},
       },
     });
@@ -451,10 +451,10 @@ describe("resolveEffectiveLLMConfig", () => {
       projectRoot: root,
       envLayers: {
         global: {
-          INKOS_LLM_SERVICE: "ollama",
-          INKOS_LLM_PROVIDER: "openai",
-          INKOS_LLM_BASE_URL: "http://127.0.0.1:11434/v1",
-          INKOS_LLM_MODEL: "qwen3.6:35b-a3b",
+          CASTOR_LLM_SERVICE: "ollama",
+          CASTOR_LLM_PROVIDER: "openai",
+          CASTOR_LLM_BASE_URL: "http://127.0.0.1:11434/v1",
+          CASTOR_LLM_MODEL: "qwen3.6:35b-a3b",
         },
         project: {},
         process: {},

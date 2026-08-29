@@ -210,7 +210,7 @@ export class StateManager {
           await this.unlinkWithRetry(lockPath);
         } catch (error) {
           if ((error as NodeJS.ErrnoException | undefined)?.code !== "ENOENT") {
-            console.warn(`[inkos] Failed to release book lock ${lockPath}: ${String(error)}`);
+            console.warn(`[castor] Failed to release book lock ${lockPath}: ${String(error)}`);
           }
         }
       };
@@ -337,7 +337,7 @@ export class StateManager {
       if (owner.heartbeatTask) return;
       const task = refresh()
         .catch((error) => {
-          console.warn(`[inkos] Failed to refresh book lock ${lockPath}: ${String(error)}`);
+          console.warn(`[castor] Failed to refresh book lock ${lockPath}: ${String(error)}`);
         })
         .finally(() => {
           if (owner.heartbeatTask === task) owner.heartbeatTask = undefined;

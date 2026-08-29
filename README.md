@@ -81,7 +81,7 @@ pnpm install
 pnpm build
 ```
 
-> 上游 InkOS 的 npm 包（`@actalk/inkos`）与 [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) 仍然属于 Narcooo 的 InkOS 项目；本独立仓库从源码构建使用。历史用户数据、`inkos.json` 配置、`INKOS_*` 环境变量与书籍目录结构保持兼容，`castor` 命令可直接加载既有 InkOS 项目。
+> 上游 InkOS 的 npm 包（`@actalk/inkos`）与 [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) 仍然属于 Narcooo 的 InkOS 项目；本独立仓库从源码构建使用。历史用户数据、`castor.json` 配置、`INKOS_*` 环境变量与书籍目录结构保持兼容，`castor` 命令可直接加载既有 InkOS 项目。
 
 ### 通过 OpenClaw 使用 🦞
 
@@ -102,7 +102,7 @@ Castor 直接使用标准 `SKILL.md` 作为专业能力扩展，不再维护一�
 可用方式：
 
 - 放到标准目录：项目 `skills/`、`.agents/skills/`，或用户目录 `~/.agents/skills/`、`~/.openclaw/skills/`。Studio 也可以导入包含 `SKILL.md` 的完整文件夹和静态参考资料；项目导入统一保存到 `.agents/skills/`。
-- 或设置 `INKOS_SKILL_DIRS=/abs/path/to/skills`，可指向单个 skill 目录，也可指向包含多个 skill 子目录的目录。多个目录按系统分隔符分隔。
+- 或设置 `CASTOR_SKILL_DIRS=/abs/path/to/skills`，可指向单个 skill 目录，也可指向包含多个 skill 子目录的目录。多个目录按系统分隔符分隔。
 - 在 Chat 里用 `@skill-id` 强制本轮使用，例如：`@detective-play 做一个证据链驱动的开放世界`。
 - 不写 `@skill-id` 时，Chat Agent 根据用户当前意图决定是否调用 `use_skill`；不再通过 session 类型、关键词或字符串包含匹配机械启用。
 - 外部 Skill 只提供指令和静态参考资料，Castor 不会自动执行其中的脚本；它也不会绕过现有工具权限与确认闸门。
@@ -130,7 +130,7 @@ Use evidence chains; do not turn clues into generic atmosphere.
 ```bash
 castor init my-novel
 cd my-novel
-inkos
+castor
 ```
 
 打开 Studio 后进入「模型配置」：
@@ -144,11 +144,11 @@ Studio 运行时只使用：
 
 ```text
 provider bank 默认值
-→ inkos.json 里的 services / 当前 service / defaultModel
-→ .inkos/secrets.json 里的 service API Key
+→ castor.json 里的 services / 当前 service / defaultModel
+→ .castor/secrets.json 里的 service API Key
 ```
 
-即使检测到 `~/.inkos/.env` 或项目 `.env`，Studio 也只会展示提示，不会用 env 覆盖 service、model、baseUrl 或 API Key。API Key 存在项目内的 `.inkos/secrets.json`，不会写进 `inkos.json`。
+即使检测到 `~/.castor/.env` 或项目 `.env`，Studio 也只会展示提示，不会用 env 覆盖 service、model、baseUrl 或 API Key。API Key 存在项目内的 `.castor/secrets.json`，不会写进 `castor.json`。
 
 #### 方式二：CLI / daemon / 部署环境的 env 配置
 
@@ -164,34 +164,34 @@ castor config set-global \
   --model <模型名>
 ```
 
-也可以手动写 `~/.inkos/.env` 或项目 `.env`：
+也可以手动写 `~/.castor/.env` 或项目 `.env`：
 
 ```bash
-INKOS_LLM_PROVIDER=custom
-INKOS_LLM_BASE_URL=https://api.moonshot.cn/v1
-INKOS_LLM_API_KEY=sk-...
-INKOS_LLM_MODEL=kimi-k2.5
+CASTOR_LLM_PROVIDER=custom
+CASTOR_LLM_BASE_URL=https://api.moonshot.cn/v1
+CASTOR_LLM_API_KEY=sk-...
+CASTOR_LLM_MODEL=kimi-k2.5
 
 # 可选
-INKOS_LLM_SERVICE=moonshot                         # 推荐写；不写时会尽量从 baseUrl 自动识别
-INKOS_LLM_TEMPERATURE=0.7
-INKOS_LLM_THINKING_BUDGET=0
-INKOS_DEFAULT_LANGUAGE=zh
-INKOS_LLM_EXTRA_top_p=0.9
+CASTOR_LLM_SERVICE=moonshot                         # 推荐写；不写时会尽量从 baseUrl 自动识别
+CASTOR_LLM_TEMPERATURE=0.7
+CASTOR_LLM_THINKING_BUDGET=0
+CASTOR_DEFAULT_LANGUAGE=zh
+CASTOR_LLM_EXTRA_top_p=0.9
 ```
 
 CLI 合成顺序：
 
 ```text
 Studio/project service 配置
-→ .inkos/secrets.json service key
-→ global ~/.inkos/.env
+→ .castor/secrets.json service key
+→ global ~/.castor/.env
 → project .env
 → 当前进程环境变量
 → CLI 参数
 ```
 
-也就是说，CLI 默认可以复用 Studio 配好的服务和密钥；如果 env 里声明了 `INKOS_LLM_SERVICE`、`INKOS_LLM_MODEL`、`INKOS_LLM_BASE_URL` 或 `INKOS_LLM_API_KEY`，则作为覆盖层生效。旧 env 只写 `baseUrl + model + apiKey` 也能继续用，Castor 会尽量从 baseUrl 反推 service。
+也就是说，CLI 默认可以复用 Studio 配好的服务和密钥；如果 env 里声明了 `CASTOR_LLM_SERVICE`、`CASTOR_LLM_MODEL`、`CASTOR_LLM_BASE_URL` 或 `CASTOR_LLM_API_KEY`，则作为覆盖层生效。旧 env 只写 `baseUrl + model + apiKey` 也能继续用，Castor 会尽量从 baseUrl 反推 service。
 
 一次性指定服务或模型：
 
@@ -237,12 +237,12 @@ castor doctor
 
 ### LLM 配置更新
 
-- **Studio / CLI 配置隔离**：Studio 固定使用服务页配置和 `.inkos/secrets.json`；CLI、daemon、部署环境支持 env 覆盖和一次性命令参数。
+- **Studio / CLI 配置隔离**：Studio 固定使用服务页配置和 `.castor/secrets.json`；CLI、daemon、部署环境支持 env 覆盖和一次性命令参数。
 - **Provider bank 能力表**：内置 Google Gemini、Moonshot、MiniMax、智谱、百炼、DeepSeek、硅基流动、火山、腾讯混元、文心、讯飞星火、OpenRouter、kkaiapi、Ollama、CodingPlan 等服务的 baseUrl、协议、模型和兼容策略。
 - **模型归属校验**：`--service google --model kimi-k2.5` 这类错配会直接报错，避免把请求发到错误服务商。
 - **Google Gemini 兼容修复**：AI Studio API Key 可直接用于 Gemini OpenAI-compatible endpoint，Castor 会自动禁用 Google 不支持的 OpenAI `store` 参数。
 - **MiniMax transport 探测**：MiniMax / MiniMax CodingPlan 使用官方 OpenAI-compatible `/v1` 入口，并自动使用可工作的非流式 transport，规避流式 usage 正常但正文为空的问题。
-- **旧 env 兼容**：老的 `INKOS_LLM_BASE_URL + INKOS_LLM_MODEL + INKOS_LLM_API_KEY` 仍可用于 CLI；没有 `INKOS_LLM_SERVICE` 时会尝试从 baseUrl 反推服务商。
+- **旧 env 兼容**：老的 `CASTOR_LLM_BASE_URL + CASTOR_LLM_MODEL + CASTOR_LLM_API_KEY` 仍可用于 CLI；没有 `CASTOR_LLM_SERVICE` 时会尝试从 baseUrl 反推服务商。
 
 ### 当前交互入口
 
@@ -374,11 +374,11 @@ castor compose chapter 吞天魔帝
 
 ### 守护进程 + 通知推送
 
-`castor up` 启动后台循环自动写章。管线会自动推进可处理的非关键问题；需要人工判断的问题会暂停并留下可审结果。通知推送支持 Telegram、飞书、企业微信、Webhook（HMAC-SHA256 签名 + 事件过滤）。日志写入 `inkos.log`（JSON Lines），`-q` 静默模式。
+`castor up` 启动后台循环自动写章。管线会自动推进可处理的非关键问题；需要人工判断的问题会暂停并留下可审结果。通知推送支持 Telegram、飞书、企业微信、Webhook（HMAC-SHA256 签名 + 事件过滤）。日志写入 `castor.log`（JSON Lines），`-q` 静默模式。
 
 ### 本地模型兼容
 
-支持任何 OpenAI 兼容接口（Studio 里新增自定义服务，或 CLI 使用 `--provider custom` / `INKOS_LLM_PROVIDER=custom`）。服务测试会尝试不同协议和流式开关组合，并保存或提示可用 transport。Fallback 解析器处理小模型不规范输出，流中断时自动恢复部分内容。
+支持任何 OpenAI 兼容接口（Studio 里新增自定义服务，或 CLI 使用 `--provider custom` / `CASTOR_LLM_PROVIDER=custom`）。服务测试会尝试不同协议和流式开关组合，并保存或提示可用 transport。Fallback 解析器处理小模型不规范输出，流中断时自动恢复部分内容。
 
 ### 可靠性保障
 
@@ -386,7 +386,7 @@ castor compose chapter 吞天魔帝
 
 伏笔系统使用 Zod schema 校验——`lastAdvancedChapter` 必须是整数，`status` 只能是 open/progressing/deferred/resolved。LLM 输出的 JSON delta 在写入前经过 `applyRuntimeStateDelta` 做 immutable 更新 + `validateRuntimeState` 结构校验。坏数据直接拒绝，不会滚雪球。
 
-模型输出上限由 provider bank 的模型卡管理；`llm.extra` / `INKOS_LLM_EXTRA_*` 中的保留键（max_tokens、temperature、model、messages、stream 等）会被自动过滤，防止意外覆盖核心请求参数。
+模型输出上限由 provider bank 的模型卡管理；`llm.extra` / `CASTOR_LLM_EXTRA_*` 中的保留键（max_tokens、temperature、model、messages、stream 等）会被自动过滤，防止意外覆盖核心请求参数。
 
 ---
 
@@ -473,7 +473,7 @@ castor write next 吞天魔帝          # 写草稿 → 审计 → 按配置自�
 castor write next 吞天魔帝 --count 5 # 连续写 5 章
 ```
 
-`write next` 现在默认走 `plan -> compose -> write` 的输入治理链路，审计后的自动修订轮数默认是 1。若你需要回退到旧的 prompt 拼装路径，可在 `inkos.json` 中显式设置：
+`write next` 现在默认走 `plan -> compose -> write` 的输入治理链路，审计后的自动修订轮数默认是 1。若你需要回退到旧的 prompt 拼装路径，可在 `castor.json` 中显式设置：
 
 ```json
 {
@@ -517,7 +517,7 @@ Studio 里的「开放世界」和「分支互动」是交互式创作入口。�
 
 <p align="center">
   <strong>Castor Short 手机封面</strong><br>
-  <img src="assets/inkos-short-demo-cover.png" width="260" alt="短篇封面">
+  <img src="assets/castor-short-demo-cover.png" width="260" alt="短篇封面">
 </p>
 
 <p align="center">
@@ -567,7 +567,7 @@ Studio 里的「开放世界」和「分支互动」是交互式创作入口。�
 | `castor consolidate [id]`                    | 归并长篇章节摘要，降低长书上下文压力                                                                         |
 | `castor forecast create/show/select`          | 生成、核验并选择长篇的非正史剧情分支；选择只保存候选计划，不修改正史                                                        |
 | `castor interact`                            | 外部 agent / CLI 自然语言入口（`--json`、`--message`、`--book`）                                       |
-| `castor config set-global`                   | 设置 CLI / daemon / 部署环境的全局 LLM env（`~/.inkos/.env`）                                         |
+| `castor config set-global`                   | 设置 CLI / daemon / 部署环境的全局 LLM env（`~/.castor/.env`）                                         |
 | `castor config show-global`                  | 查看全局配置                                                                                     |
 | `castor config set/show`                     | 查看/更新项目配置                                                                                  |
 | `castor config set-model <agent> <model>`    | 为指定 agent 设置模型覆盖（`--base-url`、`--provider`、`--api-key-env` 支持多 Provider 路由）                |
@@ -583,7 +583,7 @@ Studio 里的「开放世界」和「分支互动」是交互式创作入口。�
 | `castor update`                              | 更新到最新版本                                                                                    |
 | `castor studio` / `castor`                    | 启动 Web 工作台（`-p` 指定端口，默认 4567；Studio 使用服务页配置，不使用 env 覆盖）                                    |
 | `castor tui`                                 | 启动终端全屏 TUI                                                                                 |
-| `castor up / down`                           | 启动/停止守护进程（`-q` 静默模式，自动写入 `inkos.log`）                                                      |
+| `castor up / down`                           | 启动/停止守护进程（`-q` 静默模式，自动写入 `castor.log`）                                                      |
 
 
 `[id]` 参数在项目只有一本书时可省略，自动检测。所有命令支持 `--json` 输出结构化数据。`draft` / `write next` / `plan chapter` / `compose chapter` 支持 `--context` 传入创作指导，`--words` 覆盖每章目标字数。`book create` 支持 `--brief <file>` 传入创作简报（你的脑洞/设定文档），Architect 会基于此生成设定而非凭空创作。`plan chapter` 会调用 LLM 生成章节意图；`compose chapter` 不要求在线 LLM，可在配置 API Key 之前先检查输入治理结果。

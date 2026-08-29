@@ -84,7 +84,7 @@ describe("analyzeLongSpanFatigue", () => {
   });
 
   it("builds an English variance brief with phrase, opening, ending, and scene guidance", async () => {
-    const bookDir = await createBookDir("inkos-variance-brief-test-");
+    const bookDir = await createBookDir("castor-variance-brief-test-");
 
     await Promise.all([
       writeChapter(bookDir, 1, "Ledger", "Mara kept the ledger close to her chest. The corridor stayed quiet after the bell. There it was again."),

@@ -57,7 +57,7 @@ export function DoctorView({ nav, theme, t }: { nav: Nav; theme: Theme; t: TFunc
         </div>
       ) : (
         <div className={`border ${c.cardStatic} rounded-lg p-5`}>
-          <CheckRow label={t("doctor.inkosJson")} ok={data.projectConfigFile} />
+          <CheckRow label={t("doctor.projectConfigFile")} ok={data.projectConfigFile} />
           <CheckRow label={t("doctor.projectEnv")} ok={data.projectEnv} />
           <CheckRow label={t("doctor.globalEnv")} ok={data.globalEnv} />
           <CheckRow label={t("doctor.booksDir")} ok={data.booksDir} detail={`${data.bookCount} book(s)`} />

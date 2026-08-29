@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getAllEndpoints } from "../llm/providers/index.js";
 
-describe("InkosEndpoint.group", () => {
+describe("ProviderEndpoint.group", () => {
   it("每个非 custom endpoint 都必须声明 group 字段", () => {
     const missing = getAllEndpoints().filter((ep) => ep.id !== "custom" && !ep.group);
     expect(missing, `missing group: ${missing.map((e) => e.id).join(", ")}`).toHaveLength(0);

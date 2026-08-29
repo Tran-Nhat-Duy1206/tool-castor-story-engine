@@ -31,7 +31,7 @@ interface AgentTrajectoryScope extends AgentTrajectoryScopeInput {
 const trajectoryStorage = new AsyncLocalStorage<AgentTrajectoryScope>();
 
 export function opaqueConversationId(sessionId: string): string {
-  return `inkos-${createHash("sha256").update(sessionId).digest("hex").slice(0, 32)}`;
+  return `castor-${createHash("sha256").update(sessionId).digest("hex").slice(0, 32)}`;
 }
 
 export function runWithAgentTrajectory<T>(
@@ -95,20 +95,20 @@ export function agentTrajectoryHeaders(
 ): Record<string, string> {
   if (!trace || !isKkaiapiEndpoint(baseUrl)) return {};
   return {
-    "X-InkOS-Trace-Version": "1",
-    "X-InkOS-Scaffold": "pi-inkos",
-    "X-InkOS-Conversation-ID": trace.conversationId,
-    "X-InkOS-Run-ID": trace.runId,
-    "X-InkOS-Model-Call-ID": trace.modelCallId,
-    "X-InkOS-Agent-Role": trace.agentRole,
-    "X-InkOS-Pi-Turn-Index": String(trace.piTurnIndex),
-    "X-InkOS-Client-Attempt": String(clientAttempt),
-    "X-InkOS-Thinking-Effort": thinking.effort,
+    "X-Castor-Trace-Version": "1",
+    "X-Castor-Scaffold": "pi-castor",
+    "X-Castor-Conversation-ID": trace.conversationId,
+    "X-Castor-Run-ID": trace.runId,
+    "X-Castor-Model-Call-ID": trace.modelCallId,
+    "X-Castor-Agent-Role": trace.agentRole,
+    "X-Castor-Pi-Turn-Index": String(trace.piTurnIndex),
+    "X-Castor-Client-Attempt": String(clientAttempt),
+    "X-Castor-Thinking-Effort": thinking.effort,
     ...(thinking.budgetTokens !== undefined
-      ? { "X-InkOS-Thinking-Budget-Tokens": String(thinking.budgetTokens) }
+      ? { "X-Castor-Thinking-Budget-Tokens": String(thinking.budgetTokens) }
       : {}),
     ...(trace.parentToolCallId
-      ? { "X-InkOS-Parent-Tool-Call-ID": trace.parentToolCallId }
+      ? { "X-Castor-Parent-Tool-Call-ID": trace.parentToolCallId }
       : {}),
   };
 }

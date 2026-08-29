@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://console.cloud.tencent.com/lkeap/api
  * - API 文档：https://cloud.tencent.com/document/product/1772
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const TENCENTCLOUD: InkosEndpoint = {
+export const TENCENTCLOUD: ProviderEndpoint = {
   id: "tencentcloud",
   label: "腾讯云 (lkeap)",
   group: "china",

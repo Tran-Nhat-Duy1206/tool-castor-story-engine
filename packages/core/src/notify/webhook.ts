@@ -42,7 +42,7 @@ export async function sendWebhook(
     const signature = createHmac("sha256", config.secret)
       .update(body)
       .digest("hex");
-    headers["X-InkOS-Signature"] = `sha256=${signature}`;
+    headers["X-Castor-Signature"] = `sha256=${signature}`;
   }
 
   const response = await fetch(config.url, {

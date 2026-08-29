@@ -929,7 +929,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("does not resurface a resolved hook just because mustKeep shares an artifact term", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-resolved-artifact-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-resolved-artifact-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");

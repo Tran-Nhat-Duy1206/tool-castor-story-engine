@@ -2021,7 +2021,7 @@ export class PipelineRunner {
       id: runId,
       stage: `chapter-${chapterNumber}`,
       model: this.config.model,
-      skillIds: ["inkos-long-writing"],
+      skillIds: ["castor-long-writing"],
       resumeCursor: String(chapterNumber),
     };
 

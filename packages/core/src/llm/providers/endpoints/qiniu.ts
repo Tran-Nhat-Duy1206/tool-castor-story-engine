@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://portal.qiniu.com/ai-inference/api-key
  * - API 文档：https://developer.qiniu.com/aitokenapi
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const QINIU: InkosEndpoint = {
+export const QINIU: ProviderEndpoint = {
   id: "qiniu",
   label: "七牛云 AI",
   group: "aggregator",

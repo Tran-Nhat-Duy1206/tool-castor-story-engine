@@ -85,8 +85,8 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
       bookIndex.refetch();
       refreshReviewArtifact();
     };
-    window.addEventListener("inkos:api-invalidate", handler);
-    return () => window.removeEventListener("inkos:api-invalidate", handler);
+    window.addEventListener("castor:api-invalidate", handler);
+    return () => window.removeEventListener("castor:api-invalidate", handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookId, chapterNumber, needsStateReview]);
 

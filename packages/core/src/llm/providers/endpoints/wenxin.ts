@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application/v2
  * - API 文档：https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const WENXIN: InkosEndpoint = {
+export const WENXIN: ProviderEndpoint = {
   id: "wenxin",
   label: "文心一言 (千帆)",
   group: "china",

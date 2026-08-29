@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://platform.stepfun.com/interface-key
  * - API 文档：https://platform.stepfun.com/docs/overview/concept
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const STEPFUN: InkosEndpoint = {
+export const STEPFUN: ProviderEndpoint = {
   id: "stepfun",
   label: "阶跃星辰",
   group: "china",

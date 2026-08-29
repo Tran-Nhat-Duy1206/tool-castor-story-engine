@@ -10,13 +10,13 @@ describe("tui layout", () => {
   it("renders a codex-like single-column workspace preview", () => {
     const frame = renderTuiFrame({
       locale: "zh-CN",
-      projectName: "inkos-demo",
+      projectName: "castor-demo",
       activeBookTitle: undefined,
       automationMode: "semi",
       status: "idle",
     });
 
-    expect(frame).toContain("项目 inkos-demo");
+    expect(frame).toContain("项目 castor-demo");
     expect(frame).toContain("阶段 就绪");
     expect(frame).toContain("模式 半自动");
     expect(frame).not.toContain("Header");
@@ -29,7 +29,7 @@ describe("tui layout", () => {
   it("keeps the two-line status strip above the composer preview", () => {
     const frame = renderTuiFrame({
       locale: "en",
-      projectName: "inkos-demo",
+      projectName: "castor-demo",
       activeBookTitle: "Night Harbor Echo",
       automationMode: "auto",
       status: "writing",

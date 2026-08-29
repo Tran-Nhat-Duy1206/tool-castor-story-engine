@@ -1,7 +1,7 @@
 {
   "name": "@actalk/castor-core",
   "version": "1.8.0",
-  "description": "Tool Castor Story Engine pi-agent production harness for story creation, governed context, retrieval, review, and interactive worlds (derived from InkOS)",
+  "description": "Tool Castor Story Engine pi-agent production harness for story creation, governed context, retrieval, review, and interactive worlds (derived from Castor)",
   "keywords": [
     "story-creation-ai-agent",
     "story-agent",

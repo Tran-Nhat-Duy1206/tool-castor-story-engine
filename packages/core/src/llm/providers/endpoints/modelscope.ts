@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://www.modelscope.cn/my/myaccesstoken
  * - API 文档：https://www.modelscope.cn/docs/model-service/API-Inference/intro
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const MODELSCOPE: InkosEndpoint = {
+export const MODELSCOPE: ProviderEndpoint = {
   id: "modelscope",
   label: "魔搭社区 ModelScope",
   group: "aggregator",

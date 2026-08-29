@@ -9,7 +9,7 @@
  *  5. Click the confirm button (data-testid="confirm-action").
  *  6. Wait for execution, then cross-check the graph via the API endpoint.
  *
- * The dev server runs with INKOS_AGENT_LLM_STUB=1 (set in playwright.config.ts),
+ * The dev server runs with CASTOR_AGENT_LLM_STUB=1 (set in playwright.config.ts),
  * so the agent deterministically proposes draft_structure when the user message
  * mentions "结构". No real LLM call is made.
  */

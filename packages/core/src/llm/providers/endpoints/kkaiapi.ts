@@ -9,9 +9,9 @@
  * OpenAI-compatible 聚合入口。站点文档标注统一 /v1 入口，chat、stream、
  * tools 和 image generation 均按 OpenAI 兼容接口调用。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const KKAIAPI: InkosEndpoint = {
+export const KKAIAPI: ProviderEndpoint = {
   id: "kkaiapi",
   label: "kkaiapi",
   group: "aggregator",

@@ -1,7 +1,7 @@
 {
   "name": "@actalk/castor",
   "version": "1.8.0",
-  "description": "Tool Castor Story Engine (Castor) CLI and TUI for fiction, scripts, interactive worlds, and translation. Derived from InkOS.",
+  "description": "Tool Castor Story Engine (Castor) CLI and TUI for fiction, scripts, interactive worlds, and translation. Derived from Castor.",
   "keywords": [
     "story-creation-ai-agent",
     "story-agent",

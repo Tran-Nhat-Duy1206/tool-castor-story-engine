@@ -4,9 +4,9 @@
  * Kimi's coding endpoint uses Anthropic-compatible messages, separate from the
  * regular Moonshot OpenAI-compatible API.
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const KIMI_CODE: InkosEndpoint = {
+export const KIMI_CODE: ProviderEndpoint = {
   id: "kimicode",
   label: "Kimi Code",
   group: "codingPlan",

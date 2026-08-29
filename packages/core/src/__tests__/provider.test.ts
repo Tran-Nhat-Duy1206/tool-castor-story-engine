@@ -290,7 +290,7 @@ describe("chatCompletion via pi-ai", () => {
     await chatCompletion(client, "test-model", [{ role: "user", content: "hi" }]);
 
     const opts = mockStreamSimple.mock.calls[0]?.[2] as { headers?: Record<string, string> };
-    expect(opts.headers).toMatchObject({ "User-Agent": "InkOS/1.3.5", "X-Valid": "ok" });
+    expect(opts.headers).toMatchObject({ "User-Agent": "Castor/1.3.5", "X-Valid": "ok" });
     expect(opts.headers).not.toHaveProperty("X-Bad");
   });
 
@@ -486,14 +486,14 @@ describe("chatCompletion via pi-ai", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const first = fetchMock.mock.calls[0]?.[1]?.headers as Record<string, string>;
     const second = fetchMock.mock.calls[1]?.[1]?.headers as Record<string, string>;
-    expect(first["X-InkOS-Model-Call-ID"]).toBeTruthy();
-    expect(second["X-InkOS-Model-Call-ID"]).toBe(first["X-InkOS-Model-Call-ID"]);
-    expect(first["X-InkOS-Client-Attempt"]).toBe("1");
-    expect(second["X-InkOS-Client-Attempt"]).toBe("2");
+    expect(first["X-Castor-Model-Call-ID"]).toBeTruthy();
+    expect(second["X-Castor-Model-Call-ID"]).toBe(first["X-Castor-Model-Call-ID"]);
+    expect(first["X-Castor-Client-Attempt"]).toBe("1");
+    expect(second["X-Castor-Client-Attempt"]).toBe("2");
     expect(second).toMatchObject({
-      "X-InkOS-Conversation-ID": "inkos-conv",
-      "X-InkOS-Run-ID": "run-7",
-      "X-InkOS-Agent-Role": "workflow",
+      "X-Castor-Conversation-ID": "inkos-conv",
+      "X-Castor-Run-ID": "run-7",
+      "X-Castor-Agent-Role": "workflow",
     });
     vi.unstubAllGlobals();
   });

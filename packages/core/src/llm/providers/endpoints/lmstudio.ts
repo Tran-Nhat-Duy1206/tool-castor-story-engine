@@ -5,9 +5,9 @@
  * http://localhost:1234/v1 by default. Authentication is optional and can be
  * enabled in LM Studio's server settings.
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const LMSTUDIO: InkosEndpoint = {
+export const LMSTUDIO: ProviderEndpoint = {
   id: "lmstudio",
   label: "LM Studio (本地)",
   group: "local",

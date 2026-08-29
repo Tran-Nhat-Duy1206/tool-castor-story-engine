@@ -1,6 +1,6 @@
 import { cp, mkdir, stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { CASTOR_RUNTIME_DIRNAME, LEGACY_INKOS_RUNTIME_DIRNAME } from "./product-identity.js";
+import { CASTOR_RUNTIME_DIRNAME, LEGACY_CASTOR_RUNTIME_DIRNAME } from "./product-identity.js";
 
 /**
  * Runtime directory adapter (Checkpoint 4, plan Task 4.3).
@@ -31,7 +31,7 @@ export function castorRuntimePath(projectRoot: string, ...segments: string[]): s
 }
 
 export function legacyRuntimePath(projectRoot: string, ...segments: string[]): string {
-  return join(projectRoot, LEGACY_INKOS_RUNTIME_DIRNAME, ...segments);
+  return join(projectRoot, LEGACY_CASTOR_RUNTIME_DIRNAME, ...segments);
 }
 
 async function pathKind(path: string): Promise<"missing" | "file" | "directory"> {

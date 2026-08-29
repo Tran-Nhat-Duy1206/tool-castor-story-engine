@@ -9,9 +9,9 @@
  * 聚合平台，代理 Qwen / DeepSeek / GLM / Kimi / 百川 / 昆仑万维等多家开源 + 托管模型，
  * 新模型上架频繁，bank 只维护文本 chat 主流，元数据以 live /models probe 为准。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const SILICONCLOUD: InkosEndpoint = {
+export const SILICONCLOUD: ProviderEndpoint = {
   id: "siliconcloud",
   label: "硅基流动",
   group: "aggregator",

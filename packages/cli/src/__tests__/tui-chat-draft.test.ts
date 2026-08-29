@@ -8,7 +8,7 @@ import {
 function createSession(): InteractionSession {
   return {
     sessionId: "session-1",
-    projectRoot: "/tmp/inkos-demo",
+    projectRoot: "/tmp/castor-demo",
     activeBookId: "harbor",
     automationMode: "semi",
     messages: [],

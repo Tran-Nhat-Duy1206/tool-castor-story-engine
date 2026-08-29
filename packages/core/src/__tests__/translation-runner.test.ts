@@ -13,7 +13,7 @@ describe("translation runner", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-translation-runner-"));
+    root = await mkdtemp(join(tmpdir(), "castor-translation-runner-"));
     await mkdir(join(root, "inputs"), { recursive: true });
     await writeFile(join(root, "inputs", "book.md"), [
       "# 第一章 雨夜",

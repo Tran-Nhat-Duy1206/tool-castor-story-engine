@@ -158,7 +158,7 @@ const EN: TuiCopy = {
   },
   composer: {
     placeholder: "Ask Castor to write, revise, or explain…",
-    emptyConversation: "Start by asking InkOS what to do.",
+    emptyConversation: "Start by asking Castor what to do.",
     helper: "Enter to send • /new • /short • /play • /cover • /write • /confirm • /model • /depth • /help",
     submitting: "Submitting…",
     failed: "Last request failed",

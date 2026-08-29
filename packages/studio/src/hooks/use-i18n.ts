@@ -13,7 +13,7 @@ const strings = {
   "nav.createScript": { zh: "剧本创作", en: "Script" },
   "nav.createStoryboard": { zh: "分镜创作", en: "Storyboard" },
   "nav.createInteractiveFilm": { zh: "互动影游", en: "Interactive Film" },
-  "nav.createPlay": { zh: "InkOS 互动", en: "InkOS Play" },
+  "nav.createPlay": { zh: "Castor 互动", en: "Castor Play" },
   "nav.createBranching": { zh: "分支互动", en: "Branching Play" },
   "nav.createFree": { zh: "开放世界", en: "Open World" },
   "nav.createFanfic": { zh: "同人创作", en: "Fanfic" },
@@ -247,7 +247,7 @@ const strings = {
   // Doctor
   "doctor.title": { zh: "环境诊断", en: "Environment Check" },
   "doctor.recheck": { zh: "重新检查", en: "Re-check" },
-  "doctor.inkosJson": { zh: "castor.json 配置", en: "castor.json configuration" },
+  "doctor.projectConfigFile": { zh: "castor.json 配置", en: "castor.json configuration" },
   "doctor.projectEnv": { zh: "项目 .env 文件", en: "Project .env file" },
   "doctor.globalEnv": { zh: "全局 ~/.castor/.env", en: "Global ~/.castor/.env" },
   "doctor.booksDir": { zh: "书籍目录", en: "Books directory" },

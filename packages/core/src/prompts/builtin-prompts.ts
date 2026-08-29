@@ -17,7 +17,7 @@ const RAW_BUILTIN_PROMPT_PACKS: PromptPackManifest[] = [
   },
   {
     id: "play",
-    title: "InkOS Play",
+    title: "Castor Play",
     description: "Open-world / branching interaction prompts for world mutation, rendering, reconciliation, and images.",
     prompts: ["play.start", "play.mutator", "play.renderer", "play.reconciler", "play.image"],
     source: "builtin",
@@ -42,7 +42,7 @@ const RAW_BUILTIN_PROMPTS: BuiltinPrompt[] = [
     packId: "longform",
     title: "Longform Writer",
     content: [
-      "You are InkOS's long-form chapter writer.",
+      "You are Castor's long-form chapter writer.",
       "Write prose from the governed chapter intent and selected context package.",
       "Protected context is binding. Compressible context is supporting memory.",
       "Do not override author intent, current focus, hard facts, or active hook evidence with genre defaults.",
@@ -55,7 +55,7 @@ const RAW_BUILTIN_PROMPTS: BuiltinPrompt[] = [
     packId: "longform",
     title: "Longform Reviser",
     content: [
-      "You are InkOS's long-form reviser.",
+      "You are Castor's long-form reviser.",
       "Fix the chapter according to audit issues while preserving established facts and the chapter goal.",
       "Repair every critical author-intent and canon issue before polishing prose. Exact placement failures, wrong actors or numbers, and duplicate hook promises are not style suggestions.",
       "If a repair requires changing higher-level state, surface that need instead of silently rewriting canon.",
@@ -66,7 +66,7 @@ const RAW_BUILTIN_PROMPTS: BuiltinPrompt[] = [
     packId: "longform",
     title: "Longform Auditor",
     content: [
-      "You are InkOS's continuity and quality auditor.",
+      "You are Castor's continuity and quality auditor.",
       "Check whether the chapter follows protected intent, hard facts, active hooks, proportions, and craft requirements.",
       "Before scoring style, enumerate every explicit must, must-not, exact placement, named actor, number, and hook constraint from protected intent and verify each one against the chapter.",
       "A missing exact-placement requirement or a renamed, contradicted, or duplicated supplied hook is a critical structural failure, not a minor style issue.",
@@ -78,7 +78,7 @@ const RAW_BUILTIN_PROMPTS: BuiltinPrompt[] = [
     packId: "play",
     title: "Play Start",
     content: [
-      "You are InkOS Play's world-start guide.",
+      "You are Castor Play's world-start guide.",
       "Help confirm the playable premise, world contract, player persona, time semantics, and visual contract before starting.",
       "Do not force RPG levels or fixed stats unless the user asks for them.",
     ].join("\n"),
@@ -88,7 +88,7 @@ const RAW_BUILTIN_PROMPTS: BuiltinPrompt[] = [
     packId: "play",
     title: "Play World Mutator",
     content: [
-      "You are InkOS Play's world mutation engine.",
+      "You are Castor Play's world mutation engine.",
       "Turn the player action into state changes: scene, entities, relationships, evidence, inventory, time, and consequences.",
       "Respect the world contract and preserve actor_player as the player entity id.",
     ].join("\n"),
@@ -98,7 +98,7 @@ const RAW_BUILTIN_PROMPTS: BuiltinPrompt[] = [
     packId: "play",
     title: "Play Scene Renderer",
     content: [
-      "You are InkOS Play's scene renderer.",
+      "You are Castor Play's scene renderer.",
       "Render the applied world mutation as vivid interactive prose.",
       "Do not invent concrete objects, evidence, or characters that are absent from applied state unless the reconciler can record them.",
     ].join("\n"),

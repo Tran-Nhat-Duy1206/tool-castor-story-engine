@@ -9,9 +9,9 @@
  * 模型 id 命名历史遗留——用的是内部 domain 字段（generalv3 = Spark Pro，
  * generalv3.5 = Spark Max，4.0Ultra = 当前旗舰）。bank 按官方文档清单维护。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const SPARK: InkosEndpoint = {
+export const SPARK: ProviderEndpoint = {
   id: "spark",
   label: "讯飞星火",
   group: "china",

@@ -90,7 +90,7 @@ async function seedFoundationV1(): Promise<void> {
 }
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-arc-pipe-"));
+  root = await mkdtemp(join(tmpdir(), "castor-arc-pipe-"));
   bookDir = join(root, "books", "demo-book");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await mkdir(join(bookDir, "story", "governance"), { recursive: true });

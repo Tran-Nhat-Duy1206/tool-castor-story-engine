@@ -12,28 +12,28 @@ import {
 } from "../skills/index.js";
 
 const BUILTIN_SKILL_IDS = [
-  "inkos-interactive-film",
-  "inkos-long-market-research",
-  "inkos-long-story-analysis",
-  "inkos-long-writing",
-  "inkos-play-world",
-  "inkos-script-writing",
-  "inkos-short-market-research",
-  "inkos-short-story-analysis",
-  "inkos-short-writing",
-  "inkos-story-cover",
-  "inkos-story-deslop",
-  "inkos-story-import",
-  "inkos-story-review",
-  "inkos-storyboard",
-  "inkos-translation",
+  "castor-interactive-film",
+  "castor-long-market-research",
+  "castor-long-story-analysis",
+  "castor-long-writing",
+  "castor-play-world",
+  "castor-script-writing",
+  "castor-short-market-research",
+  "castor-short-story-analysis",
+  "castor-short-writing",
+  "castor-story-cover",
+  "castor-story-deslop",
+  "castor-story-import",
+  "castor-story-review",
+  "castor-storyboard",
+  "castor-translation",
 ] as const;
 
 describe("external skill loader", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-external-skills-"));
+    root = await mkdtemp(join(tmpdir(), "castor-external-skills-"));
   });
 
   afterEach(async () => {
@@ -47,23 +47,23 @@ describe("external skill loader", () => {
     expect(loaded.skills.map((skill) => skill.id)).toEqual(BUILTIN_SKILL_IDS);
     expect(loaded.skills).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        id: "inkos-long-writing",
+        id: "castor-long-writing",
         source: "builtin",
         body: expect.stringContaining("objective, resistance"),
-        baseDir: expect.stringMatching(/skills[\\/]inkos-long-writing$/),
+        baseDir: expect.stringMatching(/skills[\\/]castor-long-writing$/),
       }),
       expect.objectContaining({
-        id: "inkos-story-review",
+        id: "castor-story-review",
         source: "builtin",
         body: expect.stringContaining("parser or model-format failure"),
       }),
       expect.objectContaining({
-        id: "inkos-play-world",
+        id: "castor-play-world",
         source: "builtin",
         body: expect.stringContaining("world contract as authority"),
       }),
       expect.objectContaining({
-        id: "inkos-interactive-film",
+        id: "castor-interactive-film",
         source: "builtin",
         body: expect.stringContaining("Variables and flags serve story causality"),
       }),
@@ -71,13 +71,13 @@ describe("external skill loader", () => {
   });
 
   it("lets a project skill replace a built-in skill with the same id", async () => {
-    const skillDir = join(root, ".agents", "skills", "inkos-story-review");
+    const skillDir = join(root, ".agents", "skills", "castor-story-review");
     await mkdir(skillDir, { recursive: true });
     await writeFile(
       join(skillDir, "SKILL.md"),
       [
         "---",
-        "name: inkos-story-review",
+        "name: castor-story-review",
         "description: Project-specific review standard.",
         "---",
         "Use the project's own review standard.",
@@ -92,7 +92,7 @@ describe("external skill loader", () => {
     });
     const registry = createSkillRegistry({ skills: loaded.skills });
 
-    expect(registry.getSkill("inkos-story-review")).toMatchObject({
+    expect(registry.getSkill("castor-story-review")).toMatchObject({
       source: "project",
       body: "Use the project's own review standard.",
       baseDir: skillDir,
@@ -150,7 +150,7 @@ describe("external skill loader", () => {
     expect(result.skills[0]).not.toHaveProperty("contextNeeds");
   });
 
-  it("loads an AgentSkills/OpenClaw manifest without InkOS-only fields", async () => {
+  it("loads an AgentSkills/OpenClaw manifest without Castor-only fields", async () => {
     const skillDir = join(root, "writer-distillation");
     await mkdir(skillDir, { recursive: true });
     await writeFile(
@@ -298,7 +298,7 @@ describe("external skill loader", () => {
     }));
   });
 
-  it("does not discover the removed InkOS-specific skill directory", async () => {
+  it("does not discover the removed Castor-specific skill directory", async () => {
     const skillDir = join(root, ".inkos", "skills", "legacy-skill");
     await mkdir(skillDir, { recursive: true });
     await writeFile(
@@ -347,7 +347,7 @@ describe("external skill loader", () => {
     expect(loaded.skills.map((skill) => skill.id)).toContain("writer-distillation");
   });
 
-  it("loads external skills from INKOS_SKILL_DIRS and reports bad paths without throwing", async () => {
+  it("loads external skills from CASTOR_SKILL_DIRS and reports bad paths without throwing", async () => {
     const externalRoot = join(root, "external-skills");
     const skillDir = join(externalRoot, "romance-play");
     await mkdir(skillDir, { recursive: true });
@@ -367,7 +367,7 @@ describe("external skill loader", () => {
       projectRoot: join(root, "project"),
       homeDir: join(root, "home"),
       env: {
-        INKOS_SKILL_DIRS: [externalRoot, join(root, "does-not-exist")].join(delimiter),
+        CASTOR_SKILL_DIRS: [externalRoot, join(root, "does-not-exist")].join(delimiter),
       },
     });
     const registry = createSkillRegistry({ skills: loaded.skills });

@@ -18,7 +18,7 @@ const LLMCoverConfigSchema = z.object({
 }).optional();
 
 // C1 (v2.0.0 breaking): 删除 maxTokens / maxTokensCap 字段。
-// 每个模型的真实 maxOutput 来自 providers/<name>.ts 的 InkosModel.maxOutput；
+// 每个模型的真实 maxOutput 来自 providers/<name>.ts 的 ProviderModel.maxOutput；
 // 老配置里写的 maxTokens / maxTokensCap 会被 zod strip 静默丢弃（不报错）。
 export const LLMConfigSchema = z.object({
   provider: z.enum(["anthropic", "openai", "custom"]),

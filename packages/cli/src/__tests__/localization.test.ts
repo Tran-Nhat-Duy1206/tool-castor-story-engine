@@ -151,13 +151,13 @@ describe("CLI localization", () => {
 
 describe("resolveCliLanguage environment fallback", () => {
   it("prefers the explicit language over any environment variable", () => {
-    expect(resolveCliLanguage("en", { INKOS_LOCALE: "zh_CN" })).toBe("en");
-    expect(resolveCliLanguage("zh", { INKOS_LOCALE: "en", LANG: "en_US.UTF-8" })).toBe("zh");
+    expect(resolveCliLanguage("en", { CASTOR_LOCALE: "zh_CN" })).toBe("en");
+    expect(resolveCliLanguage("zh", { CASTOR_LOCALE: "en", LANG: "en_US.UTF-8" })).toBe("zh");
   });
 
-  it("reads INKOS_LOCALE before the system locale variables", () => {
-    expect(resolveCliLanguage(undefined, { INKOS_LOCALE: "en", LANG: "zh_CN.UTF-8" })).toBe("en");
-    expect(resolveCliLanguage(undefined, { INKOS_LOCALE: "zh-CN", LC_ALL: "en_US.UTF-8" })).toBe("zh");
+  it("reads CASTOR_LOCALE before the system locale variables", () => {
+    expect(resolveCliLanguage(undefined, { CASTOR_LOCALE: "en", LANG: "zh_CN.UTF-8" })).toBe("en");
+    expect(resolveCliLanguage(undefined, { CASTOR_LOCALE: "zh-CN", LC_ALL: "en_US.UTF-8" })).toBe("zh");
   });
 
   it("falls back to LC_ALL, then LC_MESSAGES, then LANG", () => {
@@ -196,10 +196,10 @@ describe("doctor hint localization", () => {
   it("keeps the original Chinese hints for zh", () => {
     expect(formatDoctorHintQuota("zh"))
       .toBe("检查 API Key 是否正确、模型是否可用，以及账号余额或配额是否足够。");
-    expect(formatDoctorHintBaseUrl("zh")).toContain("INKOS_LLM_BASE_URL");
+    expect(formatDoctorHintBaseUrl("zh")).toContain("CASTOR_LLM_BASE_URL");
     expect(formatDoctorHintStreamRequirement("zh")).toContain("stream");
-    expect(formatDoctorHintModelName("zh")).toContain("INKOS_LLM_MODEL");
-    expect(formatDoctorHintInvalidApiKey("zh")).toContain("INKOS_LLM_API_KEY");
+    expect(formatDoctorHintModelName("zh")).toContain("CASTOR_LLM_MODEL");
+    expect(formatDoctorHintInvalidApiKey("zh")).toContain("CASTOR_LLM_API_KEY");
     expect(formatDoctorHintOpenAiProbeExhausted("zh")).toContain("chat/responses");
   });
 
@@ -215,9 +215,9 @@ describe("doctor hint localization", () => {
     for (const hint of hints) {
       expect(hint).not.toMatch(CHINESE_CHARS);
     }
-    expect(formatDoctorHintBaseUrl("en")).toContain("INKOS_LLM_BASE_URL");
-    expect(formatDoctorHintModelName("en")).toContain("INKOS_LLM_MODEL");
-    expect(formatDoctorHintInvalidApiKey("en")).toContain("INKOS_LLM_API_KEY");
+    expect(formatDoctorHintBaseUrl("en")).toContain("CASTOR_LLM_BASE_URL");
+    expect(formatDoctorHintModelName("en")).toContain("CASTOR_LLM_MODEL");
+    expect(formatDoctorHintInvalidApiKey("en")).toContain("CASTOR_LLM_API_KEY");
     expect(formatDoctorHintStreamRequirement("en")).toContain("stream=true");
   });
 });

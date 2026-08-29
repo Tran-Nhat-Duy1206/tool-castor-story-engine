@@ -62,7 +62,7 @@ describe("project bootstrap", () => {
     expect(gitignore).toContain(".DS_Store\n");
   });
 
-  it("returns false when the directory is already an InkOS project", async () => {
+  it("returns false when the directory is already an Castor project", async () => {
     await writeFile(join(tempDir, "inkos.json"), "{}\n", "utf-8");
     const { ensureProjectDirectoryInitialized } = await import("../project-bootstrap.js");
 

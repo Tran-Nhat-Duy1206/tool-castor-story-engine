@@ -6,9 +6,9 @@
  * - API 文档：https://docs.x.ai/docs/overview
  * - 模型列表：https://docs.x.ai/docs/models
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const XAI: InkosEndpoint = {
+export const XAI: ProviderEndpoint = {
   id: "xai",
   label: "xAI (Grok)",
   group: "overseas",

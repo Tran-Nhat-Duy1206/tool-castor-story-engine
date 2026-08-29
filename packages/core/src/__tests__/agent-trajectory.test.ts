@@ -8,7 +8,7 @@ import {
   runWithAgentTrajectoryRole,
 } from "../llm/agent-trajectory.js";
 
-describe("InkOS agent trajectory metadata", () => {
+describe("Castor agent trajectory metadata", () => {
   it("uses an opaque stable conversation id", () => {
     const first = opaqueConversationId("session-with-user-visible-name");
     expect(first).toBe(opaqueConversationId("session-with-user-visible-name"));
@@ -62,15 +62,15 @@ describe("InkOS agent trajectory metadata", () => {
       effort: "enabled",
       budgetTokens: 4096,
     })).toMatchObject({
-      "X-InkOS-Trace-Version": "1",
-      "X-InkOS-Scaffold": "pi-inkos",
-      "X-InkOS-Conversation-ID": "inkos-conversation",
-      "X-InkOS-Run-ID": "run-1",
-      "X-InkOS-Agent-Role": "main",
-      "X-InkOS-Pi-Turn-Index": "1",
-      "X-InkOS-Client-Attempt": "2",
-      "X-InkOS-Thinking-Effort": "enabled",
-      "X-InkOS-Thinking-Budget-Tokens": "4096",
+      "X-Castor-Trace-Version": "1",
+      "X-Castor-Scaffold": "pi-inkos",
+      "X-Castor-Conversation-ID": "inkos-conversation",
+      "X-Castor-Run-ID": "run-1",
+      "X-Castor-Agent-Role": "main",
+      "X-Castor-Pi-Turn-Index": "1",
+      "X-Castor-Client-Attempt": "2",
+      "X-Castor-Thinking-Effort": "enabled",
+      "X-Castor-Thinking-Budget-Tokens": "4096",
     });
   });
 });

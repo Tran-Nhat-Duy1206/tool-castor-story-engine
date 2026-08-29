@@ -25,7 +25,7 @@ export const statusCommand = new Command("status")
       const booksData: Array<Record<string, unknown>> = [];
 
       if (!opts.json) {
-        log(`InkOS Project: ${root}`);
+        log(`Castor Project: ${root}`);
         log(`Books: ${allBookIds.length}`);
         log("");
       }

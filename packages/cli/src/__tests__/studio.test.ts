@@ -49,7 +49,7 @@ describe("studio command", () => {
       expect.objectContaining({
         cwd: "/project",
         stdio: "inherit",
-        env: expect.objectContaining({ INKOS_STUDIO_PORT: "9001" }),
+        env: expect.objectContaining({ CASTOR_STUDIO_PORT: "9001" }),
       }),
     );
   });
@@ -80,7 +80,7 @@ describe("studio command", () => {
       expect.objectContaining({
         cwd: "/project",
         stdio: "inherit",
-        env: expect.objectContaining({ INKOS_STUDIO_PORT: "4567" }),
+        env: expect.objectContaining({ CASTOR_STUDIO_PORT: "4567" }),
       }),
     );
   });

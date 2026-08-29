@@ -18,7 +18,7 @@ import {
 
 /**
  * The single Pi transport boundary used by both conversational and worker
- * agents. Pi keeps native tool calls; InkOS adds context guards, trajectory
+ * agents. Pi keeps native tool calls; Castor adds context guards, trajectory
  * headers, cancellation, and stream deadlines around the request.
  */
 export function guardedPiStream<TApi extends Api>(

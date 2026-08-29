@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { log, logError } from "../utils.js";
 
 export const updateCommand = new Command("update")
-  .description("Update InkOS to the latest version")
+  .description("Update Castor to the latest version")
   .action(async () => {
     try {
       const { createRequire } = await import("node:module");

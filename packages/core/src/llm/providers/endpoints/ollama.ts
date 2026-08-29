@@ -5,11 +5,11 @@
  * - 模型广场：https://ollama.com/library
  * - API 文档：https://github.com/ollama/ollama/blob/main/docs/api.md
  *
- * - 默认 baseUrl 指向本地 11434，inkos 通过 OpenAI 兼容模式 (/v1) 接入。
+ * - 默认 baseUrl 指向本地 11434，castor 通过 OpenAI 兼容模式 (/v1) 接入。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const OLLAMA: InkosEndpoint = {
+export const OLLAMA: ProviderEndpoint = {
   id: "ollama",
   label: "Ollama (本地)",
   group: "local",

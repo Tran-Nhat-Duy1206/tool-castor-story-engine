@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://platform.baichuan-ai.com/console/apikey
  * - API 文档：https://platform.baichuan-ai.com/docs/api
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const BAICHUAN: InkosEndpoint = {
+export const BAICHUAN: ProviderEndpoint = {
   id: "baichuan",
   label: "百川智能",
   group: "china",

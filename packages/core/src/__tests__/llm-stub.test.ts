@@ -2,16 +2,16 @@ import { describe, expect, it, afterEach } from "vitest";
 import { isLlmStubEnabled, stubChatCompletion } from "../agent/llm-stub.js";
 
 describe("llm-stub", () => {
-  const prev = process.env.INKOS_AGENT_LLM_STUB;
+  const prev = process.env.CASTOR_AGENT_LLM_STUB;
   afterEach(() => {
-    if (prev === undefined) delete process.env.INKOS_AGENT_LLM_STUB;
-    else process.env.INKOS_AGENT_LLM_STUB = prev;
+    if (prev === undefined) delete process.env.CASTOR_AGENT_LLM_STUB;
+    else process.env.CASTOR_AGENT_LLM_STUB = prev;
   });
 
   it("isLlmStubEnabled reflects the env var", () => {
-    process.env.INKOS_AGENT_LLM_STUB = "1";
+    process.env.CASTOR_AGENT_LLM_STUB = "1";
     expect(isLlmStubEnabled()).toBe(true);
-    delete process.env.INKOS_AGENT_LLM_STUB;
+    delete process.env.CASTOR_AGENT_LLM_STUB;
     expect(isLlmStubEnabled()).toBe(false);
   });
 

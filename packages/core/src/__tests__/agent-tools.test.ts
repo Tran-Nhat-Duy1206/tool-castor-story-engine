@@ -1059,7 +1059,7 @@ describe("agent deterministic writing tools", () => {
   it("injects the host-selected long-writing Skill into the worker without relying on agent intent", async () => {
     const longWritingSkill = {
       skill: {
-        id: "inkos-long-writing",
+        id: "castor-long-writing",
         name: "Long-form narrative craft",
         description: "Shared long-form worker method.",
         body: "Build scenes through objective, resistance, turn, and consequence.",
@@ -1086,7 +1086,7 @@ describe("agent deterministic writing tools", () => {
     );
     expect(result.details).toMatchObject({
       kind: "chapter_written",
-      skillIds: ["inkos-long-writing"],
+      skillIds: ["castor-long-writing"],
     });
   });
 

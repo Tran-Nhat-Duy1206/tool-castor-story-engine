@@ -4,10 +4,10 @@ import {
   type LLMConfigCliOverrides,
   type LLMConsumer,
 } from "./effective-llm-config.js";
-import { loadLLMEnvLayers, castorEnv, LEGACY_INKOS_ENV_KEYS, normalizeLegacyEnvKeys, GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath } from "./llm-env.js";
+import { loadLLMEnvLayers, castorEnv, LEGACY_ENV_KEYS, normalizeLegacyEnvKeys, GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath } from "./llm-env.js";
 import { isApiKeyOptionalForEndpoint } from "./llm-endpoint-auth.js";
 
-export { GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath, castorEnv, LEGACY_INKOS_ENV_KEYS, normalizeLegacyEnvKeys, isApiKeyOptionalForEndpoint };
+export { GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath, castorEnv, LEGACY_ENV_KEYS, normalizeLegacyEnvKeys, isApiKeyOptionalForEndpoint };
 
 export async function loadProjectConfig(
   root: string,

@@ -10,7 +10,7 @@ export interface ProjectBootstrapOptions {
 async function hasGlobalConfig(): Promise<boolean> {
   try {
     const content = await readFile(await resolveGlobalEnvPath(), "utf-8");
-    return content.includes("INKOS_LLM_API_KEY=") && !content.includes("your-api-key-here");
+    return content.includes("CASTOR_LLM_API_KEY=") && !content.includes("your-api-key-here");
   } catch {
     return false;
   }
@@ -91,10 +91,10 @@ function buildProjectEnvTemplate(globalConfigured: boolean): string {
       "# Global config at ~/.castor/.env will be used by default.",
       "# Switch Studio to 'Use Studio config' (使用 Studio 配置) if you want per-project service settings.",
       "# Uncomment below to override for this project only:",
-      "# INKOS_LLM_PROVIDER=openai",
-      "# INKOS_LLM_BASE_URL=",
-      "# INKOS_LLM_API_KEY=",
-      "# INKOS_LLM_MODEL=",
+      "# CASTOR_LLM_PROVIDER=openai",
+      "# CASTOR_LLM_BASE_URL=",
+      "# CASTOR_LLM_API_KEY=",
+      "# CASTOR_LLM_MODEL=",
       "",
       "# Web search (optional):",
       "# TAVILY_API_KEY=tvly-xxxxx",
@@ -106,12 +106,12 @@ function buildProjectEnvTemplate(globalConfigured: boolean): string {
     "# Optional project-level LLM overrides",
     "# Studio can manage provider / model / key without editing this file.",
     "# Uncomment only if you want this directory to force env-based config:",
-    "# INKOS_LLM_PROVIDER=openai",
-    "# INKOS_LLM_BASE_URL=",
-    "# INKOS_LLM_API_KEY=",
-    "# INKOS_LLM_MODEL=",
-    "# INKOS_LLM_API_FORMAT=chat",
-    "# INKOS_LLM_STREAM=true",
+    "# CASTOR_LLM_PROVIDER=openai",
+    "# CASTOR_LLM_BASE_URL=",
+    "# CASTOR_LLM_API_KEY=",
+    "# CASTOR_LLM_MODEL=",
+    "# CASTOR_LLM_API_FORMAT=chat",
+    "# CASTOR_LLM_STREAM=true",
     "",
     "# Web search (optional):",
     "# TAVILY_API_KEY=tvly-xxxxx",

@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey
  * - API 文档：https://www.volcengine.com/docs/82379
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const VOLCENGINE: InkosEndpoint = {
+export const VOLCENGINE: ProviderEndpoint = {
   id: "volcengine",
   label: "火山引擎 (豆包)",
   group: "china",

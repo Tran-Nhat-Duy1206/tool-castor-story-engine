@@ -1,8 +1,8 @@
 /**
- * inkos 自维护的 provider 定义。每个 provider 一个 .ts 文件，
- * 里面一个 InkosEndpoint 对象（provider 元数据 + models 数组）。
+ * castor 自维护的 provider 定义。每个 provider 一个 .ts 文件，
+ * 里面一个 ProviderEndpoint 对象（provider 元数据 + models 数组）。
  *
- * 数据冷启动自 lobe-chat/packages/model-bank，之后由 inkos 自管。
+ * 数据冷启动自 lobe-chat/packages/model-bank，之后由 castor 自管。
  * 新模型发布 / 参数调整时手动加 card，不做持续 sync。
  */
 
@@ -19,7 +19,7 @@ export type EndpointGroup =
   | "local"
   | "codingPlan";
 
-export interface InkosModel {
+export interface ProviderModel {
   /** API 请求体里实际用的 model id（可能带斜线如 'deepseek/deepseek-v3'）。UI 也直接用 id 显示 */
   readonly id: string;
   /** 模型输出上限 tokens */
@@ -64,7 +64,7 @@ export interface ProviderTransportDefaults {
   readonly stream?: boolean;
 }
 
-export interface InkosEndpoint {
+export interface ProviderEndpoint {
   readonly id: string;
   readonly label: string;
   /** UI 分组。custom 不参与分组，其他 endpoint 必填。 */
@@ -85,5 +85,5 @@ export interface InkosEndpoint {
   readonly compat?: ProviderCompat;
   readonly transportDefaults?: ProviderTransportDefaults;
 
-  readonly models: readonly InkosModel[];
+  readonly models: readonly ProviderModel[];
 }

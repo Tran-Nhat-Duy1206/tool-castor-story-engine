@@ -27,7 +27,7 @@ describe("LLM translation model", () => {
       model: "test-model",
       activatedSkills: [{
         skill: {
-          id: "inkos-translation",
+          id: "castor-translation",
           name: "Long-form translation",
           description: "Preserve terminology and voice.",
           body: "Treat the glossary as persistent authority.",
@@ -54,7 +54,7 @@ describe("LLM translation model", () => {
     for (const call of chatCompletionMock.mock.calls) {
       const messages = call[2] as ReadonlyArray<{ role: string; content: string }>;
       expect(messages[0]?.content).toContain("Activated professional skills");
-      expect(messages[0]?.content).toContain("inkos-translation");
+      expect(messages[0]?.content).toContain("castor-translation");
       expect(messages[0]?.content).toContain("Treat the glossary as persistent authority.");
     }
   });

@@ -18,7 +18,7 @@ describe("proxy fetch helpers", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const env = {
-      INKOS_LLM_PROXY_URL: "http://inkos-env-proxy:9910",
+      CASTOR_LLM_PROXY_URL: "http://inkos-env-proxy:9910",
       HTTPS_PROXY: "http://standard-proxy:9910",
     };
 
@@ -35,13 +35,13 @@ describe("proxy fetch helpers", () => {
     );
   });
 
-  it("uses INKOS_LLM_PROXY_URL before standard HTTPS_PROXY/HTTP_PROXY env vars", async () => {
+  it("uses CASTOR_LLM_PROXY_URL before standard HTTPS_PROXY/HTTP_PROXY env vars", async () => {
     const { fetchWithProxy, resolveProxyUrl } = await import("../utils/proxy-fetch.js");
     const fetchMock = vi.fn().mockResolvedValue({ ok: true });
     vi.stubGlobal("fetch", fetchMock);
 
     const env = {
-      INKOS_LLM_PROXY_URL: "http://inkos-proxy:9910",
+      CASTOR_LLM_PROXY_URL: "http://inkos-proxy:9910",
       HTTPS_PROXY: "http://standard-proxy:9910",
       HTTP_PROXY: "http://http-proxy:9910",
     };

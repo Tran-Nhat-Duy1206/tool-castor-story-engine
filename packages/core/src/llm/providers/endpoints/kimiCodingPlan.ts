@@ -4,9 +4,9 @@
  * - 官网：https://platform.moonshot.cn/
  * - Moonshot 针对编程场景的订阅套餐。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const KIMI_CODING_PLAN: InkosEndpoint = {
+export const KIMI_CODING_PLAN: ProviderEndpoint = {
   id: "kimiCodingPlan",
   label: "Kimi Coding Plan",
   group: "codingPlan",

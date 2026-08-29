@@ -16,10 +16,10 @@ export const CASTOR_CLI_COMMAND = "castor";
 export const CASTOR_CONFIG_FILENAME = "castor.json";
 
 /** Legacy InkOS project configuration file (read-only compatibility input). */
-export const LEGACY_INKOS_CONFIG_FILENAME = "inkos.json";
+export const LEGACY_CASTOR_CONFIG_FILENAME = "inkos.json";
 
 /** Canonical project/user runtime directory. */
 export const CASTOR_RUNTIME_DIRNAME = ".castor";
 
 /** Legacy InkOS runtime directory (read-only compatibility input). */
-export const LEGACY_INKOS_RUNTIME_DIRNAME = ".inkos";
+export const LEGACY_CASTOR_RUNTIME_DIRNAME = ".inkos";

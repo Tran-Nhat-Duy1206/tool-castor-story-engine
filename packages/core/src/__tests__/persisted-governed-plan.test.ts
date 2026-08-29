@@ -66,7 +66,7 @@ function buildPlan(chapter: number): PlanChapterOutput {
 
 describe("persisted-governed-plan round trip", () => {
   it("savePersistedPlan + loadPersistedPlan returns equal memo", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "inkos-plan-"));
+    const dir = await mkdtemp(join(tmpdir(), "castor-plan-"));
     await mkdir(join(dir, "story", "runtime"), { recursive: true });
     // Write the sibling intent.md so loader reads it back.
     await writeFile(
@@ -96,14 +96,14 @@ describe("persisted-governed-plan round trip", () => {
   });
 
   it("returns null when plan file does not exist", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "inkos-plan-"));
+    const dir = await mkdtemp(join(tmpdir(), "castor-plan-"));
     await mkdir(join(dir, "story", "runtime"), { recursive: true });
     const loaded = await loadPersistedPlan(dir, 1);
     expect(loaded).toBeNull();
   });
 
   it("returns null when memo body is missing required sections", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "inkos-plan-"));
+    const dir = await mkdtemp(join(tmpdir(), "castor-plan-"));
     await mkdir(join(dir, "story", "runtime"), { recursive: true });
 
     // Corrupt memo body: drop the 不要做 heading.
@@ -134,7 +134,7 @@ plannerInputs: []
   });
 
   it("returns null when chapter number does not match", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "inkos-plan-"));
+    const dir = await mkdtemp(join(tmpdir(), "castor-plan-"));
     await mkdir(join(dir, "story", "runtime"), { recursive: true });
     const plan = buildPlan(2);
     await savePersistedPlan(dir, plan);

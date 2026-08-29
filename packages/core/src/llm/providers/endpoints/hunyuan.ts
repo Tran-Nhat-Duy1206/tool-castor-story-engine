@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://console.cloud.tencent.com/hunyuan/api-key
  * - API 文档：https://cloud.tencent.com/document/product/1729
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const HUNYUAN: InkosEndpoint = {
+export const HUNYUAN: ProviderEndpoint = {
   id: "hunyuan",
   label: "腾讯混元",
   group: "china",

@@ -3,7 +3,7 @@ import type { Model, Api } from "@mariozechner/pi-ai";
 import { resolveServicePiProvider, resolveServicePreset } from "./service-presets.js";
 import { getServiceApiKey } from "./secrets.js";
 import { getEndpoint } from "./providers/index.js";
-import type { InkosEndpoint } from "./providers/types.js";
+import type { ProviderEndpoint } from "./providers/types.js";
 import { isApiKeyOptionalForEndpoint } from "../utils/llm-endpoint-auth.js";
 
 export interface ResolvedModel {
@@ -15,7 +15,7 @@ export interface ResolvedModel {
 }
 
 function resolveProviderCompat(
-  provider: InkosEndpoint | undefined,
+  provider: ProviderEndpoint | undefined,
   baseUrl: string,
 ): Record<string, unknown> | undefined {
   const compat = {

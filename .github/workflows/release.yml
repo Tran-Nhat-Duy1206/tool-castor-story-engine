@@ -183,7 +183,7 @@ jobs:
             exit 1
           fi
 
-          npx inkos --version
+          npx castor --version
           test -f node_modules/@actalk/castor-studio/dist/api/index.js
           node -e "import('@actalk/castor-core').then(m => { if (!m.PipelineRunner) throw new Error('installed core import missing PipelineRunner'); console.log('installed core import OK') })"
           test -f node_modules/@actalk/castor-core/dist/notify/telegram.js || test -f node_modules/@actalk/castor/node_modules/@actalk/castor-core/dist/notify/telegram.js
@@ -285,7 +285,7 @@ jobs:
             exit 1
           fi
 
-          npx inkos --version
+          npx castor --version
           test -f node_modules/@actalk/castor-studio/dist/api/index.js
           node -e "import('@actalk/castor-core').then(m => { if (!m.PipelineRunner) throw new Error('installed core import missing PipelineRunner'); console.log('installed core import OK') })"
           test -f node_modules/@actalk/castor-core/dist/notify/telegram.js || test -f node_modules/@actalk/castor/node_modules/@actalk/castor-core/dist/notify/telegram.js

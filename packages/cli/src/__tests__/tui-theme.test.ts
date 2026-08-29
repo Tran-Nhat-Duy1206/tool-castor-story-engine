@@ -9,7 +9,7 @@ describe("tui theme", () => {
   });
 
   it("allows an explicit theme override", () => {
-    expect(resolveTuiTheme({ INKOS_TUI_THEME: "light" }).reply).toBe("#1f1711");
-    expect(resolveTuiTheme({ INKOS_TUI_THEME: "dark" }).reply).toBe("#f7efe3");
+    expect(resolveTuiTheme({ CASTOR_TUI_THEME: "light" }).reply).toBe("#1f1711");
+    expect(resolveTuiTheme({ CASTOR_TUI_THEME: "dark" }).reply).toBe("#f7efe3");
   });
 });

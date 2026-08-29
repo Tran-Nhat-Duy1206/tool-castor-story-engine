@@ -6,9 +6,9 @@
  * - API 文档：https://docs.mistral.ai/api/
  * - 模型列表：https://docs.mistral.ai/getting-started/models/models_overview/
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const MISTRAL: InkosEndpoint = {
+export const MISTRAL: ProviderEndpoint = {
   id: "mistral",
   label: "Mistral AI",
   group: "overseas",

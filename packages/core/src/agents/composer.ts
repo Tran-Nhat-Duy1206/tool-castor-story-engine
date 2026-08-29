@@ -196,7 +196,7 @@ async function applyContextBudgetIfNeeded(params: {
     });
     throw new Error(
       `Protected context exceeds available input budget (${protectedTokens}/${availableInputTokens} tokens). ` +
-      "InkOS will not compress protected author intent, current focus, hard state, or active hook evidence.",
+      "Castor will not compress protected author intent, current focus, hard state, or active hook evidence.",
     );
   }
   if (compressibleEntries.length === 0) {
@@ -365,7 +365,7 @@ export class ComposerAgent extends BaseAgent {
       {
         role: "system",
         content: [
-          "You are InkOS's semantic story-memory selector.",
+          "You are Castor's semantic story-memory selector.",
           "Select only candidate memories that materially help the current chapter task. Understand negation, corrections, causal relationships, aliases, and paraphrases; do not rank by keyword overlap.",
           "Established current-state facts and active hook lifecycle are protected separately by the host, so do not invent ids or retain unrelated candidates just to be safe.",
           "Return strict JSON only: {\"selectedSources\":[\"candidate-id\"]}.",
@@ -402,12 +402,12 @@ export class ComposerAgent extends BaseAgent {
     ].join("\n")).join("\n\n");
     const system = isEn
       ? [
-          "You are InkOS's semantic outline-section selector.",
+          "You are Castor's semantic outline-section selector.",
           "Select only the outline sections needed for the current chapter. Prefer semantic relevance over keyword overlap.",
           "Return strict JSON only: {\"selectedSources\":[\"...\"]}. Use exact source ids from the candidates. If uncertain, include the safest relevant anchors rather than inventing ids.",
         ].join("\n")
       : [
-          "你是 InkOS 的语义大纲选段器。",
+          "你是 Castor 的语义大纲选段器。",
           "只选择当前章节真正需要的大纲段落。按语义相关性判断，不要按关键词重合机械选择。",
           "只返回严格 JSON：{\"selectedSources\":[\"...\"]}。必须使用候选里的精确 source id；不确定时选最安全的相关锚点，不要编造 id。",
         ].join("\n");
@@ -452,13 +452,13 @@ export class ComposerAgent extends BaseAgent {
     ].filter(Boolean).join("\n")).join("\n\n");
     const system = isEn
       ? [
-          "You are InkOS's semantic reference-section selector.",
+          "You are Castor's semantic reference-section selector.",
           "The user explicitly bound these reference assets to this book and described how each may be used.",
           "Select only sections useful for the current chapter task. References are creative guidance, never canon and never stronger than author intent or established facts.",
           "Return strict JSON only: {\"selectedSources\":[\"...\"]}. Use exact candidate source ids. An empty list is valid when no section is relevant.",
         ].join("\n")
       : [
-          "你是 InkOS 的参考资产语义选段器。",
+          "你是 Castor 的参考资产语义选段器。",
           "用户已把这些参考资产绑定到本书，并明确说明每份资料可以借鉴什么。",
           "只选择当前章节任务真正需要的段落。参考资料只是创作借鉴，不能成为正典，也不能压过作者意图和既成事实。",
           "只返回严格 JSON：{\"selectedSources\":[\"...\"]}。必须使用候选中的精确 source id；没有相关段落时可以返回空数组。",
@@ -499,12 +499,12 @@ export class ComposerAgent extends BaseAgent {
     const compressibleBlock = renderContextEntries(request.compressibleEntries);
     const system = isEn
       ? [
-          "You are InkOS's semantic context compiler.",
+          "You are Castor's semantic context compiler.",
           "Only compile the COMPRESSIBLE CONTEXT. The PROTECTED CONTEXT is binding reference material and must not be rewritten, summarized as a substitute, or weakened.",
           "Output concise Markdown with source pointers. Preserve names, unresolved promises, evidence, timing, and constraints that may affect the next chapter. Drop low-relevance noise.",
         ].join("\n")
       : [
-          "你是 InkOS 的语义上下文编译器。",
+          "你是 Castor 的语义上下文编译器。",
           "只能编译【可压缩上下文】。【受保护上下文】是绑定参照，不得改写、不得替代总结、不得削弱。",
           "输出简洁 Markdown，保留来源指针。保留会影响下一章的人名、未兑现承诺、证据、时间点和约束，丢弃低相关噪声。",
         ].join("\n");

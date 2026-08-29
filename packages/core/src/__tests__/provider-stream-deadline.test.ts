@@ -18,8 +18,8 @@ const MODEL = {
 
 describe("guardAssistantMessageStream", () => {
   afterEach(() => {
-    delete process.env.INKOS_LLM_FIRST_EVENT_TIMEOUT_MS;
-    delete process.env.INKOS_LLM_STREAM_IDLE_TIMEOUT_MS;
+    delete process.env.CASTOR_LLM_FIRST_EVENT_TIMEOUT_MS;
+    delete process.env.CASTOR_LLM_STREAM_IDLE_TIMEOUT_MS;
   });
 
   it("ends a stream that never produces its first event", async () => {
@@ -45,7 +45,7 @@ describe("guardAssistantMessageStream", () => {
   });
 
   it("keeps environment overrides authoritative", async () => {
-    process.env.INKOS_LLM_FIRST_EVENT_TIMEOUT_MS = "10";
+    process.env.CASTOR_LLM_FIRST_EVENT_TIMEOUT_MS = "10";
     const guarded = guardAssistantMessageStream(
       MODEL,
       () => createAssistantMessageEventStream(),

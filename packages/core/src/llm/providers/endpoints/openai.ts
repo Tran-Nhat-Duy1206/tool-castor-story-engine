@@ -7,9 +7,9 @@
  * - API 文档：https://platform.openai.com/docs/api-reference
  * - 模型列表：https://platform.openai.com/docs/models
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const OPENAI: InkosEndpoint = {
+export const OPENAI: ProviderEndpoint = {
   id: "openai",
   label: "OpenAI",
   group: "overseas",

@@ -81,6 +81,44 @@ describe("audit-castor-identity scanContent", () => {
     assert.equal(violations.length, 0);
     assert.equal(allowedCount, 1);
   });
+
+  it("flags the active branding examples from plan Task 6.1", () => {
+    for (const active of [
+      'log("Starting InkOS Studio on http://localhost:4567");',
+      'checks.push({ name: "InkOS Doctor" });',
+      'const CASTOR_USER_AGENT = "InkOS/1.3.5";',
+      "use inkos studio to open the workbench",
+    ]) {
+      const { violations } = scanContent("packages/cli/src/commands/studio.ts", active + "\n");
+      assert.equal(violations.length, 1, active);
+    }
+  });
+
+  it("does not flag legacy-named files inside allowlisted buckets", () => {
+    const result = runAudit({
+      root: process.cwd(),
+      files: ["test-project/inkos.json", "assets/inkos-text.svg", "castor.json"],
+      read: (rel) => (rel === "assets/inkos-text.svg" ? "<svg>inkos</svg>" : "{}"),
+    });
+    assert.deepEqual(result.summary.legacyFilenames, ["assets/inkos-text.svg"]);
+    assert.equal(result.ok, false);
+  });
+
+  it("passes when only attribution/history/legacy buckets remain", () => {
+    const result = runAudit({
+      root: process.cwd(),
+      files: [
+        "LICENSE",
+        "CHANGELOG.md",
+        "docs/migrations/castor-identity-inventory.md",
+        "packages/core/src/utils/llm-env.ts",
+        ".gitignore",
+        "test-project/inkos.json",
+      ],
+      read: () => "InkOS by Narcooo, upstream attribution — legacy inkos.json compatibility\n",
+    });
+    assert.equal(result.ok, true, JSON.stringify(result.violations?.slice(0, 3)));
+  });
 });
 
 describe("audit-castor-identity runAudit (fixture-driven)", () => {

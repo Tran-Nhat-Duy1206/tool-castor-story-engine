@@ -123,7 +123,7 @@ async function readUrlMaterial(url: string, fetchImpl: typeof fetch): Promise<Ma
   }
   const response = await fetchImpl(url, {
     headers: {
-      "User-Agent": "InkOS/1.6 material-ingestion",
+      "User-Agent": "Castor/1.6 material-ingestion",
       "Accept": "text/html, text/plain, application/json, application/pdf, */*",
     },
     signal: AbortSignal.timeout(20_000),

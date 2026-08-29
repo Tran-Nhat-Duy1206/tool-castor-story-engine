@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type { PreferencesStore } from "./types";
 
-// Same storage convention as the theme preference (`inkos:studio:theme`).
-export const TOOL_DETAILS_STORAGE_KEY = "inkos:studio:tool-details-default-open";
+// Same storage convention as the theme preference (`castor:studio:theme`).
+export const TOOL_DETAILS_STORAGE_KEY = "castor:studio:tool-details-default-open";
 
 interface PreferenceStorageLike {
   getItem(key: string): string | null;

@@ -6,7 +6,7 @@ import { PlayStore } from "../play/play-store.js";
 
 describe("PlayStore", () => {
   it("creates and lists worlds and runs with metadata", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-store-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-store-"));
     const store = new PlayStore(root);
 
     try {
@@ -36,7 +36,7 @@ describe("PlayStore", () => {
   });
 
   it("persists optional world and visual contracts as natural-language rules", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-store-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-store-"));
     const store = new PlayStore(root);
 
     try {
@@ -64,7 +64,7 @@ describe("PlayStore", () => {
   });
 
   it("creates world/run storage and persists JSONL events", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-store-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-store-"));
     const store = new PlayStore(root);
 
     try {
@@ -97,7 +97,7 @@ describe("PlayStore", () => {
   });
 
   it("persists transcripts, current state, and markdown projections", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-store-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-store-"));
     const store = new PlayStore(root);
 
     try {
@@ -134,7 +134,7 @@ describe("PlayStore", () => {
   });
 
   it("ignores malformed JSONL rows when reading logs", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-store-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-store-"));
     const store = new PlayStore(root);
 
     try {

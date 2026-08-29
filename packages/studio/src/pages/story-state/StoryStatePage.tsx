@@ -61,7 +61,7 @@ export function StoryStatePage({ bookId }: StoryStatePageProps) {
               </span>
             </h1>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              InkOS 对故事的当前权威认知（canonical structured state）· What InkOS currently believes about your story
+              Castor 对故事的当前权威认知（canonical structured state）· What Castor currently believes about your story
             </p>
           </div>
         </div>

@@ -169,7 +169,7 @@ const PAGE_COPY: Record<"zh" | "en", PlatformCopy> = {
   },
   en: {
     idleTitle: "Start from a rough idea",
-    idleBody: "Fill in the title, genre, and story core first. InkOS will generate the foundation and open the new workspace.",
+    idleBody: "Fill in the title, genre, and story core first. Castor will generate the foundation and open the new workspace.",
     formHeading: "Book basics",
     formHint: "These fields go straight into creation. A concrete brief gives the foundation generator better material.",
     titleLabel: "Title",

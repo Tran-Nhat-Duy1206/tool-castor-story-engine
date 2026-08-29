@@ -7,9 +7,9 @@
  * - 模型列表：https://ai.google.dev/gemini-api/docs/models
  * - OpenAI 兼容接入：https://ai.google.dev/gemini-api/docs/openai
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const GOOGLE: InkosEndpoint = {
+export const GOOGLE: ProviderEndpoint = {
   id: "google",
   label: "Google Gemini",
   group: "overseas",

@@ -156,11 +156,11 @@ function combineSignals(primary: AbortSignal | undefined, secondary: AbortSignal
 }
 
 /**
- * Pi stream adapter backed by the existing InkOS provider boundary.
+ * Pi stream adapter backed by the existing Castor provider boundary.
  *
  * Pi owns the worker lifecycle and cancellation. The provider remains the sole
  * transport implementation so custom endpoints, retries, context guards and
- * stream deadlines behave exactly like the rest of InkOS.
+ * stream deadlines behave exactly like the rest of Castor.
  */
 function providerWorkerStream(
   client: LLMClient,

@@ -20,14 +20,14 @@ export default defineConfig({
     headless: true,
     screenshot: "only-on-failure",
   },
-  // Always start a dedicated E2E server with INKOS_AGENT_LLM_STUB=1 so the
+  // Always start a dedicated E2E server with CASTOR_AGENT_LLM_STUB=1 so the
   // agent uses the deterministic stub and never makes real LLM calls.
   // reuseExistingServer: false ensures the stub env var is always active —
   // if an existing dev server (started without the stub) were reused, the
   // agent would attempt a real LLM call with the fake API key and hang.
   // Ports 4580/4581 are dedicated to E2E to avoid conflict with the dev server.
   webServer: {
-    command: "INKOS_AGENT_LLM_STUB=1 INKOS_STUDIO_PORT=4581 INKOS_PROJECT_ROOT=../../test-project tsx watch --clear-screen=false src/api/index.ts & INKOS_AGENT_LLM_STUB=1 INKOS_STUDIO_PORT=4581 vite --host --port 4580 ; kill %1 2>/dev/null",
+    command: "CASTOR_AGENT_LLM_STUB=1 CASTOR_STUDIO_PORT=4581 CASTOR_PROJECT_ROOT=../../test-project tsx watch --clear-screen=false src/api/index.ts & CASTOR_AGENT_LLM_STUB=1 CASTOR_STUDIO_PORT=4581 vite --host --port 4580 ; kill %1 2>/dev/null",
     url: "http://localhost:4580",
     reuseExistingServer: false,
     timeout: 120_000,

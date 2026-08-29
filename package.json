@@ -2,7 +2,7 @@
   "name": "castor-story-engine",
   "version": "1.8.0",
   "private": true,
-  "description": "Tool Castor Story Engine - long-form AI story-writing system derived from InkOS: novels, short fiction, scripts, interactive worlds, and multilingual translation",
+  "description": "Tool Castor Story Engine - long-form AI story-writing system: novels, short fiction, scripts, interactive worlds, and multilingual translation",
   "keywords": [
     "story-creation-ai-agent",
     "story-agent",
@@ -34,7 +34,7 @@
     "benchmark:studio-e2e": "node scripts/studio-e2e-benchmark.mjs",
     "release": "pnpm build && pnpm test",
     "audit:castor-identity": "node scripts/audit-castor-identity.mjs",
-    "test:scripts": "node --test scripts/__tests__/"
+    "test:scripts": "node --test \"scripts/__tests__/*.test.mjs\""
   },
   "engines": {
     "node": ">=22.0.0",

@@ -14,7 +14,7 @@ const effectLine = (e: { var: string; op: string; value: number | string | boole
 
 export function exportInk(graph: StoryGraph): string {
   const lines: string[] = [];
-  lines.push(`// ${graph.title || graph.projectId} — exported from InkOS interactive film`);
+  lines.push(`// ${graph.title || graph.projectId} — exported from Castor interactive film`);
   for (const v of graph.variables) {
     const d = typeof v.default === "string" ? JSON.stringify(v.default) : String(v.default);
     lines.push(`VAR ${sanitize(v.name)} = ${d}`);

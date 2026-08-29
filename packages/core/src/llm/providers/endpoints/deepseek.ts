@@ -12,9 +12,9 @@
  * deepseek-chat / deepseek-reasoner 是兼容别名，官方标注将在 2026-07-24 废弃，
  * 分别对应 deepseek-v4-flash 的非思考模式 / 思考模式。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const DEEPSEEK: InkosEndpoint = {
+export const DEEPSEEK: ProviderEndpoint = {
   id: "deepseek",
   label: "DeepSeek",
   group: "china",

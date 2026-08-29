@@ -1510,16 +1510,16 @@ describe("createStudioServer daemon lifecycle", () => {
 
   it("reports config source and detected env overrides for Studio switching", async () => {
     await writeFile(join(root, ".env"), [
-      "INKOS_LLM_PROVIDER=openai",
-      "INKOS_LLM_BASE_URL=https://project.example.com/v1",
-      "INKOS_LLM_MODEL=gpt-5.4",
-      "INKOS_LLM_API_KEY=sk-project",
+      "CASTOR_LLM_PROVIDER=openai",
+      "CASTOR_LLM_BASE_URL=https://project.example.com/v1",
+      "CASTOR_LLM_MODEL=gpt-5.4",
+      "CASTOR_LLM_API_KEY=sk-project",
     ].join("\n"), "utf-8");
     await writeFile(join(tmpdir(), "inkos-global.env"), [
-      "INKOS_LLM_PROVIDER=openai",
-      "INKOS_LLM_BASE_URL=https://global.example.com/v1",
-      "INKOS_LLM_MODEL=gpt-4o",
-      "INKOS_LLM_API_KEY=sk-global",
+      "CASTOR_LLM_PROVIDER=openai",
+      "CASTOR_LLM_BASE_URL=https://global.example.com/v1",
+      "CASTOR_LLM_MODEL=gpt-4o",
+      "CASTOR_LLM_API_KEY=sk-global",
     ].join("\n"), "utf-8");
     await writeFile(join(root, "inkos.json"), JSON.stringify({
       ...projectConfig,
@@ -1558,10 +1558,10 @@ describe("createStudioServer daemon lifecycle", () => {
 
   it("imports detected env config into Studio services without exposing the key", async () => {
     await writeFile(join(tmpdir(), "inkos-global.env"), [
-      "INKOS_LLM_PROVIDER=openai",
-      "INKOS_LLM_BASE_URL=https://api.kkaiapi.com/v1",
-      "INKOS_LLM_MODEL=deepseek-v4-flash",
-      "INKOS_LLM_API_KEY=sk-global",
+      "CASTOR_LLM_PROVIDER=openai",
+      "CASTOR_LLM_BASE_URL=https://api.kkaiapi.com/v1",
+      "CASTOR_LLM_MODEL=deepseek-v4-flash",
+      "CASTOR_LLM_API_KEY=sk-global",
     ].join("\n"), "utf-8");
     loadSecretsMock.mockResolvedValue({ services: {} });
 
@@ -1729,9 +1729,9 @@ describe("createStudioServer daemon lifecycle", () => {
       },
     }, null, 2), "utf-8");
     await writeFile(join(root, ".env"), [
-      "INKOS_LLM_MODEL=MiniMax-M2.7",
-      "INKOS_LLM_BASE_URL=https://api.minimax.com/v1",
-      "INKOS_LLM_API_KEY=sk-minimax",
+      "CASTOR_LLM_MODEL=MiniMax-M2.7",
+      "CASTOR_LLM_BASE_URL=https://api.minimax.com/v1",
+      "CASTOR_LLM_API_KEY=sk-minimax",
     ].join("\n"), "utf-8");
 
     createLLMClientMock.mockImplementation(((cfg: unknown) => cfg) as any);
@@ -2578,7 +2578,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("reports async create failures through the create-status endpoint", async () => {
-    processProjectInteractionRequestMock.mockRejectedValueOnce(new Error("INKOS_LLM_API_KEY not set"));
+    processProjectInteractionRequestMock.mockRejectedValueOnce(new Error("CASTOR_LLM_API_KEY not set"));
 
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -2601,7 +2601,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(status.status).toBe(200);
     await expect(status.json()).resolves.toMatchObject({
       status: "error",
-      error: "INKOS_LLM_API_KEY not set",
+      error: "CASTOR_LLM_API_KEY not set",
     });
   });
 
@@ -3474,7 +3474,7 @@ describe("createStudioServer daemon lifecycle", () => {
       expect.objectContaining({
         language: "en",
         defaultSkills: [expect.objectContaining({
-          skill: expect.objectContaining({ id: "inkos-short-writing" }),
+          skill: expect.objectContaining({ id: "castor-short-writing" }),
         })],
       }),
     );
@@ -3529,7 +3529,7 @@ describe("createStudioServer daemon lifecycle", () => {
       root,
       expect.objectContaining({
         defaultSkills: expect.arrayContaining([
-          expect.objectContaining({ skill: expect.objectContaining({ id: "inkos-short-writing" }) }),
+          expect.objectContaining({ skill: expect.objectContaining({ id: "castor-short-writing" }) }),
           expect.objectContaining({ skill: expect.objectContaining({ id: "evidence-tone" }) }),
         ]),
       }),
@@ -4638,7 +4638,7 @@ describe("createStudioServer daemon lifecycle", () => {
             tool: "play_start",
             status: "completed",
             result: "暴雨敲着铁皮门，封存档案箱压在门口。",
-            details: expect.objectContaining({ skillIds: ["inkos-play-world"] }),
+            details: expect.objectContaining({ skillIds: ["castor-play-world"] }),
           }),
         ],
       },
@@ -5835,7 +5835,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(chatCompletionMock).not.toHaveBeenCalled();
   });
 
-  it("classifies InkOS parser/tool errors as internal instead of blaming the selected provider", async () => {
+  it("classifies Castor parser/tool errors as internal instead of blaming the selected provider", async () => {
     const internalError = "sub_agent writer failed: missing YAML frontmatter delimiters";
     runAgentSessionMock.mockResolvedValueOnce({
       responseText: "",

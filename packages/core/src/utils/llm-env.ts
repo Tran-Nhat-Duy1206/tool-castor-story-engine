@@ -20,7 +20,7 @@ export const LEGACY_GLOBAL_ENV_PATH = join(LEGACY_GLOBAL_CONFIG_DIR, ".env");
  * Every documented INKOS_* variable maps to exactly one CASTOR_* name.
  * Unknown INKOS_* names are never copied. No wildcard substitution.
  */
-export const LEGACY_INKOS_ENV_KEYS: Readonly<Record<string, string>> = Object.freeze({
+export const LEGACY_ENV_KEYS: Readonly<Record<string, string>> = Object.freeze({
   INKOS_STUDIO_PORT: "CASTOR_STUDIO_PORT",
   INKOS_PROJECT_ROOT: "CASTOR_PROJECT_ROOT",
   INKOS_SKILL_DIRS: "CASTOR_SKILL_DIRS",
@@ -59,7 +59,7 @@ const LEGACY_ENV_PREFIX_RULES: ReadonlyArray<{ prefix: string; replacement: stri
 ]);
 
 function legacyToCastorKey(key: string): string | undefined {
-  const direct = LEGACY_INKOS_ENV_KEYS[key];
+  const direct = LEGACY_ENV_KEYS[key];
   if (direct) return direct;
   for (const rule of LEGACY_ENV_PREFIX_RULES) {
     if (key.startsWith(rule.prefix)) return `${rule.replacement}${key.slice(rule.prefix.length)}`;
@@ -68,7 +68,7 @@ function legacyToCastorKey(key: string): string | undefined {
 }
 
 function isLegacyEnvKey(key: string): boolean {
-  return key.startsWith("INKOS_LLM_") || key in LEGACY_INKOS_ENV_KEYS;
+  return key.startsWith("INKOS_LLM_") || key in LEGACY_ENV_KEYS;
 }
 
 /**
@@ -83,7 +83,7 @@ export function castorEnv(
   warnings?: string[],
 ): string | undefined {
   const castorValue = env[castorKey];
-  const legacyKey = Object.entries(LEGACY_INKOS_ENV_KEYS).find(([, castor]) => castor === castorKey)?.[0];
+  const legacyKey = Object.entries(LEGACY_ENV_KEYS).find(([, castor]) => castor === castorKey)?.[0];
   const legacyValue = legacyKey ? env[legacyKey] : undefined;
   if (castorValue !== undefined && castorValue !== "") {
     if (legacyValue !== undefined && legacyValue !== "" && legacyValue !== castorValue && warnings) {

@@ -132,7 +132,7 @@ genreCommand
   .option("--numerical", "Enable numerical system", false)
   .option("--power", "Enable power scaling", false)
   .option("--era", "Enable era research", false)
-  .option("--lang <language>", "Template language: zh or en (defaults to INKOS_LOCALE/LANG, then zh)")
+  .option("--lang <language>", "Template language: zh or en (defaults to CASTOR_LOCALE/LANG, then zh)")
   .action(async (id: string, opts) => {
     try {
       const root = findProjectRoot();

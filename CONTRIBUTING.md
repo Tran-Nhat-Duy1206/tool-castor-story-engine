@@ -78,8 +78,8 @@ Keep commits atomic — one logical change per commit. Split new files, interfac
 Tests live next to source in `__tests__/` directories. We use Vitest.
 
 ```bash
-pnpm --filter @actalk/inkos-core test    # Core tests only
-pnpm --filter @actalk/inkos test         # CLI tests only
+pnpm --filter @actalk/castor-core test    # Core tests only
+pnpm --filter @actalk/castor test         # CLI tests only
 ```
 
 For features touching the LLM pipeline, mock the LLM calls — don't make real API requests in tests.

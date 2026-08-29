@@ -17,7 +17,7 @@ let projectDir: string;
 function buildTestEnv(overrides?: Record<string, string>) {
   const baseEnv = Object.fromEntries(
     Object.entries(process.env).filter(([key]) =>
-      !key.startsWith("INKOS_")
+      !key.startsWith("CASTOR_")
       && !key.startsWith("OPENAI_")
       && !key.startsWith("ANTHROPIC_")
       && key !== "TAVILY_API_KEY",
@@ -57,10 +57,10 @@ function runStderr(args: string[], options?: { env?: Record<string, string> }): 
 }
 
 const failingLlmEnv = {
-  INKOS_LLM_PROVIDER: "openai",
-  INKOS_LLM_BASE_URL: "http://127.0.0.1:9/v1",
-  INKOS_LLM_MODEL: "test-model",
-  INKOS_LLM_API_KEY: "test-key",
+  CASTOR_LLM_PROVIDER: "openai",
+  CASTOR_LLM_BASE_URL: "http://127.0.0.1:9/v1",
+  CASTOR_LLM_MODEL: "test-model",
+  CASTOR_LLM_API_KEY: "test-key",
 };
 
 describe("CLI integration", () => {
@@ -107,7 +107,7 @@ describe("CLI integration", () => {
 
     it("creates .env file", async () => {
       const envContent = await readFile(join(projectDir, ".env"), "utf-8");
-      expect(envContent).toContain("INKOS_LLM_API_KEY");
+      expect(envContent).toContain("CASTOR_LLM_API_KEY");
     });
 
     it("creates .gitignore", async () => {
@@ -585,14 +585,14 @@ describe("CLI integration", () => {
         config.llm.model = "gpt-oss:20b";
         await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
         await writeFile(envPath, [
-          "INKOS_LLM_PROVIDER=openai",
-          "INKOS_LLM_BASE_URL=http://127.0.0.1:11434/v1",
-          "INKOS_LLM_MODEL=gpt-oss:20b",
+          "CASTOR_LLM_PROVIDER=openai",
+          "CASTOR_LLM_BASE_URL=http://127.0.0.1:11434/v1",
+          "CASTOR_LLM_MODEL=gpt-oss:20b",
           "",
         ].join("\n"), "utf-8");
 
         const { stdout } = runStderr(["doctor"], {
-          env: { INKOS_LLM_API_KEY: "" },
+          env: { CASTOR_LLM_API_KEY: "" },
         });
         expect(stdout).toContain("LLM API Key");
         expect(stdout).toContain("Optional for local/self-hosted endpoint");

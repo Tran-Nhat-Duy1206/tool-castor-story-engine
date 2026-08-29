@@ -1,5 +1,6 @@
 import { Type, type Static } from "@mariozechner/pi-ai";
 import type { AgentTool, AgentToolResult, AgentToolUpdateCallback } from "@mariozechner/pi-agent-core";
+import { LEGACY_CASTOR_RUNTIME_DIRNAME } from "../config/product-identity.js";
 import type { PipelineRunner } from "../pipeline/runner.js";
 import { ArchitectIncompleteFoundationError } from "../agents/architect.js";
 import { type ReviseMode } from "../agents/reviser.js";
@@ -618,7 +619,7 @@ function withSingleAttachmentFallback(
   const [path] = paths;
   const useHostAttachment = (candidate: string | undefined): boolean => {
     const value = candidate?.trim();
-    return !value || ((value.startsWith(".castor/uploads/") || value.startsWith(".inkos/uploads/")) && value !== path);
+    return !value || ((value.startsWith(".castor/uploads/") || value.startsWith(`${LEGACY_CASTOR_RUNTIME_DIRNAME}/uploads/`)) && value !== path);
   };
 
   if (params.action === "translation_create" && payload.translationCreate && useHostAttachment(payload.translationCreate.filePath)) {
@@ -1380,7 +1381,7 @@ export function createIngestMaterialTool(projectRoot: string): AgentTool<typeof 
   return {
     name: "ingest_material",
     description:
-      "Extract and archive a user-provided URL or uploaded file into .inkos/materials as traceable Markdown. " +
+      "Extract and archive a user-provided URL or uploaded file into .castor/materials as traceable Markdown. " +
       "Supports HTML/text/JSON/Markdown/PDF. This creates reference material only; it must not mutate canon, chapters, scripts, or play state.",
     label: "Ingest Material",
     parameters: IngestMaterialParams,
@@ -1450,8 +1451,8 @@ export function createRetrieveMaterialTool(projectRoot: string): AgentTool<typeo
   return {
     name: "retrieve_material",
     description:
-      "Retrieve traceable snippets from previously ingested .inkos/materials reference cards. " +
-      "The agent supplies the semantic query; InkOS returns evidence pointers. This must not mutate canon, chapters, scripts, or play state.",
+      "Retrieve traceable snippets from previously ingested .castor/materials reference cards. " +
+      "The agent supplies the semantic query; Castor returns evidence pointers. This must not mutate canon, chapters, scripts, or play state.",
     label: "Retrieve Material",
     parameters: RetrieveMaterialParams,
     async execute(
@@ -1538,7 +1539,7 @@ export function createManageBookReferenceTool(
     name: "manage_book_reference",
     description:
       "Bind already-ingested project materials to the active book with user-defined purposes, list current bindings, or unbind them. " +
-      "The material remains stored once under .inkos/materials. Binding never copies prose into the book and never changes canon by itself.",
+      "The material remains stored once under .castor/materials. Binding never copies prose into the book and never changes canon by itself.",
     label: "Manage Book Reference",
     parameters: ManageBookReferenceParams,
     async execute(
@@ -1623,7 +1624,7 @@ const ImportChaptersParams = Type.Object({
     description: "Target book ID to import into. In active-book sessions, omit it to use the current active book; if provided, it must match the active book. In general chat there is no active book, so it is required and must be an existing book.",
   })),
   sourcePath: Type.String({
-    description: "Local path of the chapter source: either the stored_path from the Uploaded Files block (project-relative, e.g. .inkos/uploads/<session>/novel.txt) or an absolute path on this machine that the user provided. A directory imports each .md/.txt file as one chapter in filename order; a single file is split into chapters automatically by heading lines.",
+    description: "Local path of the chapter source: either the stored_path from the Uploaded Files block (project-relative, e.g. .castor/uploads/<session>/novel.txt) or an absolute path on this machine that the user provided. A directory imports each .md/.txt file as one chapter in filename order; a single file is split into chapters automatically by heading lines.",
   }),
   splitPattern: Type.Optional(Type.String({
     description: "Single-file mode only: custom JavaScript regex source matching chapter heading lines. Omit to use the default pattern, which matches \"第X章/第X回\" and \"Chapter N\" headings.",
@@ -1649,8 +1650,8 @@ export function createImportChaptersTool(
   return {
     name: "import_chapters",
     description:
-      "Import an existing novel's chapters from a local file or directory into an InkOS book as real chapters (not reference material). " +
-      "InkOS reverse-engineers foundation/truth files from the imported text and replays every chapter to rebuild story state, so the book can be continued afterwards. " +
+      "Import an existing novel's chapters from a local file or directory into an Castor book as real chapters (not reference material). " +
+      "Castor reverse-engineers foundation/truth files from the imported text and replays every chapter to rebuild story state, so the book can be continued afterwards. " +
       "Use ingest_material instead when the user only wants to archive reference material without touching book chapters.",
     label: "Import Chapters",
     parameters: ImportChaptersParams,
@@ -1738,7 +1739,7 @@ export function createFanficBookTool(
 ): AgentTool<typeof FanficCreateParams> {
   return {
     name: "fanfic_create",
-    description: "Create an InkOS fanfiction book directly from supplied canon/source material after user confirmation.",
+    description: "Create an Castor fanfiction book directly from supplied canon/source material after user confirmation.",
     label: "Create Fanfiction",
     parameters: FanficCreateParams,
     async execute(_toolCallId, params: FanficCreateParamsType, signal, onUpdate) {
@@ -1798,7 +1799,7 @@ export function createSpinoffBookTool(
 ): AgentTool<typeof SpinoffCreateParams> {
   return {
     name: "spinoff_create",
-    description: "Create a standalone side story that inherits canon from an existing InkOS parent book.",
+    description: "Create a standalone side story that inherits canon from an existing Castor parent book.",
     label: "Create Side Story",
     parameters: SpinoffCreateParams,
     async execute(_toolCallId, params: SpinoffCreateParamsType, signal, onUpdate) {
@@ -1859,7 +1860,7 @@ export function createImitationBookTool(
 ): AgentTool<typeof ImitationCreateParams> {
   return {
     name: "imitation_create",
-    description: "Create an original InkOS book and derive its prose style guide from supplied reference writing.",
+    description: "Create an original Castor book and derive its prose style guide from supplied reference writing.",
     label: "Create Style Imitation",
     parameters: ImitationCreateParams,
     async execute(_toolCallId, params: ImitationCreateParamsType, signal, onUpdate) {
@@ -1917,7 +1918,7 @@ export function createContinuationImportTool(
 ): AgentTool<typeof ContinuationImportParams> {
   return {
     name: "continuation_import",
-    description: "Import an uploaded novel into an existing or newly created InkOS book, rebuild story state, and prepare it for continuation.",
+    description: "Import an uploaded novel into an existing or newly created Castor book, rebuild story state, and prepare it for continuation.",
     label: "Import for Continuation",
     parameters: ContinuationImportParams,
     async execute(_toolCallId, params: ContinuationImportParamsType, signal, onUpdate) {
@@ -2033,7 +2034,7 @@ const ShortFictionRunParams = Type.Object({
     description: "Optional image size, default 1024x1360.",
   })),
   coverApiKeyEnv: Type.Optional(Type.String({
-    description: "Optional env var containing the cover API key. Default INKOS_COVER_API_KEY.",
+    description: "Optional env var containing the cover API key. Default CASTOR_COVER_API_KEY.",
   })),
 });
 
@@ -2178,7 +2179,7 @@ export function createTranslationCreateTool(
   return {
     name: "translation_create",
     description:
-      "Create an InkOS translation project from an EPUB/PDF/TXT/Markdown file. " +
+      "Create an Castor translation project from an EPUB/PDF/TXT/Markdown file. " +
       "This only ingests and segments the source; running the actual translation is a separate long task.",
     label: "Translation",
     parameters: TranslationCreateParams,
@@ -2643,7 +2644,7 @@ export function createPlayStartTool(
   return {
     name: "play_start",
     description:
-      "Start an interactive InkOS Play world directly from chat. " +
+      "Start an interactive Castor Play world directly from chat. " +
       "Use when the user asks to play, roleplay, run an open-world interactive story, or start a Tavern-like scene.",
     label: "Start Play",
     parameters: PlayStartParams,
@@ -2656,7 +2657,7 @@ export function createPlayStartTool(
       _signal?.throwIfAborted();
       onUpdate?.(textResult("Starting interactive world..."));
       if (!pipeline) {
-        throw new Error("play_start requires an initialized InkOS pipeline to create authoritative world state.");
+        throw new Error("play_start requires an initialized Castor pipeline to create authoritative world state.");
       }
       const playPayload = options.actionPayload?.playStart;
       const activatedSkills = resolveProductionToolSkills(options);
@@ -2910,7 +2911,7 @@ export function createPlayEditTool(
   return {
     name: "play_edit",
     description:
-      "Persistently edit the active InkOS Play world card, visual contract, player persona, or entity/role cards without advancing time or narrating a turn. " +
+      "Persistently edit the active Castor Play world card, visual contract, player persona, or entity/role cards without advancing time or narrating a turn. " +
       "Use when the user says to change world rules, visual rules, character goals/persona/status, or long-lived play contracts.",
     label: "Edit Play World",
     parameters: PlayEditParams,
@@ -3010,7 +3011,7 @@ export function createPlayStepTool(
   return {
     name: "play_step",
     description:
-      "Advance the current InkOS Play world by one player action. " +
+      "Advance the current Castor Play world by one player action. " +
       "Use after play_start when the user keeps acting in the interactive scene.",
     label: "Play Step",
     parameters: PlayStepParams,
@@ -3115,7 +3116,7 @@ export function createPlayReviseTool(
   return {
     name: "play_revise",
     description:
-      "Regenerate, edit, or restore the latest InkOS Play turn using saved turn checkpoints. " +
+      "Regenerate, edit, or restore the latest Castor Play turn using saved turn checkpoints. " +
       "Use when the user says to redo the previous turn, try another version, swipe, or replace their last player input.",
     label: "Revise Play Turn",
     parameters: PlayReviseParams,
@@ -3567,7 +3568,7 @@ export function createReadTool(
   const description = options.allowSystemPaths
     ? "Read a file. Relative paths resolve under books/; absolute paths read from the system filesystem."
     : options.scope === "project"
-      ? "Read a UTF-8 file inside the current InkOS project. Path is relative to the project root."
+      ? "Read a UTF-8 file inside the current Castor project. Path is relative to the project root."
     : "Read a file from the book directory. Path is relative to books/.";
 
   return {

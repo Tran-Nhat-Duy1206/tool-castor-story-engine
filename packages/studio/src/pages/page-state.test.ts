@@ -142,10 +142,10 @@ describe("waitForBookReady", () => {
       fetchBook: async () => {
         throw new Error("Book not found");
       },
-      fetchStatus: async () => ({ status: "error", error: "INKOS_LLM_API_KEY not set" }),
+      fetchStatus: async () => ({ status: "error", error: "CASTOR_LLM_API_KEY not set" }),
       delayMs: 0,
       waitImpl: async () => undefined,
-    })).rejects.toThrow("INKOS_LLM_API_KEY not set");
+    })).rejects.toThrow("CASTOR_LLM_API_KEY not set");
   });
 });
 

@@ -10,7 +10,7 @@ const externalSkill = {
 } as const;
 
 describe("AgentSkills registry", () => {
-  it("does not inject implicit InkOS built-in skills", () => {
+  it("does not inject implicit Castor built-in skills", () => {
     const registry = createSkillRegistry();
 
     expect(registry.listSkills()).toEqual([]);

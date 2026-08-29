@@ -47,13 +47,13 @@ describe("short command", () => {
   });
 
   it("requires an explicit cover API key", () => {
-    const oldValue = process.env.INKOS_TEST_MISSING_COVER_KEY;
-    delete process.env.INKOS_TEST_MISSING_COVER_KEY;
+    const oldValue = process.env.CASTOR_TEST_MISSING_COVER_KEY;
+    delete process.env.CASTOR_TEST_MISSING_COVER_KEY;
     try {
-      expect(() => resolveCoverApiKey("INKOS_TEST_MISSING_COVER_KEY")).toThrow(/API key/i);
+      expect(() => resolveCoverApiKey("CASTOR_TEST_MISSING_COVER_KEY")).toThrow(/API key/i);
     } finally {
-      if (oldValue === undefined) delete process.env.INKOS_TEST_MISSING_COVER_KEY;
-      else process.env.INKOS_TEST_MISSING_COVER_KEY = oldValue;
+      if (oldValue === undefined) delete process.env.CASTOR_TEST_MISSING_COVER_KEY;
+      else process.env.CASTOR_TEST_MISSING_COVER_KEY = oldValue;
     }
   });
 });

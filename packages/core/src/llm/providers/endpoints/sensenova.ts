@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://console.sensecore.cn/aistudio/management/access-key
  * - API 文档：https://platform.sensenova.cn/doc
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const SENSENOVA: InkosEndpoint = {
+export const SENSENOVA: ProviderEndpoint = {
   id: "sensenova",
   label: "商汤日日新",
   group: "china",

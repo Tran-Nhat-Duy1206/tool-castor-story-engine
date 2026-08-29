@@ -10,9 +10,9 @@
  * 模型更新频繁（每周都有新 id），bank 只维护主流文本 chat 模型，
  * 元数据以 live /models probe 为准。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const PPIO: InkosEndpoint = {
+export const PPIO: ProviderEndpoint = {
   id: "ppio",
   label: "PPIO",
   group: "aggregator",

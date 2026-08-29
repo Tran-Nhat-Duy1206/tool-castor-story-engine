@@ -5,9 +5,9 @@
  * - 控制台 / API key：https://platform.lingyiwanwu.com/apikeys
  * - API 文档：https://platform.lingyiwanwu.com/docs
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const ZEROONE: InkosEndpoint = {
+export const ZEROONE: ProviderEndpoint = {
   id: "zeroone",
   label: "零一万物 (01.AI)",
   group: "china",

@@ -61,7 +61,7 @@ describe("Pi worker harness", () => {
     vi.restoreAllMocks();
   });
 
-  it("runs worker messages through the InkOS provider boundary", async () => {
+  it("runs worker messages through the Castor provider boundary", async () => {
     chatCompletionMock.mockResolvedValue({
       content: "完成",
       usage: { promptTokens: 12, completionTokens: 3, totalTokens: 15 },

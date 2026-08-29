@@ -47,7 +47,7 @@ Castor 1.8.0 converges the Chat Agent and every production workflow on one pi-ag
 ### Core Creation Modes
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="210" alt="Castor Short cover example">
+  <img src="assets/castor-short-demo-cover.png" width="210" alt="Castor Short cover example">
   <img src="assets/play-openworld-warcraft.png" width="210" alt="Castor Play fantasy open-world example">
   <img src="assets/play-openworld-romance.png" width="210" alt="Castor Play romance example">
   <img src="assets/play-openworld-detective.png" width="210" alt="Castor Play detective example">
@@ -86,7 +86,7 @@ pnpm install
 pnpm build
 ```
 
-> The upstream InkOS npm package (`@actalk/inkos`) and its [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) belong to Narcooo's InkOS project; this standalone repository is built from source. Existing user data — `inkos.json` config, `INKOS_*` environment variables, and book directory layout — remains compatible, and the `castor` command loads existing InkOS projects directly.
+> The upstream InkOS npm package (`@actalk/inkos`) and its [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) belong to Narcooo's InkOS project; this standalone repository is built from source. Existing user data — `castor.json` config, `INKOS_*` environment variables, and book directory layout — remains compatible, and the `castor` command loads existing InkOS projects directly.
 
 ### Use via OpenClaw 🦞
 
@@ -107,7 +107,7 @@ Castor uses the standard `SKILL.md` format directly and no longer maintains a se
 How to use them:
 
 - Use standard AgentSkills / OpenClaw locations: project `skills/` and `.agents/skills/`, plus `~/.agents/skills/` and `~/.openclaw/skills/`. Studio can import a complete folder containing `SKILL.md` and its static references; project imports are saved under `.agents/skills/`.
-- Or set `INKOS_SKILL_DIRS=/abs/path/to/skills`; the path may point to one skill directory or a directory containing multiple skill subdirectories. Use the platform path delimiter for multiple paths.
+- Or set `CASTOR_SKILL_DIRS=/abs/path/to/skills`; the path may point to one skill directory or a directory containing multiple skill subdirectories. Use the platform path delimiter for multiple paths.
 - Force one for a turn with `@skill-id`, for example: `@detective-play create an evidence-chain open world`.
 - Without `@skill-id`, the Chat Agent decides from the user's current intent whether to call `use_skill`. Session kinds, trigger phrases, and substring matching no longer activate skills.
 - External skills provide instructions and static references only. Castor never auto-executes their scripts, and a skill cannot bypass existing tool permissions or confirmation gates.
@@ -132,7 +132,7 @@ Castor now separates two configuration paths: **Studio uses visual service setti
 ```bash
 castor init my-novel
 cd my-novel
-inkos
+castor
 ```
 
 Open Studio, then go to **Model Settings**:
@@ -142,7 +142,7 @@ Open Studio, then go to **Model Settings**:
 3. Pick an available model and save.
 4. Return to Studio Chat or your book page.
 
-Studio uses project service settings and `.inkos/secrets.json`. It may show env-detection hints, but env files do not override the Studio-selected service/model/base URL/API key.
+Studio uses project service settings and `.castor/secrets.json`. It may show env-detection hints, but env files do not override the Studio-selected service/model/base URL/API key.
 
 MiniMax uses the official OpenAI-compatible `/v1/chat/completions` endpoint. Castor disables returned thinking by default for `MiniMax-M3*`; M2.x thinking cannot be disabled by the upstream service.
 
@@ -162,23 +162,23 @@ castor config set-global \
 # model: your model name
 ```
 
-`--lang en` sets English as the default writing language for CLI / daemon runs. Saved to `~/.inkos/.env`.
+`--lang en` sets English as the default writing language for CLI / daemon runs. Saved to `~/.castor/.env`.
 
-You can also edit global `~/.inkos/.env` or project `.env` manually:
+You can also edit global `~/.castor/.env` or project `.env` manually:
 
 ```bash
 # Required
-INKOS_LLM_PROVIDER=                               # openai / anthropic / custom (use custom for any OpenAI-compatible API)
-INKOS_LLM_BASE_URL=                               # API endpoint
-INKOS_LLM_API_KEY=                                 # API Key
-INKOS_LLM_MODEL=                                   # Model name
+CASTOR_LLM_PROVIDER=                               # openai / anthropic / custom (use custom for any OpenAI-compatible API)
+CASTOR_LLM_BASE_URL=                               # API endpoint
+CASTOR_LLM_API_KEY=                                 # API Key
+CASTOR_LLM_MODEL=                                   # Model name
 
 # Language (defaults to global setting or genre default)
-# INKOS_DEFAULT_LANGUAGE=en                        # en or zh
+# CASTOR_DEFAULT_LANGUAGE=en                        # en or zh
 
 # Optional
-# INKOS_LLM_TEMPERATURE=0.7                       # Temperature
-# INKOS_LLM_THINKING_BUDGET=0                      # Anthropic extended thinking budget
+# CASTOR_LLM_TEMPERATURE=0.7                       # Temperature
+# CASTOR_LLM_THINKING_BUDGET=0                      # Anthropic extended thinking budget
 ```
 
 CLI resolution starts from Studio/project service settings, then layers service secrets, global env, project env, process env, and CLI flags. That means CLI can reuse the service you configured in Studio, while env and command-line flags remain explicit overrides.
@@ -214,12 +214,12 @@ If a service test fails, first check that the service, model, and protocol match
 
 ### LLM Configuration Notes
 
-- **Studio / CLI config isolation**: Studio always uses the service page settings and `.inkos/secrets.json`; the CLI, daemon, and deployment environments support env overrides and one-off command flags.
+- **Studio / CLI config isolation**: Studio always uses the service page settings and `.castor/secrets.json`; the CLI, daemon, and deployment environments support env overrides and one-off command flags.
 - **Provider bank capability table**: built-in baseUrl, protocol, models, and compatibility policies for 15 services — Google Gemini, Moonshot, MiniMax, Zhipu (GLM), Bailian (Alibaba Cloud Model Studio), DeepSeek, SiliconFlow, Volcengine, Tencent Hunyuan, Baidu ERNIE (Wenxin), iFlytek Spark, OpenRouter, kkaiapi, Ollama, and CodingPlan.
 - **Model ownership validation**: mismatches like `--service google --model kimi-k2.5` fail immediately, so requests are never sent to the wrong provider.
 - **Google Gemini compatibility fix**: AI Studio API keys work directly with the Gemini OpenAI-compatible endpoint; Castor automatically disables the OpenAI `store` parameter Google does not support.
 - **MiniMax transport probing**: MiniMax / MiniMax CodingPlan use the official OpenAI-compatible `/v1` entry and automatically pick a working non-streaming transport, working around streams that report usage but return an empty body.
-- **Legacy env compatibility**: the old `INKOS_LLM_BASE_URL + INKOS_LLM_MODEL + INKOS_LLM_API_KEY` combination still works for the CLI; without `INKOS_LLM_SERVICE`, Castor tries to infer the service from the baseUrl.
+- **Legacy env compatibility**: the old `CASTOR_LLM_BASE_URL + CASTOR_LLM_MODEL + CASTOR_LLM_API_KEY` combination still works for the CLI; without `CASTOR_LLM_SERVICE`, Castor tries to infer the service from the baseUrl.
 
 ### Current Interaction Entry Points
 
@@ -278,7 +278,7 @@ The cover tool writes `covers/<title>/cover-prompt.md` and `covers/<title>/cover
 After generation, you can keep editing the cover prompt through chat, for example: "move the character closer, make the title text bigger, and give her a colder smile." Castor will pass the revised direction as `coverPrompt`, rewrite `cover-prompt.md`, and regenerate the cover without rewriting the story.
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="260" alt="Castor Short cover example">
+  <img src="assets/castor-short-demo-cover.png" width="260" alt="Castor Short cover example">
   <img src="assets/play-openworld-warcraft.png" width="260" alt="Castor Play open-world example">
   <img src="assets/play-openworld-detective.png" width="260" alt="Castor Play detective example">
 </p>
@@ -381,7 +381,7 @@ Different agents can use different models and providers. Writer on Claude (stron
 
 ### Daemon Mode + Notifications
 
-`castor up` starts an autonomous background loop that writes chapters on a schedule. The pipeline continues through handleable non-critical issues, pausing with reviewable results when human judgment is needed. Notifications via Telegram, Feishu (Lark), WeCom (Enterprise WeChat), and Webhook (HMAC-SHA256 signing + event filtering). Logs to `inkos.log` (JSON Lines), `-q` for quiet mode.
+`castor up` starts an autonomous background loop that writes chapters on a schedule. The pipeline continues through handleable non-critical issues, pausing with reviewable results when human judgment is needed. Notifications via Telegram, Feishu (Lark), WeCom (Enterprise WeChat), and Webhook (HMAC-SHA256 signing + event filtering). Logs to `castor.log` (JSON Lines), `-q` for quiet mode.
 
 ### Local Model Compatibility
 
@@ -476,7 +476,7 @@ castor write next my-book              # Draft → audit → auto-revise, all in
 castor write next my-book --count 5    # Write 5 chapters in sequence
 ```
 
-`write next` now uses the `plan -> compose -> write` governance chain by default. If you need the older prompt-assembly path, set this explicitly in `inkos.json`:
+`write next` now uses the `plan -> compose -> write` governance chain by default. If you need the older prompt-assembly path, set this explicitly in `castor.json`:
 
 ```json
 {
@@ -519,7 +519,7 @@ Studio's **Open World** and **Branching Interactive** entries launch interactive
 </p>
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="230" alt="Short-fiction cover output">
+  <img src="assets/castor-short-demo-cover.png" width="230" alt="Short-fiction cover output">
   <img src="assets/play-openworld-romance.png" width="230" alt="Romance interactive-world output">
   <img src="assets/play-openworld-detective.png" width="230" alt="Detective interactive-world output">
   <img src="assets/play-item-warcraft.png" width="230" alt="Interactive-world item image output">
@@ -556,7 +556,7 @@ The first image is a local Studio screenshot. The other images are real local ou
 | `castor consolidate [id]` | Consolidate chapter summaries for long-book context control |
 | `castor forecast create/show/select` | Create, re-check, and select non-canonical long-form branches; selection saves a candidate plan only |
 | `castor interact` | External-agent / CLI natural-language entry (`--json`, `--message`, `--book`) |
-| `castor config set-global` | Set the global CLI / daemon / deployment LLM env config (`~/.inkos/.env`) |
+| `castor config set-global` | Set the global CLI / daemon / deployment LLM env config (`~/.castor/.env`) |
 | `castor config show-global` | Show the global config |
 | `castor config set/show` | View or update project configuration |
 | `castor config set-model <agent> <model>` | Per-agent model override (`--base-url`, `--provider`, `--api-key-env`) |
@@ -572,7 +572,7 @@ The first image is a local Studio screenshot. The other images are real local ou
 | `castor update` | Update to the latest version |
 | `castor` / `castor studio` | Start web workbench (`-p` for port, default 4567) |
 | `castor tui` | Start terminal full-screen TUI |
-| `castor up / down` | Start/stop daemon (`-q` quiet mode, auto-writes `inkos.log`) |
+| `castor up / down` | Start/stop daemon (`-q` quiet mode, auto-writes `castor.log`) |
 
 `[id]` is auto-detected when the project has only one book. All commands support `--json` for structured output. `draft` / `write next` / `plan chapter` / `compose chapter` accept `--context` for steering, and `--words` overrides the target chapter size. `book create` supports `--brief <file>` to pass a creative brief — the Architect builds from your ideas instead of generating from scratch. `plan chapter` calls the LLM to create chapter intent; `compose chapter` does not require a live LLM, so you can inspect governed inputs before finishing API setup.
 

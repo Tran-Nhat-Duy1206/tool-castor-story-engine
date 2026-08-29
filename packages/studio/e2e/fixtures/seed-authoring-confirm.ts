@@ -15,7 +15,7 @@ export const E2E_AUTHOR_ID = "e2e-authoring-confirm";
 
 /**
  * Seed the project directory that the dev server needs for the authoring
- * confirm E2E. The dev server uses test-project/ as its INKOS_PROJECT_ROOT.
+ * confirm E2E. The dev server uses test-project/ as its CASTOR_PROJECT_ROOT.
  * We create:
  *  - test-project/interactive-films/<E2E_AUTHOR_ID>/story-graph.json
  *    (minimal graph so StoryGraphTree renders and shows the open-authoring button)
@@ -28,7 +28,7 @@ export const E2E_AUTHOR_ID = "e2e-authoring-confirm";
  * IMPORTANT: we do NOT touch test-project/inkos.json — that file is shared
  * across all E2E tests and must not be overwritten.
  *
- * The actual LLM calls are bypassed by INKOS_AGENT_LLM_STUB=1 set in
+ * The actual LLM calls are bypassed by CASTOR_AGENT_LLM_STUB=1 set in
  * playwright.config.ts, so the fake API key is never sent to any real service.
  */
 export async function seedAuthoringConfirm(): Promise<void> {
@@ -91,7 +91,7 @@ export async function seedAuthoringConfirm(): Promise<void> {
   // DeepSeek as "connected". The dev server then returns DeepSeek's static
   // model list from /api/v1/services/models, which allows ChatPage to
   // auto-select a model and pass the sendMessage guard.
-  // The INKOS_AGENT_LLM_STUB=1 env var ensures no real API call is made.
+  // The CASTOR_AGENT_LLM_STUB=1 env var ensures no real API call is made.
   await saveSecrets(E2E_ROOT, {
     services: {
       deepseek: { apiKey: "stub-key-e2e-not-real" },

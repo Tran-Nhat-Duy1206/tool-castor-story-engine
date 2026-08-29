@@ -28,7 +28,7 @@ describe("storyboard creation runner", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-storyboard-assets-"));
+    root = await mkdtemp(join(tmpdir(), "castor-storyboard-assets-"));
     chatCompletionMock.mockReset();
     generateStoryGraphMock.mockReset();
     generateStoryGraphMock.mockImplementation((
@@ -132,7 +132,7 @@ describe("storyboard creation runner", () => {
   it("applies storyboard-specific Skill guidance without reusing the long-writing Skill", async () => {
     const runtime = makeRuntime(root, [{
       skill: {
-        id: "inkos-storyboard",
+        id: "castor-storyboard",
         name: "Storyboard creation",
         description: "Visual shot design.",
         body: "Translate narrative beats into visible shots.",
@@ -150,9 +150,9 @@ describe("storyboard creation runner", () => {
     });
 
     const messages = chatCompletionMock.mock.calls[0]?.[2] as ReadonlyArray<{ role: string; content: string }>;
-    expect(messages[0]?.content).toContain("inkos-storyboard");
+    expect(messages[0]?.content).toContain("castor-storyboard");
     expect(messages[0]?.content).toContain("Translate narrative beats into visible shots.");
-    expect(messages[0]?.content).not.toContain("inkos-long-writing");
+    expect(messages[0]?.content).not.toContain("castor-long-writing");
   });
 
   it("continues a script after a confirmed model output limit before committing it", async () => {

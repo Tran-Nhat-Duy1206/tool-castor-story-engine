@@ -96,7 +96,7 @@ describe("play image manifest", () => {
 
 describe("play image settings", () => {
   let runDir: string;
-  beforeEach(async () => { runDir = await mkdtemp(join(tmpdir(), "inkos-playset-")); });
+  beforeEach(async () => { runDir = await mkdtemp(join(tmpdir(), "castor-playset-")); });
   afterEach(async () => { await rm(runDir, { recursive: true, force: true }); });
 
   it("defaults to all-off when no settings file exists", async () => {

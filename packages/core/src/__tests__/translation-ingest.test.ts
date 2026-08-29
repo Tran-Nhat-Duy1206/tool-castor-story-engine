@@ -53,7 +53,7 @@ describe("translation ingestion", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-translation-"));
+    root = await mkdtemp(join(tmpdir(), "castor-translation-"));
     await mkdir(join(root, "inputs"), { recursive: true });
   });
 

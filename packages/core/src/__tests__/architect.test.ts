@@ -904,7 +904,7 @@ describe("ArchitectAgent", () => {
     const { join } = await import("node:path");
 
     const agent = buildPhase5Agent();
-    const tmpDir = await mkdtemp(join(tmpdir(), "inkos-arch-legacy-test-"));
+    const tmpDir = await mkdtemp(join(tmpdir(), "castor-arch-legacy-test-"));
     try {
       await agent.writeFoundationFiles(tmpDir, {
         storyBible: "# Legacy Story Bible\n",

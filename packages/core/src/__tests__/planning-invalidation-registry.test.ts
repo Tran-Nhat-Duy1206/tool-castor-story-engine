@@ -14,7 +14,7 @@ let root = "";
 let bookDir = "";
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-plan-registry-"));
+  root = await mkdtemp(join(tmpdir(), "castor-plan-registry-"));
   bookDir = join(root, "books", "demo-book");
 });
 

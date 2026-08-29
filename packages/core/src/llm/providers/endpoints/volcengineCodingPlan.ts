@@ -14,9 +14,9 @@
  * 注：baseUrl 是 /api/coding（不是 /api/v3/anthropic）—— 后者是火山通用
  * Anthropic 兼容接入，和 CodingPlan 订阅计量不通。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
-export const VOLCENGINE_CODING_PLAN: InkosEndpoint = {
+export const VOLCENGINE_CODING_PLAN: ProviderEndpoint = {
   id: "volcengineCodingPlan",
   label: "火山 Coding Plan",
   group: "codingPlan",

@@ -4,7 +4,7 @@
  * - 任意兼容 OpenAI /v1/chat/completions 协议的服务都可通过此 endpoint 接入。
  * - 模型列表走 live /models probe，bank 不预置任何条目。
  */
-import type { InkosEndpoint } from "../types.js";
+import type { ProviderEndpoint } from "../types.js";
 
 /**
  * custom 是"用户自填 baseUrl 的中转站"的锚点 provider。
@@ -13,7 +13,7 @@ import type { InkosEndpoint } from "../types.js";
  * listModelsForService 对 custom 用用户填的 baseUrl 走 live /models probe，
  * 失败再 fallback 到全局 bank 反查补元数据。
  */
-export const CUSTOM: InkosEndpoint = {
+export const CUSTOM: ProviderEndpoint = {
   id: "custom",
   label: "自定义端点",
   api: "openai-completions",

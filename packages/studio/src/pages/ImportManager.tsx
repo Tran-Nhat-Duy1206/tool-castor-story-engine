@@ -241,7 +241,7 @@ export function ImportManager({ nav, theme, t, initialTab }: { nav: Nav; theme: 
         {tab === "canon" && (
           <>
             <p className="text-sm text-muted-foreground">
-              {tr("母本可以来自已有 InkOS 书籍，也可以直接上传外部 TXT、Markdown 或 PDF 小说。", "Use an existing InkOS book or upload an external TXT, Markdown, or PDF novel as canon.")}
+              {tr("母本可以来自已有 Castor 书籍，也可以直接上传外部 TXT、Markdown 或 PDF 小说。", "Use an existing Castor book or upload an external TXT, Markdown, or PDF novel as canon.")}
             </p>
             <div className="inline-flex rounded-lg border border-border bg-secondary/20 p-1">
               {(["book", "file"] as const).map((sourceType) => (

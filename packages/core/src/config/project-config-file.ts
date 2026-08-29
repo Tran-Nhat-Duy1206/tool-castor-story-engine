@@ -1,6 +1,6 @@
 import { access, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { CASTOR_CONFIG_FILENAME, LEGACY_INKOS_CONFIG_FILENAME } from "./product-identity.js";
+import { CASTOR_CONFIG_FILENAME, LEGACY_CASTOR_CONFIG_FILENAME } from "./product-identity.js";
 
 /**
  * Project config file adapter (Checkpoint 3, plan Task 3.4).
@@ -32,7 +32,7 @@ export class ConfigNotFoundError extends Error {
   constructor(root: string) {
     super(
       `Project config not found in ${root}: expected ${CASTOR_CONFIG_FILENAME}` +
-        ` (a legacy ${LEGACY_INKOS_CONFIG_FILENAME} is migrated automatically).\n` +
+        ` (a legacy ${LEGACY_CASTOR_CONFIG_FILENAME} is migrated automatically).\n` +
         `Run 'castor init' in this directory or open the folder created by 'castor init'.`,
     );
     this.name = "ConfigNotFoundError";
@@ -44,7 +44,7 @@ function castorPath(root: string): string {
 }
 
 function legacyPath(root: string): string {
-  return join(root, LEGACY_INKOS_CONFIG_FILENAME);
+  return join(root, LEGACY_CASTOR_CONFIG_FILENAME);
 }
 
 async function exists(path: string): Promise<boolean> {
@@ -121,14 +121,14 @@ export async function loadProjectConfigFile(root: string): Promise<LoadedProject
       } catch {
         legacy = {};
         warnings.push(
-          `Legacy ${LEGACY_INKOS_CONFIG_FILENAME} exists but is invalid JSON; it was ignored. ` +
+          `Legacy ${LEGACY_CASTOR_CONFIG_FILENAME} exists but is invalid JSON; it was ignored. ` +
             `${CASTOR_CONFIG_FILENAME} remains canonical.`,
         );
       }
       const conflicts = meaningfulConflictKeys(config, legacy);
       if (conflicts.length > 0) {
         warnings.push(
-          `Both ${CASTOR_CONFIG_FILENAME} and legacy ${LEGACY_INKOS_CONFIG_FILENAME} exist with different values ` +
+          `Both ${CASTOR_CONFIG_FILENAME} and legacy ${LEGACY_CASTOR_CONFIG_FILENAME} exist with different values ` +
             `for: ${conflicts.join(", ")}. ${CASTOR_CONFIG_FILENAME} is canonical; the legacy file was not merged.`,
         );
       }
@@ -143,7 +143,7 @@ export async function loadProjectConfigFile(root: string): Promise<LoadedProject
       config: await readJsonFile(castorPath(root)),
       source: "legacy-migrated",
       warnings: [
-        `Migrated legacy ${LEGACY_INKOS_CONFIG_FILENAME} to ${CASTOR_CONFIG_FILENAME}. ` +
+        `Migrated legacy ${LEGACY_CASTOR_CONFIG_FILENAME} to ${CASTOR_CONFIG_FILENAME}. ` +
           `The legacy file was kept unchanged; future saves update ${CASTOR_CONFIG_FILENAME} only.`,
       ],
     };

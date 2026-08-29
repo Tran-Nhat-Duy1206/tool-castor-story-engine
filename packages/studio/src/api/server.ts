@@ -2627,7 +2627,7 @@ function mapCanonMutationError(e: unknown): { status: 400 | 404 | 409 | 500; bod
     // Message carries book id + owner pid/timestamp only — no paths.
     return { status: 409, body: { error: e.message, code: "book_write_locked" } };
   }
-  console.error("[inkos] canon mutation failed:", e);
+  console.error("[castor] canon mutation failed:", e);
   return { status: 500, body: { error: "Internal error while applying canon edits." } };
 }
 
@@ -2813,9 +2813,9 @@ export function createStudioServer(
     return freshConfig;
   }
 
-  // Read the project language fresh from inkos.json on every call, so a language
+  // Read the project language fresh from castor.json on every call, so a language
   // switch takes effect on the next request instead of being frozen at startup.
-  // A missing/corrupt inkos.json means "no project language configured" -> zh.
+  // A missing/corrupt castor.json means "no project language configured" -> zh.
   async function currentProjectLanguage(): Promise<StudioLanguage> {
     const raw = await loadRawConfig(root).catch(() => ({} as Record<string, unknown>));
     return normalizeStudioLanguage(raw.language);
@@ -3058,7 +3058,7 @@ export function createStudioServer(
         try {
           await release();
         } catch (releaseError) {
-          console.warn("[inkos] failed to release book lock after canon commit:", releaseError);
+          console.warn("[castor] failed to release book lock after canon commit:", releaseError);
         }
       }
     }
@@ -3083,7 +3083,7 @@ export function createStudioServer(
     if (e instanceof BookWriteLockError) {
       return { status: 409, body: { error: e.message, code: "book_write_locked" } };
     }
-    console.error("[inkos] state review operation failed:", e);
+    console.error("[castor] state review operation failed:", e);
     return { status: 500, body: { error: "Internal error while processing the state review." } };
   }
 
@@ -3180,7 +3180,7 @@ export function createStudioServer(
         try {
           await release();
         } catch (releaseError) {
-          console.warn("[inkos] failed to release book lock after state review decision:", releaseError);
+          console.warn("[castor] failed to release book lock after state review decision:", releaseError);
         }
       }
     }
@@ -3213,7 +3213,7 @@ export function createStudioServer(
         try {
           await release();
         } catch (releaseError) {
-          console.warn("[inkos] failed to release book lock after state review edit:", releaseError);
+          console.warn("[castor] failed to release book lock after state review edit:", releaseError);
         }
       }
     }
@@ -3254,7 +3254,7 @@ export function createStudioServer(
         try {
           await release();
         } catch (releaseError) {
-          console.warn("[inkos] failed to release book lock after state review item add:", releaseError);
+          console.warn("[castor] failed to release book lock after state review item add:", releaseError);
         }
       }
     }
@@ -3286,7 +3286,7 @@ export function createStudioServer(
         try {
           await release();
         } catch (releaseError) {
-          console.warn("[inkos] failed to release book lock after state review item removal:", releaseError);
+          console.warn("[castor] failed to release book lock after state review item removal:", releaseError);
         }
       }
     }
@@ -3320,7 +3320,7 @@ export function createStudioServer(
         try {
           await release();
         } catch (releaseError) {
-          console.warn("[inkos] failed to release book lock after reject-all:", releaseError);
+          console.warn("[castor] failed to release book lock after reject-all:", releaseError);
         }
       }
     }
@@ -3440,7 +3440,7 @@ export function createStudioServer(
     if (e instanceof ApiError) {
       return { status: e.status as 400 | 404 | 409 | 500, body: { error: e.message, code: e.code } };
     }
-    console.error("[inkos] foundation operation failed:", e);
+    console.error("[castor] foundation operation failed:", e);
     return { status: 500, body: { error: "Internal error while processing foundation request." } };
   }
 
@@ -3610,7 +3610,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after saveFoundationUnitDraft:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after saveFoundationUnitDraft:", e); }
     }
   });
 
@@ -3636,7 +3636,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after saveFoundationUnitDraft:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after saveFoundationUnitDraft:", e); }
     }
   });
 
@@ -3663,7 +3663,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after approveFoundationUnit:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after approveFoundationUnit:", e); }
     }
   });
 
@@ -3688,7 +3688,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after approveFoundationUnit:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after approveFoundationUnit:", e); }
     }
   });
 
@@ -3711,7 +3711,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after markFoundationUnitNeedsRevision:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after markFoundationUnitNeedsRevision:", e); }
     }
   });
 
@@ -3734,7 +3734,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after markFoundationUnitNeedsRevision:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after markFoundationUnitNeedsRevision:", e); }
     }
   });
 
@@ -3760,7 +3760,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after reapproveStaleFoundationUnit:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after reapproveStaleFoundationUnit:", e); }
     }
   });
 
@@ -3786,7 +3786,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after reapproveStaleFoundationUnit:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after reapproveStaleFoundationUnit:", e); }
     }
   });
 
@@ -3805,7 +3805,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after discardFoundationRevision:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after discardFoundationRevision:", e); }
     }
   });
 
@@ -3832,7 +3832,7 @@ export function createStudioServer(
       const mapped = mapFoundationError(e);
       return c.json(mapped.body, mapped.status);
     } finally {
-      if (release) try { await release(); } catch (e) { console.warn("[inkos] failed to release lock after approveFoundationUnitsBatch:", e); }
+      if (release) try { await release(); } catch (e) { console.warn("[castor] failed to release lock after approveFoundationUnitsBatch:", e); }
     }
   });
 
@@ -3959,7 +3959,7 @@ export function createStudioServer(
     if (e instanceof ApiError) {
       return { status: e.status as 400 | 404 | 409 | 500, body: { error: e.message, code: e.code } };
     }
-    console.error("[inkos] planning operation failed:", e);
+    console.error("[castor] planning operation failed:", e);
     return { status: 500, body: { error: "Internal error while processing planning request." } };
   }
 
@@ -5563,7 +5563,7 @@ export function createStudioServer(
       };
     }).sort(compareServiceListItems);
 
-    // Add custom services from inkos.json
+    // Add custom services from castor.json
     for (const svc of configuredServices) {
       if (svc.service === "custom") {
         const secretKey = `custom:${svc.name}`;
@@ -6348,7 +6348,7 @@ export function createStudioServer(
   // --- Logs ---
 
   app.get("/api/v1/logs", async (c) => {
-    const logPath = join(root, "inkos.log");
+    const logPath = join(root, "castor.log");
     try {
       const content = await readFile(logPath, "utf-8");
       const lines = content.trim().split("\n").slice(-100);
@@ -8290,7 +8290,7 @@ export function createStudioServer(
     const globalEnvPath = await resolveGlobalEnvPath();
 
     const checks = {
-      projectConfigFile: existsSync(join(root, "castor.json")) || existsSync(join(root, "inkos.json")),
+      projectConfigFile: existsSync(join(root, "castor.json")) || existsSync(join(root, LEGACY_CASTOR_CONFIG_FILENAME)),
       projectEnv: existsSync(join(root, ".env")),
       globalEnv: existsSync(globalEnvPath),
       booksDir: existsSync(join(root, "books")),
@@ -8689,6 +8689,6 @@ export async function startStudioServer(
     }
   }
 
-  console.log(`InkOS Studio running on http://localhost:${port}`);
+  console.log(`Castor Studio running on http://localhost:${port}`);
   serve({ fetch: app.fetch, port });
 }

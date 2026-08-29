@@ -32,7 +32,7 @@ describe("PipelineRunner.writeChapters", () => {
   });
 
   it("holds one book lock while writing sequential chapters", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-batch-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-batch-"));
     roots.push(root);
     const runner = new PipelineRunner({
       client: {} as never,
@@ -65,7 +65,7 @@ describe("PipelineRunner.writeChapters", () => {
   });
 
   it("stops the batch after the first chapter that needs review", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-batch-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-batch-"));
     roots.push(root);
     const runner = new PipelineRunner({
       client: {} as never,
@@ -92,7 +92,7 @@ describe("PipelineRunner.writeChapters", () => {
   });
 
   it("releases the book lock when an in-flight chapter is aborted", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-batch-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-batch-"));
     roots.push(root);
     const runner = new PipelineRunner({
       client: {} as never,
@@ -124,7 +124,7 @@ describe("PipelineRunner.writeChapters", () => {
   });
 
   it("rejects invalid batch sizes before taking the lock", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-batch-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-batch-"));
     roots.push(root);
     const runner = new PipelineRunner({
       client: {} as never,

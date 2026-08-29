@@ -645,7 +645,7 @@ You MUST emit all **5 SECTION blocks in order**: story_frame → volume_map → 
     const missingList = error.missing.join(", ");
     const system = language === "en"
       ? [
-          "You repair InkOS architect output formatting.",
+          "You repair Castor architect output formatting.",
           "The previous draft is partially useful but is missing required SECTION blocks.",
           "Do not invent a new book. Preserve usable existing content and add the missing parts.",
           "Return the complete output with exactly these 5 SECTION blocks in order: story_frame, volume_map, roles, book_rules, pending_hooks.",
@@ -653,7 +653,7 @@ You MUST emit all **5 SECTION blocks in order**: story_frame → volume_map → 
           "Do not explain the repair.",
         ].join("\n")
       : [
-          "你负责修复 InkOS architect 的输出格式。",
+          "你负责修复 Castor architect 的输出格式。",
           "上一轮草稿有可用内容，但缺少必需的 SECTION 块。",
           "不要重新发明一本书；保留已有可用内容，只补齐缺失部分并整理成完整输出。",
           "必须按顺序返回完整 5 段 SECTION：story_frame、volume_map、roles、book_rules、pending_hooks。",

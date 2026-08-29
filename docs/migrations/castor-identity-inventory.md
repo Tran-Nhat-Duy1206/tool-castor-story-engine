@@ -232,7 +232,7 @@ Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGA
 
 ## ACTIVE-UI-LOG — 1 files, 1 occurrences
 
-- assets/inkos-text.svg (1)
+- assets/castor-text.svg (1)
 
 ## ACTIVE-DOC — 5 files, 254 occurrences
 

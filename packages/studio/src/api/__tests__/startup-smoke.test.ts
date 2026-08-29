@@ -11,7 +11,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
  *
  * Launches the real Studio server entry exactly the way the CLI launches it
  * (`node --import <tsx loader> packages/studio/src/api/index.ts <root>` with
- * INKOS_STUDIO_PORT), on an ephemeral port against a disposable project root,
+ * CASTOR_STUDIO_PORT), on an ephemeral port against a disposable project root,
  * and asserts the announced HTTP endpoint becomes reachable.
  *
  * The child imports Core through the real package boundary (Core dist), so a
@@ -150,7 +150,7 @@ describe("studio startup smoke", () => {
     const child = spawn("node", ["--import", pathToFileURL(tsxLoader).href, studioEntry, projectRoot], {
       cwd: repoRoot,
       stdio: ["ignore", "pipe", "pipe"],
-      env: { ...process.env, INKOS_STUDIO_PORT: String(port) },
+      env: { ...process.env, CASTOR_STUDIO_PORT: String(port) },
     });
     startedChildren.push(child);
 

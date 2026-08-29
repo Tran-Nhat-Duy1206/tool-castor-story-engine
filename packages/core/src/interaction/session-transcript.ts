@@ -2,11 +2,12 @@ import { randomUUID } from "node:crypto";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { AgentMessage } from "@mariozechner/pi-agent-core";
+import { LEGACY_CASTOR_RUNTIME_DIRNAME } from "../config/product-identity.js";
 import { TranscriptEventSchema, type TranscriptEvent } from "./session-transcript-schema.js";
 import type { SessionKind, TranscriptRole } from "./session-transcript-schema.js";
 
 const SESSIONS_DIR = ".castor/sessions";
-const LEGACY_SESSIONS_DIR = ".inkos/sessions";
+const LEGACY_SESSIONS_DIR = `${LEGACY_CASTOR_RUNTIME_DIRNAME}/sessions`;
 const appendQueues = new Map<string, Promise<void>>();
 
 export function sessionsDir(projectRoot: string): string {

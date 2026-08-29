@@ -30,7 +30,7 @@ export async function loadAvailableAgentSkills(
   ]);
   return {
     // Registry de-duplication is last-write-wins, so project/user skills can
-    // intentionally replace an InkOS default with the same AgentSkills id.
+    // intentionally replace an Castor default with the same AgentSkills id.
     skills: [...builtin.skills, ...configured.skills],
     diagnostics: [...builtin.diagnostics, ...configured.diagnostics],
   };

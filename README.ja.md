@@ -47,7 +47,7 @@ Castor 1.8.0 は、Chat Agent と各作品パイプラインを一つの pi-agen
 ### 主な創作形式
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="210" alt="Castor Short 表紙例">
+  <img src="assets/castor-short-demo-cover.png" width="210" alt="Castor Short 表紙例">
   <img src="assets/play-openworld-warcraft.png" width="210" alt="Castor Play ファンタジー開放世界例">
   <img src="assets/play-openworld-romance.png" width="210" alt="Castor Play 恋愛例">
   <img src="assets/play-openworld-detective.png" width="210" alt="Castor Play 探偵例">
@@ -86,7 +86,7 @@ pnpm install
 pnpm build
 ```
 
-> 上流の InkOS npm パッケージ（`@actalk/inkos`）と [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) は Narcooo の InkOS プロジェクトに属します。本スタンドアロンリポジトリはソースからビルドして使います。既存ユーザーデータ（`inkos.json` 設定、`INKOS_*` 環境変数、書籍ディレクトリ構造）は互換のままで、`castor` コマンドは既存の InkOS プロジェクトを直接読み込めます。
+> 上流の InkOS npm パッケージ（`@actalk/inkos`）と [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) は Narcooo の InkOS プロジェクトに属します。本スタンドアロンリポジトリはソースからビルドして使います。既存ユーザーデータ（`castor.json` 設定、`INKOS_*` 環境変数、書籍ディレクトリ構造）は互換のままで、`castor` コマンドは既存の InkOS プロジェクトを直接読み込めます。
 
 ### OpenClaw 🦞 経由で使用
 
@@ -107,7 +107,7 @@ Castor は設定経路を分けています。**Studio は可視化されたサ�
 ```bash
 castor init my-novel
 cd my-novel
-inkos
+castor
 ```
 
 Studio を開き、**モデル設定**へ進みます：
@@ -117,7 +117,7 @@ Studio を開き、**モデル設定**へ進みます：
 3. 利用可能なモデルを選んで保存。
 4. Studio Chat または書籍ページに戻って創作を開始。
 
-Studio はプロジェクトのサービス設定と `.inkos/secrets.json` を使います。env が検出されてもヒントとして表示するだけで、Studio で選んだ service / model / base URL / API Key を上書きしません。
+Studio はプロジェクトのサービス設定と `.castor/secrets.json` を使います。env が検出されてもヒントとして表示するだけで、Studio で選んだ service / model / base URL / API Key を上書きしません。
 
 MiniMax は公式 OpenAI-compatible `/v1/chat/completions` エンドポイントを使用します。Castor は `MiniMax-M3*` の thinking 返却をデフォルトで無効化します。M2.x の thinking は上流サービス側の制限により無効化できません。
 
@@ -137,23 +137,23 @@ castor config set-global \
 # model: モデル名
 ```
 
-`--lang en` は CLI / daemon 実行時のデフォルト執筆言語を英語に設定します。`~/.inkos/.env` に保存されます。
+`--lang en` は CLI / daemon 実行時のデフォルト執筆言語を英語に設定します。`~/.castor/.env` に保存されます。
 
-グローバル `~/.inkos/.env` またはプロジェクト `.env` を手動で編集することもできます：
+グローバル `~/.castor/.env` またはプロジェクト `.env` を手動で編集することもできます：
 
 ```bash
 # 必須
-INKOS_LLM_PROVIDER=                               # openai / anthropic / custom（OpenAI互換APIにはcustomを使用）
-INKOS_LLM_BASE_URL=                               # APIエンドポイント
-INKOS_LLM_API_KEY=                                 # APIキー
-INKOS_LLM_MODEL=                                   # モデル名
+CASTOR_LLM_PROVIDER=                               # openai / anthropic / custom（OpenAI互換APIにはcustomを使用）
+CASTOR_LLM_BASE_URL=                               # APIエンドポイント
+CASTOR_LLM_API_KEY=                                 # APIキー
+CASTOR_LLM_MODEL=                                   # モデル名
 
 # 言語（グローバル設定またはジャンルのデフォルトに準拠）
-# INKOS_DEFAULT_LANGUAGE=en                        # en または zh
+# CASTOR_DEFAULT_LANGUAGE=en                        # en または zh
 
 # オプション
-# INKOS_LLM_TEMPERATURE=0.7                       # Temperature
-# INKOS_LLM_THINKING_BUDGET=0                      # Anthropic拡張思考バジェット
+# CASTOR_LLM_TEMPERATURE=0.7                       # Temperature
+# CASTOR_LLM_THINKING_BUDGET=0                      # Anthropic拡張思考バジェット
 ```
 
 CLI の解決順序は、Studio/project サービス設定、サービス secrets、グローバル env、プロジェクト env、プロセス env、CLI フラグです。つまり CLI は Studio で設定したサービスを再利用でき、env やコマンドライン引数は明示的な上書きとして扱われます。
@@ -228,7 +228,7 @@ castor short run \
 生成後もチャットで表紙プロンプトを調整できます。例：「人物をもっと近く、タイトル文字を大きく、冷たい笑みにして」。Castor は新しい指示を `coverPrompt` として渡し、`cover-prompt.md` を更新して表紙を再生成します。本文を書き直す必要はありません。
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="260" alt="Castor Short 表紙例">
+  <img src="assets/castor-short-demo-cover.png" width="260" alt="Castor Short 表紙例">
   <img src="assets/play-openworld-warcraft.png" width="260" alt="Castor Play 開放世界例">
   <img src="assets/play-openworld-detective.png" width="260" alt="Castor Play 探偵例">
 </p>
@@ -331,7 +331,7 @@ castor compose chapter my-book
 
 ### デーモンモード + 通知
 
-`castor up` で自律的なバックグラウンドループを開始し、スケジュールに従って章を執筆。処理可能な非重要問題は自動で進め、人間の判断が必要な場合はレビュー可能な結果を残して一時停止します。TelegramとWebhook（HMAC-SHA256署名 + イベントフィルタリング）による通知。`inkos.log`（JSON Lines）にログ出力、`-q` でクワイエットモード。
+`castor up` で自律的なバックグラウンドループを開始し、スケジュールに従って章を執筆。処理可能な非重要問題は自動で進め、人間の判断が必要な場合はレビュー可能な結果を残して一時停止します。TelegramとWebhook（HMAC-SHA256署名 + イベントフィルタリング）による通知。`castor.log`（JSON Lines）にログ出力、`-q` でクワイエットモード。
 
 ### ローカルモデル互換性
 
@@ -426,7 +426,7 @@ castor write next my-book              # Draft → audit → 自動修正、す�
 castor write next my-book --count 5    # 5章連続で執筆
 ```
 
-`write next` はデフォルトで `plan -> compose -> write` ガバナンスチェーンを使用します。以前のプロンプトアセンブリパスが必要な場合は、`inkos.json` で明示的に設定してください：
+`write next` はデフォルトで `plan -> compose -> write` ガバナンスチェーンを使用します。以前のプロンプトアセンブリパスが必要な場合は、`castor.json` で明示的に設定してください：
 
 ```json
 {
@@ -469,7 +469,7 @@ Studio の **Open World** と **Branching Interactive** は、先に書籍を作
 </p>
 
 <p align="center">
-  <img src="assets/inkos-short-demo-cover.png" width="230" alt="短編表紙の出力例">
+  <img src="assets/castor-short-demo-cover.png" width="230" alt="短編表紙の出力例">
   <img src="assets/play-openworld-romance.png" width="230" alt="恋愛インタラクティブ世界の出力例">
   <img src="assets/play-openworld-detective.png" width="230" alt="探偵インタラクティブ世界の出力例">
   <img src="assets/play-item-warcraft.png" width="230" alt="インタラクティブ世界のアイテム画像出力例">
@@ -506,7 +506,7 @@ Studio の **Open World** と **Branching Interactive** は、先に書籍を作
 | `castor consolidate [id]` | 長編の章要約を統合し、コンテキスト負荷を下げる |
 | `castor forecast create/show/select` | 長編の非正史ルートを生成・再検証・選択。選択時は候補計画だけを保存し、正史は変更しない |
 | `castor interact` | 外部 agent / CLI 自然言語入口（`--json`、`--message`、`--book`） |
-| `castor config set-global` | グローバルLLM設定を設定（~/.inkos/.env） |
+| `castor config set-global` | グローバルLLM設定を設定（~/.castor/.env） |
 | `castor config set-model <agent> <model>` | エージェントごとのモデルオーバーライド（`--base-url`、`--provider`、`--api-key-env`） |
 | `castor config show-models` | 現在のモデルルーティングを表示 |
 | `castor doctor` | セットアップの問題を診断（API接続テスト + プロバイダー互換性ヒント） |
@@ -519,7 +519,7 @@ Studio の **Open World** と **Branching Interactive** は、先に書籍を作
 | `castor update` | 最新バージョンへ更新 |
 | `castor` / `castor studio` | Webワークベンチを起動（`-p` でポート指定、デフォルト4567） |
 | `castor tui` | 端末フルスクリーン TUI を起動 |
-| `castor up / down` | デーモンの開始/停止（`-q` クワイエットモード、`inkos.log` に自動出力） |
+| `castor up / down` | デーモンの開始/停止（`-q` クワイエットモード、`castor.log` に自動出力） |
 
 `[id]` はプロジェクトに書籍が1つしかない場合に自動検出されます。すべてのコマンドが `--json` による構造化出力に対応。`draft` / `write next` / `plan chapter` / `compose chapter` は `--context` でステアリング可能、`--words` で目標章サイズをオーバーライド。`book create` は `--brief <file>` でクリエイティブブリーフを渡せます — アーキテクトがゼロから生成するのではなく、あなたのアイデアを基に構築します。`plan chapter` は LLM を呼び出して章の意図を作成します。`compose chapter` はライブLLMを必要としないため、APIセットアップ完了前でも管理された入力を確認できます。
 

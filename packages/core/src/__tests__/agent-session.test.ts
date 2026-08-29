@@ -549,15 +549,15 @@ describe("runAgentSession cache — bookId switch", () => {
 
     const headers = streamCalls.at(-1)?.options?.headers;
     expect(headers).toMatchObject({
-      "X-InkOS-Trace-Version": "1",
-      "X-InkOS-Scaffold": "pi-inkos",
-      "X-InkOS-Conversation-ID": opaqueConversationId("trace-session"),
-      "X-InkOS-Agent-Role": "main",
-      "X-InkOS-Pi-Turn-Index": "1",
-      "X-InkOS-Client-Attempt": "1",
+      "X-Castor-Trace-Version": "1",
+      "X-Castor-Scaffold": "pi-inkos",
+      "X-Castor-Conversation-ID": opaqueConversationId("trace-session"),
+      "X-Castor-Agent-Role": "main",
+      "X-Castor-Pi-Turn-Index": "1",
+      "X-Castor-Client-Attempt": "1",
     });
-    expect(headers["X-InkOS-Run-ID"]).toBeTruthy();
-    expect(headers["X-InkOS-Model-Call-ID"]).toBeTruthy();
+    expect(headers["X-Castor-Run-ID"]).toBeTruthy();
+    expect(headers["X-Castor-Model-Call-ID"]).toBeTruthy();
   });
 
   it("rebuilds cached Agent when transcript committed seq changes outside cache", async () => {

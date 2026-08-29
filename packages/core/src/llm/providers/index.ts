@@ -1,4 +1,4 @@
-import type { InkosEndpoint } from "./types.js";
+import type { ProviderEndpoint } from "./types.js";
 import { ANTHROPIC } from "./endpoints/anthropic.js";
 import { OPENAI } from "./endpoints/openai.js";
 import { GOOGLE } from "./endpoints/google.js";
@@ -43,13 +43,13 @@ import { VOLCENGINE_CODING_PLAN } from "./endpoints/volcengineCodingPlan.js";
 import { OPENCODE_CODING_PLAN } from "./endpoints/opencodeCodingPlan.js";
 import { ASTRON_CODING_PLAN } from "./endpoints/astronCodingPlan.js";
 
-export type { InkosEndpoint, InkosModel, ApiProtocol, EndpointGroup } from "./types.js";
+export type { ProviderEndpoint, ProviderModel, ApiProtocol, EndpointGroup } from "./types.js";
 
 /**
  * 所有已注册 provider 的扁平列表。顺序定义了 lookup Layer 2 的遍历顺序，
  * 但 Layer 2 还会按 PROVIDER_PRIORITY 显式排序，所以此处顺序不影响结果。
  */
-const ALL_PROVIDERS: readonly InkosEndpoint[] = [
+const ALL_PROVIDERS: readonly ProviderEndpoint[] = [
   ANTHROPIC, OPENAI, GOOGLE, DEEPSEEK, MINIMAX,
   MOONSHOT, ZHIPU, SILICONCLOUD, BAILIAN, VOLCENGINE, HUNYUAN, BAICHUAN, STEPFUN, WENXIN,
   SPARK, SENSENOVA, TENCENTCLOUD, XIAOMI_MIMO, LONGCAT, INTERNLM,
@@ -59,14 +59,14 @@ const ALL_PROVIDERS: readonly InkosEndpoint[] = [
   KIMI_CODING_PLAN, KIMI_CODE, MINIMAX_CODING_PLAN, BAILIAN_CODING_PLAN, GLM_CODING_PLAN, VOLCENGINE_CODING_PLAN, OPENCODE_CODING_PLAN, ASTRON_CODING_PLAN,
 ];
 
-const PROVIDERS_BY_ID: Map<string, InkosEndpoint> = new Map(
+const PROVIDERS_BY_ID: Map<string, ProviderEndpoint> = new Map(
   ALL_PROVIDERS.map((p) => [p.id, p]),
 );
 
-export function getAllEndpoints(): readonly InkosEndpoint[] {
+export function getAllEndpoints(): readonly ProviderEndpoint[] {
   return ALL_PROVIDERS;
 }
 
-export function getEndpoint(id: string): InkosEndpoint | undefined {
+export function getEndpoint(id: string): ProviderEndpoint | undefined {
   return PROVIDERS_BY_ID.get(id);
 }
