@@ -1,4 +1,5 @@
 import { ProxyAgent } from "undici";
+import { castorEnv } from "./llm-env.js";
 
 type ProxyEnv = Record<string, string | undefined>;
 type FetchInitWithDispatcher = RequestInit & { dispatcher?: unknown };
@@ -6,7 +7,7 @@ type FetchInitWithDispatcher = RequestInit & { dispatcher?: unknown };
 export function resolveProxyUrl(explicitProxyUrl?: string, env: ProxyEnv = process.env): string | undefined {
   const candidate = [
     explicitProxyUrl,
-    env.INKOS_LLM_PROXY_URL,
+    castorEnv("CASTOR_LLM_PROXY_URL", env),
     env.HTTPS_PROXY,
     env.https_proxy,
     env.HTTP_PROXY,

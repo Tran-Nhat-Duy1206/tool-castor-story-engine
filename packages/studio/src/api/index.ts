@@ -1,4 +1,5 @@
 import { startStudioServer } from "./server.js";
+import { castorEnv } from "@actalk/castor-core";
 import { resolve, join, dirname } from "node:path";
 import { existsSync } from "node:fs";
 import { execSync } from "node:child_process";
@@ -6,8 +7,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const root = resolve(process.argv[2] ?? process.env.INKOS_PROJECT_ROOT ?? process.cwd());
-const port = parseInt(process.env.INKOS_STUDIO_PORT ?? "4567", 10);
+const root = resolve(process.argv[2] ?? castorEnv("CASTOR_PROJECT_ROOT") ?? process.cwd());
+const port = parseInt(castorEnv("CASTOR_STUDIO_PORT") ?? "4567", 10);
 
 // Find studio package root (2 levels up from src/api/)
 const studioRoot = resolve(__dirname, "../..");

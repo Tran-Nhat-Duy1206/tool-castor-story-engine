@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { Hono, type Context } from "hono";
+import { castorEnv } from "@actalk/castor-core";
 import { cors } from "hono/cors";
 import { streamSSE } from "hono/streaming";
 import { serve } from "@hono/node-server";
@@ -2047,11 +2048,11 @@ async function readEnvConfigValues(path: string): Promise<EnvConfigValues> {
       values.set(key, unquoteEnvValue(value));
     }
 
-    const provider = values.get("INKOS_LLM_PROVIDER") ?? null;
-    const service = values.get("INKOS_LLM_SERVICE") ?? null;
-    const baseUrl = values.get("INKOS_LLM_BASE_URL") ?? null;
-    const model = values.get("INKOS_LLM_MODEL") ?? null;
-    const apiKey = values.get("INKOS_LLM_API_KEY") ?? "";
+    const provider = values.get("CASTOR_LLM_PROVIDER") ?? null;
+    const service = values.get("CASTOR_LLM_SERVICE") ?? null;
+    const baseUrl = values.get("CASTOR_LLM_BASE_URL") ?? null;
+    const model = values.get("CASTOR_LLM_MODEL") ?? null;
+    const apiKey = values.get("CASTOR_LLM_API_KEY") ?? "";
     const detected = Boolean(provider || service || baseUrl || model || apiKey);
 
     return {
@@ -2761,7 +2762,7 @@ export function createStudioServer(
       return c.json({ error: { code: error.code, message: error.message } }, error.status as 400);
     }
     const message = error instanceof Error ? error.message : String(error);
-    if (message.includes("LLM API key not set") || message.includes("INKOS_LLM_API_KEY not set")) {
+    if (message.includes("LLM API key not set") || message.includes("CASTOR_LLM_API_KEY not set")) {
       return c.json({ error: { code: "LLM_CONFIG_ERROR", message } }, 400);
     }
     console.error("[studio] Unexpected server error", error);
@@ -5604,8 +5605,8 @@ export function createStudioServer(
       return c.json({
         error: pick(
           await currentProjectLanguage(),
-          "未检测到可导入的 LLM 环境变量配置，或缺少 INKOS_LLM_API_KEY。",
-          "No importable LLM environment variable configuration was detected, or INKOS_LLM_API_KEY is missing.",
+          "未检测到可导入的 LLM 环境变量配置，或缺少 CASTOR_LLM_API_KEY。",
+          "No importable LLM environment variable configuration was detected, or CASTOR_LLM_API_KEY is missing.",
         ),
       }, 400);
     }
@@ -5690,8 +5691,8 @@ export function createStudioServer(
     // endpoint is provided via env (the CLI/power-user path). This is the gate
     // for the Play auto-illustration toggles.
     const envConfigured = Boolean(
-      (process.env.INKOS_COVER_BASE_URL || process.env.INKOS_COVER_ENDPOINT)
-      && (process.env.INKOS_COVER_API_KEY || keyFor("kkaiapi")),
+      (castorEnv("CASTOR_COVER_BASE_URL") || castorEnv("CASTOR_COVER_ENDPOINT"))
+      && (castorEnv("CASTOR_COVER_API_KEY") || keyFor("kkaiapi")),
     );
     const configured = Boolean(cover?.service && keyFor(cover.service)) || envConfigured;
     return c.json({

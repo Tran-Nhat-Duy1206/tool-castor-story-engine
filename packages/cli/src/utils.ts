@@ -1,8 +1,8 @@
 import { readFile, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { createLLMClient, StateManager, createLogger, createStderrSink, createJsonLineSink, resolveEffectiveLLMConfig, loadLLMEnvLayers, GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath, type EffectiveLLMConfigResult, type LLMConfigCliOverrides, type ProjectConfig, type PipelineConfig, type LogSink } from "@actalk/castor-core";
+import { createLLMClient, StateManager, createLogger, createStderrSink, createJsonLineSink, resolveEffectiveLLMConfig, loadLLMEnvLayers, castorEnv, GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath, type EffectiveLLMConfigResult, type LLMConfigCliOverrides, type ProjectConfig, type PipelineConfig, type LogSink } from "@actalk/castor-core";
 
-export { GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath };
+export { GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH, resolveGlobalEnvPath, castorEnv };
 
 
 export async function resolveContext(opts: {

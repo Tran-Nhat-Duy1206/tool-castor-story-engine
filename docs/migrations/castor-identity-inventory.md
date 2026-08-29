@@ -479,3 +479,27 @@ Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGA
 ## Config ownership (Task 3.1 record)
 
 - Project config read/write: `packages/core/src/utils/effective-llm-config.ts` (readProjectConfig), `packages/core/src/utils/config-loader.ts` (loadProjectConfig), CLI bootstrap: `packages/cli/src/project-bootstrap.ts` (initializeProjectDirectory/ensureProjectDirectoryInitialized + buildProjectConfig), global Studio service config: `packages/cli/src/commands/config.ts` + core config store.
+
+## ACTIVE-ENV final mapping (Checkpoint 5)
+
+Canonical `CASTOR_*` is authoritative; each mapped legacy `INKOS_*` below is read as a deprecated fallback via the explicit map in `packages/core/src/utils/llm-env.ts` (`LEGACY_INKOS_ENV_KEYS`); unknown `INKOS_*` names are never copied; dual definitions keep Castor and emit a non-secret warning (key names only). `castorEnv("CASTOR_X")` is the single resolver for direct `process.env` reads.
+
+| Legacy (fallback) | Canonical |
+|---|---|
+| INKOS_STUDIO_PORT | CASTOR_STUDIO_PORT |
+| INKOS_PROJECT_ROOT | CASTOR_PROJECT_ROOT |
+| INKOS_SKILL_DIRS | CASTOR_SKILL_DIRS |
+| INKOS_LOCALE | CASTOR_LOCALE |
+| INKOS_TUI_LOCALE | CASTOR_TUI_LOCALE |
+| INKOS_TUI_THEME | CASTOR_TUI_THEME |
+| INKOS_DEFAULT_LANGUAGE | CASTOR_DEFAULT_LANGUAGE |
+| INKOS_USER_AGENT | CASTOR_USER_AGENT |
+| INKOS_LIVE_E2E | CASTOR_LIVE_E2E |
+| INKOS_FILM_IMAGE_SIZE | CASTOR_FILM_IMAGE_SIZE |
+| INKOS_AGENT_ALLOW_SYSTEM_READ | CASTOR_AGENT_ALLOW_SYSTEM_READ |
+| INKOS_AGENT_LLM_STUB | CASTOR_AGENT_LLM_STUB |
+| INKOS_COVER_BASE_URL / _API_KEY / _ENDPOINT / _MODEL / _SIZE | CASTOR_COVER_* |
+| INKOS_LLM_PROVIDER / _SERVICE / _BASE_URL / _API_KEY / _MODEL / _API_FORMAT / _STREAM / _TEMPERATURE / _THINKING_BUDGET / _PROXY_URL / _FIRST_EVENT_TIMEOUT_MS / _STREAM_IDLE_TIMEOUT_MS / _HEADERS | CASTOR_LLM_* |
+| INKOS_LLM_EXTRA_* (prefix family) | CASTOR_LLM_EXTRA_* |
+
+`.env.example` now teaches CASTOR_* only. INKOS_TELEGRAM_*/FEISHU/WECOM notify tokens were template-only (never read by code) and are removed from the template.

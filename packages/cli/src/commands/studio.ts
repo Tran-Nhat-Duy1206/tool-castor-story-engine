@@ -136,7 +136,7 @@ export async function launchStudioWorkbench(root: string, port: string): Promise
   const child = spawn(launch.command, launch.args, {
     cwd: root,
     stdio: "inherit",
-    env: { ...process.env, INKOS_STUDIO_PORT: port },
+    env: { ...process.env, CASTOR_STUDIO_PORT: port, INKOS_STUDIO_PORT: port },
   });
 
   child.on("error", (e) => {

@@ -1,6 +1,7 @@
 /* ── Auto-init & environment detection for TUI ── */
 
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { castorEnv } from "../utils.js";
 import { join, basename } from "node:path";
 import readline from "node:readline/promises";
 import {
@@ -230,11 +231,11 @@ export async function interactiveLlmSetup(
     const finalService = resolveSetupService(provider, effectiveBaseUrl);
 
     const envContent = [
-      `INKOS_LLM_PROVIDER=${finalProvider}`,
-      ...(finalService ? [`INKOS_LLM_SERVICE=${finalService}`] : []),
-      `INKOS_LLM_BASE_URL=${effectiveBaseUrl}`,
-      `INKOS_LLM_API_KEY=${apiKey.trim()}`,
-      `INKOS_LLM_MODEL=${model.trim()}`,
+      `CASTOR_LLM_PROVIDER=${finalProvider}`,
+      ...(finalService ? [`CASTOR_LLM_SERVICE=${finalService}`] : []),
+      `CASTOR_LLM_BASE_URL=${effectiveBaseUrl}`,
+      `CASTOR_LLM_API_KEY=${apiKey.trim()}`,
+      `CASTOR_LLM_MODEL=${model.trim()}`,
     ].join("\n");
 
     if (useGlobal) {
@@ -270,9 +271,9 @@ async function autoInit(cwd: string): Promise<void> {
     version: "0.1.0",
     language: "zh",
     llm: {
-      provider: process.env.INKOS_LLM_PROVIDER ?? "openai",
-      baseUrl: process.env.INKOS_LLM_BASE_URL ?? "",
-      model: process.env.INKOS_LLM_MODEL ?? "",
+      provider: castorEnv("CASTOR_LLM_PROVIDER") ?? "openai",
+      baseUrl: castorEnv("CASTOR_LLM_BASE_URL") ?? "",
+      model: castorEnv("CASTOR_LLM_MODEL") ?? "",
     },
     notify: [],
     daemon: {
@@ -293,10 +294,10 @@ async function autoInit(cwd: string): Promise<void> {
       join(cwd, ".env"),
       [
         messages.envTemplateHeader,
-        "INKOS_LLM_PROVIDER=openai",
-        "INKOS_LLM_BASE_URL=",
-        "INKOS_LLM_API_KEY=",
-        "INKOS_LLM_MODEL=",
+        "CASTOR_LLM_PROVIDER=openai",
+        "CASTOR_LLM_BASE_URL=",
+        "CASTOR_LLM_API_KEY=",
+        "CASTOR_LLM_MODEL=",
       ].join("\n"),
       "utf-8",
     );
@@ -320,7 +321,7 @@ async function hasGlobalConfig(): Promise<boolean> {
 async function checkEnvForKey(envPath: string): Promise<boolean> {
   try {
     const content = await readFile(envPath, "utf-8");
-    const match = content.match(/INKOS_LLM_API_KEY=(.+)/);
+    const match = content.match(/CASTOR_LLM_API_KEY=(.+)/);
     return !!match && match[1]!.trim().length > 0 && !match[1]!.includes("your-api-key");
   } catch {
     return false;
@@ -373,12 +374,12 @@ async function parseEnvModel(envPath: string): Promise<ModelInfo | undefined> {
       const m = content.match(new RegExp(`^${key}=(.+)$`, "m"));
       return m?.[1]?.trim() ?? "";
     };
-    const key = get("INKOS_LLM_API_KEY");
+    const key = get("CASTOR_LLM_API_KEY");
     if (!key || key.includes("your-api-key")) return undefined;
     return {
-      provider: get("INKOS_LLM_PROVIDER") || "openai",
-      model: get("INKOS_LLM_MODEL") || "unknown",
-      baseUrl: get("INKOS_LLM_BASE_URL") || "",
+      provider: get("CASTOR_LLM_PROVIDER") || "openai",
+      model: get("CASTOR_LLM_MODEL") || "unknown",
+      baseUrl: get("CASTOR_LLM_BASE_URL") || "",
     };
   } catch {
     return undefined;

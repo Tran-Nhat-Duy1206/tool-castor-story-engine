@@ -1,4 +1,5 @@
 /** Whether the terminal is macOS Terminal.app. */
+import { castorEnv } from "../utils.js";
 export const isAppleTerminal = process.env.TERM_PROGRAM === "Apple_Terminal";
 
 export type TerminalBackground = "dark" | "light";
@@ -43,7 +44,7 @@ const LIGHT_THEME: TuiTheme = {
 };
 
 export function detectTerminalBackground(env: Partial<NodeJS.ProcessEnv> = process.env): TerminalBackground {
-  const explicit = env.INKOS_TUI_THEME?.trim().toLowerCase();
+  const explicit = castorEnv("CASTOR_TUI_THEME", env)?.trim().toLowerCase();
   if (explicit === "light" || explicit === "dark") return explicit;
 
   const colorFgBg = env.COLORFGBG?.trim();

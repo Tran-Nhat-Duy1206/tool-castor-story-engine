@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { castorEnv } from "../utils/llm-env.js";
 import { Agent } from "@mariozechner/pi-agent-core";
 import type { AgentEvent, AgentMessage } from "@mariozechner/pi-agent-core";
 import { getModel, getEnvApiKey, createAssistantMessageEventStream } from "@mariozechner/pi-ai";
@@ -121,7 +122,7 @@ export interface AgentSessionConfig {
   model: Model<Api> | { provider: string; modelId: string };
   /** Optional API key. When omitted, falls back to env-based key lookup. */
   apiKey?: string;
-  /** Allow the read tool to read absolute paths outside projectRoot/books. Defaults to false; set INKOS_AGENT_ALLOW_SYSTEM_READ=1 to enable. */
+  /** Allow the read tool to read absolute paths outside projectRoot/books. Defaults to false; set CASTOR_AGENT_ALLOW_SYSTEM_READ=1 to enable. */
   allowSystemFileRead?: boolean;
   /** Optional listener for streaming events (for SSE forwarding). */
   onEvent?: (event: AgentEvent) => void;
@@ -1056,7 +1057,7 @@ async function runAgentSessionUnlocked(
   const skillResolutionKey = skillResolutionCacheKey(skillResolution);
   const model = resolveModel(config.model);
   const requestedModelIdentity = agentModelIdentity(model);
-  const allowSystemFileRead = config.allowSystemFileRead ?? envFlagEnabled(process.env.INKOS_AGENT_ALLOW_SYSTEM_READ, false);
+  const allowSystemFileRead = config.allowSystemFileRead ?? envFlagEnabled(castorEnv("CASTOR_AGENT_ALLOW_SYSTEM_READ"), false);
   const suppressProductionTools = config.suppressProductionTools ?? false;
   const playWorldExists = sessionKind === "play"
     ? Boolean(await new PlayStore(projectRoot).loadWorld(sessionId))

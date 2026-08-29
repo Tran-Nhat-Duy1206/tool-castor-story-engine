@@ -1,4 +1,5 @@
 import { readFile, readdir, stat } from "node:fs/promises";
+import { castorEnv } from "../utils/llm-env.js";
 import { homedir } from "node:os";
 import { basename, delimiter, dirname, isAbsolute, join } from "node:path";
 import yaml from "js-yaml";
@@ -94,7 +95,7 @@ interface ConfiguredSkillDir {
 
 function configuredSkillDirs(input: LoadConfiguredAgentSkillsInput): ConfiguredSkillDir[] {
   const env = input.env ?? process.env;
-  const envDirs = (env.INKOS_SKILL_DIRS ?? "")
+  const envDirs = (castorEnv("CASTOR_SKILL_DIRS", env) ?? "")
     .split(delimiter)
     .map((value) => value.trim())
     .filter(Boolean);

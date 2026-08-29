@@ -1,4 +1,5 @@
 import { createAssistantMessageEventStream } from "@mariozechner/pi-ai";
+import { castorEnv } from "../utils/llm-env.js";
 import type {
   AssistantMessage,
   AssistantMessageEventStream,
@@ -8,7 +9,7 @@ import type {
 import type { LLMMessage, LLMResponse } from "../llm/provider.js";
 
 export function isLlmStubEnabled(): boolean {
-  return Boolean(process.env.INKOS_AGENT_LLM_STUB);
+  return Boolean(castorEnv("CASTOR_AGENT_LLM_STUB"));
 }
 
 // Mirrors EMPTY_USAGE in agent-session.ts exactly.

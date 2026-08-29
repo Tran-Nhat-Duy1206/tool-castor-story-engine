@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { castorEnv } from "../utils.js";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { findProjectRoot, log, logError, resolveGlobalEnvPath } from "../utils.js";
@@ -107,7 +108,7 @@ export const doctorCommand = new Command("doctor")
     const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
     const root = findProjectRoot();
     // doctor is not scoped to a book, so the language comes from the environment
-    // (INKOS_LOCALE -> LC_ALL/LC_MESSAGES/LANG, default zh).
+    // (CASTOR_LOCALE -> LC_ALL/LC_MESSAGES/LANG, default zh).
     const language = resolveCliLanguage();
 
     if (opts.repairNodeRuntime) {
@@ -153,7 +154,7 @@ export const doctorCommand = new Command("doctor")
       try {
         const globalPath = await resolveGlobalEnvPath();
         const globalContent = await readFile(globalPath, "utf-8");
-        hasGlobal = globalContent.includes("INKOS_LLM_API_KEY=") && !globalContent.includes("your-api-key-here");
+        hasGlobal = globalContent.includes("CASTOR_LLM_API_KEY=") && !globalContent.includes("your-api-key-here");
         checks.push({
           name: "Global Config",
           ok: hasGlobal,
@@ -261,15 +262,15 @@ export const doctorCommand = new Command("doctor")
         loadDotenv({ path: await resolveGlobalEnvPath() });
         const env = process.env;
         const apiKeyOptional = isApiKeyOptionalForEndpoint({
-          provider: env.INKOS_LLM_PROVIDER,
-          baseUrl: env.INKOS_LLM_BASE_URL,
+          provider: castorEnv("CASTOR_LLM_PROVIDER", env),
+          baseUrl: castorEnv("CASTOR_LLM_BASE_URL", env),
         });
-        if ((env.INKOS_LLM_API_KEY || apiKeyOptional) && env.INKOS_LLM_BASE_URL && env.INKOS_LLM_MODEL) {
+        if ((castorEnv("CASTOR_LLM_API_KEY", env) || apiKeyOptional) && castorEnv("CASTOR_LLM_BASE_URL", env) && castorEnv("CASTOR_LLM_MODEL", env)) {
           llmConfig = LLMConfigSchema.parse({
-            provider: env.INKOS_LLM_PROVIDER ?? "custom",
-            baseUrl: env.INKOS_LLM_BASE_URL,
-            apiKey: env.INKOS_LLM_API_KEY ?? "",
-            model: env.INKOS_LLM_MODEL,
+            provider: castorEnv("CASTOR_LLM_PROVIDER", env) ?? "custom",
+            baseUrl: castorEnv("CASTOR_LLM_BASE_URL", env),
+            apiKey: castorEnv("CASTOR_LLM_API_KEY", env) ?? "",
+            model: castorEnv("CASTOR_LLM_MODEL", env),
           });
         }
       }

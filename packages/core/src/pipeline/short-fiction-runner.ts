@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { castorEnv } from "../utils/llm-env.js";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { AgentContext } from "../agents/base.js";
@@ -701,7 +702,7 @@ async function generateCoverImageArtifact(input: {
     coverModel: input.coverModel,
     coverApiKeyEnv: input.coverApiKeyEnv,
   });
-  const size = input.coverSize || process.env.INKOS_COVER_SIZE || "1024x1360";
+  const size = input.coverSize || castorEnv("CASTOR_COVER_SIZE") || "1024x1360";
   const { buffer, extension } = await generateImageFromPrompt(
     request,
     buildCoverImagePrompt(input.salesPackage, input.promptMode ?? "short", input.language),
@@ -781,23 +782,23 @@ export async function resolveCoverGenerationRequest(input: {
   readonly coverModel?: string;
   readonly coverApiKeyEnv?: string;
 }): Promise<ShortFictionCoverRequest> {
-  if (input.coverEndpoint || input.coverBaseUrl || process.env.INKOS_COVER_ENDPOINT || process.env.INKOS_COVER_BASE_URL) {
+  if (input.coverEndpoint || input.coverBaseUrl || castorEnv("CASTOR_COVER_ENDPOINT") || castorEnv("CASTOR_COVER_BASE_URL")) {
     const endpoint = resolveCoverEndpoint(input.coverEndpoint, input.coverBaseUrl);
-    const baseUrl = input.coverBaseUrl || process.env.INKOS_COVER_BASE_URL || endpoint
+    const baseUrl = input.coverBaseUrl || castorEnv("CASTOR_COVER_BASE_URL") || endpoint
       .replace(/\/responses\/?$/u, "")
       .replace(/\/images\/generations\/?$/u, "");
     return {
       api: endpoint.includes("/responses") ? "responses" : "images",
       baseUrl,
       endpoint,
-      model: input.coverModel || process.env.INKOS_COVER_MODEL || "gpt-image-2",
-      apiKey: resolveCoverApiKey(input.coverApiKeyEnv || "INKOS_COVER_API_KEY"),
+      model: input.coverModel || castorEnv("CASTOR_COVER_MODEL") || "gpt-image-2",
+      apiKey: resolveCoverApiKey(input.coverApiKeyEnv || "CASTOR_COVER_API_KEY"),
     };
   }
 
   const projectCover = await readProjectCoverConfig(input.root);
   if (!projectCover) {
-    throw new Error("cover endpoint is required. Configure cover generation in Studio or set INKOS_COVER_BASE_URL.");
+    throw new Error("cover endpoint is required. Configure cover generation in Studio or set CASTOR_COVER_BASE_URL.");
   }
 
   const preset = resolveCoverProviderPreset(projectCover.service);
@@ -1029,11 +1030,11 @@ export function resolveCoverApiKey(apiKeyEnv: string): string {
 }
 
 function resolveCoverEndpoint(coverEndpoint?: string, coverBaseUrl?: string): string {
-  const endpoint = coverEndpoint || process.env.INKOS_COVER_ENDPOINT;
+  const endpoint = coverEndpoint || castorEnv("CASTOR_COVER_ENDPOINT");
   if (endpoint) return endpoint;
-  const baseUrl = coverBaseUrl || process.env.INKOS_COVER_BASE_URL;
+  const baseUrl = coverBaseUrl || castorEnv("CASTOR_COVER_BASE_URL");
   if (!baseUrl) {
-    throw new Error("cover endpoint is required. Set INKOS_COVER_BASE_URL or disable cover generation.");
+    throw new Error("cover endpoint is required. Set CASTOR_COVER_BASE_URL or disable cover generation.");
   }
   return `${baseUrl.replace(/\/+$/u, "")}/images/generations`;
 }

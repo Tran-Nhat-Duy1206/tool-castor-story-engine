@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { castorEnv } from "../utils.js";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import {
@@ -51,7 +52,7 @@ shortCommand
   .option("--cover-endpoint <url>", "Exact Responses endpoint for cover generation; overrides --cover-base-url")
   .option("--cover-model <model>", "Image-capable Responses model for cover generation", "gpt-5.5")
   .option("--cover-size <size>", "Cover image size", "1024x1360")
-  .option("--cover-api-key-env <name>", "Env var containing cover API key", "INKOS_COVER_API_KEY")
+  .option("--cover-api-key-env <name>", "Env var containing cover API key", "CASTOR_COVER_API_KEY")
   .option("--no-cover", "Skip cover image generation")
   .option("--json", "Output JSON")
   .action(async (opts: ShortRunOptions) => {
@@ -245,21 +246,21 @@ function buildEnvLLMConfig(options: {
   readonly llmBaseUrl?: string;
   readonly model?: string;
 }): LLMConfig {
-  const baseUrl = options.llmBaseUrl ?? process.env.INKOS_LLM_BASE_URL;
-  const model = options.model ?? process.env.INKOS_LLM_MODEL;
-  if (!baseUrl) throw new Error("LLM base URL is required. Set INKOS_LLM_BASE_URL or pass --llm-base-url.");
-  if (!model) throw new Error("LLM model is required. Set INKOS_LLM_MODEL or pass --model.");
+  const baseUrl = options.llmBaseUrl ?? castorEnv("CASTOR_LLM_BASE_URL");
+  const model = options.model ?? castorEnv("CASTOR_LLM_MODEL");
+  if (!baseUrl) throw new Error("LLM base URL is required. Set CASTOR_LLM_BASE_URL or pass --llm-base-url.");
+  if (!model) throw new Error("LLM model is required. Set CASTOR_LLM_MODEL or pass --model.");
   return {
     provider: "openai",
-    service: process.env.INKOS_LLM_SERVICE ?? "custom",
+    service: castorEnv("CASTOR_LLM_SERVICE") ?? "custom",
     configSource: "env",
     baseUrl,
-    apiKey: process.env.INKOS_LLM_API_KEY ?? "",
+    apiKey: castorEnv("CASTOR_LLM_API_KEY") ?? "",
     model,
-    temperature: parseEnvNumber(process.env.INKOS_LLM_TEMPERATURE, 0.1),
-    thinkingBudget: parseEnvInteger(process.env.INKOS_LLM_THINKING_BUDGET, 0),
-    apiFormat: process.env.INKOS_LLM_API_FORMAT === "responses" ? "responses" : "chat",
-    stream: process.env.INKOS_LLM_STREAM === "false" ? false : true,
+    temperature: parseEnvNumber(castorEnv("CASTOR_LLM_TEMPERATURE"), 0.1),
+    thinkingBudget: parseEnvInteger(castorEnv("CASTOR_LLM_THINKING_BUDGET"), 0),
+    apiFormat: castorEnv("CASTOR_LLM_API_FORMAT") === "responses" ? "responses" : "chat",
+    stream: castorEnv("CASTOR_LLM_STREAM") === "false" ? false : true,
   };
 }
 

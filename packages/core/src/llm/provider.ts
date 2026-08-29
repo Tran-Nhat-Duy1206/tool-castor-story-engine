@@ -1,4 +1,5 @@
 import type { LLMConfig } from "../models/project.js";
+import { castorEnv } from "../utils/llm-env.js";
 import {
   streamSimple as piStreamSimple,
   completeSimple as piCompleteSimple,
@@ -36,7 +37,7 @@ export interface StreamProgress {
 
 export type OnStreamProgress = (progress: StreamProgress) => void;
 
-const INKOS_USER_AGENT = "InkOS/1.3.5";
+const CASTOR_USER_AGENT = "InkOS/1.3.5";
 const UNKNOWN_MODEL_FALLBACK_MAX_TOKENS = 8192 * 3;
 const TRANSIENT_LLM_RETRIES = 2;
 const DEFAULT_FIRST_STREAM_EVENT_TIMEOUT_MS = 120_000;
@@ -77,11 +78,11 @@ function createStreamActivityDeadline(
   overrides?: StreamDeadlineOptions,
 ): StreamActivityDeadline {
   const firstEventTimeoutMs = readPositiveTimeout(
-    process.env.INKOS_LLM_FIRST_EVENT_TIMEOUT_MS,
+    castorEnv("CASTOR_LLM_FIRST_EVENT_TIMEOUT_MS"),
     readPositiveTimeout(overrides?.firstEventTimeoutMs, defaults.firstEventTimeoutMs),
   );
   const idleTimeoutMs = readPositiveTimeout(
-    process.env.INKOS_LLM_STREAM_IDLE_TIMEOUT_MS,
+    castorEnv("CASTOR_LLM_STREAM_IDLE_TIMEOUT_MS"),
     readPositiveTimeout(overrides?.idleTimeoutMs, defaults.idleTimeoutMs),
   );
   const controller = new AbortController();
@@ -212,7 +213,7 @@ function sanitizeHttpHeaders(headers?: Record<string, string>): Record<string, s
 }
 
 function mergeUserAgent(headers?: Record<string, string>): Record<string, string> {
-  return { "User-Agent": INKOS_USER_AGENT, ...(sanitizeHttpHeaders(headers) ?? {}) };
+  return { "User-Agent": CASTOR_USER_AGENT, ...(sanitizeHttpHeaders(headers) ?? {}) };
 }
 
 export function createStreamMonitor(
@@ -393,7 +394,7 @@ function resolveProviderCompat(
 }
 
 function parseEnvHeaders(): Record<string, string> | undefined {
-  const raw = process.env.INKOS_LLM_HEADERS;
+  const raw = castorEnv("CASTOR_LLM_HEADERS");
   if (!raw) return undefined;
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -633,7 +634,7 @@ function wrapLLMError(error: unknown, context?: { readonly baseUrl?: string; rea
   }
   if (msg.includes("401")) {
     return new Error(
-      `API 返回 401 (未授权)。请检查 .env 中的 INKOS_LLM_API_KEY 是否正确。${ctxLine}`,
+      `API 返回 401 (未授权)。请检查 .env 中的 CASTOR_LLM_API_KEY 是否正确。${ctxLine}`,
     );
   }
   if (msg.includes("429")) {
@@ -657,7 +658,7 @@ function wrapLLMError(error: unknown, context?: { readonly baseUrl?: string; rea
       `  1. baseUrl 地址不正确（当前：${context?.baseUrl ?? "未知"}）\n` +
       `  2. 网络不通或被防火墙拦截\n` +
       `  3. API 服务暂时不可用\n` +
-      `  建议：检查 INKOS_LLM_BASE_URL 是否包含完整路径（如 /v1）`,
+      `  建议：检查 CASTOR_LLM_BASE_URL 是否包含完整路径（如 /v1）`,
     );
   }
   // R4 Bug 2: 5xx "status code (no body)" — 尝试从 OpenAI SDK APIError 里抽 body 给用户看具体原因
@@ -1061,7 +1062,7 @@ async function chatCompletionViaCustomAnthropicCompatible(
   const response = await fetchWithProxy(`${baseUrl.replace(/\/$/, "")}/messages`, {
     method: "POST",
     headers: sanitizeHttpHeaders({
-      "User-Agent": INKOS_USER_AGENT,
+      "User-Agent": CASTOR_USER_AGENT,
       "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
       "Content-Type": "application/json",

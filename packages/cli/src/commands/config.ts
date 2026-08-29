@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { castorEnv } from "../utils.js";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { findProjectRoot, log, logError, GLOBAL_ENV_PATH, resolveGlobalEnvPath } from "../utils.js";
@@ -116,15 +117,15 @@ configCommand
 
       const lines = [
         "# Castor Global LLM Configuration",
-        `INKOS_LLM_PROVIDER=${opts.provider}`,
-        `INKOS_LLM_BASE_URL=${opts.baseUrl}`,
-        `INKOS_LLM_API_KEY=${opts.apiKey}`,
-        `INKOS_LLM_MODEL=${opts.model}`,
+        `CASTOR_LLM_PROVIDER=${opts.provider}`,
+        `CASTOR_LLM_BASE_URL=${opts.baseUrl}`,
+        `CASTOR_LLM_API_KEY=${opts.apiKey}`,
+        `CASTOR_LLM_MODEL=${opts.model}`,
       ];
-      if (opts.temperature) lines.push(`INKOS_LLM_TEMPERATURE=${opts.temperature}`);
-      if (opts.thinkingBudget) lines.push(`INKOS_LLM_THINKING_BUDGET=${opts.thinkingBudget}`);
-      if (opts.apiFormat) lines.push(`INKOS_LLM_API_FORMAT=${opts.apiFormat}`);
-      if (opts.lang) lines.push(`INKOS_DEFAULT_LANGUAGE=${opts.lang}`);
+      if (opts.temperature) lines.push(`CASTOR_LLM_TEMPERATURE=${opts.temperature}`);
+      if (opts.thinkingBudget) lines.push(`CASTOR_LLM_THINKING_BUDGET=${opts.thinkingBudget}`);
+      if (opts.apiFormat) lines.push(`CASTOR_LLM_API_FORMAT=${opts.apiFormat}`);
+      if (opts.lang) lines.push(`CASTOR_DEFAULT_LANGUAGE=${opts.lang}`);
 
       const globalEnvPath = await resolveGlobalEnvPath();
       await mkdir(join(globalEnvPath, ".."), { recursive: true });
@@ -144,7 +145,7 @@ configCommand
     try {
       const content = await readFile(await resolveGlobalEnvPath(), "utf-8");
       const masked = content.replace(
-        /(INKOS_LLM_API_KEY=)(.{8})(.*)(.{4})/,
+        /(CASTOR_LLM_API_KEY=)(.{8})(.*)(.{4})/,
         "$1$2...$4",
       );
       log(masked);
@@ -307,11 +308,11 @@ configCommand
 configCommand
   .command("list-models <service>")
   .description("List available models for a service (with maxOutput / contextWindow / abilities)")
-  .option("--api-key <key>", "API Key (also reads from INKOS_LLM_API_KEY env)")
+  .option("--api-key <key>", "API Key (also reads from CASTOR_LLM_API_KEY env)")
   .option("--base-url <url>", "Live /models probe baseUrl (for custom/newapi)")
   .option("--json", "Output as JSON")
   .action(async (service: string, opts: { apiKey?: string; baseUrl?: string; json?: boolean }) => {
-    const apiKey = opts.apiKey ?? process.env.INKOS_LLM_API_KEY;
+    const apiKey = opts.apiKey ?? castorEnv("CASTOR_LLM_API_KEY");
     const language = resolveCliLanguage();
     const models = await listModelsForService(service, apiKey, opts.baseUrl);
     if (models.length === 0) {

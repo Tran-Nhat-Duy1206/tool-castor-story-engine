@@ -1,4 +1,5 @@
 import { writeFile, mkdir } from "node:fs/promises";
+import { castorEnv } from "../utils/llm-env.js";
 import { join, dirname, relative, isAbsolute, sep } from "node:path";
 import { generateImageFromPrompt, resolveCoverGenerationRequest } from "../pipeline/short-fiction-runner.js";
 import type { StoryNode } from "./graph-schema.js";
@@ -39,7 +40,7 @@ export async function generateNodeImage(params: {
   if (!prompt) {
     throw new Error(`node ${params.node.id} has no imageSlot.prompt or sceneDesc to generate an image from`);
   }
-  const size = params.size ?? process.env.INKOS_FILM_IMAGE_SIZE ?? "1536x1024";
+  const size = params.size ?? castorEnv("CASTOR_FILM_IMAGE_SIZE") ?? "1536x1024";
   const { buffer, extension } = await params.deps.generateImage(prompt, size);
   const assetRef = nodeImageRelPath(params.projectId, params.node.id, extension);
   const abs = join(params.projectRoot, assetRef);

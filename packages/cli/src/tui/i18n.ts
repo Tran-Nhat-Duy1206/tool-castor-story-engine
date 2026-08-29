@@ -1,4 +1,5 @@
 import type { ChatDepth } from "./chat-depth.js";
+import { castorEnv } from "../utils.js";
 
 export type TuiLocale = "zh-CN" | "en";
 
@@ -205,7 +206,7 @@ export function resolveTuiLocale(
   env: NodeJS.ProcessEnv = process.env,
   preferredLanguage?: string,
 ): TuiLocale {
-  const requested = normalizeLocale(env.INKOS_TUI_LOCALE ?? env.INKOS_LOCALE);
+  const requested = normalizeLocale(castorEnv("CASTOR_TUI_LOCALE", env) ?? castorEnv("CASTOR_LOCALE", env));
   if (requested) {
     return requested;
   }
