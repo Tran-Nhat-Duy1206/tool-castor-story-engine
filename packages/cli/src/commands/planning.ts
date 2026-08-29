@@ -4,7 +4,7 @@ import {
   getPublishedArcPlan,
   getLookahead,
   getPlanningGateReport,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 import { findProjectRoot, log, logError, resolveBookId } from "../utils.js";
 
 /**

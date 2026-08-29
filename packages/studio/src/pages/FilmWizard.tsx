@@ -14,7 +14,7 @@ import {
   computeStaleFlags,
 } from "../lib/film-wizard-progress";
 import type { Phase, PhaseStatus } from "../lib/film-wizard-progress";
-import type { StoryGraph } from "@actalk/inkos-core/interactive-film/graph-schema";
+import type { StoryGraph } from "@actalk/castor-core/interactive-film/graph-schema";
 import { ChatPage } from "./ChatPage";
 import { StoryGraphTree } from "./StoryGraphTree";
 import { StoryPlayer } from "./StoryPlayer";

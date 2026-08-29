@@ -154,10 +154,10 @@ export function fetchCanonSection<TData = unknown>(
 // request envelope; the types below are TYPE-ONLY derivations from it
 // (review I-1) so any Core change surfaces as a compile error here instead
 // of drifting silently on the wire. `import type` is erased at build time —
-// the browser bundle never pulls in @actalk/inkos-core.
+// the browser bundle never pulls in @actalk/castor-core.
 // Response/transport DTOs above remain deliberately Studio-owned.
 
-import type { CanonCommitRequest, CanonEdit } from "@actalk/inkos-core";
+import type { CanonCommitRequest, CanonEdit } from "@actalk/castor-core";
 
 export type CanonSetFactEdit = Extract<CanonEdit, { kind: "setFact" }>;
 

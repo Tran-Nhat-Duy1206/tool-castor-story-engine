@@ -21,7 +21,7 @@ import type { Theme } from "../hooks/use-theme";
 import type { TFunction } from "../hooks/use-i18n";
 import { layoutStoryGraph } from "../lib/story-flow-layout";
 import { moveNodeDelta, addNodeDelta, genNodeId, addChoiceDelta, removeChoicesDelta, removeNodeDelta, genChoiceId } from "../lib/story-editor-deltas";
-import type { StoryGraph } from "@actalk/inkos-core/interactive-film/graph-schema";
+import type { StoryGraph } from "@actalk/castor-core/interactive-film/graph-schema";
 
 interface Nav {
   toDashboard: () => void;

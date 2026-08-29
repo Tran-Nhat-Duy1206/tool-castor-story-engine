@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { NarrativeForecast } from "@actalk/inkos-core/forecast/schema";
+import type { NarrativeForecast } from "@actalk/castor-core/forecast/schema";
 import type { ToolExecution } from "../../../store/chat/types";
 import {
   NarrativeForecastPreview,

@@ -15,7 +15,7 @@ const loadBookConfigMock = vi.fn();
 const logMock = vi.fn();
 const logErrorMock = vi.fn();
 
-vi.mock("@actalk/inkos-core", () => ({
+vi.mock("@actalk/castor-core", () => ({
   StateManager: class {
     async loadBookConfig() { return loadBookConfigMock(); }
     async getNextChapterNumber() { return 5; }

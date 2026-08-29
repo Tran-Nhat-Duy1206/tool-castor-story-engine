@@ -11,7 +11,7 @@ import {
   getNarrativeForecast,
   selectNarrativeBranch,
   type NarrativeForecast,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 import { buildPipelineConfig, findProjectRoot, loadConfig, log, logError, resolveBookId } from "../utils.js";
 
 // CLI surface for RFC #342: create / show / select. All three operate only on

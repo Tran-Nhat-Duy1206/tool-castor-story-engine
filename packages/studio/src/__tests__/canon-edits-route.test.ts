@@ -7,7 +7,7 @@ import { createStudioServer } from "../api/server.js";
 import {
   commitCanonEdits as coreCommitCanonEdits,
   StateManager,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 

@@ -2,7 +2,7 @@ import { Command } from "commander";
 import {
   StateManager,
   evaluateBookQuality,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 import { findProjectRoot, resolveBookId, log, logError } from "../utils.js";
 
 export const evalCommand = new Command("eval")

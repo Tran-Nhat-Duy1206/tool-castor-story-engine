@@ -3,7 +3,7 @@ import { mkdtemp, rm, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createStudioServer } from "../api/server.js";
-import { saveStoryGraph, loadStoryGraph, StoryGraphSchema } from "@actalk/inkos-core";
+import { saveStoryGraph, loadStoryGraph, StoryGraphSchema } from "@actalk/castor-core";
 
 const PNG = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]);
 

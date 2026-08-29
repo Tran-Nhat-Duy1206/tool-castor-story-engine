@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { findProjectRoot, log, logError, GLOBAL_ENV_PATH } from "../utils.js";
-import { fetchWithProxy } from "@actalk/inkos-core";
+import { fetchWithProxy } from "@actalk/castor-core";
 import {
   ensureNodeRuntimePinFiles,
   evaluateNodeRuntimeSupport,
@@ -165,7 +165,7 @@ export const doctorCommand = new Command("doctor")
     // 5. Check effective LLM config (Studio project base + env/CLI overlay, or legacy env)
     {
       const { loadConfigWithDiagnostics } = await import("../utils.js");
-      const { isApiKeyOptionalForEndpoint } = await import("@actalk/inkos-core");
+      const { isApiKeyOptionalForEndpoint } = await import("@actalk/castor-core");
       let configResult: Awaited<ReturnType<typeof loadConfigWithDiagnostics>> | undefined;
       try {
         configResult = await loadConfigWithDiagnostics({ requireApiKey: false });
@@ -198,7 +198,7 @@ export const doctorCommand = new Command("doctor")
 
     // 5. Check books directory
     try {
-      const { StateManager } = await import("@actalk/inkos-core");
+      const { StateManager } = await import("@actalk/castor-core");
       const state = new StateManager(root);
       const books = await state.listBooks();
       checks.push({
@@ -215,7 +215,7 @@ export const doctorCommand = new Command("doctor")
       const { existsSync } = await import("node:fs");
       const hasStructuredState = existsSync(join(root, "books"));
       if (hasStructuredState) {
-        const { StateManager } = await import("@actalk/inkos-core");
+        const { StateManager } = await import("@actalk/castor-core");
         const sm = new StateManager(root);
         const bookIds = await sm.listBooks();
         let legacyCount = 0;
@@ -242,7 +242,7 @@ export const doctorCommand = new Command("doctor")
 
     // 6. API connectivity test
     try {
-      const { createLLMClient, chatCompletion, LLMConfigSchema, isApiKeyOptionalForEndpoint, resolveServiceModelsBaseUrl } = await import("@actalk/inkos-core");
+      const { createLLMClient, chatCompletion, LLMConfigSchema, isApiKeyOptionalForEndpoint, resolveServiceModelsBaseUrl } = await import("@actalk/castor-core");
       const { loadConfig } = await import("../utils.js");
 
       let llmConfig;

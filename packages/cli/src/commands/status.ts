@@ -1,6 +1,6 @@
 import { Command } from "commander";
-import { StateManager, formatLengthCount, readGenreProfile, resolveLengthCountingMode } from "@actalk/inkos-core";
-import * as Core from "@actalk/inkos-core";
+import { StateManager, formatLengthCount, readGenreProfile, resolveLengthCountingMode } from "@actalk/castor-core";
+import * as Core from "@actalk/castor-core";
 import { findProjectRoot, getLegacyMigrationHint, log, logError } from "../utils.js";
 
 export const statusCommand = new Command("status")

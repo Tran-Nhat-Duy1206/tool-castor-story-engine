@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { StateManager, formatLengthCount, readGenreProfile, resolveLengthCountingMode } from "@actalk/inkos-core";
+import { StateManager, formatLengthCount, readGenreProfile, resolveLengthCountingMode } from "@actalk/castor-core";
 import { findProjectRoot, resolveBookId, log, logError } from "../utils.js";
 
 export const reviewCommand = new Command("review")

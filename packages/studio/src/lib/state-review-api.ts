@@ -2,7 +2,7 @@
  * Task 14 — typed client for the Phase 4 State Review HTTP boundary.
  *
  * SEMANTIC CONTRACT: Core-owned. The artifact/receipt types below are
- * TYPE-ONLY derivations from `@actalk/inkos-core` (erased at build time — the
+ * TYPE-ONLY derivations from `@actalk/castor-core` (erased at build time — the
  * browser bundle never pulls in Core). Every mutation returns a discriminated
  * outcome; callers MUST branch on `ok` — `edit_conflict` (stale CAS revision)
  * is a first-class state, never a blind-retry exception.
@@ -16,7 +16,7 @@ import type {
   ActiveStateReviewArtifact,
   ResolvedReviewReceipt,
   StateReviewArtifact,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 
 /** Browser-safe type surface for pages/models (erased at build time). */
 export type {
@@ -26,7 +26,7 @@ export type {
   ReviewItem,
   ReviewItemKind,
   StateReviewArtifact,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 
 export type StateReviewViewDto = StateReviewArtifact;
 

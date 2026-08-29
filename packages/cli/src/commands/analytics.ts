@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { StateManager, computeAnalytics } from "@actalk/inkos-core";
+import { StateManager, computeAnalytics } from "@actalk/castor-core";
 import { loadConfig, findProjectRoot, resolveBookId, log, logError } from "../utils.js";
 
 export const analyticsCommand = new Command("analytics")

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { moveNodeDelta, addNodeDelta, addChoiceDelta, removeChoiceDelta, removeChoicesDelta, removeNodeDelta } from "../lib/story-editor-deltas";
-import { StoryNodeSchema } from "@actalk/inkos-core";
+import { StoryNodeSchema } from "@actalk/castor-core";
 
 const node = StoryNodeSchema.parse({ id: "s", type: "branch", title: "T", choices: [{ id: "c1", text: "A", targetNodeId: "e" }] });
 

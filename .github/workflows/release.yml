@@ -29,8 +29,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - run: pnpm --filter @actalk/inkos-core typecheck
-      - run: pnpm --filter @actalk/inkos typecheck
+      - run: pnpm --filter @actalk/castor-core typecheck
+      - run: pnpm --filter @actalk/castor typecheck
       - run: pnpm test
 
   smoke-test:
@@ -148,7 +148,7 @@ jobs:
 
           ACTUAL_CANARY=""
           for _ in 1 2 3 4 5 6; do
-            ACTUAL_CANARY=$(npm view @actalk/inkos@canary version 2>/dev/null || true)
+            ACTUAL_CANARY=$(npm view @actalk/castor@canary version 2>/dev/null || true)
             if [ "$ACTUAL_CANARY" = "$EXPECTED_CANARY" ]; then
               break
             fi
@@ -163,30 +163,30 @@ jobs:
           TMPDIR=$(mktemp -d)
           cd "$TMPDIR"
           npm init -y
-          npm install "@actalk/inkos@$EXPECTED_CANARY"
+          npm install "@actalk/castor@$EXPECTED_CANARY"
 
-          if grep -q '"workspace:' node_modules/@actalk/inkos/package.json; then
+          if grep -q '"workspace:' node_modules/@actalk/castor/package.json; then
             echo "FATAL: canary CLI package still contains workspace: protocol"
-            cat node_modules/@actalk/inkos/package.json | grep workspace
+            cat node_modules/@actalk/castor/package.json | grep workspace
             exit 1
           fi
 
-          if grep -q '"workspace:' node_modules/@actalk/inkos-studio/package.json; then
+          if grep -q '"workspace:' node_modules/@actalk/castor-studio/package.json; then
             echo "FATAL: canary studio package still contains workspace: protocol"
-            cat node_modules/@actalk/inkos-studio/package.json | grep workspace
+            cat node_modules/@actalk/castor-studio/package.json | grep workspace
             exit 1
           fi
 
-          if grep -q '"workspace:' node_modules/@actalk/inkos-core/package.json; then
+          if grep -q '"workspace:' node_modules/@actalk/castor-core/package.json; then
             echo "FATAL: canary core package still contains workspace: protocol"
-            cat node_modules/@actalk/inkos-core/package.json | grep workspace
+            cat node_modules/@actalk/castor-core/package.json | grep workspace
             exit 1
           fi
 
           npx inkos --version
-          test -f node_modules/@actalk/inkos-studio/dist/api/index.js
-          node -e "import('@actalk/inkos-core').then(m => { if (!m.PipelineRunner) throw new Error('installed core import missing PipelineRunner'); console.log('installed core import OK') })"
-          test -f node_modules/@actalk/inkos-core/dist/notify/telegram.js || test -f node_modules/@actalk/inkos/node_modules/@actalk/inkos-core/dist/notify/telegram.js
+          test -f node_modules/@actalk/castor-studio/dist/api/index.js
+          node -e "import('@actalk/castor-core').then(m => { if (!m.PipelineRunner) throw new Error('installed core import missing PipelineRunner'); console.log('installed core import OK') })"
+          test -f node_modules/@actalk/castor-core/dist/notify/telegram.js || test -f node_modules/@actalk/castor/node_modules/@actalk/castor-core/dist/notify/telegram.js
           echo "Canary verification passed"
           rm -rf "$TMPDIR"
 
@@ -250,7 +250,7 @@ jobs:
 
           ACTUAL_LATEST=""
           for _ in 1 2 3 4 5 6; do
-            ACTUAL_LATEST=$(npm view @actalk/inkos@latest version 2>/dev/null || true)
+            ACTUAL_LATEST=$(npm view @actalk/castor@latest version 2>/dev/null || true)
             if [ "$ACTUAL_LATEST" = "$EXPECTED_RELEASE" ]; then
               break
             fi
@@ -265,30 +265,30 @@ jobs:
           TMPDIR=$(mktemp -d)
           cd "$TMPDIR"
           npm init -y
-          npm install "@actalk/inkos@$EXPECTED_RELEASE"
+          npm install "@actalk/castor@$EXPECTED_RELEASE"
 
-          if grep -q '"workspace:' node_modules/@actalk/inkos/package.json; then
+          if grep -q '"workspace:' node_modules/@actalk/castor/package.json; then
             echo "FATAL: released CLI package still contains workspace: protocol"
-            cat node_modules/@actalk/inkos/package.json | grep workspace
+            cat node_modules/@actalk/castor/package.json | grep workspace
             exit 1
           fi
 
-          if grep -q '"workspace:' node_modules/@actalk/inkos-studio/package.json; then
+          if grep -q '"workspace:' node_modules/@actalk/castor-studio/package.json; then
             echo "FATAL: released studio package still contains workspace: protocol"
-            cat node_modules/@actalk/inkos-studio/package.json | grep workspace
+            cat node_modules/@actalk/castor-studio/package.json | grep workspace
             exit 1
           fi
 
-          if grep -q '"workspace:' node_modules/@actalk/inkos-core/package.json; then
+          if grep -q '"workspace:' node_modules/@actalk/castor-core/package.json; then
             echo "FATAL: released core package still contains workspace: protocol"
-            cat node_modules/@actalk/inkos-core/package.json | grep workspace
+            cat node_modules/@actalk/castor-core/package.json | grep workspace
             exit 1
           fi
 
           npx inkos --version
-          test -f node_modules/@actalk/inkos-studio/dist/api/index.js
-          node -e "import('@actalk/inkos-core').then(m => { if (!m.PipelineRunner) throw new Error('installed core import missing PipelineRunner'); console.log('installed core import OK') })"
-          test -f node_modules/@actalk/inkos-core/dist/notify/telegram.js || test -f node_modules/@actalk/inkos/node_modules/@actalk/inkos-core/dist/notify/telegram.js
+          test -f node_modules/@actalk/castor-studio/dist/api/index.js
+          node -e "import('@actalk/castor-core').then(m => { if (!m.PipelineRunner) throw new Error('installed core import missing PipelineRunner'); console.log('installed core import OK') })"
+          test -f node_modules/@actalk/castor-core/dist/notify/telegram.js || test -f node_modules/@actalk/castor/node_modules/@actalk/castor-core/dist/notify/telegram.js
           echo "Release verification passed"
           rm -rf "$TMPDIR"
 

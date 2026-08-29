@@ -1,4 +1,4 @@
-import type { StoryNode } from "@actalk/inkos-core/interactive-film/graph-schema";
+import type { StoryNode } from "@actalk/castor-core/interactive-film/graph-schema";
 
 export function genNodeId(): string {
   return `node-${crypto.randomUUID().slice(0, 8)}`;

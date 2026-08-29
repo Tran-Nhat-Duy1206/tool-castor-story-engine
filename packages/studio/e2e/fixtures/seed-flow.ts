@@ -1,4 +1,4 @@
-import { saveStoryGraph, StoryGraphSchema } from "@actalk/inkos-core";
+import { saveStoryGraph, StoryGraphSchema } from "@actalk/castor-core";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 

@@ -3,7 +3,7 @@ import { mkdtemp, rm, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createStudioServer } from "../api/server.js";
-import { saveStoryGraph, StoryGraphSchema } from "@actalk/inkos-core";
+import { saveStoryGraph, StoryGraphSchema } from "@actalk/castor-core";
 
 describe("GET /api/v1/projects/:id/story-graph/validation", () => {
   let root: string;

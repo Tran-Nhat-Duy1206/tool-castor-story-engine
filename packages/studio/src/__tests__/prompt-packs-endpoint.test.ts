@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { promptOverridePath } from "@actalk/inkos-core";
+import { promptOverridePath } from "@actalk/castor-core";
 import { createStudioServer } from "../api/server.js";
 
 describe("Studio prompt pack endpoints", () => {

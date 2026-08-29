@@ -186,7 +186,7 @@ import {
   type RequestedIntent,
   type SessionKind,
   type AgentSessionAttachment,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 import { isConfirmedProductionAction } from "../shared/confirmed-production.js";
 import { summarizeToolResult } from "../shared/tool-result.js";
 import { access, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
@@ -3995,8 +3995,8 @@ export function createStudioServer(
       const coreFn = (typeof getPublishedArcPlan !== "undefined" ? getPublishedArcPlan : undefined) as unknown as ((p: Record<string, unknown>) => Promise<unknown>) | undefined;
       const result = coreFn
         ? await coreFn({ bookId: target.bookId })
-        : await (await import("@actalk/inkos-core") as unknown as Record<string, unknown>).getPublishedArcPlan
-          ? await ((await import("@actalk/inkos-core") as unknown as { getPublishedArcPlan: (p: unknown) => Promise<unknown> }).getPublishedArcPlan({ bookId: target.bookId }))
+        : await (await import("@actalk/castor-core") as unknown as Record<string, unknown>).getPublishedArcPlan
+          ? await ((await import("@actalk/castor-core") as unknown as { getPublishedArcPlan: (p: unknown) => Promise<unknown> }).getPublishedArcPlan({ bookId: target.bookId }))
           : {};
       return c.json(result as Record<string, unknown>);
     } catch (e) {
@@ -4014,7 +4014,7 @@ export function createStudioServer(
         const result = await coreFn({ bookId: target.bookId });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const fn = mod.getPublishedArcPlan as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (fn) {
         const result = await fn({ bookId: target.bookId });
@@ -4038,7 +4038,7 @@ export function createStudioServer(
         if (Array.isArray(result)) return c.json({ drafts: result, items: result });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.listArcDrafts ?? mod.listArcPlanDrafts) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId });
@@ -4065,7 +4065,7 @@ export function createStudioServer(
         try { broadcast("planning:arc:draft:created", { bookId: target.bookId }); } catch {}
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.generateArcDraft ?? mod.generateArcPlanDraft) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir, ...body });
@@ -4091,7 +4091,7 @@ export function createStudioServer(
         const result = await fn({ bookId: target.bookId, bookDir: target.bookDir, draftId });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.getArcDraft ?? mod.loadArcPlanDraft) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir, draftId });
@@ -4116,7 +4116,7 @@ export function createStudioServer(
         const result = await fn({ bookId: target.bookId, bookDir: target.bookDir, draftId });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.getArcPreflight ?? mod.runArcPreflight) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir, draftId });
@@ -4138,7 +4138,7 @@ export function createStudioServer(
         const result = await fn({ bookId: target.bookId, bookDir: target.bookDir });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.getArcPreflight ?? mod.runArcPreflight) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4167,7 +4167,7 @@ export function createStudioServer(
       if (fn) {
         result = await fn({ bookDir: target.bookDir, draftId, humanActor, expectedFoundationVersion: (body.expectedFoundationVersion as number) ?? 0, expectedCanonRevision: (body.expectedCanonRevision as number) ?? 0, bookId: target.bookId, ...body });
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.publishArcPlan as unknown as ((p: unknown) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("publishArcPlan not implemented");
         result = await alt({ bookDir: target.bookDir, draftId, humanActor, expectedFoundationVersion: (body.expectedFoundationVersion as number) ?? 0, expectedCanonRevision: (body.expectedCanonRevision as number) ?? 0, bookId: target.bookId, ...(body as Record<string, unknown>) });
@@ -4192,7 +4192,7 @@ export function createStudioServer(
         const result = await fn({ bookId: target.bookId, bookDir: target.bookDir });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = mod.getBeatProgress as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4217,7 +4217,7 @@ export function createStudioServer(
         const result = await fn({ bookId: target.bookId, bookDir: target.bookDir });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = mod.getLookahead as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4240,7 +4240,7 @@ export function createStudioServer(
         const result = await fn({ bookId: target.bookId, bookDir: target.bookDir });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = mod.getDetailedPlan as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4264,7 +4264,7 @@ export function createStudioServer(
         const result = await fn({ bookId: target.bookId, bookDir: target.bookDir, chapter: chapterNum, chapterNumber: chapterNum });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = mod.getDetailedPlan as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir, chapter: chapterNum, chapterNumber: chapterNum });
@@ -4282,7 +4282,7 @@ export function createStudioServer(
     let body: Record<string, unknown> = {};
     try { body = await c.req.json() as Record<string, unknown>; } catch { body = {}; }
     try {
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       // existing Core regenerate — use getDetailedPlan regenerate or PipelineRunner if available
       const fn = (mod.regenerateDetailedPlan ?? mod.regeneratePlan ?? (typeof getDetailedPlan !== "undefined" ? getDetailedPlan : undefined)) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (fn) {
@@ -4316,7 +4316,7 @@ export function createStudioServer(
         result = await (getPlanningGateReport as unknown as (p: Record<string, unknown>) => Promise<unknown>)({ bookId: target.bookId, bookDir: target.bookDir, ...(chapterNum ? { chapter: chapterNum, chapterNumber: chapterNum } : {}) });
       } else if (typeof evaluatePlanningGate !== "undefined" && evaluatePlanningGate) {
         // evaluatePlanningGate expects { bookDir, planId } — but for Studio gate we pass bookId context; wrap via dynamic import fallback
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const gpr = mod.getPlanningGateReport as unknown as ((p: unknown) => Promise<unknown>) | undefined;
         const epg = mod.evaluatePlanningGate as unknown as ((p: unknown, o?: unknown) => Promise<unknown>) | undefined;
         if (gpr) result = await gpr({ bookId: target.bookId, bookDir: target.bookDir, ...(chapterNum ? { chapter: chapterNum, chapterNumber: chapterNum } : {}) });
@@ -4327,7 +4327,7 @@ export function createStudioServer(
           result = { verdict: "SAFE", canWrite: true };
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const gpr = mod.getPlanningGateReport as unknown as ((p: unknown) => Promise<unknown>) | undefined;
         const epg = mod.evaluatePlanningGate as unknown as ((p: unknown) => Promise<unknown>) | undefined;
         if (gpr) result = await gpr({ bookId: target.bookId, bookDir: target.bookDir, ...(chapterNum ? { chapter: chapterNum, chapterNumber: chapterNum } : {}) });
@@ -4369,7 +4369,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, t: string, ctx: unknown) => Promise<unknown>)(target.bookDir, String(text).trim(), { canonRevision: 0, arcPlanVersion: null });
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.parseHumanDirectionDraft as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("parseHumanDirectionDraft not implemented");
         try {
@@ -4404,7 +4404,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, t: string, ctx: unknown) => Promise<unknown>)(target.bookDir, String(text).trim(), { canonRevision: 0, arcPlanVersion: null });
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.parseHumanDirectionDraft as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("parseHumanDirectionDraft not implemented");
         try {
@@ -4431,7 +4431,7 @@ export function createStudioServer(
         if (Array.isArray(result)) return c.json({ items: result });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.getHumanDirections ?? mod.listHumanDirections ?? mod.getPendingHumanDirectionProposal) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4454,7 +4454,7 @@ export function createStudioServer(
         if (Array.isArray(result)) return c.json({ items: result });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.getHumanDirections ?? mod.listHumanDirections) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4478,7 +4478,7 @@ export function createStudioServer(
         if (Array.isArray(result)) return c.json({ items: result });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.getHumanDirections ?? mod.listHumanDirections) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4510,7 +4510,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, id: string, actor: string) => Promise<unknown>)(target.bookDir, dirId!, humanActor);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.confirmHumanDirection as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("confirmHumanDirection not implemented");
         try {
@@ -4545,7 +4545,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, id: string, actor: string) => Promise<unknown>)(target.bookDir, dirId!, humanActor);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.confirmHumanDirection as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("confirmHumanDirection not implemented");
         try {
@@ -4580,7 +4580,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, ids: string[], ch: string, actor: string) => Promise<unknown>)(target.bookDir, ids as string[], choice, humanActor);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.resolveDirectionConflict as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("resolveDirectionConflict not implemented");
         try {
@@ -4616,7 +4616,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, ids: string[], ch: string, actor: string) => Promise<unknown>)(target.bookDir, ids as string[], choice, humanActor);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.resolveDirectionConflict as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("resolveDirectionConflict not implemented");
         try {
@@ -4651,7 +4651,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, p: unknown) => Promise<unknown>)(target.bookDir, body);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.createAuthorization as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("createAuthorization not implemented");
         try {
@@ -4682,7 +4682,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, p: unknown) => Promise<unknown>)(target.bookDir, body);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.createAuthorization as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("createAuthorization not implemented");
         try {
@@ -4709,7 +4709,7 @@ export function createStudioServer(
         if (Array.isArray(result)) return c.json({ items: result });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.listAuthorizations ?? mod.getAuthorizations) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4732,7 +4732,7 @@ export function createStudioServer(
         if (Array.isArray(result)) return c.json({ items: result });
         return c.json(result as Record<string, unknown>);
       }
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const alt = (mod.listAuthorizations ?? mod.getAuthorizations) as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (alt) {
         const result = await alt({ bookId: target.bookId, bookDir: target.bookDir });
@@ -4764,7 +4764,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, id: string, actor: string) => Promise<unknown>)(target.bookDir, authId!, humanActor);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.confirmAuthorization as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("confirmAuthorization not implemented");
         try {
@@ -4798,7 +4798,7 @@ export function createStudioServer(
           result = await (fn as unknown as (b: string, id: string, actor: string) => Promise<unknown>)(target.bookDir, authId!, humanActor);
         }
       } else {
-        const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+        const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
         const alt = mod.confirmAuthorization as unknown as ((...a: unknown[]) => Promise<unknown>) | undefined;
         if (!alt) throw new Error("confirmAuthorization not implemented");
         try {
@@ -4827,7 +4827,7 @@ export function createStudioServer(
     try {
       // Prefer PipelineRunner.writeNextChapter (Task 19) — instantiate PipelineRunner with current config
       // For test compat, also support direct Core.writeNextChapter
-      const mod = await import("@actalk/inkos-core") as unknown as Record<string, unknown>;
+      const mod = await import("@actalk/castor-core") as unknown as Record<string, unknown>;
       const coreWrite = mod.writeNextChapter as unknown as ((p: unknown) => Promise<unknown>) | undefined;
       if (coreWrite) {
         // Call EXACT Core function with bookId (test expects {bookId})
@@ -4861,7 +4861,7 @@ export function createStudioServer(
   // --- Genres ---
 
   app.get("/api/v1/genres", async (c) => {
-    const { listAvailableGenres, readGenreProfile } = await import("@actalk/inkos-core");
+    const { listAvailableGenres, readGenreProfile } = await import("@actalk/castor-core");
     const rawGenres = await listAvailableGenres(root);
     const genres = await Promise.all(
       rawGenres.map(async (g) => {
@@ -4961,7 +4961,7 @@ export function createStudioServer(
     // run (or a server restart) can also drop it — so a bare 404 is ambiguous
     // ("done" vs "never existed"). Check disk: if the foundation is fully
     // written, the book really is ready; report that truthfully.
-    const { isBookFoundationComplete } = await import("@actalk/inkos-core");
+    const { isBookFoundationComplete } = await import("@actalk/castor-core");
     if (await isBookFoundationComplete(state.bookDir(id))) {
       return c.json({ status: "ready" });
     }
@@ -5291,7 +5291,7 @@ export function createStudioServer(
     // can warn users their edits won't reach the runtime.
     // Hotfix: only tag as legacy when the book actually HAS the new layout.
     // Pre-Phase-5 books use story_bible/book_rules as the authoritative source.
-    const { isNewLayoutBook, tryParseBookRulesFrontmatter } = await import("@actalk/inkos-core");
+    const { isNewLayoutBook, tryParseBookRulesFrontmatter } = await import("@actalk/castor-core");
     const legacy = LEGACY_SHIM_FILES.has(file) && await isNewLayoutBook(bookDir);
 
     try {
@@ -6237,7 +6237,7 @@ export function createStudioServer(
     }
 
     // Hotfix: only tag shim files as legacy when the book has the new layout.
-    const { isNewLayoutBook } = await import("@actalk/inkos-core");
+    const { isNewLayoutBook } = await import("@actalk/castor-core");
     const newLayout = await isNewLayoutBook(bookDir);
 
     async function describe(relPath: string): Promise<{ readonly name: string; readonly size: number; readonly preview: string; readonly legacy?: true; readonly readonly?: true; readonly readonlyReason?: string } | null> {
@@ -7384,7 +7384,7 @@ export function createStudioServer(
 
       const content = await readFile(join(chaptersDir, match), "utf-8");
       const currentConfig = await loadCurrentProjectConfig();
-      const { ContinuityAuditor } = await import("@actalk/inkos-core");
+      const { ContinuityAuditor } = await import("@actalk/castor-core");
       const auditor = new ContinuityAuditor({
         client: createLLMClient(currentConfig.llm),
         model: currentConfig.llm.model,
@@ -7503,7 +7503,7 @@ export function createStudioServer(
   app.get("/api/v1/genres/:id", async (c) => {
     const genreId = c.req.param("id");
     try {
-      const { readGenreProfile } = await import("@actalk/inkos-core");
+      const { readGenreProfile } = await import("@actalk/castor-core");
       const { profile, body } = await readGenreProfile(root, genreId);
       return c.json({ profile, body });
     } catch (e) {
@@ -7517,7 +7517,7 @@ export function createStudioServer(
       throw new ApiError(400, "INVALID_GENRE_ID", `Invalid genre ID: "${genreId}"`);
     }
     try {
-      const { getBuiltinGenresDir } = await import("@actalk/inkos-core");
+      const { getBuiltinGenresDir } = await import("@actalk/castor-core");
       const { mkdir: mkdirFs, copyFile } = await import("node:fs/promises");
       const builtinDir = getBuiltinGenresDir();
       const projectGenresDir = join(root, "genres");
@@ -7703,7 +7703,7 @@ export function createStudioServer(
       if (!match) return c.json({ error: "Chapter not found" }, 404);
 
       const content = await readFile(join(chaptersDir, match), "utf-8");
-      const { analyzeAITells } = await import("@actalk/inkos-core");
+      const { analyzeAITells } = await import("@actalk/castor-core");
       const result = analyzeAITells(content);
       return c.json({ chapterNumber: chapterNum, ...result });
     } catch (e) {
@@ -7725,7 +7725,7 @@ export function createStudioServer(
     // story_bible.md or book_rules.md does nothing at runtime (the pipeline
     // reads outline/ instead). For pre-Phase-5 books these ARE authoritative.
     if (LEGACY_SHIM_FILES.has(file)) {
-      const { isNewLayoutBook } = await import("@actalk/inkos-core");
+      const { isNewLayoutBook } = await import("@actalk/castor-core");
       if (await isNewLayoutBook(bookDir)) {
         return c.json(
           { error: "Legacy compat shim; edit outline/story_frame.md instead" },
@@ -7851,7 +7851,7 @@ export function createStudioServer(
       const chaptersDir = join(bookDir, "chapters");
       const files = await readdir(chaptersDir);
       const mdFiles = files.filter((f) => f.endsWith(".md") && /^\d{4}/.test(f)).sort();
-      const { analyzeAITells } = await import("@actalk/inkos-core");
+      const { analyzeAITells } = await import("@actalk/castor-core");
 
       const results = await Promise.all(
         mdFiles.map(async (f) => {
@@ -7872,7 +7872,7 @@ export function createStudioServer(
   app.get("/api/v1/books/:id/detect/stats", async (c) => {
     const id = c.req.param("id");
     try {
-      const { loadDetectionHistory, analyzeDetectionInsights } = await import("@actalk/inkos-core");
+      const { loadDetectionHistory, analyzeDetectionInsights } = await import("@actalk/castor-core");
       const bookDir = state.bookDir(id);
       const history = await loadDetectionHistory(bookDir);
       const insights = analyzeDetectionInsights(history);
@@ -7987,7 +7987,7 @@ export function createStudioServer(
     if (!text?.trim()) return c.json({ error: "text is required" }, 400);
 
     try {
-      const { analyzeStyle } = await import("@actalk/inkos-core");
+      const { analyzeStyle } = await import("@actalk/castor-core");
       const profile = analyzeStyle(text, sourceName ?? "unknown");
       return c.json(profile);
     } catch (e) {
@@ -8023,7 +8023,7 @@ export function createStudioServer(
 
     broadcast("import:start", { bookId: id, type: "chapters" });
     try {
-      const { splitChapters } = await import("@actalk/inkos-core");
+      const { splitChapters } = await import("@actalk/castor-core");
       const chapters = [...splitChapters(text, splitRegex)];
 
       const pipeline = new PipelineRunner(await buildPipelineConfig());
@@ -8296,7 +8296,7 @@ export function createStudioServer(
 
   app.get("/api/v1/doctor", async (c) => {
     const { existsSync } = await import("node:fs");
-    const { GLOBAL_ENV_PATH } = await import("@actalk/inkos-core");
+    const { GLOBAL_ENV_PATH } = await import("@actalk/castor-core");
 
     const checks = {
       inkosJson: existsSync(join(root, "inkos.json")),

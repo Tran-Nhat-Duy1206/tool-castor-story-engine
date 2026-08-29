@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 
 // --- Mock Core Task 8/9 foundation functions ---
-vi.mock("@actalk/inkos-core", async (importOriginal) => {
+vi.mock("@actalk/castor-core", async (importOriginal) => {
   const actual = await importOriginal() as Record<string, unknown>;
   class FoundationError extends Error {
     code: string;
@@ -40,7 +40,7 @@ vi.mock("@actalk/inkos-core", async (importOriginal) => {
 
 // RED import — file does not exist yet (intended failure)
 import { registerFoundationRoutes } from "../api/foundation-route.js";
-import * as Core from "@actalk/inkos-core";
+import * as Core from "@actalk/castor-core";
 
 const BOOK_ID = "demo-book-22";
 const REV_ID = "rev-001";

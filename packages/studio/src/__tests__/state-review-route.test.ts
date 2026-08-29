@@ -26,7 +26,7 @@ import {
   saveStateReviewShell,
   writeResolvedReceipt,
   type ResolvedReviewReceipt,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 import { createStudioServer } from "../api/server.js";
 import {
   confirmReview,
@@ -505,8 +505,8 @@ describe("state-review HTTP routes (Task 14)", () => {
   it("mutation routes hold the shared book lock across the whole sequence and release it", async () => {
     await seedActiveReview(bookDir);
     const events: string[] = [];
-    const originalAcquire = (await import("@actalk/inkos-core")).StateManager.prototype.acquireBookLock;
-    const spy = vi.spyOn((await import("@actalk/inkos-core")).StateManager.prototype, "acquireBookLock");
+    const originalAcquire = (await import("@actalk/castor-core")).StateManager.prototype.acquireBookLock;
+    const spy = vi.spyOn((await import("@actalk/castor-core")).StateManager.prototype, "acquireBookLock");
     spy.mockImplementation(async function (this: unknown, bookId: string) {
       const release = await (originalAcquire as (this: unknown, id: string) => Promise<() => Promise<void>>).call(this, bookId);
       events.push("acquire");

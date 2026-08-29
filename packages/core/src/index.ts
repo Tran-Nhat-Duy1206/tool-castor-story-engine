@@ -847,7 +847,7 @@ export { evaluatePlanningGate, type PlanningGateResult } from "./planning/gate.j
 
 // CLI-friendly wrappers for `castor planning` (read-only, advisory)
 // These forward to the underlying read-only APIs via StateManager/bookDir.
-// Tests mock these directly via vi.mock("@actalk/inkos-core").
+// Tests mock these directly via vi.mock("@actalk/castor-core").
 export async function getPublishedArcPlan(params: {
   readonly bookId: string;
   readonly projectRoot?: string;

@@ -1,5 +1,5 @@
 {
-  "name": "@actalk/inkos",
+  "name": "@actalk/castor",
   "version": "1.8.0",
   "description": "Tool Castor Story Engine (Castor) CLI and TUI for fiction, scripts, interactive worlds, and translation. Derived from InkOS.",
   "keywords": [
@@ -23,8 +23,7 @@
   ],
   "type": "module",
   "bin": {
-    "castor": "dist/index.js",
-    "inkos": "dist/index.js"
+    "castor": "dist/index.js"
   },
   "files": [
     "dist",
@@ -37,7 +36,7 @@
     "directory": "packages/cli"
   },
   "scripts": {
-    "prepare:workspace-core": "pnpm --filter @actalk/inkos-core build",
+    "prepare:workspace-core": "pnpm --filter @actalk/castor-core build",
     "prepack": "node ../../scripts/prepare-package-for-publish.mjs",
     "postpack": "node ../../scripts/restore-package-json.mjs",
     "prepublishOnly": "node ../../scripts/verify-no-workspace-protocol.mjs .",
@@ -50,8 +49,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@actalk/inkos-core": "workspace:*",
-    "@actalk/inkos-studio": "workspace:*",
+    "@actalk/castor-core": "workspace:*",
+    "@actalk/castor-studio": "workspace:*",
     "commander": "^13.0.0",
     "dotenv": "^16.4.0",
     "epub-gen-memory": "^1.0.10",

@@ -1,6 +1,6 @@
 import { Command } from "commander";
-import { StateManager } from "@actalk/inkos-core";
-import * as Core from "@actalk/inkos-core";
+import { StateManager } from "@actalk/castor-core";
+import * as Core from "@actalk/castor-core";
 import { findProjectRoot, resolveBookId, log, logError } from "../utils.js";
 
 // -----------------------------------------------------------------------------

@@ -21,10 +21,10 @@ import {
   type OnStreamProgress,
   type ShortFictionReference,
   type ShortFictionLanguage,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 import { buildPipelineConfig, findProjectRoot, loadConfig, log, logError } from "../utils.js";
 
-export { extractResponsesImageBase64, resolveCoverApiKey } from "@actalk/inkos-core";
+export { extractResponsesImageBase64, resolveCoverApiKey } from "@actalk/castor-core";
 
 export const shortCommand = new Command("short")
   .description("Short fiction production workflow");

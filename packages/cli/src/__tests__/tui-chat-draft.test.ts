@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { InteractionSession } from "@actalk/inkos-core";
+import type { InteractionSession } from "@actalk/castor-core";
 import {
   appendStreamingAssistantChunk,
   createOptimisticUserMessageSession,

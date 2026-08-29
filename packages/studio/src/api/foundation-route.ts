@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Hono } from "hono";
 import { isSafeBookId } from "./safety.js";
-import * as Core from "@actalk/inkos-core";
+import * as Core from "@actalk/castor-core";
 const getFoundationOverview = (Core as unknown as { getFoundationOverview: unknown }).getFoundationOverview as unknown as (p: Record<string, unknown>) => Promise<unknown>;
 const listFoundationManifests = (Core as unknown as { listFoundationManifests: unknown }).listFoundationManifests as unknown as (p: Record<string, unknown>) => Promise<unknown>;
 const getFoundationReadiness = (Core as unknown as { getFoundationReadiness: unknown }).getFoundationReadiness as unknown as (p: Record<string, unknown>) => Promise<unknown>;

@@ -1,4 +1,4 @@
-import { normalizePlatformOrOther, defaultChapterLength, type Platform } from "@actalk/inkos-core";
+import { normalizePlatformOrOther, defaultChapterLength, type Platform } from "@actalk/castor-core";
 export { waitForStudioBookReady } from "../lib/book-ready.js";
 export type { StudioBookDetail, WaitForStudioBookReadyOptions } from "../lib/book-ready.js";
 

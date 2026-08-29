@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { DEFAULT_REVISE_MODE, PipelineRunner, StateManager, resolveRevisionGate, type ReviseMode } from "@actalk/inkos-core";
+import { DEFAULT_REVISE_MODE, PipelineRunner, StateManager, resolveRevisionGate, type ReviseMode } from "@actalk/castor-core";
 import { loadConfig, buildPipelineConfig, findProjectRoot, resolveBookId, log, logError } from "../utils.js";
 import {
   formatNotifyCommandTitle,

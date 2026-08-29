@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { loadChaptersFromPath, PipelineRunner, StateManager } from "@actalk/inkos-core";
+import { loadChaptersFromPath, PipelineRunner, StateManager } from "@actalk/castor-core";
 import { resolve } from "node:path";
 import { loadConfig, buildPipelineConfig, findProjectRoot, resolveBookId, log, logError } from "../utils.js";
 import {

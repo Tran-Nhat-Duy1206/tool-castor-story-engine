@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { Hono } from "hono";
-import * as Core from "@actalk/inkos-core";
+import * as Core from "@actalk/castor-core";
 
 // Local safe checks (mirror safety.ts)
 function isSafeBookIdLocal(v: string): boolean {

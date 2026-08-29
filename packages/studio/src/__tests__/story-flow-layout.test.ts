@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { layoutStoryGraph } from "../lib/story-flow-layout";
-import { StoryGraphSchema } from "@actalk/inkos-core";
+import { StoryGraphSchema } from "@actalk/castor-core";
 
 const g = StoryGraphSchema.parse({
   schemaVersion: 1, projectId: "p", title: "T", variables: [],

@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "ink-testing-library";
 import { describe, expect, it } from "vitest";
-import type { InteractionSession } from "@actalk/inkos-core";
+import type { InteractionSession } from "@actalk/castor-core";
 
 function createSession(): InteractionSession {
   return {

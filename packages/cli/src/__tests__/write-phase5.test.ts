@@ -17,7 +17,7 @@ const logMock = vi.fn();
 const logErrorMock = vi.fn();
 const writerAgentMock = vi.fn();
 
-vi.mock("@actalk/inkos-core", () => ({
+vi.mock("@actalk/castor-core", () => ({
   PipelineRunner: class { writeNextChapter = writeNextChapterMock; },
   WriterAgent: class { write = writerAgentMock; },
   StateManager: class {

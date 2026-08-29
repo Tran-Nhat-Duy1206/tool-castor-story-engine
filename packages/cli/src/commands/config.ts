@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { findProjectRoot, log, logError, GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH } from "../utils.js";
-import { listModelsForService } from "@actalk/inkos-core";
+import { listModelsForService } from "@actalk/castor-core";
 import { formatListModelsEmpty, formatListModelsHeader, resolveCliLanguage } from "../localization.js";
 
 export const configCommand = new Command("config")

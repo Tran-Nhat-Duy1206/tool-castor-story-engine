@@ -3,7 +3,7 @@ import { gunzipSync } from "node:zlib";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveStoryGraph, StoryGraphSchema } from "@actalk/inkos-core";
+import { saveStoryGraph, StoryGraphSchema } from "@actalk/castor-core";
 import { createStudioServer } from "../api/server.js";
 
 const graph = StoryGraphSchema.parse({

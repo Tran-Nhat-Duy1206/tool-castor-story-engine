@@ -14,10 +14,10 @@ importers:
 
   packages/cli:
     dependencies:
-      '@actalk/inkos-core':
+      '@actalk/castor-core':
         specifier: workspace:*
         version: link:../core
-      '@actalk/inkos-studio':
+      '@actalk/castor-studio':
         specifier: workspace:*
         version: link:../studio
       commander:
@@ -109,7 +109,7 @@ importers:
 
   packages/studio:
     dependencies:
-      '@actalk/inkos-core':
+      '@actalk/castor-core':
         specifier: workspace:*
         version: link:../core
       '@base-ui/react':

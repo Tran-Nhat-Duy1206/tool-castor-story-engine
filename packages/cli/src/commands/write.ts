@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { PipelineRunner, StateManager, resolveChapterReviewMode } from "@actalk/inkos-core";
+import { PipelineRunner, StateManager, resolveChapterReviewMode } from "@actalk/castor-core";
 import { readdir, stat, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
@@ -58,7 +58,7 @@ writeCommand
       const bookId = await resolveBookId(bookIdArg, root);
       // Pre-check Planning Gate (Task 16) before invoking Writer — CONFLICT/AUTHOR_DECISION/UNCERTAIN must not call writeNextChapter
       try {
-        const { getPlanningGateReport } = await import("@actalk/inkos-core") as unknown as { getPlanningGateReport?: (p: unknown) => Promise<unknown> };
+        const { getPlanningGateReport } = await import("@actalk/castor-core") as unknown as { getPlanningGateReport?: (p: unknown) => Promise<unknown> };
         if (getPlanningGateReport) {
           const gate: any = await getPlanningGateReport({ bookId, bookDir: new StateManager(root).bookDir(bookId) }).catch(() => null);
           const verdict = String(gate?.verdict ?? gate?.outcome ?? "").toUpperCase();

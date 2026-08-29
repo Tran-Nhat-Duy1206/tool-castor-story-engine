@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
-vi.mock("@actalk/inkos-core", async (importOriginal) => {
+vi.mock("@actalk/castor-core", async (importOriginal) => {
   const actual = await importOriginal() as Record<string, unknown>;
   class PlanningError extends Error { code: string; constructor(c:string,m:string){super(m);this.code=c} }
   return { ...actual,
@@ -24,7 +24,7 @@ vi.mock("@actalk/inkos-core", async (importOriginal) => {
     PlanningError };
 });
 import { registerPlanningRoutes } from "../api/planning-route.js";
-import * as Core from "@actalk/inkos-core";
+import * as Core from "@actalk/castor-core";
 const BOOK_ID="book-23";
 function makeApp(){ const app=new Hono(); registerPlanningRoutes(app as never); return app; }
 beforeEach(()=>{ vi.clearAllMocks();

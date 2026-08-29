@@ -197,8 +197,8 @@ const logger = {
   error: vi.fn(),
 };
 
-vi.mock("@actalk/inkos-core", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@actalk/inkos-core")>();
+vi.mock("@actalk/castor-core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@actalk/castor-core")>();
   generatePlayImageMock.mockImplementation(actual.generatePlayImage);
 
   class MockSessionAlreadyMigratedError extends Error {
@@ -751,7 +751,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("uses the real core bookId validator in the Studio safety mock", async () => {
-    const { isSafeBookId } = await import("@actalk/inkos-core");
+    const { isSafeBookId } = await import("@actalk/castor-core");
 
     expect(vi.isMockFunction(isSafeBookId)).toBe(false);
     expect(isSafeBookId("demo-book")).toBe(true);
@@ -3731,7 +3731,7 @@ describe("createStudioServer daemon lifecycle", () => {
   // 走真实 transcript 文件验证：确认式生产任务的用户指令必须在任务开始时就
   // 写进 transcript（而不是任务完成后才补写），完成/失败时只追加助手工具消息。
   async function wireRealSessionTranscript() {
-    const actual = await vi.importActual<typeof import("@actalk/inkos-core")>("@actalk/inkos-core");
+    const actual = await vi.importActual<typeof import("@actalk/castor-core")>("@actalk/castor-core");
     appendManualSessionMessagesMock.mockImplementation(actual.appendManualSessionMessages);
     loadBookSessionMock.mockImplementation(
       (projectRoot: string, sessionId: string) => actual.loadBookSession(projectRoot, sessionId),
@@ -4144,7 +4144,7 @@ describe("createStudioServer daemon lifecycle", () => {
       createdAt: 1,
       updatedAt: 1,
     });
-    const core = await import("@actalk/inkos-core");
+    const core = await import("@actalk/castor-core");
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 

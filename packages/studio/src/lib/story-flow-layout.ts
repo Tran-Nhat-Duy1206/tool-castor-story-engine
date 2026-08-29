@@ -1,4 +1,4 @@
-import type { StoryGraph } from "@actalk/inkos-core/interactive-film/graph-schema";
+import type { StoryGraph } from "@actalk/castor-core/interactive-film/graph-schema";
 
 export interface FlowNodeData {
   readonly label: string;

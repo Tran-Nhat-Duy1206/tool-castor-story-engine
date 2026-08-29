@@ -1,7 +1,7 @@
 import {
   appendInteractionMessage,
   type InteractionSession,
-} from "@actalk/inkos-core";
+} from "@actalk/castor-core";
 
 export function createOptimisticUserMessageSession(
   session: InteractionSession,

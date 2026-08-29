@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { StateManager, writeExportArtifact } from "@actalk/inkos-core";
+import { StateManager, writeExportArtifact } from "@actalk/castor-core";
 import { join } from "node:path";
 import { findProjectRoot, resolveBookId, log, logError } from "../utils.js";
 

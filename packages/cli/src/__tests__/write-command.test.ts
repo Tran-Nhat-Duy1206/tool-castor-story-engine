@@ -20,7 +20,7 @@ const restoreStateMock = vi.fn();
 const logMock = vi.fn();
 const logErrorMock = vi.fn();
 
-vi.mock("@actalk/inkos-core", () => ({
+vi.mock("@actalk/castor-core", () => ({
   PipelineRunner: class {
     writeNextChapter = writeNextChapterMock;
   },

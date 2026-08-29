@@ -14,8 +14,8 @@ const {
   buildPipelineConfigMock: vi.fn(),
 }));
 
-vi.mock("@actalk/inkos-core", async () => {
-  const actual = await vi.importActual<typeof import("@actalk/inkos-core")>("@actalk/inkos-core");
+vi.mock("@actalk/castor-core", async () => {
+  const actual = await vi.importActual<typeof import("@actalk/castor-core")>("@actalk/castor-core");
   class PipelineRunnerMock {
     constructor(_config: unknown) {}
     async initBook(_book: unknown, _options?: unknown) {}

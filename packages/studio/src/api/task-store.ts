@@ -1,6 +1,6 @@
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { RequestedIntent } from "@actalk/inkos-core";
+import type { RequestedIntent } from "@actalk/castor-core";
 
 export type StudioTaskExecutionStatus = "running" | "processing" | "completed" | "error";
 
