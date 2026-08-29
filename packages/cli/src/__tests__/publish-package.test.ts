@@ -61,7 +61,7 @@ async function extractPackedPackageJson(packageDir: string, packDir: string) {
 
 describe.sequential("publish packaging", () => {
   it("rewrites workspace package versions for canary publishing", async () => {
-    const tempRoot = await mkdtemp(join(tmpdir(), "inkos-version-script-"));
+    const tempRoot = await mkdtemp(join(tmpdir(), "castor-version-script-"));
     const tempPackagesDir = join(tempRoot, "packages");
     const tempCoreDir = join(tempPackagesDir, "core");
     const tempCliDir = join(tempPackagesDir, "cli");
@@ -72,7 +72,7 @@ describe.sequential("publish packaging", () => {
 
       await writeFile(
         join(tempRoot, "package.json"),
-        `${JSON.stringify({ name: "inkos", version: "0.4.6" }, null, 2)}\n`,
+        `${JSON.stringify({ name: "castor", version: "0.4.6" }, null, 2)}\n`,
       );
       await writeFile(
         join(tempCoreDir, "package.json"),
@@ -141,7 +141,7 @@ describe.sequential("publish packaging", () => {
   });
 
   it("accepts canonical workspace protocol in source manifests", async () => {
-    const tempRoot = await mkdtemp(join(tmpdir(), "inkos-publish-verify-pass-"));
+    const tempRoot = await mkdtemp(join(tmpdir(), "castor-publish-verify-pass-"));
     const tempPackagesDir = join(tempRoot, "packages");
     const tempCoreDir = join(tempPackagesDir, "core");
     const tempCliDir = join(tempPackagesDir, "cli");
@@ -152,7 +152,7 @@ describe.sequential("publish packaging", () => {
 
       await writeFile(
         join(tempRoot, "package.json"),
-        `${JSON.stringify({ name: "inkos", version: "0.5.1" }, null, 2)}\n`,
+        `${JSON.stringify({ name: "castor", version: "0.5.1" }, null, 2)}\n`,
       );
       await writeFile(
         join(tempCoreDir, "package.json"),
@@ -191,7 +191,7 @@ describe.sequential("publish packaging", () => {
   });
 
   it("rejects workspace protocol manifests that normalize to the wrong internal version", async () => {
-    const tempRoot = await mkdtemp(join(tmpdir(), "inkos-publish-verify-fail-"));
+    const tempRoot = await mkdtemp(join(tmpdir(), "castor-publish-verify-fail-"));
     const tempPackagesDir = join(tempRoot, "packages");
     const tempCoreDir = join(tempPackagesDir, "core");
     const tempCliDir = join(tempPackagesDir, "cli");
@@ -202,7 +202,7 @@ describe.sequential("publish packaging", () => {
 
       await writeFile(
         join(tempRoot, "package.json"),
-        `${JSON.stringify({ name: "inkos", version: "0.5.1" }, null, 2)}\n`,
+        `${JSON.stringify({ name: "castor", version: "0.5.1" }, null, 2)}\n`,
       );
       await writeFile(
         join(tempCoreDir, "package.json"),
@@ -240,7 +240,7 @@ describe.sequential("publish packaging", () => {
   });
 
   it("replaces workspace dependencies before npm pack", { timeout: CLI_PACK_TEST_TIMEOUT_MS }, async () => {
-    const packDir = await mkdtemp(join(tmpdir(), "inkos-cli-pack-"));
+    const packDir = await mkdtemp(join(tmpdir(), "castor-cli-pack-"));
 
     try {
       const packedPackageJson = JSON.parse(await extractPackedPackageJson(cliDir, packDir));
@@ -257,7 +257,7 @@ describe.sequential("publish packaging", () => {
   });
 
   it("packs the studio runtime entry alongside the built frontend", { timeout: STUDIO_PACK_TEST_TIMEOUT_MS }, async () => {
-    const packDir = await mkdtemp(join(tmpdir(), "inkos-studio-pack-"));
+    const packDir = await mkdtemp(join(tmpdir(), "castor-studio-pack-"));
 
     try {
       const tarballPath = await packPackage(studioDir, packDir);
@@ -275,7 +275,7 @@ describe.sequential("publish packaging", () => {
   });
 
   it("packs the built-in professional skills with core", { timeout: STUDIO_PACK_TEST_TIMEOUT_MS }, async () => {
-    const packDir = await mkdtemp(join(tmpdir(), "inkos-core-pack-"));
+    const packDir = await mkdtemp(join(tmpdir(), "castor-core-pack-"));
 
     try {
       const coreDir = resolve(workspaceRoot, "packages", "core");

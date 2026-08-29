@@ -22,7 +22,7 @@ const bookPath = () => join(bookDir, "book.json");
 const authPath = (id: string) => join(bookDir, "story", "governance", "authorizations", `${id}.gov.json`);
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-settle-"));
+  root = await mkdtemp(join(tmpdir(), "castor-settle-"));
   bookDir = join(root, "books", "demo-book");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await mkdir(join(bookDir, "chapters"), { recursive: true });

@@ -105,7 +105,7 @@ async function seedBook(root: string): Promise<string> {
   // A loopback baseUrl marks the API key optional (llm-endpoint-auth); the
   // rebuild test injects its own writer so no endpoint is ever contacted.
   await writeFile(
-    join(root, "inkos.json"),
+    join(root, "castor.json"),
     JSON.stringify({
       name: "test-project", version: "0.1.0", language: "zh",
       llm: { model: "test-model", provider: "custom", baseUrl: "http://127.0.0.1:9/v1" },

@@ -18,7 +18,7 @@ describe("proxy fetch helpers", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const env = {
-      CASTOR_LLM_PROXY_URL: "http://inkos-env-proxy:9910",
+      CASTOR_LLM_PROXY_URL: "http://castor-env-proxy:9910",
       HTTPS_PROXY: "http://standard-proxy:9910",
     };
 
@@ -41,19 +41,19 @@ describe("proxy fetch helpers", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const env = {
-      CASTOR_LLM_PROXY_URL: "http://inkos-proxy:9910",
+      CASTOR_LLM_PROXY_URL: "http://castor-proxy:9910",
       HTTPS_PROXY: "http://standard-proxy:9910",
       HTTP_PROXY: "http://http-proxy:9910",
     };
 
-    expect(resolveProxyUrl(undefined, env)).toBe("http://inkos-proxy:9910");
+    expect(resolveProxyUrl(undefined, env)).toBe("http://castor-proxy:9910");
     await fetchWithProxy("https://api.example/v1/models", {}, undefined, env);
 
-    expect(proxyAgentMock).toHaveBeenCalledWith("http://inkos-proxy:9910");
+    expect(proxyAgentMock).toHaveBeenCalledWith("http://castor-proxy:9910");
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.example/v1/models",
       expect.objectContaining({
-        dispatcher: { kind: "proxy-agent", url: "http://inkos-proxy:9910" },
+        dispatcher: { kind: "proxy-agent", url: "http://castor-proxy:9910" },
       }),
     );
   });

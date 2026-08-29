@@ -25,7 +25,7 @@ describe("session transcript restore", () => {
   let projectRoot: string;
 
   beforeEach(async () => {
-    projectRoot = await mkdtemp(join(tmpdir(), "inkos-restore-"));
+    projectRoot = await mkdtemp(join(tmpdir(), "castor-restore-"));
   });
 
   afterEach(async () => {

@@ -13,7 +13,7 @@ import {
 let bookDir: string;
 
 beforeEach(async () => {
-  bookDir = await mkdtemp(join(tmpdir(), "inkos-outline-paths-"));
+  bookDir = await mkdtemp(join(tmpdir(), "castor-outline-paths-"));
   await mkdir(join(bookDir, "story"), { recursive: true });
 });
 

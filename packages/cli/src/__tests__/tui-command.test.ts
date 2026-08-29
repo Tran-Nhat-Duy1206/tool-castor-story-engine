@@ -11,7 +11,7 @@ describe("tui command", () => {
   let tempDir: string;
 
   beforeEach(async () => {
-    tempDir = await mkdtemp(join(tmpdir(), "inkos-default-studio-"));
+    tempDir = await mkdtemp(join(tmpdir(), "castor-default-studio-"));
     process.chdir(tempDir);
   });
 
@@ -39,7 +39,7 @@ describe("tui command", () => {
     await program.parseAsync([], { from: "user" });
 
     const config = JSON.parse(await readFile(join(tempDir, "castor.json"), "utf-8"));
-    expect(config.name).toMatch(/^inkos-default-studio-/);
+    expect(config.name).toMatch(/^castor-default-studio-/);
     expect(config.llm.configSource).toBe("studio");
     expect(config.llm.model).toBe("");
     expect(config.llm.baseUrl).toBe("");

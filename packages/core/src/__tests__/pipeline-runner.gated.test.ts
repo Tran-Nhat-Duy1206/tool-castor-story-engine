@@ -127,7 +127,7 @@ function contentFingerprint(
 }
 
 async function createGatedFixture() {
-  const root = await mkdtemp(join(tmpdir(), "inkos-gated-test-"));
+  const root = await mkdtemp(join(tmpdir(), "castor-gated-test-"));
   const state = new StateManager(root);
   const bookId = "test-book";
   const now = "2026-03-19T00:00:00.000Z";
@@ -502,7 +502,7 @@ describe("PipelineRunner gated Phase 4 publication", () => {
       const afterFp = contentFingerprint(await captureBookMetadata(root), runtimeWorkingFiles);
       const beforeFp = contentFingerprint(before, runtimeWorkingFiles);
       expect(afterFp).toEqual(beforeFp);
-      const residue = (await readdir(bookDir)).filter((name) => name.startsWith(".inkos-file-txn-"));
+      const residue = (await readdir(bookDir)).filter((name) => name.startsWith(".castor-file-txn-"));
       expect(residue).toEqual([]);
       await expect(readFile(join(bookDir, ACTIVE_REVIEW_RELPATH(1)), "utf-8"))
         .rejects.toMatchObject({ code: "ENOENT" });

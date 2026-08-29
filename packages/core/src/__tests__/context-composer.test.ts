@@ -110,7 +110,7 @@ async function seedPublishedArc(arcId = "arc-1", version = 1): Promise<void> {
 }
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-composer-"));
+  root = await mkdtemp(join(tmpdir(), "castor-composer-"));
   bookDir = join(root, "books", "demo-book");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await mkdir(join(bookDir, "story", "governance"), { recursive: true });

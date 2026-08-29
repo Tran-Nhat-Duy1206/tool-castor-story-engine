@@ -145,7 +145,7 @@ interface PostCorrectionFixture {
  */
 async function seedPostCorrectionBook(options?: { readonly semanticHead?: number }): Promise<PostCorrectionFixture> {
   const semanticHead = options?.semanticHead ?? SLOT;
-  const root = await mkdtemp(join(tmpdir(), "inkos-future-progression-"));
+  const root = await mkdtemp(join(tmpdir(), "castor-future-progression-"));
   const bookId = "demo-canon-book";
   const bookDir = join(root, "books", bookId);
   const storyDir = join(bookDir, "story");

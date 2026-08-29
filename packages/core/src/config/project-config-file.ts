@@ -8,10 +8,10 @@ import { CASTOR_CONFIG_FILENAME, LEGACY_CASTOR_CONFIG_FILENAME } from "./product
  * One-way legacy migration at the configuration boundary, per spec §6:
  *
  *   1. castor.json exists           → canonical, used directly.
- *   2. castor.json + inkos.json     → castor.json wins; meaningful conflicts
+ *   2. castor.json + castor.json     → castor.json wins; meaningful conflicts
  *                                      produce a non-secret warning (key names
  *                                      only). Never merged.
- *   3. inkos.json only              → legacy input: validated, then an
+ *   3. castor.json only              → legacy input: validated, then an
  *                                      equivalent castor.json is atomically
  *                                      created. The legacy file is left
  *                                      byte-identical and never written again.

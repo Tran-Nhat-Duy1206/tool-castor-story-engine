@@ -47,7 +47,7 @@ const PROSE_A = "Core conflict premise.\nAuthoritative resolution line.\n";
 const PROSE_B = "World setting description.\nAtmosphere details.\n";
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-pub-test-"));
+  root = await mkdtemp(join(tmpdir(), "castor-pub-test-"));
   bookDir = join(root, "books", "pub-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "state"), { recursive: true });

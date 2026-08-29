@@ -13,7 +13,7 @@ let root = "";
 let bookDir = "";
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-tx-test-"));
+  root = await mkdtemp(join(tmpdir(), "castor-tx-test-"));
   bookDir = join(root, "books", "tx-book");
   await mkdir(join(bookDir, "story"), { recursive: true });
   await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: "tx-book", title: "Tx Book" }), "utf-8");

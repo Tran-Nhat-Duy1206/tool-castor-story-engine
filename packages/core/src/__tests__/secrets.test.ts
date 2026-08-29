@@ -8,7 +8,7 @@ describe("secrets", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-secrets-"));
+    root = await mkdtemp(join(tmpdir(), "castor-secrets-"));
   });
 
   afterEach(async () => {
@@ -16,15 +16,15 @@ describe("secrets", () => {
   });
 
   describe("loadSecrets", () => {
-    it("returns empty when .inkos/secrets.json does not exist", async () => {
+    it("returns empty when .castor/secrets.json does not exist", async () => {
       const secrets = await loadSecrets(root);
       expect(secrets).toEqual({ services: {} });
     });
 
     it("reads existing secrets file", async () => {
-      await mkdir(join(root, ".inkos"), { recursive: true });
+      await mkdir(join(root, ".castor"), { recursive: true });
       await writeFile(
-        join(root, ".inkos", "secrets.json"),
+        join(root, ".castor", "secrets.json"),
         JSON.stringify({ services: { moonshot: { apiKey: "sk-test" } } }),
       );
       const secrets = await loadSecrets(root);
@@ -59,9 +59,9 @@ describe("secrets", () => {
 
   describe("getServiceApiKey", () => {
     it("returns key from secrets.json first", async () => {
-      await mkdir(join(root, ".inkos"), { recursive: true });
+      await mkdir(join(root, ".castor"), { recursive: true });
       await writeFile(
-        join(root, ".inkos", "secrets.json"),
+        join(root, ".castor", "secrets.json"),
         JSON.stringify({ services: { moonshot: { apiKey: "sk-from-file" } } }),
       );
       const key = await getServiceApiKey(root, "moonshot");
@@ -81,9 +81,9 @@ describe("secrets", () => {
     });
 
     it("handles custom service with colon key format", async () => {
-      await mkdir(join(root, ".inkos"), { recursive: true });
+      await mkdir(join(root, ".castor"), { recursive: true });
       await writeFile(
-        join(root, ".inkos", "secrets.json"),
+        join(root, ".castor", "secrets.json"),
         JSON.stringify({
           services: { "custom:内网GPT": { apiKey: "sk-custom" } },
         }),

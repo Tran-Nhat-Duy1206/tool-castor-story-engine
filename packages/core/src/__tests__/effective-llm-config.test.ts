@@ -13,8 +13,8 @@ describe("resolveEffectiveLLMConfig", () => {
   });
 
   async function writeProject(llm: Record<string, unknown>) {
-    root = await mkdtemp(join(tmpdir(), "inkos-effective-llm-"));
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    root = await mkdtemp(join(tmpdir(), "castor-effective-llm-"));
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "effective-project",
       version: "0.1.0",
       language: "zh",
@@ -24,8 +24,8 @@ describe("resolveEffectiveLLMConfig", () => {
   }
 
   async function writeSecrets(services: Record<string, { apiKey: string }>) {
-    await mkdir(join(root, ".inkos"), { recursive: true });
-    await writeFile(join(root, ".inkos", "secrets.json"), JSON.stringify({ services }, null, 2), "utf-8");
+    await mkdir(join(root, ".castor"), { recursive: true });
+    await writeFile(join(root, ".castor", "secrets.json"), JSON.stringify({ services }, null, 2), "utf-8");
   }
 
   it("Studio consumer 使用 Studio/project 配置，并忽略旧顶层 model/baseUrl", async () => {

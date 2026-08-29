@@ -7,7 +7,7 @@
 
 **Goal:** Implement the approved Phase 5 Foundation + Planning
 Intelligence architecture while preserving Phase 4 Canon settlement,
-legacy InkOS compatibility, and the one-chapter human execution boundary.
+legacy castor compatibility, and the one-chapter human execution boundary.
 
 **Architecture:** Phase 5 adds an **Evolutionary Governance Kernel** on top of the
 existing Castor pipeline: Foundation and Arc Plan become versioned, human-published
@@ -115,8 +115,8 @@ No `governance` capability/version markers exist yet anywhere (verified); they a
 - One deliberate Write action produces at most one chapter.
 - P0 authority context is never silently dropped; no automatic model switching to
   escape the context budget.
-- Old InkOS-derived books keep working before V2 adoption; preserve `inkos.json`,
-  `INKOS_*`, `.inkos/` compatibility unless a justified migration requires otherwise.
+- Old castor-derived books keep working before V2 adoption; preserve `castor.json`,
+  `castor_*`, `.castor/` compatibility unless a justified migration requires otherwise.
 - Governance capability markers flip atomically with the first Human Publish — never
   before, never in a separate transaction.
 - No Phase 6 deep prose-autonomy leakage; no Phase 7 Story Intelligence leakage.
@@ -450,10 +450,10 @@ export type PlanningArtifactKind = z.infer<typeof PlanningArtifactKindSchema>;
       invented kinds; `SafeGovernanceIdSchema` rejects path separators, `..`,
       absolute/drive paths, control characters, and oversize values — path-traversal
       negative tests). Run
-      `pnpm --filter @actalk/inkos-core exec vitest run src/__tests__/governance-contracts.test.ts`
+      `pnpm --filter @actalk/castor-core exec vitest run src/__tests__/governance-contracts.test.ts`
       and verify failure (module missing).
 - [ ] Implement `contracts.ts` + `BookConfigSchema` additive field; re-run targeted test → PASS.
-- [ ] Run `pnpm --filter @actalk/inkos-core exec vitest run src/__tests__/models.test.ts` (regression).
+- [ ] Run `pnpm --filter @actalk/castor-core exec vitest run src/__tests__/models.test.ts` (regression).
 - [ ] Run the Task Completion Gate using commit message
       `feat(core): phase 5 governance domain contracts and vocabularies`.
 
@@ -2102,7 +2102,7 @@ Human-approved Task: STOP and report the owning Task/regression — never silent
 history or pretend the E2E is "test-only PASS".**
 
 Scenarios:
-- legacy book (existing `inkos.json`, `.inkos/`, Foundation files, ChapterIntent,
+- legacy book (existing `castor.json`, `.castor/`, Foundation files, ChapterIntent,
   ChapterMemo, chapters, Canon/state) remains fully usable without V2 upgrade
   (write-next + Phase 4 flow green);
 - opt-in upgrade candidate → Human review (Task 8) → Human Publish (Task 9) → V2 v1,

@@ -37,7 +37,7 @@ const B_ORIGINAL = "World setting description stays untouched.\n";
 const PUBLISHED_OUTLINE = "PUBLISHED FOUNDATION — immutable production context.\n";
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-revservice-"));
+  root = await mkdtemp(join(tmpdir(), "castor-revservice-"));
   bookDir = join(root, "books", "rev-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "state"), { recursive: true });

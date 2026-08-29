@@ -1,6 +1,6 @@
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Task 16 — CLI refusal surfacing (hardened plan): `inkos write` is another
+// Task 16 — CLI refusal surfacing (hardened plan): `castor write` is another
 // human interface in front of the SAME Core State Review system. When the
 // Phase 4 advancement gate (assertCanAdvanceStory) refuses chapter generation
 // because a State Review is unresolved, the refusal text MUST reach the

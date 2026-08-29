@@ -2,9 +2,9 @@
 
 > **For Duy:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Make Castor the only canonical active product identity while preserving safe one-way compatibility for legacy InkOS config/runtime data and preserving all Phase 4/5 authority semantics.
+**Goal:** Make Castor the only canonical active product identity while preserving safe one-way compatibility for legacy castor config/runtime data and preserving all Phase 4/5 authority semantics.
 
-**Architecture:** Establish a known-good bootable baseline first, then migrate package/CLI identity, introduce explicit Castor identity/legacy adapters at configuration boundaries, and finally remove active InkOS branding. Core story/governance logic receives canonical Castor-shaped inputs; compatibility logic stays at the edges and may never create Human authority or mutate Canon merely because a project was renamed.
+**Architecture:** Establish a known-good bootable baseline first, then migrate package/CLI identity, introduce explicit Castor identity/legacy adapters at configuration boundaries, and finally remove active castor branding. Core story/governance logic receives canonical Castor-shaped inputs; compatibility logic stays at the edges and may never create Human authority or mutate Canon merely because a project was renamed.
 
 **Tech Stack:** TypeScript, pnpm workspaces, Node.js >=22, Vitest, Studio server/client, existing atomic file helpers and Phase 4/5 governance tests.
 
@@ -19,7 +19,7 @@
 - One checkpoint at a time. Inside a checkpoint, fix ordinary test/type/import failures autonomously; stop for architecture/spec conflict, scope expansion, authority ambiguity, repeated failed fixes, or an unclassifiable regression.
 - **Autonomous inside the checkpoint, human-controlled between checkpoints.**
 - Never change Foundation/Arc Publish semantics, Planning Gate semantics, Human Direction/Authorization authority, Final Confirm settlement, Canon semantics, or one deliberate Write → at most one chapter.
-- Never bulk search/replace `inkos` blindly. Every remaining InkOS occurrence must end in an approved attribution/history/legacy-compatibility bucket.
+- Never bulk search/replace `castor` blindly. Every remaining castor occurrence must end in an approved attribution/history/legacy-compatibility bucket.
 - Do not push, tag, publish npm packages, create a release, or start Phase 6.
 - Preserve existing untracked smoke evidence unless the Human explicitly asks to delete/archive it.
 
@@ -50,15 +50,15 @@ Run:
 
 ```powershell
 pnpm build
-pnpm --filter @actalk/inkos-core build
-pnpm --filter @actalk/inkos-studio build
+pnpm --filter @actalk/castor-core build
+pnpm --filter @actalk/castor-studio build
 node packages/cli/dist/index.js studio
 ```
 
 Expected on the pre-fix baseline: startup fails before the Studio server binds, with an ESM named-export error equivalent to:
 
 ```text
-SyntaxError: The requested module '@actalk/inkos-core' does not provide an export named 'confirmAuthorization'
+SyntaxError: The requested module '@actalk/castor-core' does not provide an export named 'confirmAuthorization'
 ```
 
 If the exact baseline no longer reproduces, STOP and investigate before applying the documented fix; do not assume the report is still current.
@@ -82,7 +82,7 @@ resolveDirectionConflict
 Run:
 
 ```powershell
-pnpm --filter @actalk/inkos-core test -- governance-public-exports.test.ts
+pnpm --filter @actalk/castor-core test -- governance-public-exports.test.ts
 ```
 
 Expected RED: one or more public exports are missing/undefined or module import fails.
@@ -98,7 +98,7 @@ Do not mock the Core barrel in this test.
 Run the narrow test with the Studio package's existing Vitest configuration, e.g.:
 
 ```powershell
-pnpm --filter @actalk/inkos-studio test -- startup-smoke.test.ts
+pnpm --filter @actalk/castor-studio test -- startup-smoke.test.ts
 ```
 
 If the current Studio test layout requires a different exact path/command, use the package's existing test convention; keep the test purpose unchanged.
@@ -121,10 +121,10 @@ Restore the public exports from `./governance/authorizations.js` required by cur
 Run:
 
 ```powershell
-pnpm --filter @actalk/inkos-core test -- governance-public-exports.test.ts
-pnpm --filter @actalk/inkos-studio test -- startup-smoke.test.ts
-pnpm --filter @actalk/inkos-core typecheck
-pnpm --filter @actalk/inkos-studio typecheck
+pnpm --filter @actalk/castor-core test -- governance-public-exports.test.ts
+pnpm --filter @actalk/castor-studio test -- startup-smoke.test.ts
+pnpm --filter @actalk/castor-core typecheck
+pnpm --filter @actalk/castor-studio typecheck
 ```
 
 Expected GREEN.
@@ -163,7 +163,7 @@ git commit -m "fix(core): restore governance public exports for studio startup"
 
 ---
 
-## Checkpoint 1 — Build a complete InkOS identity inventory and freeze the migration boundary
+## Checkpoint 1 — Build a complete castor identity inventory and freeze the migration boundary
 
 ### Task 1.1 — Generate a repository-wide inventory
 
@@ -172,7 +172,7 @@ git commit -m "fix(core): restore governance public exports for studio startup"
 Run from repo root:
 
 ```powershell
-rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' 'InkOS|inkos|INKOS_|@actalk/inkos|\.inkos|inkos\.json' .
+rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' 'castor|castor|castor_|@actalk/castor|\.castor|castor\.json' .
 ```
 
 Classify every occurrence into exactly one of:
@@ -201,10 +201,10 @@ The inventory must include at least the currently known active package surfaces:
 - `scripts/prepare-package-for-publish.mjs`
 - `scripts/restore-package-json.mjs`
 - `scripts/verify-no-workspace-protocol.mjs`
-- production imports using `@actalk/inkos-*`
-- `inkos.json` readers/writers
-- `.inkos/` readers/writers
-- `INKOS_*` readers/writers
+- production imports using `@actalk/castor-*`
+- `castor.json` readers/writers
+- `.castor/` readers/writers
+- `castor_*` readers/writers
 - user-agent/product banners/Doctor strings
 - README/docs references.
 
@@ -214,7 +214,7 @@ Do not edit production code during the inventory task.
 
 **Create:** `scripts/audit-castor-identity.mjs`
 
-The script should scan tracked production/user-facing files and fail if an InkOS occurrence remains outside explicit allowlisted paths/categories. The allowlist may include:
+The script should scan tracked production/user-facing files and fail if an castor occurrence remains outside explicit allowlisted paths/categories. The allowlist may include:
 
 - `LICENSE` / legal notices;
 - derived-project attribution sections;
@@ -255,7 +255,7 @@ packages/core name == @actalk/castor-core
 packages/cli name == @actalk/castor
 packages/studio name == @actalk/castor-studio
 CLI bin keys == [castor]
-no workspace dependency name begins @actalk/inkos
+no workspace dependency name begins @actalk/castor
 ```
 
 Run it before changing manifests and record RED.
@@ -271,19 +271,19 @@ Run it before changing manifests and record RED.
 Required mapping:
 
 ```text
-inkos                -> castor-story-engine
-@actalk/inkos-core   -> @actalk/castor-core
-@actalk/inkos        -> @actalk/castor
-@actalk/inkos-studio -> @actalk/castor-studio
+castor                -> castor-story-engine
+@actalk/castor-core   -> @actalk/castor-core
+@actalk/castor        -> @actalk/castor
+@actalk/castor-studio -> @actalk/castor-studio
 ```
 
-In `packages/cli/package.json`, remove the `inkos` bin entry completely; retain only `castor`.
+In `packages/cli/package.json`, remove the `castor` bin entry completely; retain only `castor`.
 
 Update workspace filter scripts to the Castor package names.
 
 ### Task 2.3 — Rename all workspace package imports and script references
 
-Use the inventory, not an unreviewed blanket replacement. Update production/test imports and package filters from `@actalk/inkos-*` to `@actalk/castor-*`.
+Use the inventory, not an unreviewed blanket replacement. Update production/test imports and package filters from `@actalk/castor-*` to `@actalk/castor-*`.
 
 Known consumers include:
 
@@ -295,7 +295,7 @@ Known consumers include:
 After edits, run:
 
 ```powershell
-rg -n --hidden --glob '!node_modules' --glob '!dist' '@actalk/inkos' packages scripts package.json pnpm-workspace.yaml
+rg -n --hidden --glob '!node_modules' --glob '!dist' '@actalk/castor' packages scripts package.json pnpm-workspace.yaml
 ```
 
 Expected: only explicit legacy compatibility/test/attribution references, ideally none in workspace package wiring.
@@ -325,7 +325,7 @@ pnpm --filter @actalk/castor build
 node packages/cli/dist/index.js --help
 ```
 
-If the repo has a local bin/link test convention, add/extend it so `castor --help` works from a packed/local workspace package and no Castor package manifest publishes an `inkos` executable alias.
+If the repo has a local bin/link test convention, add/extend it so `castor --help` works from a packed/local workspace package and no Castor package manifest publishes an `castor` executable alias.
 
 Commit package/CLI identity atomically.
 
@@ -333,14 +333,14 @@ Commit package/CLI identity atomically.
 
 ---
 
-## Checkpoint 3 — Introduce canonical Castor identity constants and one-way `inkos.json` → `castor.json` migration
+## Checkpoint 3 — Introduce canonical Castor identity constants and one-way `castor.json` → `castor.json` migration
 
 ### Task 3.1 — Locate current config ownership before editing
 
 Run:
 
 ```powershell
-rg -n --hidden --glob '!node_modules' --glob '!dist' 'inkos\.json|configSource|set-global|Global Config|project config' packages scripts
+rg -n --hidden --glob '!node_modules' --glob '!dist' 'castor\.json|configSource|set-global|Global Config|project config' packages scripts
 ```
 
 Record the exact current config loader/writer paths in `docs/migrations/castor-identity-inventory.md` before edits. Do not duplicate config ownership into a new subsystem if an existing config module already owns it.
@@ -356,9 +356,9 @@ with canonical constants such as:
 ```ts
 export const CASTOR_PRODUCT_NAME = "Castor Story Engine";
 export const CASTOR_CONFIG_FILENAME = "castor.json";
-export const LEGACY_INKOS_CONFIG_FILENAME = "inkos.json";
+export const LEGACY_castor_CONFIG_FILENAME = "castor.json";
 export const CASTOR_RUNTIME_DIRNAME = ".castor";
-export const LEGACY_INKOS_RUNTIME_DIRNAME = ".inkos";
+export const LEGACY_castor_RUNTIME_DIRNAME = ".castor";
 ```
 
 Do not place story authority logic here.
@@ -371,14 +371,14 @@ Export only what downstream packages legitimately need through `packages/core/sr
 
 Required scenarios:
 
-1. only `inkos.json` exists → validate and create equivalent `castor.json`;
+1. only `castor.json` exists → validate and create equivalent `castor.json`;
 2. only `castor.json` exists → use it, do not touch legacy path;
 3. both exist, semantically same → Castor remains canonical;
 4. both conflict → Castor wins + non-secret warning, no merge;
 5. invalid legacy config → no partial `castor.json`;
 6. migration replay → idempotent;
 7. secret-bearing values are never printed in diagnostics;
-8. after migration, subsequent saves update `castor.json`, not `inkos.json`.
+8. after migration, subsequent saves update `castor.json`, not `castor.json`.
 
 Before production changes, run the narrow test and record RED.
 
@@ -391,9 +391,9 @@ Required algorithm:
 ```text
 if castor.json exists:
   validate/use castor.json
-  if inkos.json also exists and meaningful values conflict:
+  if castor.json also exists and meaningful values conflict:
     emit redacted warning
-else if inkos.json exists:
+else if castor.json exists:
   validate legacy shape
   map to canonical Castor shape
   atomically write castor.json
@@ -413,7 +413,7 @@ Add/extend public-surface test(s) to create/configure a fresh project through th
 
 ```text
 castor.json exists
-inkos.json does not get newly created
+castor.json does not get newly created
 ```
 
 Run affected config/CLI/Studio tests plus Core/CLI/Studio typecheck/build.
@@ -424,14 +424,14 @@ Commit config migration separately.
 
 ---
 
-## Checkpoint 4 — Migrate `.inkos/` runtime state to `.castor/` without touching story authority
+## Checkpoint 4 — Migrate `.castor/` runtime state to `.castor/` without touching story authority
 
 ### Task 4.1 — Inventory current runtime-directory ownership
 
 Run:
 
 ```powershell
-rg -n --hidden --glob '!node_modules' --glob '!dist' '\.inkos|INKOS_HOME|runtimeDir|cacheDir|session' packages scripts
+rg -n --hidden --glob '!node_modules' --glob '!dist' '\.castor|castor_HOME|runtimeDir|cacheDir|session' packages scripts
 ```
 
 Document exact production owners in the inventory.
@@ -444,7 +444,7 @@ Distinguish runtime/cache/preferences from `story/state/*.json`. Never classify 
 
 Test:
 
-- `.inkos/` only → safe one-way migration/read into `.castor/`;
+- `.castor/` only → safe one-way migration/read into `.castor/`;
 - `.castor/` only → no legacy mutation;
 - both → `.castor/` canonical, no implicit merge/overwrite;
 - injected copy/write failure → no half-written canonical runtime and legacy preserved;
@@ -485,14 +485,14 @@ Commit runtime migration separately.
 
 ---
 
-## Checkpoint 5 — Replace active `INKOS_*` environment variables with explicit `CASTOR_*` canonical mappings
+## Checkpoint 5 — Replace active `castor_*` environment variables with explicit `CASTOR_*` canonical mappings
 
 ### Task 5.1 — Build the explicit environment mapping inventory
 
 Run:
 
 ```powershell
-rg -n --hidden --glob '!node_modules' --glob '!dist' 'INKOS_[A-Z0-9_]+' packages scripts README*.md docs
+rg -n --hidden --glob '!node_modules' --glob '!dist' 'castor_[A-Z0-9_]+' packages scripts README*.md docs
 ```
 
 List every active variable and its intended Castor counterpart in `docs/migrations/castor-identity-inventory.md`.
@@ -500,12 +500,12 @@ List every active variable and its intended Castor counterpart in `docs/migratio
 Known examples include:
 
 ```text
-INKOS_STUDIO_PORT  -> CASTOR_STUDIO_PORT
-INKOS_PROJECT_ROOT -> CASTOR_PROJECT_ROOT
-INKOS_SKILL_DIRS   -> CASTOR_SKILL_DIRS
+castor_STUDIO_PORT  -> CASTOR_STUDIO_PORT
+castor_PROJECT_ROOT -> CASTOR_PROJECT_ROOT
+castor_SKILL_DIRS   -> CASTOR_SKILL_DIRS
 ```
 
-No wildcard copying of arbitrary `INKOS_*` names.
+No wildcard copying of arbitrary `castor_*` names.
 
 ### Task 5.2 — Write RED environment compatibility tests
 
@@ -517,20 +517,20 @@ Per mapped key test:
 - only legacy set → use legacy as compatibility fallback;
 - both same → Castor value;
 - both different → Castor value + redacted deprecation/conflict warning;
-- unknown `INKOS_*` → not magically mapped;
+- unknown `castor_*` → not magically mapped;
 - emitted help/docs/settings refer to Castor key.
 
 ### Task 5.3 — Implement a single compatibility resolver
 
 Add the explicit map/resolver to the config boundary identified earlier. Update callers to ask the resolver for canonical Castor values rather than reading both names ad hoc.
 
-Update package scripts such as Studio dev/server commands from `INKOS_*` to `CASTOR_*` canonical variables.
+Update package scripts such as Studio dev/server commands from `castor_*` to `CASTOR_*` canonical variables.
 
 Run narrow tests and affected Studio/CLI tests → GREEN.
 
 Commit env migration separately.
 
-**HUMAN GATE 5:** Present complete env mapping and confirm no unclassified active `INKOS_*` remains.
+**HUMAN GATE 5:** Present complete env mapping and confirm no unclassified active `castor_*` remains.
 
 ---
 
@@ -541,10 +541,10 @@ Commit env migration separately.
 Extend `scripts/audit-castor-identity.mjs` fixtures so it fails on active examples such as:
 
 ```text
-Starting InkOS Studio
-InkOS Doctor
-InkOS/<version>
-use inkos studio
+Starting castor Studio
+castor Doctor
+castor/<version>
+use castor studio
 ```
 
 while allowing clearly marked legal/history/legacy references.
@@ -575,14 +575,14 @@ Keep a prominent derived-project notice and AGPL attribution. Do not claim the p
 
 ```powershell
 pnpm audit:castor-identity
-rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' 'InkOS|inkos|INKOS_|@actalk/inkos|\.inkos|inkos\.json' .
+rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' 'castor|castor|castor_|@actalk/castor|\.castor|castor\.json' .
 ```
 
 For every remaining occurrence, annotate/classify it in the inventory. Any active product occurrence outside approved buckets blocks completion.
 
 Commit branding/docs identity cleanup.
 
-**HUMAN GATE 6:** Human reviews remaining InkOS occurrences and attribution wording before final acceptance.
+**HUMAN GATE 6:** Human reviews remaining castor occurrences and attribution wording before final acceptance.
 
 ---
 
@@ -616,8 +616,8 @@ castor command works
 Castor Studio boots
 castor.json is created
 .castor/ is used when runtime state is needed
-no new inkos.json is created
-no new .inkos/ is created
+no new castor.json is created
+no new .castor/ is created
 normal output says Castor
 ```
 
@@ -625,7 +625,7 @@ Do not yet spend real model tokens on the full Chapter 1 acceptance; that final 
 
 ### Task 7.4 — Legacy-project migration smoke
 
-Use a disposable copy of a representative legacy project containing `inkos.json` and relevant `.inkos/` data.
+Use a disposable copy of a representative legacy project containing `castor.json` and relevant `.castor/` data.
 
 Record authoritative hashes before migration, open through Castor, migrate, and verify:
 
@@ -645,7 +645,7 @@ Use a fresh reviewer context. Provide:
 - diff from Checkpoint 0 approved baseline;
 - new test list;
 - migration smoke evidence;
-- remaining InkOS audit classifications.
+- remaining castor audit classifications.
 
 Reviewer must specifically search for:
 
@@ -656,7 +656,7 @@ legacy overwrite/data loss
 Canon mutation caused by migration
 Human authority creation/consumption
 old package import leakage
-inkos CLI alias leakage
+castor CLI alias leakage
 new project creating old artifacts
 ```
 
@@ -676,7 +676,7 @@ build/typecheck results
 new-project smoke
 legacy-project smoke
 authority hash comparison
-remaining InkOS occurrences by allowed bucket
+remaining castor occurrences by allowed bucket
 independent review findings
 tracked worktree status
 untracked evidence intentionally preserved

@@ -8,8 +8,8 @@ describe("loadSecrets legacy service id migration", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-secrets-mig-"));
-    await mkdir(join(root, ".inkos"), { recursive: true });
+    root = await mkdtemp(join(tmpdir(), "castor-secrets-mig-"));
+    await mkdir(join(root, ".castor"), { recursive: true });
   });
 
   afterEach(async () => {
@@ -17,7 +17,7 @@ describe("loadSecrets legacy service id migration", () => {
   });
 
   async function seedSecrets(data: unknown): Promise<void> {
-    await writeFile(join(root, ".inkos", "secrets.json"), JSON.stringify(data, null, 2), "utf-8");
+    await writeFile(join(root, ".castor", "secrets.json"), JSON.stringify(data, null, 2), "utf-8");
   }
 
   async function readSecretsRaw(): Promise<any> {
@@ -49,14 +49,14 @@ describe("loadSecrets legacy service id migration", () => {
 
   it("无迁移时不重写磁盘", async () => {
     await seedSecrets({ services: { openai: { apiKey: "sk-openai" } } });
-    const before = await readFile(join(root, ".inkos", "secrets.json"), "utf-8");
+    const before = await readFile(join(root, ".castor", "secrets.json"), "utf-8");
     await loadSecrets(root);
-    const after = await readFile(join(root, ".inkos", "secrets.json"), "utf-8");
+    const after = await readFile(join(root, ".castor", "secrets.json"), "utf-8");
     expect(after).toBe(before);
   });
 
   it("secrets 文件不存在时返回空 services,不报错", async () => {
-    await rm(join(root, ".inkos", "secrets.json"), { force: true });
+    await rm(join(root, ".castor", "secrets.json"), { force: true });
     const result = await loadSecrets(root);
     expect(result).toEqual({ services: {} });
   });

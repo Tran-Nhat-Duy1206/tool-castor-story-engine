@@ -1,10 +1,10 @@
 # Castor Identity Inventory (Checkpoint 1)
 
-Generated: 2026-08-29 · baseline HEAD f1a36d1d · scan: case-insensitive "inkos", excluding node_modules/dist/.git (per plan Task 1.1).
+Generated: 2026-08-29 · baseline HEAD f1a36d1d · scan: case-insensitive "castor", excluding node_modules/dist/.git (per plan Task 1.1).
 
 Total: 434 files, 2181 occurrences.
 
-Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGAL-ATTRIBUTION (LICENSE/AGPL), HISTORICAL-PROVENANCE (CHANGELOG, historical design docs, local evidence logs) and LEGACY-COMPAT (this migration plan/spec and legacy fixtures/tests) retain InkOS references by design — spec §2/§11/§17. LEGACY-TEST-FIXTURE occurrences are updated only where they assert the new canonical identity, otherwise retained as legacy coverage.
+Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGAL-ATTRIBUTION (LICENSE/AGPL), HISTORICAL-PROVENANCE (CHANGELOG, historical design docs, local evidence logs) and LEGACY-COMPAT (this migration plan/spec and legacy fixtures/tests) retain castor references by design — spec §2/§11/§17. LEGACY-TEST-FIXTURE occurrences are updated only where they assert the new canonical identity, otherwise retained as legacy coverage.
 
 ## ACTIVE-PACKAGE — 170 files, 561 occurrences
 
@@ -43,8 +43,8 @@ Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGA
 - packages/core/src/llm/providers/endpoints/githubCopilot.ts (3)
 - packages/core/src/llm/providers/endpoints/bailian.ts (3)
 - packages/core/src/llm/providers/endpoints/astronCodingPlan.ts (3)
-- packages/core/skills/inkos-story-import/SKILL.md (3)
-- packages/core/skills/inkos-play-world/SKILL.md (3)
+- packages/core/skills/castor-story-import/SKILL.md (3)
+- packages/core/skills/castor-play-world/SKILL.md (3)
 - .gitignore (3)
 - packages/studio/vite.config.ts (2)
 - packages/studio/tsconfig.json (2)
@@ -107,9 +107,9 @@ Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGA
 - packages/core/src/agents/architect.ts (2)
 - packages/core/src/agent/worker-agent.ts (2)
 - packages/core/src/agent/agent-session.ts (2)
-- packages/core/skills/inkos-translation/SKILL.md (2)
-- packages/core/skills/inkos-story-cover/SKILL.md (2)
-- packages/core/skills/inkos-long-writing/SKILL.md (2)
+- packages/core/skills/castor-translation/SKILL.md (2)
+- packages/core/skills/castor-story-cover/SKILL.md (2)
+- packages/core/skills/castor-long-writing/SKILL.md (2)
 - packages/core/package.json (2)
 - package.json (2)
 - packages/studio/src/store/chat/types.ts (1)
@@ -166,16 +166,16 @@ Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGA
 - packages/core/src/agent/pi-stream.ts (1)
 - packages/core/src/agent/llm-stub.ts (1)
 - packages/core/src/agent/chapter-import-source.ts (1)
-- packages/core/skills/inkos-storyboard/SKILL.md (1)
-- packages/core/skills/inkos-story-review/SKILL.md (1)
-- packages/core/skills/inkos-story-deslop/SKILL.md (1)
-- packages/core/skills/inkos-short-writing/SKILL.md (1)
-- packages/core/skills/inkos-short-story-analysis/SKILL.md (1)
-- packages/core/skills/inkos-short-market-research/SKILL.md (1)
-- packages/core/skills/inkos-script-writing/SKILL.md (1)
-- packages/core/skills/inkos-long-story-analysis/SKILL.md (1)
-- packages/core/skills/inkos-long-market-research/SKILL.md (1)
-- packages/core/skills/inkos-interactive-film/SKILL.md (1)
+- packages/core/skills/castor-storyboard/SKILL.md (1)
+- packages/core/skills/castor-story-review/SKILL.md (1)
+- packages/core/skills/castor-story-deslop/SKILL.md (1)
+- packages/core/skills/castor-short-writing/SKILL.md (1)
+- packages/core/skills/castor-short-story-analysis/SKILL.md (1)
+- packages/core/skills/castor-short-market-research/SKILL.md (1)
+- packages/core/skills/castor-script-writing/SKILL.md (1)
+- packages/core/skills/castor-long-story-analysis/SKILL.md (1)
+- packages/core/skills/castor-long-market-research/SKILL.md (1)
+- packages/core/skills/castor-interactive-film/SKILL.md (1)
 - .github/ISSUE_TEMPLATE/feature_request.yml (1)
 - .github/ISSUE_TEMPLATE/config.yml (1)
 
@@ -464,17 +464,17 @@ Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGA
 
 ## ACTIVE-CONFIG — config files bearing the legacy name (filename itself, not contents)
 
-- `inkos.json` (repo root project config) — canonical target `castor.json` (Checkpoint 3)
-- `test-project/inkos.json` — legacy fixture (Checkpoint 3 tests)
-- `books/*/book.json` etc. — book-level state files do not carry InkOS naming; untouched.
+- `castor.json` (repo root project config) — canonical target `castor.json` (Checkpoint 3)
+- `test-project/castor.json` — legacy fixture (Checkpoint 3 tests)
+- `books/*/book.json` etc. — book-level state files do not carry castor naming; untouched.
 
-## ACTIVE-ENV — documented/active INKOS_* variables (detail in Checkpoint 5)
+## ACTIVE-ENV — documented/active castor_* variables (detail in Checkpoint 5)
 
-- `INKOS_STUDIO_PORT` (packages/cli/src/commands/studio.ts, studio api/index.ts)
-- `INKOS_PROJECT_ROOT` (packages/studio/src/api/index.ts, others per scan)
-- `INKOS_SKILL_DIRS` (core skill loader)
-- `INKOS_LLM_*` (.env.example template, env overrides)
-- `INKOS_HOME` / other INKOS_* — see CP5 mapping inventory.
+- `castor_STUDIO_PORT` (packages/cli/src/commands/studio.ts, studio api/index.ts)
+- `castor_PROJECT_ROOT` (packages/studio/src/api/index.ts, others per scan)
+- `castor_SKILL_DIRS` (core skill loader)
+- `castor_LLM_*` (.env.example template, env overrides)
+- `castor_HOME` / other castor_* — see CP5 mapping inventory.
 
 ## Config ownership (Task 3.1 record)
 
@@ -482,24 +482,24 @@ Bucket policy: ACTIVE-* surfaces are migrated to Castor in Checkpoints 2-6. LEGA
 
 ## ACTIVE-ENV final mapping (Checkpoint 5)
 
-Canonical `CASTOR_*` is authoritative; each mapped legacy `INKOS_*` below is read as a deprecated fallback via the explicit map in `packages/core/src/utils/llm-env.ts` (`LEGACY_INKOS_ENV_KEYS`); unknown `INKOS_*` names are never copied; dual definitions keep Castor and emit a non-secret warning (key names only). `castorEnv("CASTOR_X")` is the single resolver for direct `process.env` reads.
+Canonical `CASTOR_*` is authoritative; each mapped legacy `castor_*` below is read as a deprecated fallback via the explicit map in `packages/core/src/utils/llm-env.ts` (`LEGACY_castor_ENV_KEYS`); unknown `castor_*` names are never copied; dual definitions keep Castor and emit a non-secret warning (key names only). `castorEnv("CASTOR_X")` is the single resolver for direct `process.env` reads.
 
 | Legacy (fallback) | Canonical |
 |---|---|
-| INKOS_STUDIO_PORT | CASTOR_STUDIO_PORT |
-| INKOS_PROJECT_ROOT | CASTOR_PROJECT_ROOT |
-| INKOS_SKILL_DIRS | CASTOR_SKILL_DIRS |
-| INKOS_LOCALE | CASTOR_LOCALE |
-| INKOS_TUI_LOCALE | CASTOR_TUI_LOCALE |
-| INKOS_TUI_THEME | CASTOR_TUI_THEME |
-| INKOS_DEFAULT_LANGUAGE | CASTOR_DEFAULT_LANGUAGE |
-| INKOS_USER_AGENT | CASTOR_USER_AGENT |
-| INKOS_LIVE_E2E | CASTOR_LIVE_E2E |
-| INKOS_FILM_IMAGE_SIZE | CASTOR_FILM_IMAGE_SIZE |
-| INKOS_AGENT_ALLOW_SYSTEM_READ | CASTOR_AGENT_ALLOW_SYSTEM_READ |
-| INKOS_AGENT_LLM_STUB | CASTOR_AGENT_LLM_STUB |
-| INKOS_COVER_BASE_URL / _API_KEY / _ENDPOINT / _MODEL / _SIZE | CASTOR_COVER_* |
-| INKOS_LLM_PROVIDER / _SERVICE / _BASE_URL / _API_KEY / _MODEL / _API_FORMAT / _STREAM / _TEMPERATURE / _THINKING_BUDGET / _PROXY_URL / _FIRST_EVENT_TIMEOUT_MS / _STREAM_IDLE_TIMEOUT_MS / _HEADERS | CASTOR_LLM_* |
-| INKOS_LLM_EXTRA_* (prefix family) | CASTOR_LLM_EXTRA_* |
+| castor_STUDIO_PORT | CASTOR_STUDIO_PORT |
+| castor_PROJECT_ROOT | CASTOR_PROJECT_ROOT |
+| castor_SKILL_DIRS | CASTOR_SKILL_DIRS |
+| castor_LOCALE | CASTOR_LOCALE |
+| castor_TUI_LOCALE | CASTOR_TUI_LOCALE |
+| castor_TUI_THEME | CASTOR_TUI_THEME |
+| castor_DEFAULT_LANGUAGE | CASTOR_DEFAULT_LANGUAGE |
+| castor_USER_AGENT | CASTOR_USER_AGENT |
+| castor_LIVE_E2E | CASTOR_LIVE_E2E |
+| castor_FILM_IMAGE_SIZE | CASTOR_FILM_IMAGE_SIZE |
+| castor_AGENT_ALLOW_SYSTEM_READ | CASTOR_AGENT_ALLOW_SYSTEM_READ |
+| castor_AGENT_LLM_STUB | CASTOR_AGENT_LLM_STUB |
+| castor_COVER_BASE_URL / _API_KEY / _ENDPOINT / _MODEL / _SIZE | CASTOR_COVER_* |
+| castor_LLM_PROVIDER / _SERVICE / _BASE_URL / _API_KEY / _MODEL / _API_FORMAT / _STREAM / _TEMPERATURE / _THINKING_BUDGET / _PROXY_URL / _FIRST_EVENT_TIMEOUT_MS / _STREAM_IDLE_TIMEOUT_MS / _HEADERS | CASTOR_LLM_* |
+| castor_LLM_EXTRA_* (prefix family) | CASTOR_LLM_EXTRA_* |
 
-`.env.example` now teaches CASTOR_* only. INKOS_TELEGRAM_*/FEISHU/WECOM notify tokens were template-only (never read by code) and are removed from the template.
+`.env.example` now teaches CASTOR_* only. castor_TELEGRAM_*/FEISHU/WECOM notify tokens were template-only (never read by code) and are removed from the template.

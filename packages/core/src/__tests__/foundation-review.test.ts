@@ -25,7 +25,7 @@ const B_ORIGINAL = "World stays untouched.\n";
 const PUBLISHED = "PUBLISHED FOUNDATION — immutable context.\n";
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-foundation-review-"));
+  root = await mkdtemp(join(tmpdir(), "castor-foundation-review-"));
   bookDir = join(root, "books", "review-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "state"), { recursive: true });

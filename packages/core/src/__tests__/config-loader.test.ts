@@ -37,13 +37,13 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("allows missing API keys for localhost OpenAI-compatible endpoints", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-local-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-local-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
     }
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "local-project",
       version: "0.1.0",
       llm: {
@@ -62,13 +62,13 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("still requires API keys for remote hosted endpoints", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-remote-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-remote-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
     }
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "remote-project",
       version: "0.1.0",
       llm: {
@@ -82,13 +82,13 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("loads service-based config using defaultModel and project secrets", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-services-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-services-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
     }
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "service-project",
       version: "0.1.0",
       language: "zh",
@@ -100,9 +100,9 @@ describe("loadProjectConfig local provider auth", () => {
       },
       notify: [],
     }, null, 2), "utf-8");
-    await mkdir(join(root, ".inkos"), { recursive: true });
+    await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
-      join(root, ".inkos", "secrets.json"),
+      join(root, ".castor", "secrets.json"),
       JSON.stringify({ services: { moonshot: { apiKey: "sk-moon" } } }, null, 2),
       "utf-8",
     );
@@ -118,13 +118,13 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("derives provider/baseUrl from the MiniMax preset single source of truth", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-minimax-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-minimax-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
     }
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "minimax-project",
       version: "0.1.0",
       language: "zh",
@@ -136,9 +136,9 @@ describe("loadProjectConfig local provider auth", () => {
       },
       notify: [],
     }, null, 2), "utf-8");
-    await mkdir(join(root, ".inkos"), { recursive: true });
+    await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
-      join(root, ".inkos", "secrets.json"),
+      join(root, ".castor", "secrets.json"),
       JSON.stringify({ services: { minimax: { apiKey: "sk-minimax" } } }, null, 2),
       "utf-8",
     );
@@ -153,13 +153,13 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("loads custom service config using custom secret key and entry baseUrl", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-custom-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-custom-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
     }
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "custom-project",
       version: "0.1.0",
       language: "zh",
@@ -171,9 +171,9 @@ describe("loadProjectConfig local provider auth", () => {
       },
       notify: [],
     }, null, 2), "utf-8");
-    await mkdir(join(root, ".inkos"), { recursive: true });
+    await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
-      join(root, ".inkos", "secrets.json"),
+      join(root, ".castor", "secrets.json"),
       JSON.stringify({ services: { "custom:内网GPT": { apiKey: "sk-corp" } } }, null, 2),
       "utf-8",
     );
@@ -191,13 +191,13 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("keeps Studio config active when llm.configSource is studio", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-studio-source-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-studio-source-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
     }
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "studio-source-project",
       version: "0.1.0",
       language: "zh",
@@ -216,9 +216,9 @@ describe("loadProjectConfig local provider auth", () => {
       "CASTOR_LLM_MODEL=gpt-5.4",
       "CASTOR_LLM_API_KEY=sk-env",
     ].join("\n"), "utf-8");
-    await mkdir(join(root, ".inkos"), { recursive: true });
+    await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
-      join(root, ".inkos", "secrets.json"),
+      join(root, ".castor", "secrets.json"),
       JSON.stringify({ services: { "custom:内网GPT": { apiKey: "sk-corp" } } }, null, 2),
       "utf-8",
     );
@@ -233,13 +233,13 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("does not mix stale top-level env-era model/baseUrl with selected Studio service", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-studio-stale-top-level-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-studio-stale-top-level-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
     }
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "studio-stale-project",
       version: "0.1.0",
       language: "zh",
@@ -263,9 +263,9 @@ describe("loadProjectConfig local provider auth", () => {
       "CASTOR_LLM_MODEL=kimi-k2.5",
       "CASTOR_LLM_API_KEY=sk-env-moon",
     ].join("\n"), "utf-8");
-    await mkdir(join(root, ".inkos"), { recursive: true });
+    await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
-      join(root, ".inkos", "secrets.json"),
+      join(root, ".castor", "secrets.json"),
       JSON.stringify({
         services: {
           google: { apiKey: "sk-google" },
@@ -286,7 +286,7 @@ describe("loadProjectConfig local provider auth", () => {
   });
 
   it("falls back to env when Studio config is still the empty bootstrap state", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-config-loader-studio-bootstrap-"));
+    root = await mkdtemp(join(tmpdir(), "castor-config-loader-studio-bootstrap-"));
     for (const key of ENV_KEYS) {
       previousEnv.set(key, process.env[key]);
       process.env[key] = "";
@@ -297,7 +297,7 @@ describe("loadProjectConfig local provider auth", () => {
     process.env.CASTOR_LLM_MODEL = "gpt-5.4";
     process.env.CASTOR_LLM_API_KEY = "sk-env";
 
-    await writeFile(join(root, "inkos.json"), JSON.stringify({
+    await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "studio-bootstrap-project",
       version: "0.1.0",
       language: "zh",

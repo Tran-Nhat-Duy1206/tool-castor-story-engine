@@ -21,7 +21,7 @@ describe("session transcript codec", () => {
   let projectRoot: string;
 
   beforeEach(async () => {
-    projectRoot = await mkdtemp(join(tmpdir(), "inkos-transcript-"));
+    projectRoot = await mkdtemp(join(tmpdir(), "castor-transcript-"));
   });
 
   afterEach(async () => {
@@ -88,7 +88,7 @@ describe("session transcript codec", () => {
   });
 
   it("跳过坏行并保留合法 event", async () => {
-    const dir = join(projectRoot, ".inkos", "sessions");
+    const dir = join(projectRoot, ".castor", "sessions");
     await mkdir(dir, { recursive: true });
     await writeFile(
       join(dir, "s1.jsonl"),

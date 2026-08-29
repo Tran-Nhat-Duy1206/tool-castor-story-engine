@@ -211,9 +211,9 @@ describe("WriterAgent.saveChapter deferred publication", () => {
     ).rejects.toThrow(/injected mid-set rename failure/);
 
     expect(await captureBookMetadata(fixture.root)).toEqual(treeBefore);
-    const runtimeDir = join(fixture.bookDir, ".inkos-file-txn-");
+    const runtimeDir = join(fixture.bookDir, ".castor-file-txn-");
     void runtimeDir; // transaction dir lives under bookDir root; verify no residue:
-    const residue = (await readdir(fixture.bookDir)).filter((name) => name.startsWith(".inkos-file-txn-"));
+    const residue = (await readdir(fixture.bookDir)).filter((name) => name.startsWith(".castor-file-txn-"));
     expect(residue).toEqual([]);
     // Old index intact byte-for-byte.
     expect(await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8")).toBe(oldIndex);

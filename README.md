@@ -17,9 +17,9 @@
 
 > **Thông báo dự án phái sinh / Derived project notice**
 >
-> Tool Castor Story Engine (Castor) được phái sinh từ [InkOS](https://github.com/Narcooo/inkos) (tác giả Narcooo), sau đó đã được chỉnh sửa và phát triển mạnh mẽ, trở thành một hệ thống viết truyện AI dài kỳ độc lập. Dự án này giữ lại lịch sử Git, thông báo bản quyền và các nghĩa vụ giấy phép AGPL-3.0 của InkOS; mã nguồn InkOS thượng nguồn không phải do tác giả của dự án này viết. Phiên bản chỉnh sửa này cũng được phát hành theo giấy phép [AGPL-3.0](LICENSE).
+> Tool Castor Story Engine (Castor) được phái sinh từ [castor](https://github.com/Narcooo/castor) (tác giả Narcooo), sau đó đã được chỉnh sửa và phát triển mạnh mẽ, trở thành một hệ thống viết truyện AI dài kỳ độc lập. Dự án này giữ lại lịch sử Git, thông báo bản quyền và các nghĩa vụ giấy phép AGPL-3.0 của castor; mã nguồn castor thượng nguồn không phải do tác giả của dự án này viết. Phiên bản chỉnh sửa này cũng được phát hành theo giấy phép [AGPL-3.0](LICENSE).
 >
-> *Tool Castor Story Engine (Castor) is derived from [InkOS](https://github.com/Narcooo/inkos) by Narcooo and has been substantially modified and evolved into an independent long-form AI story-writing system. This project preserves InkOS's Git history, copyright notices and AGPL-3.0 obligations. The original InkOS code was not authored by the maintainers of this project. This modified work remains licensed under AGPL-3.0.*
+> *Tool Castor Story Engine (Castor) is derived from [castor](https://github.com/Narcooo/castor) by Narcooo and has been substantially modified and evolved into an independent long-form AI story-writing system. This project preserves castor's Git history, copyright notices and AGPL-3.0 obligations. The original castor code was not authored by the maintainers of this project. This modified work remains licensed under AGPL-3.0.*
 
 ---
 
@@ -81,11 +81,11 @@ pnpm install
 pnpm build
 ```
 
-> Gói npm của InkOS thượng nguồn (`@actalk/inkos`) và [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) vẫn thuộc về dự án InkOS của Narcooo; kho độc lập này xây dựng và sử dụng từ mã nguồn. Dữ liệu người dùng cũ, cấu hình `castor.json`, biến môi trường `INKOS_*` và cấu trúc thư mục sách vẫn giữ tương thích; lệnh `castor` có thể nạp trực tiếp các dự án InkOS có sẵn.
+> Gói npm của castor thượng nguồn (`@actalk/castor`) và [OpenClaw Skill](https://clawhub.ai/narcooo/castor) vẫn thuộc về dự án castor của Narcooo; kho độc lập này xây dựng và sử dụng từ mã nguồn. Dữ liệu người dùng cũ, cấu hình `castor.json`, biến môi trường `castor_*` và cấu trúc thư mục sách vẫn giữ tương thích; lệnh `castor` có thể nạp trực tiếp các dự án castor có sẵn.
 
 ### Dùng qua OpenClaw 🦞
 
-InkOS thượng nguồn đã được phát hành dưới dạng [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill. Kho này phái sinh từ InkOS và kế thừa cùng một bộ lối vào tương tác chia sẻ; sau khi xây từ mã nguồn có thể gọi trực tiếp:
+castor thượng nguồn đã được phát hành dưới dạng [OpenClaw](https://clawhub.ai/narcooo/castor) Skill. Kho này phái sinh từ castor và kế thừa cùng một bộ lối vào tương tác chia sẻ; sau khi xây từ mã nguồn có thể gọi trực tiếp:
 
 ```bash
 castor interact --json --message "Tiếp tục cuốn sách hiện tại nhưng siết nhịp lại một chút"
@@ -606,11 +606,11 @@ pnpm typecheck    # Kiểm tra kiểu
 
 ## Star History
 
-<a href="https://www.star-history.com/#Narcooo/inkos&type=date&legend=top-left">
+<a href="https://www.star-history.com/#Narcooo/castor&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&legend=top-left" />
  </picture>
 </a>
 
@@ -619,8 +619,8 @@ pnpm typecheck    # Kiểm tra kiểu
 
 <div align="center">
 
-<a href="https://skill-history.com/narcooo/inkos">
-  <img alt="Skills Download History" src="https://skill-history.com/chart/narcooo/inkos.svg" />
+<a href="https://skill-history.com/narcooo/castor">
+  <img alt="Skills Download History" src="https://skill-history.com/chart/narcooo/castor.svg" />
 </a>
 
 </div>
@@ -631,8 +631,8 @@ pnpm typecheck    # Kiểm tra kiểu
 
 ## Contributors
 
-<a href="https://github.com/Narcooo/inkos/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Narcooo/inkos" alt="Contributors" />
+<a href="https://github.com/Narcooo/castor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Narcooo/castor" alt="Contributors" />
 </a>
 
 ## Lời cảm ơn

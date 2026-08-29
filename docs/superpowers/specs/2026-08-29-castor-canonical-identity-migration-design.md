@@ -9,15 +9,15 @@
 
 Castor Story Engine becomes the canonical product identity across source code, packages, CLI, configuration, runtime directories, environment variables, Studio, logs, diagnostics, documentation, examples, tests, and newly created user data.
 
-InkOS remains only where required for:
+castor remains only where required for:
 
 1. historical attribution and AGPL notices;
-2. one-way compatibility reads/migration of legacy InkOS project/config data;
+2. one-way compatibility reads/migration of legacy castor project/config data;
 3. tests and migration documentation that explicitly exercise legacy compatibility.
 
-The normal Castor user experience must not expose InkOS branding or require InkOS commands.
+The normal Castor user experience must not expose castor branding or require castor commands.
 
-The old `inkos` CLI command is removed. There is no deprecated runtime alias. Legacy compatibility is data/config compatibility, not a parallel CLI/product surface.
+The old `castor` CLI command is removed. There is no deprecated runtime alias. Legacy compatibility is data/config compatibility, not a parallel CLI/product surface.
 
 ## 1. Product identity
 
@@ -43,7 +43,7 @@ Canonical runtime/config identities:
 - `CASTOR_*`
 - `Castor/...` User-Agent and trace/product identifiers
 
-New source code, tests, documentation, scripts, generated files, and runtime state must use the canonical Castor identity unless the code is explicitly implementing or testing legacy InkOS migration.
+New source code, tests, documentation, scripts, generated files, and runtime state must use the canonical Castor identity unless the code is explicitly implementing or testing legacy castor migration.
 
 ## 2. Attribution and project history
 
@@ -54,14 +54,14 @@ The repository must preserve:
 - the AGPL-3.0 license;
 - Git history;
 - existing upstream copyright/legal notices;
-- a prominent derived-project notice identifying InkOS/Narcooo as the upstream origin;
+- a prominent derived-project notice identifying castor/Narcooo as the upstream origin;
 - a prominent notice that Castor is a modified version maintained as an independent product.
 
 The normal product may be branded entirely as Castor while the repository remains transparent about origin.
 
 Recommended attribution wording:
 
-> Castor Story Engine is a substantially modified and independently developed derivative of InkOS by Narcooo. Castor preserves the original project history, applicable copyright notices, and AGPL-3.0 obligations. The upstream InkOS code was not originally authored by the Castor maintainer.
+> Castor Story Engine is a substantially modified and independently developed derivative of castor by Narcooo. Castor preserves the original project history, applicable copyright notices, and AGPL-3.0 obligations. The upstream castor code was not originally authored by the Castor maintainer.
 
 Do not remove legally relevant notices merely to achieve a zero-string branding scan.
 
@@ -102,10 +102,10 @@ Rename workspace package identities atomically across manifests, workspace depen
 Required mapping:
 
 ```text
-inkos                         -> castor-story-engine
-@actalk/inkos-core            -> @actalk/castor-core
-@actalk/inkos                 -> @actalk/castor
-@actalk/inkos-studio          -> @actalk/castor-studio
+castor                         -> castor-story-engine
+@actalk/castor-core            -> @actalk/castor-core
+@actalk/castor                 -> @actalk/castor
+@actalk/castor-studio          -> @actalk/castor-studio
 ```
 
 The CLI package exposes only:
@@ -118,9 +118,9 @@ The CLI package exposes only:
 }
 ```
 
-Do not retain an `inkos` executable alias.
+Do not retain an `castor` executable alias.
 
-After package migration, production source imports must not depend on `@actalk/inkos-*` package names.
+After package migration, production source imports must not depend on `@actalk/castor-*` package names.
 
 ## 6. Configuration migration
 
@@ -131,14 +131,14 @@ New Castor projects use `castor.json` only.
 Load order:
 
 1. if `castor.json` exists, it is canonical;
-2. otherwise, if `inkos.json` exists, treat it as legacy input and run one-way migration;
+2. otherwise, if `castor.json` exists, treat it as legacy input and run one-way migration;
 3. if both exist, `castor.json` wins and the loader must not silently merge competing authority/config values.
 
 When both files exist and meaningful values conflict, surface a clear warning/diagnostic rather than silently reconciling them.
 
 ### 6.2 One-way migration
 
-Migration from `inkos.json` must:
+Migration from `castor.json` must:
 
 - parse and validate the legacy config;
 - preserve provider/model/settings semantics;
@@ -148,19 +148,19 @@ Migration from `inkos.json` must:
 - be idempotent;
 - report what was migrated without exposing secrets.
 
-The legacy file may be retained as an untouched backup/source record unless a later explicit cleanup policy says otherwise. Castor must not keep writing updates to `inkos.json` after migration.
+The legacy file may be retained as an untouched backup/source record unless a later explicit cleanup policy says otherwise. Castor must not keep writing updates to `castor.json` after migration.
 
 ## 7. Runtime directory migration
 
 Canonical project/user runtime directory becomes `.castor/`.
 
-Legacy `.inkos/` is read only for compatibility/migration when `.castor/` does not yet contain the corresponding canonical state.
+Legacy `.castor/` is read only for compatibility/migration when `.castor/` does not yet contain the corresponding canonical state.
 
 Rules:
 
-- new projects create `.castor/`, never `.inkos/`;
+- new projects create `.castor/`, never `.castor/`;
 - migration is one-way;
-- an existing `.castor/` is never overwritten by `.inkos/` automatically;
+- an existing `.castor/` is never overwritten by `.castor/` automatically;
 - legacy import must preserve semantic content and relevant timestamps/provenance where practical;
 - secrets are never echoed during migration;
 - no story authority may be derived from runtime-cache migration.
@@ -172,20 +172,20 @@ All documented and newly emitted environment variables become `CASTOR_*`.
 Example mapping:
 
 ```text
-INKOS_STUDIO_PORT    -> CASTOR_STUDIO_PORT
-INKOS_PROJECT_ROOT   -> CASTOR_PROJECT_ROOT
-INKOS_SKILL_DIRS     -> CASTOR_SKILL_DIRS
+castor_STUDIO_PORT    -> CASTOR_STUDIO_PORT
+castor_PROJECT_ROOT   -> CASTOR_PROJECT_ROOT
+castor_SKILL_DIRS     -> CASTOR_SKILL_DIRS
 ...                  -> corresponding CASTOR_* name
 ```
 
 Compatibility policy:
 
 - `CASTOR_*` is authoritative;
-- when the Castor variable is absent, a known legacy `INKOS_*` value may be read as a deprecated fallback;
+- when the Castor variable is absent, a known legacy `castor_*` value may be read as a deprecated fallback;
 - if both are present, Castor wins;
 - conflicting dual definitions produce a non-secret warning;
 - runtime/log output must refer to the Castor variable as the preferred setting;
-- no new documentation should instruct users to set `INKOS_*` except the legacy migration guide.
+- no new documentation should instruct users to set `castor_*` except the legacy migration guide.
 
 The implementation must use an explicit compatibility map rather than unrestricted string substitution or wildcard environment copying.
 
@@ -205,15 +205,15 @@ Castor Doctor
 Starting Castor Studio on http://localhost:4567
 ```
 
-Normal CLI help must not advertise `inkos` commands.
+Normal CLI help must not advertise `castor` commands.
 
-If a user invokes an old globally installed upstream `inkos` executable, that is outside Castor's new runtime compatibility contract. Castor is responsible for migrating legacy project data when invoked through `castor`, not for maintaining the upstream binary.
+If a user invokes an old globally installed upstream `castor` executable, that is outside Castor's new runtime compatibility contract. Castor is responsible for migrating legacy project data when invoked through `castor`, not for maintaining the upstream binary.
 
 ## 10. User-Agent, diagnostics, logs, telemetry labels, and generated metadata
 
 Rename product-owned identifiers such as:
 
-- InkOS user-agent strings;
+- castor user-agent strings;
 - diagnostic headings;
 - startup banners;
 - trace producer/product labels;
@@ -222,26 +222,26 @@ Rename product-owned identifiers such as:
 
 New values use Castor.
 
-Historical persisted records that already contain InkOS provenance must not be rewritten merely for branding. Historical provenance is evidence, not active branding.
+Historical persisted records that already contain castor provenance must not be rewritten merely for branding. Historical provenance is evidence, not active branding.
 
 ## 11. Documentation policy
 
 README files, quick-start docs, examples, CLI examples, screenshots/captions, development instructions, and new specs must teach Castor-first usage.
 
-InkOS may appear in documentation only for:
+castor may appear in documentation only for:
 
 - the derived-project notice;
 - license/history attribution;
 - the legacy migration guide;
-- comparison/history text where InkOS is genuinely the subject.
+- comparison/history text where castor is genuinely the subject.
 
-The README must not instruct new users to install or execute `@actalk/inkos` or `inkos` as the normal Castor workflow.
+The README must not instruct new users to install or execute `@actalk/castor` or `castor` as the normal Castor workflow.
 
 ## 12. Legacy book compatibility
 
 Legacy book content and authority are more important than naming cleanliness.
 
-A legacy InkOS book opened by Castor must preserve, byte-for-byte where applicable:
+A legacy castor book opened by Castor must preserve, byte-for-byte where applicable:
 
 - chapter prose;
 - authoritative Foundation content/versions;
@@ -266,8 +266,8 @@ A project created after migration must satisfy all of the following:
 - normal environment/help references are `CASTOR_*`;
 - workspace/runtime imports use Castor package names;
 - logs and Studio use Castor branding;
-- no new `inkos.json` or `.inkos/` is created;
-- no normal user-facing InkOS command is required.
+- no new `castor.json` or `.castor/` is created;
+- no normal user-facing castor command is required.
 
 ## 14. Migration architecture
 
@@ -276,12 +276,12 @@ Use explicit compatibility adapters rather than scattered special cases.
 Recommended boundaries:
 
 1. **Identity constants** — canonical product/package/config/runtime names.
-2. **Legacy config adapter** — `inkos.json` -> validated Castor config.
-3. **Legacy environment adapter** — explicit `INKOS_*` -> `CASTOR_*` fallback map.
-4. **Legacy runtime adapter** — `.inkos/` -> `.castor/` migration/read compatibility.
+2. **Legacy config adapter** — `castor.json` -> validated Castor config.
+3. **Legacy environment adapter** — explicit `castor_*` -> `CASTOR_*` fallback map.
+4. **Legacy runtime adapter** — `.castor/` -> `.castor/` migration/read compatibility.
 5. **Migration diagnostics** — non-secret warnings and migration receipts/status.
 
-Core business logic should consume canonical Castor-shaped configuration after these adapters run. It should not repeatedly branch on `inkos` vs `castor` throughout Foundation/Planning/Writer/Canon code.
+Core business logic should consume canonical Castor-shaped configuration after these adapters run. It should not repeatedly branch on `castor` vs `castor` throughout Foundation/Planning/Writer/Canon code.
 
 ## 15. Error handling
 
@@ -290,8 +290,8 @@ Migration errors must be actionable and fail closed.
 Examples:
 
 - invalid legacy config -> report exact field/category, do not create partial canonical config;
-- conflicting `castor.json` + `inkos.json` -> use Castor, warn clearly, never merge silently;
-- failed `.inkos/` migration -> leave legacy data intact and avoid half-written canonical state;
+- conflicting `castor.json` + `castor.json` -> use Castor, warn clearly, never merge silently;
+- failed `.castor/` migration -> leave legacy data intact and avoid half-written canonical state;
 - permission/write failure -> leave original data intact;
 - secret-bearing values -> redact in logs/reports;
 - unsupported legacy shape -> stop with migration-required diagnostic rather than guessing.
@@ -314,7 +314,7 @@ Before the identity migration:
 Tests must prove:
 
 - all workspace dependencies use Castor package names;
-- no production import uses `@actalk/inkos-*`;
+- no production import uses `@actalk/castor-*`;
 - CLI exposes only `castor`;
 - clean install/build/typecheck resolves all package edges.
 
@@ -322,7 +322,7 @@ Tests must prove:
 
 Scenarios:
 
-- only `inkos.json` -> creates equivalent `castor.json`;
+- only `castor.json` -> creates equivalent `castor.json`;
 - only `castor.json` -> no legacy path invoked;
 - both identical -> Castor remains canonical;
 - both conflicting -> Castor wins + warning;
@@ -335,16 +335,16 @@ Scenarios:
 Scenarios:
 
 - only `CASTOR_*` -> use it;
-- only mapped `INKOS_*` -> compatibility fallback;
+- only mapped `castor_*` -> compatibility fallback;
 - both same -> Castor used;
 - both conflicting -> Castor used + warning;
-- unknown `INKOS_*` -> not copied magically.
+- unknown `castor_*` -> not copied magically.
 
 ### 16.5 Runtime directory migration
 
 Scenarios:
 
-- `.inkos/` only -> safe migration/read into `.castor/`;
+- `.castor/` only -> safe migration/read into `.castor/`;
 - `.castor/` only -> no legacy mutation;
 - both -> `.castor/` canonical, no merge;
 - failure injection -> no partial canonical state and legacy preserved.
@@ -363,7 +363,7 @@ Open a real legacy fixture/book and verify hashes/semantic authority before and 
 
 ### 16.7 New Castor project
 
-Create a new project through public Castor surfaces and verify no new InkOS-named config/runtime artifacts appear.
+Create a new project through public Castor surfaces and verify no new castor-named config/runtime artifacts appear.
 
 ### 16.8 Real-user acceptance
 
@@ -378,12 +378,12 @@ This test must be black-box first and white-box read-only afterward.
 At completion, perform a repository-wide case-sensitive and case-insensitive audit for:
 
 ```text
-InkOS
-inkos
-INKOS_
-@actalk/inkos
-.inkos
-inkos.json
+castor
+castor
+castor_
+@actalk/castor
+.castor
+castor.json
 ```
 
 Every remaining occurrence must be classified into exactly one approved bucket:
@@ -427,8 +427,8 @@ This migration does not:
 - add Phase 6 autonomous multi-chapter writing;
 - change story quality prompts merely because names changed;
 - migrate or rewrite story prose for branding;
-- keep an `inkos` CLI alias;
-- maintain old `@actalk/inkos-*` workspace package identities as production aliases.
+- keep an `castor` CLI alias;
+- maintain old `@actalk/castor-*` workspace package identities as production aliases.
 
 ## 20. Acceptance criteria
 
@@ -439,11 +439,11 @@ The migration is technically complete only when all are true:
 3. Production workspace imports use `@actalk/castor-*` only.
 4. CLI exposes `castor` only.
 5. New config/runtime identifiers are `castor.json`, `.castor/`, `CASTOR_*`.
-6. Legacy `inkos.json`, `.inkos/`, and mapped `INKOS_*` inputs can be consumed/migrated safely.
-7. A new Castor project creates no new InkOS-named artifacts.
-8. A legacy InkOS project migrates without Canon/Foundation/Arc/chapter/authority mutation.
+6. Legacy `castor.json`, `.castor/`, and mapped `castor_*` inputs can be consumed/migrated safely.
+7. A new Castor project creates no new castor-named artifacts.
+8. A legacy castor project migrates without Canon/Foundation/Arc/chapter/authority mutation.
 9. All normal user-facing UI/help/logs/docs identify Castor.
-10. Remaining InkOS strings are limited to attribution/history/legacy compatibility buckets.
+10. Remaining castor strings are limited to attribution/history/legacy compatibility buckets.
 11. Existing Phase 4/5 authority invariants remain green.
 12. Real-provider black-box Chapter 1 acceptance completes successfully.
 13. Independent review reports Critical 0 / Important 0.

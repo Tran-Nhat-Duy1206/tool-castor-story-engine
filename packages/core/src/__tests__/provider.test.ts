@@ -477,7 +477,7 @@ describe("chatCompletion via pi-ai", () => {
     });
 
     const result = await runWithAgentTrajectory({
-      conversationId: "inkos-conv",
+      conversationId: "castor-conv",
       runId: "run-7",
       agentRole: "workflow",
     }, () => chatCompletion(client, "deepseek-v4-flash", [{ role: "user", content: "write" }]));
@@ -491,7 +491,7 @@ describe("chatCompletion via pi-ai", () => {
     expect(first["X-Castor-Client-Attempt"]).toBe("1");
     expect(second["X-Castor-Client-Attempt"]).toBe("2");
     expect(second).toMatchObject({
-      "X-Castor-Conversation-ID": "inkos-conv",
+      "X-Castor-Conversation-ID": "castor-conv",
       "X-Castor-Run-ID": "run-7",
       "X-Castor-Agent-Role": "workflow",
     });

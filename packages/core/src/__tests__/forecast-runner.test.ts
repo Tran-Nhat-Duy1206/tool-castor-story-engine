@@ -53,7 +53,7 @@ describe("narrative forecast runner", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-forecast-run-"));
+    root = await mkdtemp(join(tmpdir(), "castor-forecast-run-"));
     bookDir = join(root, "books", BOOK_ID);
     await writeForecastFixtureBook(bookDir);
   });

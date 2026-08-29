@@ -8,7 +8,7 @@ describe("material ingestion", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-material-ingest-"));
+    root = await mkdtemp(join(tmpdir(), "castor-material-ingest-"));
   });
 
   afterEach(async () => {

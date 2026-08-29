@@ -15,7 +15,7 @@ const bookId = "demo-book";
 let projectRoot = "";
 
 async function setupBook() {
-  root = await mkdtemp(join(tmpdir(), "inkos-transition-"));
+  root = await mkdtemp(join(tmpdir(), "castor-transition-"));
   projectRoot = root;
   bookDir = join(root, "books", bookId);
   await mkdir(join(bookDir, "story", "state"), { recursive: true });

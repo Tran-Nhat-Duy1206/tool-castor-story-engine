@@ -13,7 +13,7 @@ let tempRoot: string;
 
 describe("runtime requirements", () => {
   beforeEach(async () => {
-    tempRoot = await mkdtemp(join(tmpdir(), "inkos-runtime-requirements-"));
+    tempRoot = await mkdtemp(join(tmpdir(), "castor-runtime-requirements-"));
   });
 
   afterEach(async () => {

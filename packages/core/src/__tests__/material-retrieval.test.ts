@@ -9,7 +9,7 @@ describe("material retrieval", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-material-retrieve-"));
+    root = await mkdtemp(join(tmpdir(), "castor-material-retrieve-"));
   });
 
   afterEach(async () => {

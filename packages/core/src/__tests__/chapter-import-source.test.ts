@@ -12,7 +12,7 @@ describe("loadChaptersFromPath", () => {
   });
 
   it("loads unpadded chapter files in natural numeric order", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-chapter-import-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-chapter-import-"));
     roots.push(root);
     const source = join(root, "chapters");
     await mkdir(source);

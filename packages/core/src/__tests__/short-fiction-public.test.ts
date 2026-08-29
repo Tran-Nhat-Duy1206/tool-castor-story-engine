@@ -157,9 +157,9 @@ describe("public short-fiction chain", () => {
   });
 
   it("resolves cover generation from project cover config and stored cover secret", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-short-cover-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-short-cover-"));
     try {
-      await writeFile(join(root, "inkos.json"), JSON.stringify({
+      await writeFile(join(root, "castor.json"), JSON.stringify({
         name: "cover-test",
         version: "0.1.0",
         language: "zh",
@@ -195,9 +195,9 @@ describe("public short-fiction chain", () => {
   });
 
   it("uses a custom cover base URL stored in the project cover config", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-short-cover-custom-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-short-cover-custom-"));
     try {
-      await writeFile(join(root, "inkos.json"), JSON.stringify({
+      await writeFile(join(root, "castor.json"), JSON.stringify({
         name: "cover-test",
         version: "0.1.0",
         language: "zh",
@@ -261,7 +261,7 @@ describe("public short-fiction chain", () => {
   });
 
   it("generates a standalone cover artifact without running the short fiction pipeline", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-cover-tool-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-cover-tool-"));
     const originalFetch = globalThis.fetch;
     const controller = new AbortController();
     process.env.CASTOR_TEST_COVER_KEY = "sk-cover";

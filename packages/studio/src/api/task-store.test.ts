@@ -12,7 +12,7 @@ describe("Studio task snapshots", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-studio-task-"));
+    root = await mkdtemp(join(tmpdir(), "castor-studio-task-"));
   });
 
   afterEach(async () => {

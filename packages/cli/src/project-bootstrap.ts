@@ -10,8 +10,8 @@ export interface ProjectBootstrapOptions {
 async function hasGlobalConfig(): Promise<boolean> {
   try {
     const content = await readFile(await resolveGlobalEnvPath(), "utf-8");
-    // A migrated legacy env keeps its original INKOS_* key names; both count.
-    const hasKey = content.includes("CASTOR_LLM_API_KEY=") || content.includes("INKOS_LLM_API_KEY=");
+    // A migrated legacy env keeps its original castor_* key names; both count.
+    const hasKey = content.includes("CASTOR_LLM_API_KEY=") || content.includes("castor_LLM_API_KEY=");
     return hasKey && !content.includes("your-api-key-here");
   } catch {
     return false;
@@ -134,8 +134,8 @@ export async function initializeProjectDirectory(
   }
   // A legacy-only project must not be silently shadowed by a fresh default
   // config: migrating through the normal load path is the supported route.
-  if (await exists(join(projectDir, "inkos.json"))) {
-    throw new Error(`Legacy inkos.json found in ${projectDir}. Run any castor command once to migrate it to castor.json, or delete the legacy file first.`);
+  if (await exists(join(projectDir, "castor.json"))) {
+    throw new Error(`Legacy castor.json found in ${projectDir}. Run any castor command once to migrate it to castor.json, or delete the legacy file first.`);
   }
 
   await mkdir(projectDir, { recursive: true });

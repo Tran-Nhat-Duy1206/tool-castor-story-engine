@@ -315,7 +315,7 @@ describe("state-review-invalidation", () => {
     await expect(readFile(join(fixture.root, newVersionKeys[0]!), "utf-8")).resolves.toBe(beforeBytes.prose);
     expect((await readdir(fixture.root, { recursive: true }))
       .map((entry) => entry.replace(/\\/g, "/"))
-      .filter((entry) => entry.includes(".inkos-file-txn-")))
+      .filter((entry) => entry.includes(".castor-file-txn-")))
       .toEqual([]);
   });
 

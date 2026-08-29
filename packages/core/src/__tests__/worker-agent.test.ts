@@ -124,7 +124,7 @@ describe("Pi worker harness", () => {
     const worker = new TwoStepWorker({
       client: client(),
       model: "deepseek-v4-flash",
-      projectRoot: "/tmp/inkos-worker-test",
+      projectRoot: "/tmp/castor-worker-test",
       signal: controller.signal,
     });
 

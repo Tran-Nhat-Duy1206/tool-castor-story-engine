@@ -258,7 +258,7 @@ export function stateReviewItemId(kind: string, opIndex: number, payload: unknow
 Steps:
 - [ ] RED `state-review-schema.test.ts`: (1) shell variants parse WITHOUT anchors/items; active variant without `reviewId`/anchors/`items` FAILS parse; (2) `decision` defaults `"undecided"`; (3) unknown kind rejected; (4) `fact/set` without object rejected, with object accepted; (5) `hook-upsert` proposal embeds a FULL valid `HookRecordSchema` value and rejects malformed hooks; (6) `resolveReviewItemEffectiveChange` truth table (accepted→proposal; edited→editedChange; rejected→none; user accepted→proposal; note→none; undecided→none; edited-without-editedChange throws `state_review_invalid_change`); (7) `stateReviewItemId` deterministic + input-order-sensitive; (8) `fnv1a8` determinism + 8-hex shape + differs on 1-char change (no magic constants).
 - [ ] GREEN implement exactly as frozen; barrel-export public symbols.
-- [ ] Verify: `pnpm -C inkos --filter @actalk/inkos-core exec vitest run src/__tests__/state-review-schema.test.ts`
+- [ ] Verify: `pnpm -C castor --filter @actalk/castor-core exec vitest run src/__tests__/state-review-schema.test.ts`
 - [ ] Proposed commit: `feat(core): state review domain schemas`
 
 ### Task 2 — Prose revision + evidence verification primitives
@@ -674,7 +674,7 @@ Model: domain groups (Current State ← fact items; Hooks/Subplots ← hook kind
 
 ### Task 17 — Final integration checkpoint
 
-- [ ] Sequential, each awaited alone: focused Phase 4 core tests → core suite (only the 2 known EPERM failures) → studio suite → CLI suites → `pnpm -C inkos typecheck` → `pnpm -C inkos build`.
+- [ ] Sequential, each awaited alone: focused Phase 4 core tests → core suite (only the 2 known EPERM failures) → studio suite → CLI suites → `pnpm -C castor typecheck` → `pnpm -C castor build`.
 - [ ] Walk acceptance matrix + blocker-verification map; gaps ⇒ new RED test first.
 - [ ] Commit: `test: phase 4 acceptance matrix verified`.
 

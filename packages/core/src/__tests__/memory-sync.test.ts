@@ -40,7 +40,7 @@ async function seedSnapshotFacts(chapter: number, facts: Array<ReturnType<typeof
 }
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-memory-sync-"));
+  root = await mkdtemp(join(tmpdir(), "castor-memory-sync-"));
   bookDir = join(root, "books", "demo");
   await mkdir(join(bookDir, "chapters"), { recursive: true });
 });

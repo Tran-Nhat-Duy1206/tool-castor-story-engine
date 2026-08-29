@@ -15,7 +15,7 @@ describe("evaluateBookQuality", () => {
   });
 
   it("computes a reusable quality report from a persisted book", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-book-eval-"));
+    root = await mkdtemp(join(tmpdir(), "castor-book-eval-"));
     const state = new StateManager(root);
     const now = new Date().toISOString();
     const book = {

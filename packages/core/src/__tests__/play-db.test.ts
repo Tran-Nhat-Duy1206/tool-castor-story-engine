@@ -17,7 +17,7 @@ const sqliteIt = hasNodeSqlite ? it : it.skip;
 
 describe("PlayDB", () => {
   sqliteIt("upserts entities and reopens persisted data", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-db-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-db-"));
 
     try {
       const db = new PlayDB(root);
@@ -44,7 +44,7 @@ describe("PlayDB", () => {
   });
 
   sqliteIt("stores temporal edges and excludes expired edges from current queries", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-db-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-db-"));
     const db = new PlayDB(root);
 
     try {
@@ -72,7 +72,7 @@ describe("PlayDB", () => {
   });
 
   sqliteIt("finds evidence supporting a claim", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-db-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-db-"));
     const db = new PlayDB(root);
 
     try {
@@ -107,7 +107,7 @@ describe("PlayDB", () => {
   });
 
   sqliteIt("persists state slots and events", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-db-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-db-"));
     const db = new PlayDB(root);
 
     try {

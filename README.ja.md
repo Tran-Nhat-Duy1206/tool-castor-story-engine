@@ -17,7 +17,7 @@
 
 > **派生プロジェクトのお知らせ**
 >
-> Tool Castor Story Engine（Castor）は [InkOS](https://github.com/Narcooo/inkos)（作者 Narcooo）から派生し、大幅な修正・進化を経て独立した長編 AI ストーリー執筆システムになりました。本プロジェクトは InkOS の Git 履歴、著作権表示、AGPL-3.0 の義務を保持します。元の InkOS コードは本プロジェクトの保守者による著作ではありません。本修正版も [AGPL-3.0](LICENSE) で提供されます。
+> Tool Castor Story Engine（Castor）は [castor](https://github.com/Narcooo/castor)（作者 Narcooo）から派生し、大幅な修正・進化を経て独立した長編 AI ストーリー執筆システムになりました。本プロジェクトは castor の Git 履歴、著作権表示、AGPL-3.0 の義務を保持します。元の castor コードは本プロジェクトの保守者による著作ではありません。本修正版も [AGPL-3.0](LICENSE) で提供されます。
 
 ---
 
@@ -86,11 +86,11 @@ pnpm install
 pnpm build
 ```
 
-> 上流の InkOS npm パッケージ（`@actalk/inkos`）と [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) は Narcooo の InkOS プロジェクトに属します。本スタンドアロンリポジトリはソースからビルドして使います。既存ユーザーデータ（`castor.json` 設定、`INKOS_*` 環境変数、書籍ディレクトリ構造）は互換のままで、`castor` コマンドは既存の InkOS プロジェクトを直接読み込めます。
+> 上流の castor npm パッケージ（`@actalk/castor`）と [OpenClaw Skill](https://clawhub.ai/narcooo/castor) は Narcooo の castor プロジェクトに属します。本スタンドアロンリポジトリはソースからビルドして使います。既存ユーザーデータ（`castor.json` 設定、`castor_*` 環境変数、書籍ディレクトリ構造）は互換のままで、`castor` コマンドは既存の castor プロジェクトを直接読み込めます。
 
 ### OpenClaw 🦞 経由で使用
 
-上流の InkOS が [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill として公開されています。本リポジトリは InkOS から派生し、同じ共有インタラクション入口を受け継いでいます。ソースからビルド後、直接呼び出せます：
+上流の castor が [OpenClaw](https://clawhub.ai/narcooo/castor) Skill として公開されています。本リポジトリは castor から派生し、同じ共有インタラクション入口を受け継いでいます。ソースからビルド後、直接呼び出せます：
 
 ```bash
 castor interact --json --message "continue the current book, but keep the pacing tighter"
@@ -543,11 +543,11 @@ pnpm typecheck    # 出力なしで型チェック
 
 ## Star History
 
-<a href="https://www.star-history.com/#Narcooo/inkos&type=date&legend=top-left">
+<a href="https://www.star-history.com/#Narcooo/castor&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&legend=top-left" />
  </picture>
 </a>
 
@@ -555,8 +555,8 @@ pnpm typecheck    # 出力なしで型チェック
 
 <div align="center">
 
-<a href="https://skill-history.com/narcooo/inkos">
-  <img alt="Skills Download History" src="https://skill-history.com/chart/narcooo/inkos.svg" />
+<a href="https://skill-history.com/narcooo/castor">
+  <img alt="Skills Download History" src="https://skill-history.com/chart/narcooo/castor.svg" />
 </a>
 
 </div>

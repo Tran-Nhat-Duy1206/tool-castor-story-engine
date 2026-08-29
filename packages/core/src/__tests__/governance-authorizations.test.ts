@@ -34,7 +34,7 @@ const canonPath = () => join(bookDir, "story", "state", "manifest.json");
 const bookPath = () => join(bookDir, "book.json");
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-authorizations-"));
+  root = await mkdtemp(join(tmpdir(), "castor-authorizations-"));
   bookDir = join(root, "books", "demo-book");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await writeFile(bookPath(), `${JSON.stringify({

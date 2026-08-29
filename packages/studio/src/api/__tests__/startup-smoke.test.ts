@@ -95,7 +95,7 @@ describe("studio startup smoke", () => {
     // the same minimal shape the CLI creates for a fresh project.
     await mkdir(join(projectRoot, "books"), { recursive: true });
     await writeFile(
-      join(projectRoot, "inkos.json"),
+      join(projectRoot, "castor.json"),
       JSON.stringify(
         {
           name: "castor-studio-startup-smoke",

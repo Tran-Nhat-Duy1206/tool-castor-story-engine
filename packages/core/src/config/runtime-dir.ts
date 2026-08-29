@@ -7,7 +7,7 @@ import { CASTOR_RUNTIME_DIRNAME, LEGACY_CASTOR_RUNTIME_DIRNAME } from "./product
  * Runtime directory adapter (Checkpoint 4, plan Task 4.3).
  *
  * Canonical runtime state (uploads, materials, secrets, sessions, tasks,
- * research, backups) lives under `.castor/`. Legacy `.inkos/` content is
+ * research, backups) lives under `.castor/`. Legacy `.castor/` content is
  * read only for one-way compatibility, per spec §7 and §15:
  *
  *   - the canonical path always wins;

@@ -29,7 +29,7 @@ describe("ContinuityAuditor", () => {
         },
       },
       model: "test-model",
-      projectRoot: "/tmp/inkos-auditor-bad-json-test",
+      projectRoot: "/tmp/castor-auditor-bad-json-test",
     });
 
     const result = (auditor as any).parseAuditResult("模型只返回了一段散文，没有 JSON。", "zh");
@@ -58,7 +58,7 @@ describe("ContinuityAuditor", () => {
         },
       },
       model: "test-model",
-      projectRoot: "/tmp/inkos-auditor-repair-scope-test",
+      projectRoot: "/tmp/castor-auditor-repair-scope-test",
     });
 
     const result = (auditor as any).parseAuditResult(JSON.stringify({
@@ -80,7 +80,7 @@ describe("ContinuityAuditor", () => {
   });
 
   it("prefers book language override when building audit prompts", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-auditor-lang-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-auditor-lang-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -155,7 +155,7 @@ describe("ContinuityAuditor", () => {
   });
 
   it("localizes English audit prompts instead of mixing Chinese control text", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-auditor-en-prompt-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-auditor-en-prompt-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -245,7 +245,7 @@ describe("ContinuityAuditor", () => {
   });
 
   it("uses selected summary and hook evidence instead of full long-history markdown in governed mode", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-auditor-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-auditor-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -359,7 +359,7 @@ describe("ContinuityAuditor", () => {
   });
 
   it("injects the chapter memo into the audit prompt for memo-drift checking", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-auditor-memo-drift-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-auditor-memo-drift-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });

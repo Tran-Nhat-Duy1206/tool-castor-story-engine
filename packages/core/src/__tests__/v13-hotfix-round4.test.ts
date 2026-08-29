@@ -33,7 +33,7 @@ describe("Issue 1 — isNewLayoutBook detection", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-layout-detect-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-layout-detect-"));
     await mkdir(join(bookDir, "story"), { recursive: true });
   });
 
@@ -53,7 +53,7 @@ describe("Issue 1 — isNewLayoutBook detection", () => {
   });
 
   it("returns false when story/ dir does not exist at all", async () => {
-    const emptyDir = await mkdtemp(join(tmpdir(), "inkos-empty-"));
+    const emptyDir = await mkdtemp(join(tmpdir(), "castor-empty-"));
     try {
       expect(await isNewLayoutBook(emptyDir)).toBe(false);
     } finally {
@@ -70,7 +70,7 @@ describe("Issue 1 — write_truth_file per-book shim detection", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-wt-shim-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-wt-shim-"));
     await mkdir(join(bookDir, "story"), { recursive: true });
   });
 
@@ -178,7 +178,7 @@ describe("Issue 2 — per-chapter promotion persists to pending_hooks.md", () =>
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-perchapt-promo-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-perchapt-promo-"));
     await mkdir(join(bookDir, "story"), { recursive: true });
   });
 
@@ -321,7 +321,7 @@ describe("Issue 1 — write_truth_file per-book shim detection", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-wt-shim-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-wt-shim-"));
     await mkdir(join(bookDir, "story"), { recursive: true });
   });
 

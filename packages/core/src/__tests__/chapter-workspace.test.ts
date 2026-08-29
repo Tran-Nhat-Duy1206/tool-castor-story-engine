@@ -17,7 +17,7 @@ async function exists(path: string): Promise<boolean> {
 
 describe("chapter workspace", () => {
   it("persists, reads, and clears a per-chapter user brief", async () => {
-    const bookDir = await mkdtemp(join(tmpdir(), "inkos-chapter-workspace-"));
+    const bookDir = await mkdtemp(join(tmpdir(), "castor-chapter-workspace-"));
 
     await expect(readChapterUserBrief(bookDir, 3)).resolves.toBe("");
     await saveChapterUserBrief(bookDir, 3, "  保留雨夜证词，重写结尾。  ");
@@ -30,7 +30,7 @@ describe("chapter workspace", () => {
   });
 
   it("reads the persisted system plan without requiring one to exist", async () => {
-    const bookDir = await mkdtemp(join(tmpdir(), "inkos-chapter-workspace-"));
+    const bookDir = await mkdtemp(join(tmpdir(), "castor-chapter-workspace-"));
     await expect(readChapterPlanDocument(bookDir, 2)).resolves.toBeNull();
 
     const runtimeDir = join(bookDir, "story", "runtime");
@@ -42,7 +42,7 @@ describe("chapter workspace", () => {
   });
 
   it("archives immutable chapter versions and lists newest first", async () => {
-    const bookDir = await mkdtemp(join(tmpdir(), "inkos-chapter-workspace-"));
+    const bookDir = await mkdtemp(join(tmpdir(), "castor-chapter-workspace-"));
     const first = await archiveChapterVersion(
       bookDir,
       4,
@@ -78,13 +78,13 @@ describe("chapter workspace", () => {
   });
 
   it("rejects unsafe version ids instead of reading outside the archive", async () => {
-    const bookDir = await mkdtemp(join(tmpdir(), "inkos-chapter-workspace-"));
+    const bookDir = await mkdtemp(join(tmpdir(), "castor-chapter-workspace-"));
     await expect(readChapterVersion(bookDir, 1, "../book.json"))
       .rejects.toThrow(/invalid chapter version id/i);
   });
 
   it("does not expose archives from another chapter", async () => {
-    const bookDir = await mkdtemp(join(tmpdir(), "inkos-chapter-workspace-"));
+    const bookDir = await mkdtemp(join(tmpdir(), "castor-chapter-workspace-"));
     const version = await archiveChapterVersion(
       bookDir,
       1,

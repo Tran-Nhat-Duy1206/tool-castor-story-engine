@@ -9,7 +9,7 @@ import {
 } from "../prompts/index.js";
 
 async function tempProject(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "inkos-prompt-pack-"));
+  return await mkdtemp(join(tmpdir(), "castor-prompt-pack-"));
 }
 
 async function writePrompt(root: string, promptId: string, content: string): Promise<string> {

@@ -24,7 +24,7 @@ describe("narrative forecast agent tools", () => {
   let pipeline: PipelineRunner;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-forecast-tools-"));
+    root = await mkdtemp(join(tmpdir(), "castor-forecast-tools-"));
     bookDir = join(root, "books", BOOK_ID);
     await writeForecastFixtureBook(bookDir);
     const runtime: AgentContext = { client: { provider: "openai" } as never, model: "fake", projectRoot: root };

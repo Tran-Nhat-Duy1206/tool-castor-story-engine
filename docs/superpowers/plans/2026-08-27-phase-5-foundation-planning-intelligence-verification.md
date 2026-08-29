@@ -22,7 +22,7 @@ This record reports technical readiness only. It does not claim Human acceptance
 | E. PLAN_DEFECT | Initial + exactly two replans; three durable attempts; three distinct plan IDs/hashes and immutable snapshot IDs; third defect stops; Canon unchanged | PASS |
 | F. Arc completion/transition | Missing Beat evidence `not_ready`; Canon evidence produces `ready_to_close`; unpublished next Arc yields `prepare_next_before_transition` and apply refusal; Human-published next Arc permits atomic transition; concurrent applies produce one winner; Canon/Foundation/Authorization unchanged | PASS |
 
-Command evidence: `pnpm --filter @actalk/inkos-core exec vitest run src/__tests__/phase5-acceptance.test.ts --run --pool forks --no-file-parallelism` — 10 tests passed (9 acceptance scenarios + settlement provenance).
+Command evidence: `pnpm --filter @actalk/castor-core exec vitest run src/__tests__/phase5-acceptance.test.ts --run --pool forks --no-file-parallelism` — 10 tests passed (9 acceptance scenarios + settlement provenance).
 
 ## Acceptance regression found and fixed
 
@@ -81,14 +81,14 @@ Command evidence: `pnpm --filter @actalk/inkos-core exec vitest run src/__tests_
 
 - `legacy-v2-upgrade-e2e.test.ts`: 8/8 PASS (included in high-risk battery — 93 total).
 - `phase5-recovery-e2e.test.ts`: 8/8 PASS (included in high-risk battery).
-- High-risk battery command: `pnpm --filter @actalk/inkos-core exec vitest run src/__tests__/phase5-acceptance.test.ts src/__tests__/core-writer-gate.test.ts src/__tests__/planning-transition.test.ts src/__tests__/settlement-integration.test.ts src/__tests__/legacy-v2-upgrade-e2e.test.ts src/__tests__/phase5-recovery-e2e.test.ts --run --pool forks --no-file-parallelism` — 6 files, 93/93 PASS.
+- High-risk battery command: `pnpm --filter @actalk/castor-core exec vitest run src/__tests__/phase5-acceptance.test.ts src/__tests__/core-writer-gate.test.ts src/__tests__/planning-transition.test.ts src/__tests__/settlement-integration.test.ts src/__tests__/legacy-v2-upgrade-e2e.test.ts src/__tests__/phase5-recovery-e2e.test.ts --run --pool forks --no-file-parallelism` — 6 files, 93/93 PASS.
 - Recovery truth order remains committed immutable history > current pointers/manifests > journals > drafts > derived state. Corrupt immutable history fails closed.
 
 ## Full package test evidence
 
 ### Core monolithic serial
 
-Command: `NODE_OPTIONS=--max-old-space-size=6144 pnpm --filter @actalk/inkos-core exec vitest run --pool forks --no-file-parallelism`
+Command: `NODE_OPTIONS=--max-old-space-size=6144 pnpm --filter @actalk/castor-core exec vitest run --pool forks --no-file-parallelism`
 
 - Files: 248 total; 247 passed; 1 file partially failed for known OS baseline only.
 - Tests: 2,759 total; 2,757 passed; 2 known baseline failures; 0 regressions.
@@ -131,16 +131,16 @@ Command: `NODE_OPTIONS=--max-old-space-size=6144 pnpm --filter @actalk/inkos-cor
 | 6 | 4 | 31 | 31 | 0 |
 | **Excl. total** | **44** | **238** | **238** | **0** |
 
-- Flaky file excluded: `packages/cli/src/__tests__/cli-integration.test.ts` — 13 failures (`ENOENT` reading `inkos.json` in Temp dir; `castor interact` 10s timeout). Classification: **ENVIRONMENTAL** — pre-existing integration harness flake, not Phase 5 authority regression. With the file included the suite reports 1 failed file / 45, but no authority/transaction semantics are affected.
+- Flaky file excluded: `packages/cli/src/__tests__/cli-integration.test.ts` — 13 failures (`ENOENT` reading `castor.json` in Temp dir; `castor interact` 10s timeout). Classification: **ENVIRONMENTAL** — pre-existing integration harness flake, not Phase 5 authority regression. With the file included the suite reports 1 failed file / 45, but no authority/transaction semantics are affected.
 
 ## Typecheck/build matrix
 
 | Package | Typecheck command | Result | Build command | Result |
 |---|---|---|---|---|
-| Core | `pnpm --filter @actalk/inkos-core typecheck` (`tsc --noEmit`) | PASS | `pnpm --filter @actalk/inkos-core build` (`tsc`) | PASS |
-| Studio client | `pnpm --filter @actalk/inkos-studio typecheck` (`tsc --noEmit`) | PASS | `pnpm --filter @actalk/inkos-studio build` (`vite build` + `tsc -p tsconfig.server.json`) | PASS |
+| Core | `pnpm --filter @actalk/castor-core typecheck` (`tsc --noEmit`) | PASS | `pnpm --filter @actalk/castor-core build` (`tsc`) | PASS |
+| Studio client | `pnpm --filter @actalk/castor-studio typecheck` (`tsc --noEmit`) | PASS | `pnpm --filter @actalk/castor-studio build` (`vite build` + `tsc -p tsconfig.server.json`) | PASS |
 | Studio server | `tsc -p tsconfig.server.json --noEmit` (part of above) | PASS | (part of above) | PASS |
-| CLI | `pnpm --filter @actalk/inkos typecheck` (`tsc --noEmit` + workspace-core build) | PASS | `pnpm --filter @actalk/inkos build` (`tsc`) | PASS |
+| CLI | `pnpm --filter @actalk/castor typecheck` (`tsc --noEmit` + workspace-core build) | PASS | `pnpm --filter @actalk/castor build` (`tsc`) | PASS |
 | Repo-wide orchestration | `pnpm -r typecheck` (equiv. to above per-package) | PASS via per-package | `pnpm -r build` | PASS via per-package |
 
 Evidence: Studio client built 56.24s (2,707 kB index chunk), Studio server built via `tsc -p tsconfig.server.json`, Core/CLI built via `tsc`. No type errors after acceptance fix.

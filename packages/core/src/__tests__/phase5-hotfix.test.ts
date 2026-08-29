@@ -16,7 +16,7 @@ describe("Phase 5 hotfix 2 — bookRules.body decoupling", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-hotfix2-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-hotfix2-"));
   });
 
   afterEach(async () => {
@@ -124,7 +124,7 @@ describe("Phase 5 hotfix 3 — broken frontmatter fallback", () => {
   let warnSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-hotfix3-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-hotfix3-"));
     warnSpy = vi.spyOn(console, "warn").mockImplementation(() => { /* suppress */ });
   });
 

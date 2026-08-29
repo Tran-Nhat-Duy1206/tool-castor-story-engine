@@ -64,7 +64,7 @@ describe("production skill bindings", () => {
   });
 
   it("retrieves task-relevant references for production workers", async () => {
-    const baseDir = await mkdtemp(join(tmpdir(), "inkos-skill-bindings-"));
+    const baseDir = await mkdtemp(join(tmpdir(), "castor-skill-bindings-"));
     try {
       await mkdir(join(baseDir, "references"), { recursive: true });
       await writeFile(join(baseDir, "references", "craft.md"), [

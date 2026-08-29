@@ -163,7 +163,7 @@ async function seedActiveAuthorization(authId = "auth-1"): Promise<void> {
 }
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-writer-gate-"));
+  root = await mkdtemp(join(tmpdir(), "castor-writer-gate-"));
   state = new StateManager(root);
   bookDir = state.bookDir(bookId);
   await state.saveBookConfig(bookId, sampleBookConfig());

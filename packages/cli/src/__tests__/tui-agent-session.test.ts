@@ -59,7 +59,7 @@ describe("tui agent session bridge", () => {
   let projectRoot: string;
 
   beforeEach(async () => {
-    projectRoot = await mkdtemp(join(tmpdir(), "inkos-tui-agent-"));
+    projectRoot = await mkdtemp(join(tmpdir(), "castor-tui-agent-"));
     vi.clearAllMocks();
     loadConfigMock.mockResolvedValue({
       llm: {
@@ -246,7 +246,7 @@ describe("tui agent session bridge", () => {
           actionPayload: {
             interactiveFilmCreate: {
               title: "回声航线",
-              sourcePath: ".inkos/uploads/echo.md",
+              sourcePath: ".castor/uploads/echo.md",
               episodeCount: 3,
             },
           },
@@ -289,7 +289,7 @@ describe("tui agent session bridge", () => {
         actionPayload: {
           interactiveFilmCreate: {
             title: "回声航线",
-            sourcePath: ".inkos/uploads/echo.md",
+            sourcePath: ".castor/uploads/echo.md",
             episodeCount: 3,
           },
         },

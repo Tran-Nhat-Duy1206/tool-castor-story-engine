@@ -48,7 +48,7 @@ function residueCount(): number {
     const dir = stack.pop()!;
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
-      if (entry.name.startsWith(".inkos-file-txn-")) count += 1;
+      if (entry.name.startsWith(".castor-file-txn-")) count += 1;
       else stack.push(join(dir, entry.name));
     }
   }

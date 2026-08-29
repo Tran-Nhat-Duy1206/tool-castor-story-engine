@@ -47,12 +47,12 @@ async function exists(path: string): Promise<boolean> {
 }
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-foundation-pipeline-"));
+  root = await mkdtemp(join(tmpdir(), "castor-foundation-pipeline-"));
   bookDir = join(root, "books", "demo-book");
   bookJsonPath = join(bookDir, "book.json");
   canonPath = join(bookDir, "story", "state", "manifest.json");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
-  await writeFile(join(root, "inkos.json"), JSON.stringify({
+  await writeFile(join(root, "castor.json"), JSON.stringify({
     name: "pipeline-test",
     version: "0.1.0",
     language: "en",

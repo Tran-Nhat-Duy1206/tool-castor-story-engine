@@ -19,7 +19,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("indexes current state facts into sqlite-backed memory selection", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -68,7 +68,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("does not treat unpromoted hook seeds as active debt", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-hook-seeds-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-hook-seeds-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -102,7 +102,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("retrieves a relevant deferred seed without promoting it to active debt", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-deferred-seed-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-deferred-seed-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -139,7 +139,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("prefers the mentor-debt recap chapter over nearby guild-noise chapters in English retrieval", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-en-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-en-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -196,7 +196,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("prefers the explicit 师债回响 chapter over nearby 商会噪音 chapters in Chinese retrieval", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-zh-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-zh-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -253,7 +253,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("backfills sqlite memory from structured state instead of stale markdown truth files", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-db-structured-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-db-structured-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -378,7 +378,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("bootstraps structured runtime state from legacy markdown truth files during retrieval", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-bootstrap-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-bootstrap-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -438,7 +438,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("prefers structured state files over legacy markdown truth files when both exist", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-structured-preferred-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-structured-preferred-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -547,7 +547,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("recalls stale open hooks alongside recent governed memory selections", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-stale-hook-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-stale-hook-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -620,7 +620,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("surfaces one stale unresolved hook beyond the primary quota while excluding stale resolved hooks", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-stale-quota-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-stale-quota-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -725,7 +725,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("surfaces multiple stale hook families when debt pressure clusters instead of only one stale extra", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-stale-cluster-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-stale-cluster-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -827,7 +827,7 @@ describe("retrieveMemorySelection", () => {
   });
 
   it("does not surface far-future unstarted hooks in early chapter retrieval", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-memory-retrieval-future-hook-gate-test-"));
+    root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-future-hook-gate-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");

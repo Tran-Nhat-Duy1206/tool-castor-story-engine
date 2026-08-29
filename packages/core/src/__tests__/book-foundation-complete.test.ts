@@ -26,7 +26,7 @@ async function writeFoundation(bookDir: string, parts: {
 
 describe("isBookFoundationComplete", () => {
   let dir: string;
-  beforeEach(async () => { dir = await mkdtemp(join(tmpdir(), "inkos-foundation-")); });
+  beforeEach(async () => { dir = await mkdtemp(join(tmpdir(), "castor-foundation-")); });
   afterEach(async () => { await rm(dir, { recursive: true, force: true }); });
 
   it("is true when every foundation file + a major-role sheet exists", async () => {

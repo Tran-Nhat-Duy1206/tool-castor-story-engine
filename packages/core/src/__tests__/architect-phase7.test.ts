@@ -98,7 +98,7 @@ describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-phase7-arch-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-phase7-arch-"));
   });
 
   afterEach(async () => {

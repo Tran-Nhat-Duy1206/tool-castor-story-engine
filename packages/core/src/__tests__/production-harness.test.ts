@@ -16,7 +16,7 @@ describe("production harness", () => {
   });
 
   it("commits artifacts before the authoritative completion snapshot", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-production-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-production-"));
     roots.push(root);
     const run = createProductionRunSnapshot({
       kind: "script",

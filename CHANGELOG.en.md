@@ -35,7 +35,7 @@ Unified Pi Agent Harness and professional creation kernel. Studio Chat, TUI, ext
 
 ### Release Focus
 
-Agent Skills compatibility and a single Skill runtime. InkOS now consumes standard `SKILL.md` packages directly. The Chat Agent can activate a Skill from user intent, while users can force one from the composer `+` button or with `@skill-id`. The former InkOS-private Skill protocol, keyword triggers, and parallel context planner have been removed instead of being layered beside the new system.
+Agent Skills compatibility and a single Skill runtime. castor now consumes standard `SKILL.md` packages directly. The Chat Agent can activate a Skill from user intent, while users can force one from the composer `+` button or with `@skill-id`. The former castor-private Skill protocol, keyword triggers, and parallel context planner have been removed instead of being layered beside the new system.
 
 ### Agent Skills
 
@@ -47,7 +47,7 @@ Agent Skills compatibility and a single Skill runtime. InkOS now consumes standa
 
 ### Compatibility
 
-- Removed the legacy `.inkos/skills` loader and InkOS-only fields such as `whenToUse`, `promptPacks`, `toolHints`, and `contextNeeds`
+- Removed the legacy `.castor/skills` loader and castor-only fields such as `whenToUse`, `promptPacks`, `toolHints`, and `contextNeeds`
 - Prompt packs remain a separate, Studio-editable subsystem under Project Settings instead of masquerading as Skills
 - Migrate old Skills to a standard folder containing `SKILL.md` and static references, then import it in Studio or place it under `.agents/skills/`
 
@@ -61,7 +61,7 @@ Narrative forecasting and non-blocking Studio collaboration. Long-form authors c
 
 - Added long-form narrative forecasts: generate 2-5 isolated futures from current canon and compare chapter beats, character decisions, projected changes, risks, author-intent alignment, and uncertainties
 - Added an inline Studio Chat comparison card with branch selection and stale-forecast re-checking. Selection writes only `selected-branch-plan.md`; prose, foundations, outlines, and runtime canon remain unchanged
-- Added `inkos forecast create / show / select` to the CLI, sharing the same forecast schema, store, context fingerprints, agent, runner, and non-canonical boundary as Core
+- Added `castor forecast create / show / select` to the CLI, sharing the same forecast schema, store, context fingerprints, agent, runner, and non-canonical boundary as Core
 - Added whole-book backup / restore and safe latest-chapter deletion with chapter-state rollback, preventing prose and runtime state from drifting apart
 
 ### Collaboration And Task Reliability
@@ -83,20 +83,20 @@ Narrative forecasting and non-blocking Studio collaboration. Long-form authors c
 
 ### Release Focus
 
-Major multilingual creation and long-task reliability release. InkOS gains a complete long-form translation and localization workflow, while English support now extends through short fiction, scripts, storyboards, interactive film, Studio, and the CLI. Chat-driven novel import, configurable review and revision, automatic write-lock recovery, and abort propagation make long-form collaboration and cross-platform use more reliable.
+Major multilingual creation and long-task reliability release. castor gains a complete long-form translation and localization workflow, while English support now extends through short fiction, scripts, storyboards, interactive film, Studio, and the CLI. Chat-driven novel import, configurable review and revision, automatic write-lock recovery, and abort propagation make long-form collaboration and cross-platform use more reliable.
 
 ### Major Features
 
 - Added a translation and localization workflow for EPUB, text-based PDF, TXT, and Markdown sources, with chapter-aware semantic segmentation, glossary management, chapter review, and TXT / Markdown / EPUB export
 - Added the Studio Translation workbench for human-readable source and target languages, project creation, translation runs, side-by-side source and translated text review, review reports, and complete-file export
-- Added `inkos translate init / run / export` to the CLI. Studio Chat can also propose a confirmed translation action without requiring users to know language codes such as `zh` or `en`
+- Added `castor translate init / run / export` to the CLI. Studio Chat can also propose a confirmed translation action without requiring users to know language codes such as `zh` or `en`
 - Added English prompt branches for short fiction, scripts, storyboards, and interactive film, plus bilingual dynamic Studio copy and corrected CLI environment-language fallback
 - Added the Chat `import_chapters` tool: existing novels from local files, directories, or chat attachments can become real book chapters, with settings reverse-engineered and chapter state replayed. This is distinct from `ingest_material`, which only stores reference material (#324)
 
 ### Collaboration And Control
 
 - Added configurable `writing.revisionGate` policies: strict, lenient, and always, with project-level and per-book overrides. Rejected revisions now report before/after review metrics and remaining issues (#326)
-- The CLI now respects per-book `writing.reviewMode`; new `inkos auto [book-id] <target-chapter>` writes continuously to a target chapter (#307)
+- The CLI now respects per-book `writing.reviewMode`; new `castor auto [book-id] <target-chapter>` writes continuously to a target chapter (#307)
 - Notification channels support plain text, and `write next / write rewrite / auto / revise / audit` can send completion or failure notifications with `--notify` (#308)
 - Studio can expand action details by default, including read / grep tool results, making completed work directly inspectable (#306)
 
@@ -112,7 +112,7 @@ Major multilingual creation and long-task reliability release. InkOS gains a com
 
 ### Hotfix
 
-- Fixed `@actalk/inkos@1.6.2` / `@actalk/inkos-studio@1.6.2` leaking `workspace:*` into the registry manifest when published to npm; for Windows / npm global upgrades, install `1.6.3` directly or update to `latest`
+- Fixed `@actalk/castor@1.6.2` / `@actalk/castor-studio@1.6.2` leaking `workspace:*` into the registry manifest when published to npm; for Windows / npm global upgrades, install `1.6.3` directly or update to `latest`
 - Release validation now rejects `workspace:` dependencies in publishable manifests, preventing this class of install failure from recurring
 - The MiniMax official OpenAI-compatible integration adds a `MiniMax-M3` model card and sends `thinking: { "type": "disabled" }` by default for `MiniMax-M3*`, reducing the API's default behavior of returning thinking content
 
@@ -142,7 +142,7 @@ Chat collaboration and tunable prompt hot-updates: building on v1.6.0's interact
 
 ### Release Focus
 
-Major interactive film and Skill system release: extends InkOS creation entries from "novels + Play" to interactive film/games, scripts, storyboards, and pluggable professional capabilities. Studio Chat can now invoke external / built-in skills based on user intent, and generate traceable research reports when real facts are needed; this release also fixes several stability issues affecting long-task continuation and collaborative user editing.
+Major interactive film and Skill system release: extends castor creation entries from "novels + Play" to interactive film/games, scripts, storyboards, and pluggable professional capabilities. Studio Chat can now invoke external / built-in skills based on user intent, and generate traceable research reports when real facts are needed; this release also fixes several stability issues affecting long-task continuation and collaborative user editing.
 
 ### Major Features
 
@@ -157,17 +157,17 @@ Major interactive film and Skill system release: extends InkOS creation entries 
 - Fixed `patch_chapter_text` only matching exact text; slightly paraphrased target passages can now be located with a high-confidence paragraph fallback, and it still fails explicitly when the target cannot be confirmed, avoiding wrong edits
 - Fixed audit / multi-chapter operation failures possibly writing `chapters/index.json` as an empty array; the save layer now rebuilds the index from on-disk chapter files, preventing existing chapters from disappearing in the UI
 - Fixed the regression risk of sessions losing the bookId after switching to the same model on a different channel, and added tests locking down session-bound bookId passing
-- Research reports are saved as reference material under `.inkos/research/`, and do not directly contaminate story truth, character cards, or prose
+- Research reports are saved as reference material under `.castor/research/`, and do not directly contaminate story truth, character cards, or prose
 
 ## v1.5.0
 
 ### Release Focus
 
-Major InkOS Play and creation workbench release: pushes InkOS from a "write the next chapter automatically" pipeline tool toward a more complete Story Creation AI Agent. Long-form novels, short fiction, fanfic, spinoffs, style imitation, continuation, covers, and open-world interaction now share the same Studio Chat / CLI / TUI interaction core, with systematic work on instruction following, context management, and the visual experience.
+Major castor Play and creation workbench release: pushes castor from a "write the next chapter automatically" pipeline tool toward a more complete Story Creation AI Agent. Long-form novels, short fiction, fanfic, spinoffs, style imitation, continuation, covers, and open-world interaction now share the same Studio Chat / CLI / TUI interaction core, with systematic work on instruction following, context management, and the visual experience.
 
 ### Major Features
 
-- Added the **InkOS Play** open-world / branching interaction entry: free-form actions, clickable choices, world contracts, non-fixed time advancement, character agents, item / evidence / relationship state, HUD, and automatic illustration
+- Added the **castor Play** open-world / branching interaction entry: free-form actions, clickable choices, world contracts, non-fixed time advancement, character agents, item / evidence / relationship state, HUD, and automatic illustration
 - Studio creation entries reorganized as first-class entries: long-form novel, short fiction, fan fiction, spinoff, style imitation, continuation, branching interactive, and open world can all be launched directly from the workbench
 - Play world-state visualization upgraded: the side HUD shows world time, current location, who you are facing, inventory, relationships, and illustrations; generated images enter the conversation stream and can be scrolled back through
 - Added / improved the spinoff, style imitation, and continuation creation chains, so existing IPs, settings, and writing styles can keep spawning new content
@@ -186,7 +186,7 @@ Major InkOS Play and creation workbench release: pushes InkOS from a "write the 
 
 - The Studio left navigation, Play conversation area, view-world panel, illustration buttons, artifact previews, and font sizes were reorganized as a whole
 - Play illustration supports characters, items, evidence, moments, and other objects; images render inside the conversation context instead of only appearing in a fixed panel preview
-- Model settings, cover services, aggregator API entries, and error messages are further separated: InkOS execution errors, model provider errors, and image generation errors are no longer mixed together
+- Model settings, cover services, aggregator API entries, and error messages are further separated: castor execution errors, model provider errors, and image generation errors are no longer mixed together
 - The README and Skill docs were updated to the Story Creation AI Agent positioning, showing real v1.5.0 Studio Play screenshots
 
 ### Bug Fixes
@@ -205,7 +205,7 @@ Windows / provider hotfix plus configurable long-form writing speed: fixes the u
 
 ### Improvements
 
-- Long-form chapter writing gains the `writing.reviewRetries` project setting for automatic review/revision passes; the default remains 1, and you can run `inkos config set writing.reviewRetries 3` when stronger revision is needed
+- Long-form chapter writing gains the `writing.reviewRetries` project setting for automatic review/revision passes; the default remains 1, and you can run `castor config set writing.reviewRetries 3` when stronger revision is needed
 - The Studio chapter-writing chain reads the same project setting, keeping CLI and Studio behavior consistent
 - README / development notes updated for the v1.4.1 MiniMax and long-form writing configuration changes
 
@@ -225,7 +225,7 @@ Major short-fiction and Studio Chat collaboration release: adds a public short-f
 - Added a standalone short-fiction writing chain: Studio Chat and the CLI can generate the complete short manuscript, outline records, review records, synopsis / selling points, and a cover prompt
 - Added cover-making capability: covers can be generated / regenerated on their own, with the generated cover image previewed directly in Studio messages
 - Studio plain chat supports project-level persistent sessions; after a refresh or restart you can keep viewing, switching, renaming, and deleting sessions
-- Chat can directly edit generated text artifacts inside the project, which is handy for adjusting chapters, cover prompts, synopses, and other files before continuing with the InkOS writing chain
+- Chat can directly edit generated text artifacts inside the project, which is handy for adjusting chapters, cover prompts, synopses, and other files before continuing with the castor writing chain
 - The service settings page adds a cover-generation section, separating the cover text model and image model more clearly
 
 ### Bug Fixes
@@ -394,13 +394,13 @@ v13 book-creation flow migration: creation output upgraded to a paragraph-style 
 - **Restored the `architect` foundation output budget**: re-pinned `maxTokens: 16384`, lowering the chance of local models and LM Studio truncating output and losing foundation sections during book creation
 - **Restored the old OpenAI-compatible path**: `provider=openai + custom compatible baseUrl` is no longer wrongly routed into the more aggressive `custom fetch` path; legacy compatibility scenarios like Google/Gemma work again
 - **Native Anthropic-compatible transport for custom services**: `service=custom` with `provider=anthropic` also uses the native request chain, no longer hard-bound to the SDK
-- **Windows Studio startup fix**: `inkos studio` no longer crashes on Windows because the absolute-path loader was treated as an invalid ESM URL
-- **Bootstrap projects fall back to env config**: Studio projects auto-initialized in an empty directory fall back to the global `.inkos/.env` when no service is configured; `book create` no longer dies immediately on a missing key
+- **Windows Studio startup fix**: `castor studio` no longer crashes on Windows because the absolute-path loader was treated as an invalid ESM URL
+- **Bootstrap projects fall back to env config**: Studio projects auto-initialized in an empty directory fall back to the global `.castor/.env` when no service is configured; `book create` no longer dies immediately on a missing key
 - **Unified service routing truth**: `config-loader`, `service-resolver`, Studio service probing, and `doctor` all read provider/api/chatBaseUrl/modelsBaseUrl from the same `service-presets`, reducing each chain guessing the same service on its own
 
 ### Improvements
 
-- **Start directly from an empty directory**: `inkos` / `inkos studio` now auto-initialize a minimal project skeleton and start Studio, no longer requiring an explicit `init` first
+- **Start directly from an empty directory**: `castor` / `castor studio` now auto-initialize a minimal project skeleton and start Studio, no longer requiring an explicit `init` first
 - **Studio auto-detects transports**: service tests automatically try combinations of candidate models, `chat/responses`, and streaming toggles to match a working configuration
 - **`doctor` enhanced**: no longer fixates on the current single model/combination; supports multi-model, multi-protocol, multi-streaming probes
 - **Fresh session for book-creation chat**: re-entering "Create book" clears the old conversation instead of reusing the previous creation chat history
@@ -433,13 +433,13 @@ v13 book-creation flow migration: creation output upgraded to a paragraph-style 
 
 ### Release Focus
 
-Studio 2.0 official release. `inkos` now starts Studio directly by default; the local web workbench becomes the main entry, and the TUI is kept as `inkos tui`.
+Studio 2.0 official release. `castor` now starts Studio directly by default; the local web workbench becomes the main entry, and the TUI is kept as `castor tui`.
 
 ### New Features
 
-- **Studio 2.0 as the default entry**: `inkos` starts Studio directly; the home page, provider management, and writing workbench are unified as the new main interaction entry
+- **Studio 2.0 as the default entry**: `castor` starts Studio directly; the home page, provider management, and writing workbench are unified as the new main interaction entry
 - **Custom OpenAI-compatible services**: Studio now supports a custom `baseUrl`, protocol type (`chat` / `responses`), and streaming toggle, compatible with more proxies and aggregation gateways
-- **Config source switching**: Studio adds an explicit switch between `.env` and Studio configuration, no longer passively overridden by `INKOS_LLM_*` in the directory
+- **Config source switching**: Studio adds an explicit switch between `.env` and Studio configuration, no longer passively overridden by `castor_LLM_*` in the directory
 - **Native custom transport**: a native fetch request chain for `custom` services, reducing single-point dependence on the SDK path and improving compatibility
 
 ### Improvements
@@ -453,24 +453,24 @@ Studio 2.0 official release. `inkos` now starts Studio directly by default; the 
 
 - Fixed `llm.services + defaultModel + secrets` being inconsistent with the runtime loading contract
 - Fixed inconsistent chains for `custom:*` services across connection tests, model lists, and `/api/v1/agent`
-- Fixed `inkos` starting Studio throwing the `llm.model` validation error directly when no default model was set
+- Fixed `castor` starting Studio throwing the `llm.model` validation error directly when no default model was set
 - Fixed non-streaming / SSE responses from custom services being wrongly parsed as plain JSON
 
 ## v1.2.0
 
 ### Release Focus
 
-Unified interaction core — the TUI, Studio, `inkos interact`, and the OpenClaw Skill share the same natural-language understanding and execution runtime.
+Unified interaction core — the TUI, Studio, `castor interact`, and the OpenClaw Skill share the same natural-language understanding and execution runtime.
 
 ### New Features
 
 - **Shared interaction runtime** (`packages/core/src/interaction/`): natural-language router (15+ intents), session management, edit transaction controller, event tracing, stage telemetry
-- **Ink TUI dashboard**: `inkos` opens a full-screen Ink + React dashboard directly, with conversational creation, slash-command Tab completion, themed animations (writing/auditing/revising/planning each with their own), and bilingual Chinese/English i18n
+- **Ink TUI dashboard**: `castor` opens a full-screen Ink + React dashboard directly, with conversational creation, slash-command Tab completion, themed animations (writing/auditing/revising/planning each with their own), and bilingual Chinese/English i18n
 - **Studio assistant panel**: the right-side AI assistant connects to the shared interaction core, operating books in natural language (write chapters, rename, audit, export), with SSE real-time status push and execution stage icons
 - **Conversational book creation**: brainstorm the book concept, setting, and target chapter count step by step through the Studio assistant, then create with one click once the draft is ready
 - **Whole-book entity rename**: `把林烬改成张三` / `/rename 林烬 => 张三`, a full scan of chapters + truth files replaced in one pass
 - **Single-chapter text replacement**: `/replace 5 old-text => new-text`, precise patching of a specific chapter
-- **`inkos interact --json`**: the shared interaction JSON entry, returning request / response / session / events, callable directly by OpenClaw and external agents
+- **`castor interact --json`**: the shared interaction JSON entry, returning request / response / session / events, callable directly by OpenClaw and external agents
 - **Thinking-model temperature clamping** (PR #174): thinking models like kimi-k2.5 automatically get temperature=1, compatible with per-call temperature tuning, warning once per model
 
 ### Improvements
@@ -525,8 +525,8 @@ Full writing-pipeline upgrade. Driven by multiple rounds of autoresearch experim
 - **Foundation Reviewer**: an independent review agent added at book creation, scoring 5 dimensions on a 100-point scale (original-work DNA preservation, new narrative space, core conflict, opening pacing, pacing feasibility); below 80 it rejects automatically and feeds the review comments back to the Architect for regeneration
 - **New-timeline requirement**: fanfic modes (canon/au/ooc/cp) must design an original divergence point; retelling the original plot is not allowed
 - **Hook Seed Excerpt**: at hook payoff time, the Composer extracts the original seed scene's text from chapter_summaries and injects it into the Writer context, replacing the complex lifecycle pressure system
-- **Review Reject rollback**: `inkos review reject` rolls state back to the snapshot before the rejected chapter, discarding downstream chapters and memory indexes
-- **State Validation Recovery**: failed state validation automatically retries the settler; if it still fails, the state is saved in degraded mode, with `inkos write repair-state` for manual repair
+- **Review Reject rollback**: `castor review reject` rolls state back to the snapshot before the rejected chapter, discarding downstream chapters and memory indexes
+- **State Validation Recovery**: failed state validation automatically retries the settler; if it still fails, the state is saved in degraded mode, with `castor write repair-state` for manual repair
 - **Audit drift isolation**: audit corrections are written to a standalone `audit_drift.md`, no longer appended to `current_state.md`
 - **Title collapse fix**: detects theme clustering in recent titles and regenerates titles from new keywords extracted from the prose
 - **Hook budget hint**: a budget warning is shown at ≥10 active hooks, steering toward paying off old debt first
@@ -534,7 +534,7 @@ Full writing-pipeline upgrade. Driven by multiple rounds of autoresearch experim
 - **Mood/pacing detection**: mood-monotony and title-clustering detection; sequence-level warnings do not count toward the revision blockingCount
 - **Fanfic style extraction**: `fanfic init` and `import chapters` automatically generate style_guide.md + style_profile.json
 - **Governed path completion**: parent_canon.md and fanfic_canon.md for continuation/fanfic are injected into the Writer through the governed path
-- **Custom HTTP headers**: the `INKOS_LLM_HEADERS` environment variable injects custom HTTP headers
+- **Custom HTTP headers**: the `castor_LLM_HEADERS` environment variable injects custom HTTP headers
 
 ### Bug Fixes
 
@@ -556,11 +556,11 @@ Full writing-pipeline upgrade. Driven by multiple rounds of autoresearch experim
 
 ## v1.0.0
 
-InkOS Studio + stability hardening. Upgraded from a CLI tool to CLI + web workbench.
+castor Studio + stability hardening. Upgraded from a CLI tool to CLI + web workbench.
 
-### InkOS Studio
+### castor Studio
 
-- `inkos studio` starts the local web workbench (Vite + React + Hono, default port 4567)
+- `castor studio` starts the local web workbench (Vite + React + Hono, default port 4567)
 - Book management: create, delete, export (TXT/MD/EPUB), configure
 - Chapter review and editing: approve/reject, inline editing, multi-mode revision (polish/spot-fix/rewrite/anti-detect)
 - Real-time writing progress: SSE-pushed generation status
@@ -605,7 +605,7 @@ InkOS Studio + stability hardening. Upgraded from a CLI tool to CLI + web workbe
 - **#111** — SKILL.md adds 13 missing commands (eval, consolidate, write rewrite, book update/delete, plan/compose, studio, fanfic show/refresh, genre create/copy)
 - **#95** — The doctor command adds version migration detection (identifying pre-v0.6 legacy-format books)
 - **#103** — Added an end-to-end rewrite regression test (rewrite 2 → next should be 3)
-- Added the `inkos eval` command — structured quality evaluation report
+- Added the `castor eval` command — structured quality evaluation report
 - SKILL.md version bumped to 2.1.0
 
 ## v0.6.2
@@ -667,7 +667,7 @@ Focuses on three systemic long-form writing problems: **context bloat after 20+ 
 
 ### Bug Fixes
 
-- The user's `INKOS_LLM_MAX_TOKENS` now takes effect as the global cap (#87)
+- The user's `castor_LLM_MAX_TOKENS` now takes effect as the global cap (#87)
 - `stripReservedKeys` prevents `llm.extra` from overriding max_tokens / temperature
 - Chapter summary dedup: dedup before append + dedup on bootstrap load + JSON auto-repair
 - The `consolidate` regex supports full-width bracket volume-boundary formats
@@ -700,8 +700,8 @@ Native English writing + system stability fixes.
 
 ### CLI Enhancements
 
-- `inkos book delete <id>`: delete a book and all its data (`--force` skips confirmation)
-- `inkos status --chapters`: shows per-chapter status and critical issues for failed chapters
+- `castor book delete <id>`: delete a book and all its data (`--force` skips confirmation)
+- `castor status --chapters`: shows per-chapter status and critical issues for failed chapters
 - Audit JSON parsing tolerance (#51)
 - `write_truth_file` agent tool (#53)
 - Audit drift corrections auto-injected into the state card (#52)
@@ -715,7 +715,7 @@ Logging system + streaming compatibility + local model tolerance + CLI enhanceme
 ### Structured Logging
 
 - New Logger module: ANSI-colored output (INFO=cyan, WARN=yellow, ERROR=red), JSON Lines file logging
-- `inkos up` automatically writes `inkos.log`; daemon restarts are traceable
+- `castor up` automatically writes `castor.log`; daemon restarts are traceable
 - `write next`, `draft`, and `up` support the `-q, --quiet` quiet mode
 - LLM streaming heartbeat: progress is reported every 30 seconds while the model is thinking (characters received, Chinese character count)
 - 17 `process.stderr.write` calls in the pipeline replaced with the structured logger
@@ -725,7 +725,7 @@ Logging system + streaming compatibility + local model tolerance + CLI enhanceme
 - Stream auto-fallback: failed streaming automatically retries with sync, so proxies without SSE support still work
 - Partial-content recovery on stream interruption: with ≥500 characters already received, the truncated content is returned instead of an error (#21)
 - Improved error diagnostics: 400/401/403/429/Connection errors include baseUrl, model context, and troubleshooting hints
-- `inkos doctor` provides targeted hints on failure (check the baseUrl, try stream:false, check the API key)
+- `castor doctor` provides targeted hints on failure (check the baseUrl, try stream:false, check the API key)
 
 ### Bug Fixes
 
@@ -746,13 +746,13 @@ Continuation + spinoff writing + style imitation + multi-provider routing + post
 
 ### Continue an Existing Work
 
-Import an existing novel (single file or a chapter directory) into InkOS; the system splits chapters automatically and reverse-engineers the full set of truth files (world state, hooks, character matrix, etc.), after which `write next` continues directly.
+Import an existing novel (single file or a chapter directory) into castor; the system splits chapters automatically and reverse-engineers the full set of truth files (world state, hooks, character matrix, etc.), after which `write next` continues directly.
 
 ```bash
-inkos import chapters 我的小说 --from 已有章节/        # import from a directory
-inkos import chapters 我的小说 --from 全书.txt          # import from a single file (auto-split on "第X章")
-inkos import chapters 我的小说 --from 全书.txt --split "Chapter\\s+\\d+"  # custom chapter-split regex
-inkos write next 我的小说                               # continue seamlessly
+castor import chapters 我的小说 --from 已有章节/        # import from a directory
+castor import chapters 我的小说 --from 全书.txt          # import from a single file (auto-split on "第X章")
+castor import chapters 我的小说 --from 全书.txt --split "Chapter\\s+\\d+"  # custom chapter-split regex
+castor write next 我的小说                               # continue seamlessly
 ```
 
 Single-file mode splits chapters on `第X章` automatically, and `--split <regex>` supports custom patterns. Interrupted imports can resume with `--resume-from <n>`.
@@ -762,8 +762,8 @@ Single-file mode splits chapters on `第X章` automatically, and `--split <regex
 Create a prequel, sequel, side story, or what-if line based on an existing book. The spinoff and the parent share the worldview and characters but have an independent plot line.
 
 ```bash
-inkos import canon 烈焰前传 --from 吞天魔帝   # import the parent canon into the spinoff
-inkos write next 烈焰前传                     # the writer automatically reads the canon constraints
+castor import canon 烈焰前传 --from 吞天魔帝   # import the parent canon into the spinoff
+castor write next 烈焰前传                     # the writer automatically reads the canon constraints
 ```
 
 Import generates `story/parent_canon.md`, containing the parent's world rules, character snapshots (with information boundaries), key-event timeline, and hook status. The writer consults the canon before writing, and the auditor automatically activates 4 spinoff-specific dimensions:
@@ -782,8 +782,8 @@ Activated automatically when `parent_canon.md` is detected — no extra configur
 Feed in excerpts from a human-written novel; the system extracts a statistical fingerprint + generates a style guide, automatically injected into the writer prompt for every subsequent chapter.
 
 ```bash
-inkos style analyze 参考小说.txt                     # analyze: sentence length, TTR, rhetorical features
-inkos style import 参考小说.txt 吞天魔帝 --name 某作者  # import the style into a book
+castor style analyze 参考小说.txt                     # analyze: sentence length, TTR, rhetorical features
+castor style import 参考小说.txt 吞天魔帝 --name 某作者  # import the style into a book
 ```
 
 Two files are produced:
@@ -826,16 +826,16 @@ Real-world testing found that `rewrite` mode introduced 6x more AI marker words,
 Different agents can use different API providers — not just different model names, but entirely different API endpoints and keys. For example, the writer can use a cheap model for fast drafting while the auditor uses a strong model for careful review:
 
 ```bash
-inkos config set-model writer gpt-4o-mini                                    # simple model override
-inkos config set-model auditor gemini-2.5-flash \
+castor config set-model writer gpt-4o-mini                                    # simple model override
+castor config set-model auditor gemini-2.5-flash \
   --base-url https://generativelanguage.googleapis.com/v1beta/openai \
   --provider openai \
   --api-key-env GEMINI_API_KEY                                                # route through the Gemini API
-inkos config set-model reviser claude-sonnet-4-20250514 \
+castor config set-model reviser claude-sonnet-4-20250514 \
   --base-url https://api.anthropic.com \
   --provider anthropic \
   --api-key-env ANTHROPIC_API_KEY                                             # route through the Anthropic API
-inkos config show-models                                                      # view the full routing picture
+castor config show-models                                                      # view the full routing picture
 ```
 
 Each agent independently configures `--base-url`, `--provider`, `--api-key-env`, `--no-stream`. Agents without overrides use the project's default model.
@@ -843,8 +843,8 @@ Each agent independently configures `--base-url`, `--provider`, `--api-key-env`,
 ### Analytics
 
 ```bash
-inkos analytics 吞天魔帝          # audit pass rate, most frequent issue categories, chapters with the most issues
-inkos analytics 吞天魔帝 --json   # structured output
+castor analytics 吞天魔帝          # audit pass rate, most frequent issue categories, chapters with the most issues
+castor analytics 吞天魔帝 --json   # structured output
 ```
 
 ### Other v0.4 Changes
@@ -855,7 +855,7 @@ inkos analytics 吞天魔帝 --json   # structured output
 - The reviser gains `spot-fix` mode (targeted repair)
 - `additionalAuditDimensions` in `book_rules.md` supports Chinese-name matching
 - All 5 genres activate dims 24-26 (subplot stagnation / flat arcs / monotonous pacing)
-- `inkos export` supports `--format md`, `--output <path>`, `--approved-only`
+- `castor export` supports `--format md`, `--output <path>`, `--approved-only`
 - The post-write validator's "consecutive 了" threshold raised from 4 sentences to 6 (fewer false positives in Chinese narration)
 - Security hardening: overwrite-protection checks for `init`/`book create`/`import chapters`, type inference + key validation for `config set`, downgrade protection for `update`, `doctor` can test the API outside a project, status display consistency, `genre show` rejects invalid IDs
 
@@ -881,16 +881,16 @@ The Writer automatically generates a summary for each chapter and updates the su
 | Feature | Description |
 |------|------|
 | AI-trace audit | Pure rule-based detection (no LLM): equal-length paragraphs, boilerplate density, formulaic transitions, list-style structure, automatically merged into audit results |
-| AIGC detection API | External API integration (GPTZero / Originality / custom endpoints), the `inkos detect` command |
+| AIGC detection API | External API integration (GPTZero / Originality / custom endpoints), the `castor detect` command |
 | Style fingerprint learning | Extracts a StyleProfile from reference text (sentence length, TTR, rhetorical features), injected into the Writer prompt |
 | Anti-detection rewriting | ReviserAgent `anti-detect` mode: detect → rewrite → re-detect loop |
-| Detection feedback loop | `detection_history.json` records every detection/rewrite result; `inkos detect --stats` shows statistics |
+| Detection feedback loop | `detection_history.json` records every detection/rewrite result; `castor detect --stats` shows statistics |
 
 ```bash
-inkos style analyze reference.txt         # analyze the reference text's style
-inkos style import reference.txt 吞天魔帝  # import the style into a book
-inkos detect 吞天魔帝 --all               # whole-book AIGC detection
-inkos detect --stats                      # detection statistics
+castor style analyze reference.txt         # analyze the reference text's style
+castor style import reference.txt 吞天魔帝  # import the style into a book
+castor detect 吞天魔帝 --all               # whole-book AIGC detection
+castor detect --stats                      # detection statistics
 ```
 
 ### Webhook + Smart Scheduling
@@ -912,16 +912,16 @@ Pipeline events are POSTed as JSON to a configured URL (HMAC-SHA256 signed), wit
 Specify the genre at book creation, and the corresponding rules take effect automatically:
 
 ```bash
-inkos book create --title "吞天魔帝" --genre xuanhuan
+castor book create --title "吞天魔帝" --genre xuanhuan
 ```
 
 Genre rules can be inspected, copied into a project for editing, or created from scratch:
 
 ```bash
-inkos genre list                      # view all genres
-inkos genre show xuanhuan             # view the complete xuanhuan rules
-inkos genre copy xuanhuan             # copy into the project; edit freely
-inkos genre create wuxia --name 武侠   # create a new genre from scratch
+castor genre list                      # view all genres
+castor genre show xuanhuan             # view the complete xuanhuan rules
+castor genre copy xuanhuan             # copy into the project; edit freely
+castor genre create wuxia --name 武侠   # create a new genre from scratch
 ```
 
 After copying into a project, add or remove taboos, adjust fatigue words, change pacing rules, or customize the iron language rules — the changes take effect automatically on the next chapter.
@@ -980,5 +980,5 @@ Lexical-fatigue audit + AI-trace audit (dims 20-23) provide double detection. St
 - Genres without a numerical system do not generate a resource ledger
 - All commands support `--json` structured output, directly parseable by OpenClaw / external agents
 - book-id auto-detection: the book-id can be omitted when the project has only one book
-- `inkos update` for one-command updates, `inkos init` supports initializing the current directory
-- API errors come with Chinese diagnostic hints, and `inkos doctor` includes an API connectivity test
+- `castor update` for one-command updates, `castor init` supports initializing the current directory
+- API errors come with Chinese diagnostic hints, and `castor doctor` includes an API connectivity test

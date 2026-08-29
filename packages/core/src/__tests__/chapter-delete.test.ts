@@ -29,7 +29,7 @@ async function setupBook(params: {
   readonly chapters: ReadonlyArray<{ readonly number: number; readonly title: string; readonly content: string }>;
   readonly snapshotChapters: ReadonlyArray<number>;
 }): Promise<{ readonly root: string; readonly bookDir: string }> {
-  const root = await mkdtemp(join(tmpdir(), "inkos-chapter-delete-"));
+  const root = await mkdtemp(join(tmpdir(), "castor-chapter-delete-"));
   const bookDir = join(root, "books", params.bookId);
   const storyDir = join(bookDir, "story");
   await mkdir(join(bookDir, "chapters"), { recursive: true });

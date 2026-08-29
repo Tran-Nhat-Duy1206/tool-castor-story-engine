@@ -45,7 +45,7 @@ async function setupBook(params: {
   readonly index: ReadonlyArray<ChapterEntry>;
   readonly snapshotChapters?: ReadonlyArray<number>;
 }): Promise<string> {
-  projectRoot = await mkdtemp(join(tmpdir(), "inkos-chapter-cmd-"));
+  projectRoot = await mkdtemp(join(tmpdir(), "castor-chapter-cmd-"));
   const bookDir = join(projectRoot, "books", params.bookId);
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await writeFile(
@@ -71,7 +71,7 @@ async function setupBook(params: {
   return bookDir;
 }
 
-describe("inkos chapter sync", () => {
+describe("castor chapter sync", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -117,7 +117,7 @@ describe("inkos chapter sync", () => {
   });
 });
 
-describe("inkos chapter delete", () => {
+describe("castor chapter delete", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

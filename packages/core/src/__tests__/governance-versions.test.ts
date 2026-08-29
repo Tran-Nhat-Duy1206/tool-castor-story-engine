@@ -14,7 +14,7 @@ let root = "";
 let bookDir = "";
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-versions-"));
+  root = await mkdtemp(join(tmpdir(), "castor-versions-"));
   bookDir = join(root, "books", "versions-book");
   await mkdir(bookDir, { recursive: true });
 }

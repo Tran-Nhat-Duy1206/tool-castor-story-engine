@@ -25,7 +25,7 @@ describe("import_chapters agent tool", () => {
   let state: StateManager;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-import-chapters-tool-"));
+    root = await mkdtemp(join(tmpdir(), "castor-import-chapters-tool-"));
     state = new StateManager(root);
 
     await state.saveBookConfig("harbor", {
@@ -100,9 +100,9 @@ describe("import_chapters agent tool", () => {
   });
 
   it("auto-splits a single file by chapter headings and resolves project-relative stored_path", async () => {
-    await mkdir(join(root, ".inkos", "uploads", "s1"), { recursive: true });
+    await mkdir(join(root, ".castor", "uploads", "s1"), { recursive: true });
     await writeFile(
-      join(root, ".inkos", "uploads", "s1", "novel.txt"),
+      join(root, ".castor", "uploads", "s1", "novel.txt"),
       "第一章 开局\n\n他在码头醒来。\n\n第二章 反转\n\n账本不见了。\n",
       "utf-8",
     );
@@ -110,7 +110,7 @@ describe("import_chapters agent tool", () => {
     const pipeline = mockPipeline();
     const tool = createImportChaptersTool(pipeline as never, "harbor", root);
 
-    await tool.execute("tool-import-file", { sourcePath: ".inkos/uploads/s1/novel.txt" });
+    await tool.execute("tool-import-file", { sourcePath: ".castor/uploads/s1/novel.txt" });
 
     expect(pipeline.importChapters).toHaveBeenCalledWith({
       bookId: "harbor",

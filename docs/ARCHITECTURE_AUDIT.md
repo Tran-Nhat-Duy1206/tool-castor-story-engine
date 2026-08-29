@@ -1,9 +1,9 @@
-# InkOS 1.8.0 — Repository Architecture Audit
+# castor 1.8.0 — Repository Architecture Audit
 
-**Status:** COMPLETE — preserved record of a read-only repository audit performed against InkOS 1.8.0.
-**Purpose:** Document what InkOS **currently** does. This is a factual architecture record, not an implementation plan and not a requirements document.
+**Status:** COMPLETE — preserved record of a read-only repository audit performed against castor 1.8.0.
+**Purpose:** Document what castor **currently** does. This is a factual architecture record, not an implementation plan and not a requirements document.
 **Context documents (product intent, not reinterpreted here):** `docs/PROJECT_VISION.md`, `docs/V1_SPEC.md`.
-**Baseline at time of audit:** InkOS 1.8.0 · Node 24.19.0 · pnpm 9.15.9 · install/build/typecheck PASS · 1856 tests passed with 2 known Windows symlink EPERM failures in `packages/core/src/__tests__/skill-agent-tool.test.ts` (known environment baseline).
+**Baseline at time of audit:** castor 1.8.0 · Node 24.19.0 · pnpm 9.15.9 · install/build/typecheck PASS · 1856 tests passed with 2 known Windows symlink EPERM failures in `packages/core/src/__tests__/skill-agent-tool.test.ts` (known environment baseline).
 
 ---
 
@@ -27,12 +27,12 @@ pnpm monorepo (`pnpm-workspace.yaml`: `packages/*`) with three packages:
 
 | Package | Name | Role |
 |---|---|---|
-| `packages/core` | `@actalk/inkos-core` | Story engine: pipeline, agents, state, LLM providers, retrieval |
-| `packages/cli` | `@actalk/inkos` | CLI (bin `inkos`, 34 commands) + Ink/React TUI |
-| `packages/studio` | `@actalk/inkos-studio` | React 19 + Vite client + Hono Node server |
+| `packages/core` | `@actalk/castor-core` | Story engine: pipeline, agents, state, LLM providers, retrieval |
+| `packages/cli` | `@actalk/castor` | CLI (bin `castor`, 34 commands) + Ink/React TUI |
+| `packages/studio` | `@actalk/castor-studio` | React 19 + Vite client + Hono Node server |
 
 - Root `package.json`: version 1.8.0, private, engines node ≥22 / pnpm ≥9; scripts delegate via `pnpm -r`. Pins `@mariozechner/pi-ai` and `pi-agent-core` to 0.67.1.
-- Dependency direction is **strictly one-way**: studio imports core heavily; cli imports core but only *spawns* studio (no static import of `@actalk/inkos-studio` anywhere in `packages/cli/src`). Bare `inkos` with no command launches Studio on port 4567 (`packages/cli/src/program.ts:62-64`) [VERIFIED].
+- Dependency direction is **strictly one-way**: studio imports core heavily; cli imports core but only *spawns* studio (no static import of `@actalk/castor-studio` anywhere in `packages/cli/src`). Bare `castor` with no command launches Studio on port 4567 (`packages/cli/src/program.ts:62-64`) [VERIFIED].
 - CI (`.github/workflows/ci.yml`): ubuntu+windows × Node 22/24, build+test, plus a pack-manifest verification job. Release (`.github/workflows/release.yml`): tag-driven canary publish of `@actalk/*`.
 - `scripts/audit-semantic-patterns.mjs` is a CI guard that fails when keyword-matching ("semantic decision") logic appears on action-surface paths — an enforced architectural invariant: intent decisions belong to the agent/action layer.
 - Known defect: root script `benchmark:studio-e2e` targets `scripts/studio-e2e-benchmark.mjs`, which **does not exist** [VERIFIED].
@@ -47,11 +47,11 @@ pnpm monorepo (`pnpm-workspace.yaml`: `packages/*`) with three packages:
 | `agents/` | One-shot LLM worker roles + pure heuristics | `base.ts#BaseAgent` (`chat`/`submitStructured` → pi-agent worker; prompt-pack and skill guidance injection); `architect.ts#ArchitectAgent` (`generateFoundation` :111, `writeFoundationFiles` :842); `planner.ts#PlannerAgent`; `composer.ts#ComposerAgent`; `writer.ts#WriterAgent` (`writeChapter` :143, `settle` :494, `saveChapter` :628); `continuity.ts#ContinuityAuditor`; `reviser.ts#ReviserAgent`; `polisher.ts#PolisherAgent`; `consolidator.ts#ConsolidatorAgent`; `foundation-reviewer.ts#FoundationReviewerAgent`; `chapter-analyzer.ts#ChapterAnalyzerAgent`; `state-validator.ts#StateValidatorAgent` (LLM validator — distinct from pure `state/state-validator.ts`); settlement family (`settler-prompts/parser/delta-parser.ts`, `observer-prompts.ts`). Heuristics (no LLM): `ai-tells.ts`, `sensitive-words.ts`, `post-write-validator.ts`, `style-analyzer.ts`, `writer-parser.ts`, `rules-reader.ts`, `detector.ts` |
 | `state/` | Persistence core (owns the book format) | `manager.ts#StateManager` (locks :136, chapter index, control docs :66-107, snapshots `snapshotStateAt` :561, `restoreState` :648, `rollbackToChapter` :717); `runtime-state-store.ts` (canonical v2 JSON state); `state-bootstrap.ts` (markdown→JSON reconstruction); `state-reducer.ts#applyRuntimeStateDelta`; `state-projections.ts` (JSON→markdown renderers); `memory-db.ts#MemoryDB` (SQLite WAL); `chapter-workspace.ts` (version archive, per-chapter brief); `chapter-delete.ts#deleteLatestChapter`; `chapter-word-sync.ts#syncChapterWordCounts` |
 | `models/` | Zod contracts | `project.ts#ProjectConfigSchema`; `book.ts#BookConfigSchema`; `chapter.ts#ChapterMetaSchema`; `runtime-state.ts` (`StateManifestSchema` v2, `CurrentStateFactSchema`, `HookRecordSchema`, `ChapterSummaryRowSchema`, `RuntimeStateDeltaSchema`); `input-governance.ts` (`ChapterIntentSchema`, `ContextPackageSchema`, `RuleStackSchema`, `ChapterTraceSchema`); `length-governance.ts#LengthCountingModeSchema`; `genre-profile.ts`; `book-rules.ts`; `play.ts`; `state.ts` (**vestigial**, see §12) |
-| `llm/` | Provider abstraction | `provider.ts#createLLMClient` :303 / `chatCompletion` :1434 / `PartialResponseError` :418 / `ContextWindowExceededError` :434; `service-presets.ts#SERVICE_PRESETS`; 41 endpoint modules under `providers/endpoints/` (18 tagged `group:"china"`); `secrets.ts` (`.inkos/secrets.json`); `config-migration.ts`; `cover-providers.ts`; `long-form-completion.ts`; `agent-trajectory.ts` (kkaiapi observability headers) |
+| `llm/` | Provider abstraction | `provider.ts#createLLMClient` :303 / `chatCompletion` :1434 / `PartialResponseError` :418 / `ContextWindowExceededError` :434; `service-presets.ts#SERVICE_PRESETS`; 41 endpoint modules under `providers/endpoints/` (18 tagged `group:"china"`); `secrets.ts` (`.castor/secrets.json`); `config-migration.ts`; `cover-providers.ts`; `long-form-completion.ts`; `agent-trajectory.ts` (kkaiapi observability headers) |
 | `agent/` | Conversational pi-agent harness | `agent-session.ts#runAgentSession` (1,426 lines); `agent-tools.ts` (≈3.8k lines, ~30 tool factories incl. `createWriteTruthFileTool`, `createPatchChapterTextTool`, import/fanfic/spinoff/translation/play tools); `agent-system-prompt.ts`; `context-transform.ts#createBookContextTransform`; `worker-agent.ts`; `pi-stream.ts` |
-| `interaction/` | Chat intents/sessions/deterministic edits/export | `intents.ts`; `action-envelope.ts`; `session-transcript.ts` (`.inkos/sessions/<id>.jsonl`); `session-transcript-restore.ts`; `edit-controller.ts#planEditTransaction/executeEditTransaction`; `truth-authority.ts#classifyTruthAuthority`; `export-artifact.ts#buildExportArtifact/writeExportArtifact`; `request-router.ts`; `project-control.ts#processProjectInteractionRequest` |
+| `interaction/` | Chat intents/sessions/deterministic edits/export | `intents.ts`; `action-envelope.ts`; `session-transcript.ts` (`.castor/sessions/<id>.jsonl`); `session-transcript-restore.ts`; `edit-controller.ts#planEditTransaction/executeEditTransaction`; `truth-authority.ts#classifyTruthAuthority`; `export-artifact.ts#buildExportArtifact/writeExportArtifact`; `request-router.ts`; `project-control.ts#processProjectInteractionRequest` |
 | `forecast/` | Non-canonical branch planning | `schema.ts`; `store.ts#ForecastStore` (writes ONLY `story/runtime/narrative-forecasts/<fcId>/*`; header comment forbids touching canonical state); `runner.ts`; `context-builder.ts`; `render.ts` |
-| Other | — | `play/` (interactive worlds, SQLite-or-file graph DB); `interactive-film/` (story graphs); `translation/` (language-neutral localization subsystem); `materials/` (ingest `.inkos/materials/`); `retrieval/local-search.ts#LocalSearchIndex` (FTS5/BM25 on `node:sqlite`); `references/` (book-bound materials); `prompts/prompt-pack.ts` (overrides at `<root>/prompt/<pack>/<prompt>.md`); `skills/` (SKILL.md loader); `notify/dispatcher.ts`; `production/harness.ts` (run snapshots, `commitProductionArtifacts`); `utils/` (40 files: `atomic-file-set.ts`, hook governance suite, context assembly suite, `outline-paths.ts`, `book-id.ts`, `language.ts`, `length-metrics.ts`, `story-markdown.ts`, `governed-working-set.ts`, …) |
+| Other | — | `play/` (interactive worlds, SQLite-or-file graph DB); `interactive-film/` (story graphs); `translation/` (language-neutral localization subsystem); `materials/` (ingest `.castor/materials/`); `retrieval/local-search.ts#LocalSearchIndex` (FTS5/BM25 on `node:sqlite`); `references/` (book-bound materials); `prompts/prompt-pack.ts` (overrides at `<root>/prompt/<pack>/<prompt>.md`); `skills/` (SKILL.md loader); `notify/dispatcher.ts`; `production/harness.ts` (run snapshots, `commitProductionArtifacts`); `utils/` (40 files: `atomic-file-set.ts`, hook governance suite, context assembly suite, `outline-paths.ts`, `book-id.ts`, `language.ts`, `length-metrics.ts`, `story-markdown.ts`, `governed-working-set.ts`, …) |
 
 Bundled data: `packages/core/genres/*.md` (15 genre profiles; 10 declare `language: en`, 5 zh-default with no `language:` field) and `packages/core/skills/*/SKILL.md` (15 builtin skill packs).
 
@@ -61,8 +61,8 @@ Bundled data: `packages/core/genres/*.md` (15 genre profiles; 10 declare `langua
 - Shared service layer `src/utils.ts`: `findProjectRoot()` returns `process.cwd()` verbatim (no walk-up search); `buildPipelineConfig`; `resolveBookId` (auto-detect when exactly one book); `getLegacyMigrationHint` (pre-v0.6 books).
 - Command→core mapping examples: `write.ts` → `PipelineRunner.writeNextChapter/writeChapters/rewrite(resync/repair-state)`; `review.ts` → StateManager approve/reject (reject ⇒ rollback); `book.ts` → `initBook`; `studio.ts` spawns the studio server (repo TS via tsx loader → installed dist fallback) and opens a browser.
 - TUI (`src/tui/`, 19 modules): `app.ts#launchTui`, bridge `agent-input.ts#processTuiAgentInput` → core `runAgentSession`; locale resolution `tui/i18n.ts#resolveTuiLocale`.
-- `localization.ts` (544 lines): `CliLanguage="zh"|"en"`, `resolveCliLanguage` arg → `INKOS_LOCALE` → LC_* env → **default zh**.
-- `project-bootstrap.ts#initializeProjectDirectory` :122: pure filesystem project init (inkos.json, commented .env template, .gitignore merge, `.nvmrc`=22, mkdir `books/`, `radar/`). Throws if inkos.json exists.
+- `localization.ts` (544 lines): `CliLanguage="zh"|"en"`, `resolveCliLanguage` arg → `castor_LOCALE` → LC_* env → **default zh**.
+- `project-bootstrap.ts#initializeProjectDirectory` :122: pure filesystem project init (castor.json, commented .env template, .gitignore merge, `.nvmrc`=22, mkdir `books/`, `radar/`). Throws if castor.json exists.
 
 ### 1.4 packages/studio (summary; detail in Part II §7)
 
@@ -76,22 +76,22 @@ Five scripts, all read in full: `prepare-package-for-publish.mjs` / `restore-pac
 
 ### 1.6 skills/
 
-Repo-root `skills/SKILL.md` (827 lines, v2.9.0) is an OpenClaw/AgentSkills descriptor for the InkOS product itself. Consumption chain [VERIFIED]: `core/src/skills/external-loader.ts#configuredSkillDirs()` scans `INKOS_SKILL_DIRS` → `~/.openclaw/skills` → `~/.agents/skills` → `<projectRoot>/.agents/skills` → `<projectRoot>/skills`; each directory containing `SKILL.md` becomes a skill (depth-2, dedupe last-write-wins vs builtin ids). Builtin packs load from `packages/core/skills/` via `builtin-loader.ts`.
+Repo-root `skills/SKILL.md` (827 lines, v2.9.0) is an OpenClaw/AgentSkills descriptor for the castor product itself. Consumption chain [VERIFIED]: `core/src/skills/external-loader.ts#configuredSkillDirs()` scans `castor_SKILL_DIRS` → `~/.openclaw/skills` → `~/.agents/skills` → `<projectRoot>/.agents/skills` → `<projectRoot>/skills`; each directory containing `SKILL.md` becomes a skill (depth-2, dedupe last-write-wins vs builtin ids). Builtin packs load from `packages/core/skills/` via `builtin-loader.ts`.
 
 ### 1.7 Project / book storage [VERIFIED layout]
 
-Project root is **cwd-based**; global config at `~/.inkos/.env` (`core/src/utils/llm-env.ts:6-7`; env precedence global → project `.env` → process).
+Project root is **cwd-based**; global config at `~/.castor/.env` (`core/src/utils/llm-env.ts:6-7`; env precedence global → project `.env` → process).
 
 ```
-<projectRoot>/                          # = cwd after `inkos init`
-├── inkos.json                          # ProjectConfigSchema (models/project.ts)
+<projectRoot>/                          # = cwd after `castor init`
+├── castor.json                          # ProjectConfigSchema (models/project.ts)
 ├── .env · .gitignore · .nvmrc/.node-version (=22)
-├── books/ · radar/ · inkos.log · inkos.pid
+├── books/ · radar/ · castor.log · castor.pid
 ├── shorts/<id>/… · covers/<title>/…    # short fiction & covers
 ├── worlds/<worldId>/runs/<runId>/…     # Play (events.jsonl/transcript.jsonl/state/checkpoints/projections)
 ├── interactive-films/<projectId>/      # story-graph.json, node assets
 ├── translations/<projectId>/…          # translation projects
-└── .inkos/
+└── .castor/
     ├── session.json                    # active interaction session
     ├── sessions/<sessionId>.jsonl      # append-only transcripts (.json = legacy)
     ├── backups/<bookId>/<ts>/          # whole-book backups (+ pre-restore auto-backup)
@@ -136,10 +136,10 @@ Legacy layout fallbacks remain readable everywhere: `story_bible.md`, `volume_ou
 Shared plumbing for every flow [VERIFIED chain]: every command loads config (`cli/src/utils.ts#loadConfigWithDiagnostics` → core `resolveEffectiveLLMConfig`) → `buildPipelineConfig` → `core/src/llm/provider.ts#createLLMClient` :303 (provider bank resolution via `providers/lookup.ts`, `service-presets.ts`). Every agent stage: `BaseAgent.chat/submitStructured` (`agents/base.ts`) → `runWorkerAgent(Tool)` (`agent/worker-agent.ts`, pi-agent-core wrapper) → `chatCompletion` (`provider.ts:1434`: temperature clamp, `assertWithinContextWindow` :589, stream deadlines, transient retry) → OpenAI-compatible or pi-ai transport. Truncated streams raise `PartialResponseError` and are regenerated whole — half-prose is never persisted. Structured outputs use a single pi tool call, never JSON scraping.
 
 ### 2.1 Create project
-`inkos init [name] --lang zh|en` → `initializeProjectDirectory` (`cli/src/project-bootstrap.ts:122`) — pure fs, no LLM.
+`castor init [name] --lang zh|en` → `initializeProjectDirectory` (`cli/src/project-bootstrap.ts:122`) — pure fs, no LLM.
 
 ### 2.2 Idea → foundation
-`inkos book create --title --genre [--brief <file>]` (`commands/book.ts:24`) → `deriveBookIdFromTitle` (`utils/book-id.ts`) → `PipelineRunner.initBook` (`runner.ts:758`):
+`castor book create --title --genre [--brief <file>]` (`commands/book.ts:24`) → `deriveBookIdFromTitle` (`utils/book-id.ts`) → `PipelineRunner.initBook` (`runner.ts:758`):
 1. `generateAndReviewFoundation` (:538): `ArchitectAgent.generateFoundation` (`agents/architect.ts:111`; temp 0.8; zh/en prompt builders :202/:408; idea enters solely as `externalContext` block) → `parseSectionsWithRepair`/`parseSections` (:674, `=== SECTION: name ===` markers; missing sections ⇒ repair chat temp 0.2 ⇒ `MissingArchitectSectionsError` aborts).
 2. `FoundationReviewerAgent.review` loop (max `foundationReviewRetries`, default 2; pass = avg ≥80 ∧ no dim <60; parse failure/reject-after-max ⇒ keep current foundation and CONTINUE).
 3. Staging dir `books/.tmp-book-create-*`: `saveBookConfigAt` → `book.json`; `writeFoundationFiles` (:842) writes `outline/story_frame.md`, `outline/volume_map.md`, `roles/{主要角色,次要角色}/<name>.md`, compat shims `story_bible.md`+`character_matrix.md`, `book_rules.md`, seeds truth placeholders; `ensureControlDocumentsAt` seeds control docs; empty `chapters/index.json`; `snapshotStateAt(0)`.
@@ -149,7 +149,7 @@ Studio trigger: `POST /api/v1/books/create` (`server.ts:2831`) → `processProje
 Post-hoc regeneration = `PipelineRunner.reviseFoundation` (`runner.ts:842`): backs up to `story/.backup-phase5-<ts>/`, re-runs architect in revise mode; `writeFoundationFiles(mode:"revise")` aborts if output regresses to legacy format. Callers: Studio `POST /books/:id/foundation/revise` and agent tool `revise_foundation` — **no CLI command invokes it**.
 
 ### 2.3 Planning (per-chapter; no separate book-level outline step beyond `volume_map`)
-`inkos plan chapter` → `PipelineRunner.planChapter` :1238 → `resolveGovernedPlan` :3822 → `PlannerAgent.planChapter` (`agents/planner.ts:77`):
+`castor plan chapter` → `PipelineRunner.planChapter` :1238 → `resolveGovernedPlan` :3822 → `PlannerAgent.planChapter` (`agents/planner.ts:77`):
 - `findOutlineNode` :608 + `extractNumberedBeat` :723 pull the chapter's beats from `volume_map`;
 - `planChapterMemo` :187 (temp 0.7; `agents/planner-prompts.ts#getPlannerMemoSystemPrompt`); parse via `utils/chapter-memo-parser.ts` — `PlannerParseError` ⇒ ≤3 retries with error feedback (`MEMO_RETRY_LIMIT=3`) ⇒ degraded fallback memo (CONTINUE);
 - writes human-readable `story/runtime/chapter-NNNN.intent.md` and authoritative cache `chapter-NNNN.plan.md` (`pipeline/persisted-governed-plan.ts:39`).
@@ -157,7 +157,7 @@ Then `ComposerAgent.composeGovernedChapter` (`agents/composer.ts:91`): context s
 
 **Scene planning does not exist as a distinct stage** [VERIFIED by exhaustive search]: no scene-plan agent/schema/file. The planner memo body plus `volume_map` numbered beats function as the de-facto scene layer consumed by writer/reviser/auditor; forecast `beats` are future-chapter planning material only.
 
-### 2.4 `inkos write next`
+### 2.4 `castor write next`
 `commands/write.ts#next` :22 → `PipelineRunner.writeNextChapter` :1815 → `acquireBookLock` (`.write.lock`; held lock ⇒ `BookWriteLockError`, ABORT) → `_writeNextChapterLocked` :1902 (writes `.run.json` status=running) → `_executeNextChapterLocked` :1996:
 1. `ensureControlDocuments`; `getNextChapterNumber` (from durable artifact chain, see §4); **`assertNoPendingStateRepair`** :3244 — latest chapter `state-degraded` ⇒ THROW (writes blocked until repaired);
 2. `prepareWriteInput` :3260 — plan reused from `.plan.md` when no new `--context` (skips planner LLM), otherwise plan+compose;
@@ -166,7 +166,7 @@ Then `ComposerAgent.composeGovernedChapter` (`agents/composer.ts:91`): context s
 5. `buildPersistenceOutput` :3203 (title dedup, hook promotion pass, long-span fatigue analysis);
 6. `validateChapterTruthPersistence` then `persistChapterArtifacts` (§6);
 7. notifications/webhook; run snapshot terminal status.
-CLI batch (`--count`) stops on `state-degraded`; `inkos auto` forces auto-review and aborts the run on any failure.
+CLI batch (`--count`) stops on `state-degraded`; `castor auto` forces auto-review and aborts the run on any failure.
 
 ### 2.5 Chapter generation
 `WriterAgent.writeChapter` (`agents/writer.ts:143`):
@@ -176,11 +176,11 @@ CLI batch (`--count`) stops on `state-degraded`; `inkos auto` forces auto-review
 - Deterministic post-checks (zero LLM): `normalizePostWriteSurface`, `validatePostWrite`, cross-chapter repetition, paragraph drift, `analyzeAITells`, `analyzeSensitiveWords`, `analyzeHookHealth`.
 
 ### 2.6 Post-write processing
-`runChapterReviewCycle` (`pipeline/chapter-review-cycle.ts:45`): assessment = ContinuityAuditor + AI-tell/sensitive-word counts + deterministic post-write errors + `validateHookLedger` + length hard-range; pass requires audit passed ∧ score ≥85 ∧ length in range; ≤`writingReviewRetries` (default 1) reviser rounds; ε=3 net-improvement gate keeps the best-scoring in-memory version; auditor parse-failure skips auto-revise entirely. If revision changed the body, `ChapterAnalyzerAgent.analyzeChapter` re-settles truth so state matches final text (`buildPersistenceOutput` :3203). Batch consolidation is separate (`inkos consolidate` → `ConsolidatorAgent.consolidate`).
+`runChapterReviewCycle` (`pipeline/chapter-review-cycle.ts:45`): assessment = ContinuityAuditor + AI-tell/sensitive-word counts + deterministic post-write errors + `validateHookLedger` + length hard-range; pass requires audit passed ∧ score ≥85 ∧ length in range; ≤`writingReviewRetries` (default 1) reviser rounds; ε=3 net-improvement gate keeps the best-scoring in-memory version; auditor parse-failure skips auto-revise entirely. If revision changed the body, `ChapterAnalyzerAgent.analyzeChapter` re-settles truth so state matches final text (`buildPersistenceOutput` :3203). Batch consolidation is separate (`castor consolidate` → `ConsolidatorAgent.consolidate`).
 
 ### 2.7 Audit / review
-`inkos audit` → `auditDraft` :1290 (lock-free) → `evaluateMergedAudit` :3710 → index status update (`ready-for-review`|`audit-failed` + issues) → `persistAuditDriftGuidance` :3596 writes `story/audit_drift.md` → webhooks. `ContinuityAuditor.auditChapter` (`agents/continuity.ts:380`) injects truth files + FULL previous chapter text; output contract strict JSON `{passed, overall_score, issues[{severity critical|warning|info, repair_scope, category,…}], summary}`; eraResearch genres use `chatWithSearch` (OpenAI native search or Tavily). `passed=false` only for critical issues.
-`inkos review list|approve|approve-all|reject` — pure index ops; reject ⇒ `rollbackToChapter(n−1)` by default. **Studio divergence [VERIFIED]:** `POST /api/v1/books/:id/audit/:chapter` (`server.ts:5321`) constructs `ContinuityAuditor` directly (:5338) and updates neither `chapters/index.json` nor `audit_drift.md`.
+`castor audit` → `auditDraft` :1290 (lock-free) → `evaluateMergedAudit` :3710 → index status update (`ready-for-review`|`audit-failed` + issues) → `persistAuditDriftGuidance` :3596 writes `story/audit_drift.md` → webhooks. `ContinuityAuditor.auditChapter` (`agents/continuity.ts:380`) injects truth files + FULL previous chapter text; output contract strict JSON `{passed, overall_score, issues[{severity critical|warning|info, repair_scope, category,…}], summary}`; eraResearch genres use `chatWithSearch` (OpenAI native search or Tavily). `passed=false` only for critical issues.
+`castor review list|approve|approve-all|reject` — pure index ops; reject ⇒ `rollbackToChapter(n−1)` by default. **Studio divergence [VERIFIED]:** `POST /api/v1/books/:id/audit/:chapter` (`server.ts:5321`) constructs `ContinuityAuditor` directly (:5338) and updates neither `chapters/index.json` nor `audit_drift.md`.
 
 ### 2.8 Story-state update
 Two regimes inside `persistChapterArtifacts` (`pipeline/chapter-persistence.ts:14`):
@@ -189,14 +189,14 @@ Two regimes inside `persistChapterArtifacts` (`pipeline/chapter-persistence.ts:1
 Then memory index sync (`rebuildNarrativeMemoryIndex` → MemoryDB replace; `rebuildCurrentStateFactHistory` :3441 replays snapshot facts into temporal fact table) and per-chapter snapshot. Validation failure ⇒ `retrySettlementAfterValidationFailure` (one settle-only retry with feedback, `chapter-state-recovery.ts:49`) ⇒ still failing ⇒ **state-degraded**: body saved, truth reverted, next write blocked (§9).
 
 ### 2.9 Rewrite / revise
-`inkos revise --mode spot-fix|polish|rewrite|rework|anti-detect` → `reviseDraft` :1350: pre-audit → skip-if-clean-and-uninstructed → **baseline snapshot N−1 required (missing ⇒ ABORT)** :1437-1446 → `ReviserAgent.reviseChapter` (`agents/reviser.ts:112`, temp 0.3, `FIXED_ISSUES/PATCHES/REVISED_CONTENT` tags) → settle-vs-baseline → state validation (retry/degraded ⇒ keep original, `applied:false`) → post-audit temp 0 → **revisionGate** `strict|lenient|always` (`resolveRevisionGate`, `models/book.ts:102`; standards table `REVISION_GATE_STANDARDS` `runner.ts:233`) decides apply → `archiveChapterVersion` BEFORE overwrite :1663 → save (latest chapter touches live truth + snapshot :1669-1735; older chapters touch only the chapter file and mark descendants `needs-revision`).
-Regenerate-from-scratch: `inkos write rewrite` deletes target+later chapters, `restoreState(snapshot N−1)` (missing snapshot ⇒ ABORT), reruns write-next. Studio rewrite endpoint actually calls `reviseDraft(…,"rework")` with gate `always`.
+`castor revise --mode spot-fix|polish|rewrite|rework|anti-detect` → `reviseDraft` :1350: pre-audit → skip-if-clean-and-uninstructed → **baseline snapshot N−1 required (missing ⇒ ABORT)** :1437-1446 → `ReviserAgent.reviseChapter` (`agents/reviser.ts:112`, temp 0.3, `FIXED_ISSUES/PATCHES/REVISED_CONTENT` tags) → settle-vs-baseline → state validation (retry/degraded ⇒ keep original, `applied:false`) → post-audit temp 0 → **revisionGate** `strict|lenient|always` (`resolveRevisionGate`, `models/book.ts:102`; standards table `REVISION_GATE_STANDARDS` `runner.ts:233`) decides apply → `archiveChapterVersion` BEFORE overwrite :1663 → save (latest chapter touches live truth + snapshot :1669-1735; older chapters touch only the chapter file and mark descendants `needs-revision`).
+Regenerate-from-scratch: `castor write rewrite` deletes target+later chapters, `restoreState(snapshot N−1)` (missing snapshot ⇒ ABORT), reruns write-next. Studio rewrite endpoint actually calls `reviseDraft(…,"rework")` with gate `always`.
 
 ### 2.10 Resume / recovery
-Layered, artifact-based (no transactional replay engine): book lock with stale takeover; persisted `.plan.md` lets a crashed run skip planner re-invocation; `.run.json` journals are observability-only (nothing auto-resumes from them); `assertNoPendingStateRepair` + `inkos write repair-state` / `inkos write sync`; snapshots power rollback (`review reject`, `write rewrite`, `deleteLatestChapter`); whole-book backups `inkos book backup|restore` (`.inkos/backups/`, pre-restore auto-backup); daemon `Scheduler` pauses after `qualityGates.pauseAfterConsecutiveFailures` (default 3) consecutive failures with temperature escalation; `inkos doctor` diagnostics.
+Layered, artifact-based (no transactional replay engine): book lock with stale takeover; persisted `.plan.md` lets a crashed run skip planner re-invocation; `.run.json` journals are observability-only (nothing auto-resumes from them); `assertNoPendingStateRepair` + `castor write repair-state` / `castor write sync`; snapshots power rollback (`review reject`, `write rewrite`, `deleteLatestChapter`); whole-book backups `castor book backup|restore` (`.castor/backups/`, pre-restore auto-backup); daemon `Scheduler` pauses after `qualityGates.pauseAfterConsecutiveFailures` (default 3) consecutive failures with temperature escalation; `castor doctor` diagnostics.
 
 ### 2.11 Export
-`inkos export --format txt|md|epub [--approved-only]` → `writeExportArtifact` (`interaction/export-artifact.ts:133`; builder :58): concatenates chapter md or builds EPUB (epub-gen-memory); no LLM; default `<root>/<bookId>_export.<fmt>`. Studio streams via `GET /books/:id/export` and saves via intent `export_book`.
+`castor export --format txt|md|epub [--approved-only]` → `writeExportArtifact` (`interaction/export-artifact.ts:133`; builder :58): concatenates chapter md or builds EPUB (epub-gen-memory); no LLM; default `<root>/<bookId>_export.<fmt>`. Studio streams via `GET /books/:id/export` and saves via intent `export_book`.
 
 ---
 
@@ -207,8 +207,8 @@ Layered, artifact-based (no transactional replay engine): book lock with stale t
 Legend: **canonical** = authoritative input to decisions; **derived** = computed from another store. All paths relative to `books/<bookId>/` unless noted.
 
 ### 3.1 Project-level configuration
-- **`<root>/inkos.json`** — `ProjectConfigSchema` (`models/project.ts:131`): llm, notify[], detection, foundation/writing gates, researchSearch, modelOverrides (per-agent LLM routing), daemon schedule, `language: z.enum(["zh","en"]).default("zh")` :134. Written by `inkos init`/config command/Studio settings endpoints. Human-safe: zod-validated on read, never regenerated by the pipeline; loaded fresh each run. Note: zod strip mode silently drops removed fields (e.g., legacy `maxTokens`) on read.
-- **`<root>/.inkos/secrets.json`** — API keys only (`llm/secrets.ts`). Not story data despite the name.
+- **`<root>/castor.json`** — `ProjectConfigSchema` (`models/project.ts:131`): llm, notify[], detection, foundation/writing gates, researchSearch, modelOverrides (per-agent LLM routing), daemon schedule, `language: z.enum(["zh","en"]).default("zh")` :134. Written by `castor init`/config command/Studio settings endpoints. Human-safe: zod-validated on read, never regenerated by the pipeline; loaded fresh each run. Note: zod strip mode silently drops removed fields (e.g., legacy `maxTokens`) on read.
+- **`<root>/.castor/secrets.json`** — API keys only (`llm/secrets.ts`). Not story data despite the name.
 - **`books/<id>/book.json`** — `BookConfigSchema` (`models/book.ts:55`): title, `platform: tomato|feilu|qidian|other` (Chinese web-novel platforms), genre, status lifecycle (`incubating…completed`), `targetChapters` (default 200), `chapterWordCount` (min 1000, default 3000 — zh-calibrated floor), `language: z.enum(["zh","en"]).optional()` (optional precisely so pre-language books fall back to genre/project), `writing.{reviewMode,revisionGate}` overrides. Read fresh every run; updated only by deliberate settings actions (`markBookActiveIfNeeded` flips status; Studio `PUT /api/v1/books/:id`).
 
 ### 3.2 Human direction layer (canonical, never auto-written)
@@ -349,7 +349,7 @@ Projections are inputs to prompts and Studio display, but they are **not** an in
 ### 6.1 Atomic multi-file commit [VERIFIED]
 
 `commitAtomicFileSet({rootDir, writes, deletes})` — `packages/core/src/utils/atomic-file-set.ts:46-115`:
-1. Stage all writes under a temp dir `<rootDir>/.inkos-file-txn-*` (mkdtemp :62).
+1. Stage all writes under a temp dir `<rootDir>/.castor-file-txn-*` (mkdtemp :62).
 2. Rename each existing target into `<txnDir>/backup/` (:81-84), recording backups.
 3. Rename staged files into final locations; apply deletes.
 4. On any error: roll back committed renames and restore backups (:99+); incomplete rollback raises `AggregateError`.
@@ -361,7 +361,7 @@ Primary users:
 
 Known non-atomic writes (by design where content is rebuildable or append-only): `saveChapterIndexAt` (plain writeFile; index self-heals), `archiveChapterVersion` (append-only), `edit-controller` chapter replacement (archives a version first, then plain writeFile), `snapshotStateAt` copies (redundant per-chapter copies exist), forecast/graph stores.
 
-Residual crash-window fact [VERIFIED]: between backup renames and staged renames, targets exist only inside the txn dir; cleanup runs in a `finally` (graceful unwind only) and **there is no startup scan that restores orphaned `.inkos-file-txn-*` dirs after SIGKILL/power loss**.
+Residual crash-window fact [VERIFIED]: between backup renames and staged renames, targets exist only inside the txn dir; cleanup runs in a `finally` (graceful unwind only) and **there is no startup scan that restores orphaned `.castor-file-txn-*` dirs after SIGKILL/power loss**.
 
 ### 6.2 Per-chapter persistence ordering
 
@@ -464,17 +464,17 @@ Mechanisms verified present and interlocking (all [VERIFIED] unless noted):
 | Empty responses | Throw everywhere ("LLM returned empty response"); reasoning-only throws; runner asserts non-empty prose per stage (`assertChapterContentNotEmpty` `runner.ts:3394`); reviser empty ⇒ throw; review cycle exits when revision produces nothing new |
 | Output-limit handling | `finish_reason length` / `max_tokens` / `response.incomplete` ⇒ `PartialResponseError(reason:"output-limit")` ⇒ one full retry, then loud failure |
 | Context-window policy | Pre-flight `assertWithinContextWindow` ⇒ `ContextWindowExceededError` with numbers; no silent truncation; composer-side budget compression runs before this guard is needed |
-| Stream deadlines | First-event 120 s (300 s pipeline agents), idle 90 s (180 s); env overrides `INKOS_LLM_FIRST_EVENT_TIMEOUT_MS`/`INKOS_LLM_STREAM_IDLE_TIMEOUT_MS` |
+| Stream deadlines | First-event 120 s (300 s pipeline agents), idle 90 s (180 s); env overrides `castor_LLM_FIRST_EVENT_TIMEOUT_MS`/`castor_LLM_STREAM_IDLE_TIMEOUT_MS` |
 | State-degraded recovery | Failed settlement ⇒ body saved, OLD truth restored (`buildStateDegradedPersistenceOutput`, `chapter-state-recovery.ts:164-179`), review note recorded (:187/:198), snapshots skipped; `assertNoPendingStateRepair` blocks further writes (`runner.ts:3244-3254`); repairs: `write repair-state` (settlement-only re-run :2387), `write sync` (resettle from externally edited body :2513) |
 | Rewrite safety | All gates precede any write (in-memory generation/validation/audit/gate first); old draft archived to `.versions` BEFORE overwrite (:1663); failing revision gate ⇒ `applied:false` with ZERO writes; failed commit rolls back atomically |
 | Chapter-state recovery | Snapshot-based baselines for revise/repair; `loadRuntimeStateSnapshotAtChapter` prefers `snapshots/<N>/state/*.json` and falls back to parsing snapshot markdown (`runtime-state-store.ts:56-112`) |
 | Snapshots/rollback/trash/backups | §3.8/§6.2; whole-book backups outside `books/` with pre-restore auto-backup (`cli/src/book-backup.ts`) |
 | Concurrency | `acquireBookLock` wraps all mutating ops (PID liveness, stale takeover, heartbeat) |
-| Manual review checkpoint | `chapterReviewMode:"manual"` stops right after draft persistence; forced auto for unattended `inkos auto` |
+| Manual review checkpoint | `chapterReviewMode:"manual"` stops right after draft persistence; forced auto for unattended `castor auto` |
 
 **Can a failed rewrite or later pipeline stage destroy a valid draft? No** [VERIFIED write-order trace of `reviseDraft` :1350-1757]: generation, settling, validation, post-audit and gate evaluation all occur in memory; archive precedes replace; commits roll back; audit is read-only except index metadata and `audit_drift.md`; truth updates are validator-gated with old-truth preservation in degraded mode; snapshots are written after success.
 
-Residual risks (documented facts, not defects assigned for fixing): orphaned `.inkos-file-txn-*` txn dirs after hard kill (no startup scan); superseded same-number chapter files with changed titles deleted unarchived in `saveChapter` (recoverable only from snapshots/backups); CLI `write rewrite` hard-deletes later chapters without versioning (confirm/`--force` gated, snapshot check required); non-atomic single-file writes where content is rebuildable/append-only (§6.1).
+Residual risks (documented facts, not defects assigned for fixing): orphaned `.castor-file-txn-*` txn dirs after hard kill (no startup scan); superseded same-number chapter files with changed titles deleted unarchived in `saveChapter` (recoverable only from snapshots/backups); CLI `write rewrite` hard-deletes later chapters without versioning (confirm/`--force` gated, snapshot check required); non-atomic single-file writes where content is rebuildable/append-only (§6.1).
 
 ---
 
@@ -659,7 +659,7 @@ Open questions code alone cannot answer (recorded, not invented):
 | State-degraded machinery | `pipeline/chapter-state-recovery.ts` :49/:164/:187/:198 |
 | Studio blind to canonical state | grep of `packages/studio/src` — zero refs to `story/state/*.json`/`loadRuntimeStateSnapshot`/`snapshots`; anchors `server.ts:2554/:2556/:3157` |
 | Studio audit divergence | `server.ts:5321` constructs `ContinuityAuditor` :5338; nearby `saveChapterIndex` calls belong to approve/reject |
-| Language enums/defaults | `models/project.ts:134`, `models/book.ts:63`, `models/runtime-state.ts:3`, `models/length-governance.ts:3`, `test-project/inkos.json` |
+| Language enums/defaults | `models/project.ts:134`, `models/book.ts:63`, `models/runtime-state.ts:3`, `models/length-governance.ts:3`, `test-project/castor.json` |
 | Slugifier CJK-only class | `utils/book-id.ts:3-11`; `inferLanguage` in `utils/language.ts` |
 | Index-rebuild char counting | `state/manager.ts` rebuild path (`wordCount: content.replace(/\s+/g,"").length`, default title `第N章`) |
 | PolisherAgent unwired | grep across `packages/` — only barrel export + tests |

@@ -186,7 +186,7 @@ function stateJsonFiles(docs: FixtureDocs): Record<string, string> {
  * engine's own format instead of hand-written fixtures.
  */
 export async function createCanonBook(options: CreateCanonBookOptions = {}): Promise<CanonBookFixture> {
-  const root = await mkdtemp(join(tmpdir(), "inkos-canon-"));
+  const root = await mkdtemp(join(tmpdir(), "castor-canon-"));
   const bookDir = join(root, "books", "demo-canon-book");
   const storyDir = join(bookDir, "story");
   const chapterCount = options.chapterCount ?? 12;

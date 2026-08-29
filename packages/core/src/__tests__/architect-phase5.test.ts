@@ -179,7 +179,7 @@ describe("ArchitectAgent — Phase 5 prose output", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-phase5-arch-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-phase5-arch-"));
   });
 
   afterEach(async () => {
@@ -368,7 +368,7 @@ describe("writeFoundationFiles — rhythm file is skipped when rhythmPrinciples 
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-phase5-rhythm-skip-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-phase5-rhythm-skip-"));
   });
 
   afterEach(async () => {

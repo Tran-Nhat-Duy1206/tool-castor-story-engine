@@ -21,7 +21,7 @@ describe("runtime-state-store memory helpers", () => {
   });
 
   it("prefers structured runtime state over stale markdown projections for narrative memory", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-runtime-state-store-"));
+    root = await mkdtemp(join(tmpdir(), "castor-runtime-state-store-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -117,7 +117,7 @@ describe("runtime-state-store memory helpers", () => {
   });
 
   it("normalizes dormant and confirmed hook lifecycle terms from markdown projections", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-runtime-hook-status-"));
+    root = await mkdtemp(join(tmpdir(), "castor-runtime-hook-status-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const chaptersDir = join(bookDir, "chapters");
@@ -166,7 +166,7 @@ describe("runtime-state-store memory helpers", () => {
   });
 
   it("prefers structured snapshot state over stale markdown snapshots for fact history rebuild", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-runtime-state-snapshot-"));
+    root = await mkdtemp(join(tmpdir(), "castor-runtime-state-snapshot-"));
     const bookDir = join(root, "book");
     const snapshotDir = join(bookDir, "story", "snapshots", "5");
     const snapshotStateDir = join(snapshotDir, "state");
@@ -225,7 +225,7 @@ describe("runtime-state-store memory helpers", () => {
   });
 
   it("reconstructs a pre-chapter runtime snapshot from markdown without losing stable hook ids", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-runtime-revision-baseline-"));
+    root = await mkdtemp(join(tmpdir(), "castor-runtime-revision-baseline-"));
     const bookDir = join(root, "book");
     const snapshotDir = join(bookDir, "story", "snapshots", "0");
     await mkdir(snapshotDir, { recursive: true });
@@ -273,7 +273,7 @@ describe("runtime-state-store memory helpers", () => {
   });
 
   it("rejects persisted duplicate summary chapters in structured runtime state", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-runtime-state-invalid-"));
+    root = await mkdtemp(join(tmpdir(), "castor-runtime-state-invalid-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -336,7 +336,7 @@ describe("runtime-state-store memory helpers", () => {
   });
 
   it("repairs persisted hooks with empty type instead of failing the library load", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-runtime-state-hook-repair-"));
+    root = await mkdtemp(join(tmpdir(), "castor-runtime-state-hook-repair-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");
@@ -399,7 +399,7 @@ describe("runtime-state-store memory helpers", () => {
   });
 
   it("canonicalizes structurally valid new hook candidates without semantic guessing", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-runtime-state-arbiter-"));
+    root = await mkdtemp(join(tmpdir(), "castor-runtime-state-arbiter-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     const stateDir = join(storyDir, "state");

@@ -168,7 +168,7 @@ describe("short-fiction English parsing and rendering", () => {
 
 describe("short-fiction runner English branch", () => {
   let root: string;
-  beforeEach(async () => { root = await mkdtemp(join(tmpdir(), "inkos-short-en-")); });
+  beforeEach(async () => { root = await mkdtemp(join(tmpdir(), "castor-short-en-")); });
   afterEach(async () => { vi.restoreAllMocks(); await rm(root, { recursive: true, force: true }); });
 
   function runtimes(projectRoot: string) {

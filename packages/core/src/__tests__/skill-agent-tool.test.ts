@@ -9,7 +9,7 @@ describe("use_skill agent tool", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-use-skill-"));
+    root = await mkdtemp(join(tmpdir(), "castor-use-skill-"));
   });
 
   afterEach(async () => {

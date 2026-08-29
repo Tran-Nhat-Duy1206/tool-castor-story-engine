@@ -19,13 +19,13 @@ export const E2E_AUTHOR_ID = "e2e-authoring-confirm";
  * We create:
  *  - test-project/interactive-films/<E2E_AUTHOR_ID>/story-graph.json
  *    (minimal graph so StoryGraphTree renders and shows the open-authoring button)
- *  - test-project/.inkos/secrets.json
+ *  - test-project/.castor/secrets.json
  *    (a fake DeepSeek API key so the UI's model picker goes to "ready" state
  *     and ChatPage auto-selects a model, allowing sendMessage to proceed past
  *     the "请先选择一个模型" guard)
  *  - a fresh book session so the agent endpoint can load it
  *
- * IMPORTANT: we do NOT touch test-project/inkos.json — that file is shared
+ * IMPORTANT: we do NOT touch test-project/castor.json — that file is shared
  * across all E2E tests and must not be overwritten.
  *
  * The actual LLM calls are bypassed by CASTOR_AGENT_LLM_STUB=1 set in
@@ -36,8 +36,8 @@ export async function seedAuthoringConfirm(): Promise<void> {
   // ChatPage picks the most-recently-updated session (ids[0] from listBookSessions);
   // stale sessions with old message history can confuse the test.
   // Sessions now live canonically under .castor/sessions; the pre-rename
-  // .inkos/sessions location is cleaned too for older runs.
-  for (const dir of [resolve(E2E_ROOT, ".castor", "sessions"), resolve(E2E_ROOT, ".inkos", "sessions")]) {
+  // .castor/sessions location is cleaned too for older runs.
+  for (const dir of [resolve(E2E_ROOT, ".castor", "sessions"), resolve(E2E_ROOT, ".castor", "sessions")]) {
     try {
       const files = await readdir(dir);
       await Promise.all(

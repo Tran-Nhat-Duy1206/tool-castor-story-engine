@@ -12,8 +12,8 @@ import { fileURLToPath } from "node:url";
  *   - packages/core  name == @actalk/castor-core
  *   - packages/cli   name == @actalk/castor
  *   - packages/studio name == @actalk/castor-studio
- *   - CLI bin keys == [castor] exactly (no inkos alias)
- *   - no workspace dependency name begins with @actalk/inkos
+ *   - CLI bin keys == [castor] exactly (no castor alias)
+ *   - no workspace dependency name begins with @actalk/castor
  */
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -54,13 +54,13 @@ describe("castor package identity", () => {
     assert.equal(manifests.studio.name, "@actalk/castor-studio");
   });
 
-  it("cli exposes exactly the castor bin (no inkos alias)", () => {
+  it("cli exposes exactly the castor bin (no castor alias)", () => {
     assert.deepEqual(Object.keys(manifests.cli.bin ?? {}), ["castor"]);
   });
 
-  it("no workspace dependency name begins with @actalk/inkos", () => {
+  it("no workspace dependency name begins with @actalk/castor", () => {
     for (const [pkg, manifest] of Object.entries(manifests)) {
-      const legacy = workspaceDeps(manifest).filter((d) => d.name.startsWith("@actalk/inkos"));
+      const legacy = workspaceDeps(manifest).filter((d) => d.name.startsWith("@actalk/castor"));
       assert.deepEqual(legacy, [], `${pkg} has legacy workspace deps`);
     }
   });

@@ -15,7 +15,7 @@ describe("book reference bindings", () => {
   const bookId = "reference-book";
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-book-reference-"));
+    root = await mkdtemp(join(tmpdir(), "castor-book-reference-"));
     await mkdir(join(root, "books", bookId, "story"), { recursive: true });
   });
 
@@ -98,7 +98,7 @@ describe("book reference context selection", () => {
   const bookId = "selection-book";
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-reference-context-"));
+    root = await mkdtemp(join(tmpdir(), "castor-reference-context-"));
     await mkdir(join(root, "books", bookId, "story"), { recursive: true });
   });
 

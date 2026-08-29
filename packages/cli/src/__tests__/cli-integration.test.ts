@@ -65,21 +65,21 @@ const failingLlmEnv = {
 
 describe("CLI integration", () => {
   beforeAll(async () => {
-    projectDir = await mkdtemp(join(tmpdir(), "inkos-cli-test-"));
+    projectDir = await mkdtemp(join(tmpdir(), "castor-cli-test-"));
   });
 
   afterAll(async () => {
     await rm(projectDir, { recursive: true, force: true });
   });
 
-  describe("inkos --version", () => {
+  describe("castor --version", () => {
     it("prints version number", () => {
       const output = run(["--version"]);
       expect(output.trim()).toMatch(/^\d+\.\d+\.\d+$/);
     }, CLI_PROCESS_TIMEOUT_MS);
   });
 
-  describe("inkos --help", () => {
+  describe("castor --help", () => {
     it("prints help with command list", () => {
       const output = run(["--help"]);
       expect(output).toContain("castor");
@@ -134,14 +134,14 @@ describe("CLI integration", () => {
       expect(output).toContain("Project initialized");
     });
 
-    it("creates inkos.json in subdirectory", async () => {
+    it("creates castor.json in subdirectory", async () => {
       const raw = await readFile(join(projectDir, "subproject", "castor.json"), "utf-8");
       const config = JSON.parse(raw);
       expect(config.name).toBe("subproject");
     });
 
     it("supports absolute project paths instead of nesting them under cwd", async () => {
-      const absoluteDir = await mkdtemp(join(tmpdir(), "inkos-cli-abs-init-"));
+      const absoluteDir = await mkdtemp(join(tmpdir(), "castor-cli-abs-init-"));
 
       try {
         const output = run(["init", absoluteDir]);
@@ -156,7 +156,7 @@ describe("CLI integration", () => {
     });
 
     it("prints English next steps when initialized with --lang en", async () => {
-      const englishDir = await mkdtemp(join(tmpdir(), "inkos-cli-en-init-"));
+      const englishDir = await mkdtemp(join(tmpdir(), "castor-cli-en-init-"));
 
       try {
         const output = run(["init", englishDir, "--lang", "en"]);
@@ -169,7 +169,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos config set", () => {
+  describe("castor config set", () => {
     it("sets a known config value", () => {
       const output = run(["config", "set", "llm.provider", "anthropic"]);
       expect(output).toContain("Set llm.provider = anthropic");
@@ -198,7 +198,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos config show", () => {
+  describe("castor config show", () => {
     it("shows current config as JSON", () => {
       const output = run(["config", "show"]);
       const config = JSON.parse(output);
@@ -291,7 +291,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos book list", () => {
+  describe("castor book list", () => {
     it("shows no books in empty project", () => {
       const output = run(["book", "list"]);
       expect(output).toContain("No books found");
@@ -634,7 +634,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos write", () => {
+  describe("castor write", () => {
     it("warns before writing when the target book still uses legacy format", async () => {
       const bookDir = join(projectDir, "books", "legacy-write-hint");
       const storyDir = join(bookDir, "story");
@@ -773,7 +773,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos analytics", () => {
+  describe("castor analytics", () => {
     it("errors when no book exists", () => {
       const { exitCode } = runStderr(["analytics"]);
       expect(exitCode).not.toBe(0);
@@ -849,7 +849,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos plan/compose", () => {
+  describe("castor plan/compose", () => {
     beforeAll(async () => {
       const configPath = join(projectDir, "castor.json");
       const initialized = await stat(configPath).then(() => true).catch(() => false);
@@ -964,7 +964,7 @@ describe("CLI integration", () => {
     });
   });
 
-  describe("inkos export", () => {
+  describe("castor export", () => {
     beforeAll(async () => {
       const configPath = join(projectDir, "castor.json");
       const initialized = await stat(configPath).then(() => true).catch(() => false);

@@ -14,7 +14,7 @@ let root = "";
 let bookDir = "";
 
 async function setupBook(units: ReadonlyArray<FoundationUnitManifest>): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-deps-"));
+  root = await mkdtemp(join(tmpdir(), "castor-deps-"));
   bookDir = join(root, "books", "deps-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "## 主题与基调\nA\n\n## 核心冲突\nB\n\n## 世界观底色\nC\n\n## 终局方向\nD\n", "utf-8");

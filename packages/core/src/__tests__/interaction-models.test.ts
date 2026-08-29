@@ -120,14 +120,14 @@ describe("interaction models", () => {
   it("validates derivative-work payloads without magic routes", () => {
     expect(FanficCreateActionPayloadSchema.parse({
       title: "霜港来信",
-      sourcePath: ".inkos/uploads/canon.pdf",
+      sourcePath: ".castor/uploads/canon.pdf",
       mode: "canon",
     })).toMatchObject({ title: "霜港来信", mode: "canon" });
     expect(FanficCreateActionPayloadSchema.safeParse({ title: "缺少正典" }).success).toBe(false);
 
     expect(ContinuationImportActionPayloadSchema.parse({
       title: "雾港续章",
-      sourcePath: ".inkos/uploads/novel.txt",
+      sourcePath: ".castor/uploads/novel.txt",
     })).toMatchObject({ title: "雾港续章" });
     expect(ContinuationImportActionPayloadSchema.safeParse({
       sourcePath: "novel.txt",

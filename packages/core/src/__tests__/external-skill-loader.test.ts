@@ -299,7 +299,7 @@ describe("external skill loader", () => {
   });
 
   it("does not discover the removed Castor-specific skill directory", async () => {
-    const skillDir = join(root, ".inkos", "skills", "legacy-skill");
+    const skillDir = join(root, ".castor", "skills", "legacy-skill");
     await mkdir(skillDir, { recursive: true });
     await writeFile(
       join(skillDir, "SKILL.md"),

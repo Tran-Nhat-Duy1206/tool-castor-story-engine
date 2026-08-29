@@ -9,7 +9,7 @@ describe("config migration", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-migrate-"));
+    root = await mkdtemp(join(tmpdir(), "castor-migrate-"));
   });
 
   afterEach(async () => {
@@ -27,7 +27,7 @@ describe("config migration", () => {
       },
       language: "zh",
     };
-    await writeFile(join(root, "inkos.json"), JSON.stringify(oldConfig));
+    await writeFile(join(root, "castor.json"), JSON.stringify(oldConfig));
 
     const result = await migrateConfig(root);
 
@@ -56,7 +56,7 @@ describe("config migration", () => {
       },
       language: "zh",
     };
-    await writeFile(join(root, "inkos.json"), JSON.stringify(newConfig));
+    await writeFile(join(root, "castor.json"), JSON.stringify(newConfig));
 
     const result = await migrateConfig(root);
     expect(result.migrated).toBe(false);
@@ -71,7 +71,7 @@ describe("config migration", () => {
         apiKey: "sk-deep",
       },
     };
-    await writeFile(join(root, "inkos.json"), JSON.stringify(oldConfig));
+    await writeFile(join(root, "castor.json"), JSON.stringify(oldConfig));
 
     await migrateConfig(root);
 
@@ -89,7 +89,7 @@ describe("config migration", () => {
         apiKey: "sk-corp",
       },
     };
-    await writeFile(join(root, "inkos.json"), JSON.stringify(oldConfig));
+    await writeFile(join(root, "castor.json"), JSON.stringify(oldConfig));
 
     await migrateConfig(root);
 

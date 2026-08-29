@@ -32,7 +32,7 @@ function optionalBeat(beatId = "beat-opt-1", category: BeatRef["category"] = "re
 }
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-beats-"));
+  root = await mkdtemp(join(tmpdir(), "castor-beats-"));
   bookDir = join(root, "books", "demo-book");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await writeFile(canonPath(), `${JSON.stringify({

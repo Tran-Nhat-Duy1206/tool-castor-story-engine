@@ -13,7 +13,7 @@ describe("audit-castor-identity classifyPath", () => {
   it("allowlists migration/legacy documentation buckets", () => {
     assert.equal(classifyPath("docs/superpowers/plans/x.md").bucket, "LEGACY-COMPAT");
     assert.equal(classifyPath("docs/migrations/castor-identity-inventory.md").bucket, "LEGACY-COMPAT");
-    assert.equal(classifyPath("test-project/inkos.json").bucket, "LEGACY-COMPAT");
+    assert.equal(classifyPath("test-project/castor.json").bucket, "LEGACY-COMPAT");
   });
 
   it("treats active production and user-facing files as ACTIVE (not allowed)", () => {
@@ -24,7 +24,7 @@ describe("audit-castor-identity classifyPath", () => {
       "packages/cli/src/commands/studio.ts",
       "README.md",
       "skills/SKILL.md",
-      "inkos.json",
+      "castor.json",
       "scripts/prepare-package-for-publish.mjs",
       "pnpm-lock.yaml",
       ".github/workflows/release.yml",
@@ -48,8 +48,8 @@ describe("audit-castor-identity scope + filename rules", () => {
   });
 
   it("flags legacy-named files regardless of content", () => {
-    assert.equal(isLegacyFilename("inkos.json"), true);
-    assert.equal(isLegacyFilename("assets/inkos-text.svg"), true);
+    assert.equal(isLegacyFilename("castor.json"), true);
+    assert.equal(isLegacyFilename("assets/castor-text.svg"), true);
     assert.equal(isLegacyFilename("castor.json"), false);
     assert.equal(isLegacyFilename("packages/core/src/index.ts"), false);
   });
@@ -57,37 +57,37 @@ describe("audit-castor-identity scope + filename rules", () => {
 
 describe("audit-castor-identity scanContent", () => {
   it("flags active occurrences with file:line evidence", () => {
-    const { violations } = scanContent("packages/cli/src/commands/studio.ts", 'log("Starting InkOS Studio");\nlog("ok");\nlog("use inkos doctor");\n');
+    const { violations } = scanContent("packages/cli/src/commands/studio.ts", 'log("Starting castor Studio");\nlog("ok");\nlog("use castor doctor");\n');
     assert.equal(violations.length, 2);
     assert.equal(violations[0].line, 1);
     assert.equal(violations[1].line, 3);
   });
 
   it("passes attribution lines in user-facing docs (spec §2)", () => {
-    const line = "Castor Story Engine is a substantially modified derivative of InkOS by Narcooo.";
+    const line = "Castor Story Engine is a substantially modified derivative of castor by Narcooo.";
     const { violations, attributionLines } = scanContent("README.md", line + "\n");
     assert.equal(violations.length, 0);
     assert.equal(attributionLines, 1);
   });
 
   it("does not accept the attribution exception in production code files", () => {
-    const line = "Castor Story Engine is a derivative of InkOS by Narcooo.";
+    const line = "Castor Story Engine is a derivative of castor by Narcooo.";
     const { violations } = scanContent("packages/core/src/foo.ts", line + "\n");
     assert.equal(violations.length, 1);
   });
 
   it("counts occurrences inside allowlisted buckets as allowed", () => {
-    const { violations, allowedCount } = scanContent("CHANGELOG.md", "## v1.0 InkOS rename\n");
+    const { violations, allowedCount } = scanContent("CHANGELOG.md", "## v1.0 castor rename\n");
     assert.equal(violations.length, 0);
     assert.equal(allowedCount, 1);
   });
 
   it("flags the active branding examples from plan Task 6.1", () => {
     for (const active of [
-      'log("Starting InkOS Studio on http://localhost:4567");',
-      'checks.push({ name: "InkOS Doctor" });',
-      'const CASTOR_USER_AGENT = "InkOS/1.3.5";',
-      "use inkos studio to open the workbench",
+      'log("Starting castor Studio on http://localhost:4567");',
+      'checks.push({ name: "castor Doctor" });',
+      'const CASTOR_USER_AGENT = "castor/1.3.5";',
+      "use castor studio to open the workbench",
     ]) {
       const { violations } = scanContent("packages/cli/src/commands/studio.ts", active + "\n");
       assert.equal(violations.length, 1, active);
@@ -97,10 +97,10 @@ describe("audit-castor-identity scanContent", () => {
   it("does not flag legacy-named files inside allowlisted buckets", () => {
     const result = runAudit({
       root: process.cwd(),
-      files: ["test-project/inkos.json", "assets/inkos-text.svg", "castor.json"],
-      read: (rel) => (rel === "assets/inkos-text.svg" ? "<svg>inkos</svg>" : "{}"),
+      files: ["test-project/castor.json", "assets/castor-text.svg", "castor.json"],
+      read: (rel) => (rel === "assets/castor-text.svg" ? "<svg>castor</svg>" : "{}"),
     });
-    assert.deepEqual(result.summary.legacyFilenames, ["assets/inkos-text.svg"]);
+    assert.deepEqual(result.summary.legacyFilenames, ["assets/castor-text.svg"]);
     assert.equal(result.ok, false);
   });
 
@@ -113,9 +113,9 @@ describe("audit-castor-identity scanContent", () => {
         "docs/migrations/castor-identity-inventory.md",
         "packages/core/src/utils/llm-env.ts",
         ".gitignore",
-        "test-project/inkos.json",
+        "test-project/castor.json",
       ],
-      read: () => "InkOS by Narcooo, upstream attribution — legacy inkos.json compatibility\n",
+      read: () => "castor by Narcooo, upstream attribution — legacy castor.json compatibility\n",
     });
     assert.equal(result.ok, true, JSON.stringify(result.violations?.slice(0, 3)));
   });
@@ -123,11 +123,11 @@ describe("audit-castor-identity scanContent", () => {
 
 describe("audit-castor-identity runAudit (fixture-driven)", () => {
   const fixtures = [
-    { rel: "packages/cli/src/commands/studio.ts", content: 'log("Starting InkOS Studio");\n' },
-    { rel: "README.md", content: "Castor is a derivative of InkOS by Narcooo, per attribution.\n" },
-    { rel: "CHANGELOG.md", content: "history: inkos notes\n" },
-    { rel: "packages/core/src/__tests__/x.test.ts", content: "inkos import legacy test\n" },
-    { rel: "inkos.json", content: "{}\n" },
+    { rel: "packages/cli/src/commands/studio.ts", content: 'log("Starting castor Studio");\n' },
+    { rel: "README.md", content: "Castor is a derivative of castor by Narcooo, per attribution.\n" },
+    { rel: "CHANGELOG.md", content: "history: castor notes\n" },
+    { rel: "packages/core/src/__tests__/x.test.ts", content: "castor import legacy test\n" },
+    { rel: "castor.json", content: "{}\n" },
     { rel: "packages/core/src/index.ts", content: "export const ok = 1;\n" },
   ];
 
@@ -143,15 +143,15 @@ describe("audit-castor-identity runAudit (fixture-driven)", () => {
     const result = audit();
     assert.equal(result.ok, false);
     assert.ok(result.violations.some((v) => v.relPath === "packages/cli/src/commands/studio.ts"));
-    assert.deepEqual(result.summary.legacyFilenames, ["inkos.json"]);
+    assert.deepEqual(result.summary.legacyFilenames, ["castor.json"]);
   });
 
   it("becomes clean when active surfaces are migrated to Castor", () => {
     const migrated = [
       { rel: "packages/cli/src/commands/studio.ts", content: 'log("Starting Castor Studio");\n' },
-      { rel: "README.md", content: "Castor is a derivative of InkOS by Narcooo, per attribution.\n" },
-      { rel: "CHANGELOG.md", content: "history: inkos notes\n" },
-      { rel: "packages/core/src/__tests__/x.test.ts", content: "inkos import legacy test\n" },
+      { rel: "README.md", content: "Castor is a derivative of castor by Narcooo, per attribution.\n" },
+      { rel: "CHANGELOG.md", content: "history: castor notes\n" },
+      { rel: "packages/core/src/__tests__/x.test.ts", content: "castor import legacy test\n" },
       { rel: "castor.json", content: "{}\n" },
       { rel: "packages/core/src/index.ts", content: "export const ok = 1;\n" },
     ];

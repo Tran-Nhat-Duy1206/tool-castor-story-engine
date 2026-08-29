@@ -39,7 +39,7 @@ describe("derivative-work agent tools", () => {
   let state: StateManager;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-derivative-tools-"));
+    root = await mkdtemp(join(tmpdir(), "castor-derivative-tools-"));
     state = new StateManager(root);
     await state.saveBookConfig("harbor", {
       id: "harbor",
@@ -150,9 +150,9 @@ describe("derivative-work agent tools", () => {
   });
 
   it("imports an uploaded manuscript into a newly created continuation book", async () => {
-    await mkdir(join(root, ".inkos", "uploads", "continuation"), { recursive: true });
+    await mkdir(join(root, ".castor", "uploads", "continuation"), { recursive: true });
     await writeFile(
-      join(root, ".inkos", "uploads", "continuation", "novel.txt"),
+      join(root, ".castor", "uploads", "continuation", "novel.txt"),
       "第一章 雨港\n\n林鹿在旧码头找到一本账簿。\n\n第二章 空号\n\n电话那头只有潮声。\n",
       "utf-8",
     );
@@ -161,7 +161,7 @@ describe("derivative-work agent tools", () => {
 
     const result = await tool.execute("continuation-1", {
       title: "雾港续章",
-      sourcePath: ".inkos/uploads/continuation/novel.txt",
+      sourcePath: ".castor/uploads/continuation/novel.txt",
       language: "zh",
     });
 

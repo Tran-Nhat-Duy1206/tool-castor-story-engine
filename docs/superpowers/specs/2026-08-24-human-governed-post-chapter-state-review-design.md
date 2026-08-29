@@ -13,7 +13,7 @@
 
 ## 0. Product principle
 
-InkOS continues to automate the writing workflow, but the **human author is the final
+castor continues to automate the writing workflow, but the **human author is the final
 authority over story meaning and Canon**.
 
 There remains **exactly one Canon store**: `story/state/*.json`. Everything this phase
@@ -646,7 +646,7 @@ authoritative write-set creation.
 
 **Studio owns:** HTTP validation/mapping; book-lock orchestration per the established
 pattern; UI; typed client. Studio must NOT duplicate ReviewItem/Canon contracts
-locally — type-only imports from `@actalk/inkos-core` exactly as P3B/I-1 established.
+locally — type-only imports from `@actalk/castor-core` exactly as P3B/I-1 established.
 
 ## 30. Conceptual Studio API
 

@@ -88,7 +88,7 @@ export async function listBookBackups(
   // Canonical backups plus a read-only view of pre-rename legacy backups.
   const backups = [
     ...(await listDir(bookBackupsDir(root, bookId))),
-    ...(await listDir(join(root, ".inkos", "backups", bookId))),
+    ...(await listDir(join(root, ".castor", "backups", bookId))),
   ];
   // Backup ids start with a UTC timestamp, so a descending id sort is newest-first.
   return backups.sort((a, b) => b.id.localeCompare(a.id));
@@ -112,7 +112,7 @@ export async function restoreBookBackup(
   // (read-only compatibility; they are never copied or rewritten).
   let resolvedBackupPath = backupPath;
   if (!backupInfo?.isDirectory()) {
-    const legacyBackupPath = join(root, ".inkos", "backups", bookId, backupId);
+    const legacyBackupPath = join(root, ".castor", "backups", bookId, backupId);
     const legacyBackupInfo = await stat(legacyBackupPath).catch(() => null);
     if (legacyBackupInfo?.isDirectory()) {
       resolvedBackupPath = legacyBackupPath;

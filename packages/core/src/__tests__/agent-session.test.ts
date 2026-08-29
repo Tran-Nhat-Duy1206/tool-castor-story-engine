@@ -257,7 +257,7 @@ describe("runAgentSession cache — bookId switch", () => {
   let otherProjectRoot: string | null;
 
   beforeEach(async () => {
-    projectRoot = await mkdtemp(join(tmpdir(), "inkos-agent-cache-"));
+    projectRoot = await mkdtemp(join(tmpdir(), "castor-agent-cache-"));
     otherProjectRoot = null;
     await mkdir(join(projectRoot, "books", "book-a", "story"), { recursive: true });
     await writeFile(
@@ -450,7 +450,7 @@ describe("runAgentSession cache — bookId switch", () => {
   it("keeps cached Agents isolated by projectRoot for the same sessionId", async () => {
     const model = { provider: "x", id: "y", api: "anthropic-messages" } as any;
     const pipeline = {} as any;
-    otherProjectRoot = await mkdtemp(join(tmpdir(), "inkos-agent-cache-other-"));
+    otherProjectRoot = await mkdtemp(join(tmpdir(), "castor-agent-cache-other-"));
     await mkdir(join(otherProjectRoot, "books", "book-a", "story"), { recursive: true });
     await writeFile(
       join(otherProjectRoot, "books", "book-a", "story", "story_bible.md"),

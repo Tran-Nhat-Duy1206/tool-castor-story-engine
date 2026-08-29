@@ -17,7 +17,7 @@
 
 > **Derived project notice**
 >
-> Tool Castor Story Engine (Castor) is derived from [InkOS](https://github.com/Narcooo/inkos) by Narcooo and has been substantially modified and evolved into an independent long-form AI story-writing system. This project preserves InkOS's Git history, copyright notices and AGPL-3.0 obligations. The original InkOS code was not authored by the maintainers of this project. This modified work remains licensed under [AGPL-3.0](LICENSE).
+> Tool Castor Story Engine (Castor) is derived from [castor](https://github.com/Narcooo/castor) by Narcooo and has been substantially modified and evolved into an independent long-form AI story-writing system. This project preserves castor's Git history, copyright notices and AGPL-3.0 obligations. The original castor code was not authored by the maintainers of this project. This modified work remains licensed under [AGPL-3.0](LICENSE).
 
 ---
 
@@ -86,11 +86,11 @@ pnpm install
 pnpm build
 ```
 
-> The upstream InkOS npm package (`@actalk/inkos`) and its [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) belong to Narcooo's InkOS project; this standalone repository is built from source. Existing user data — `castor.json` config, `INKOS_*` environment variables, and book directory layout — remains compatible, and the `castor` command loads existing InkOS projects directly.
+> The upstream castor npm package (`@actalk/castor`) and its [OpenClaw Skill](https://clawhub.ai/narcooo/castor) belong to Narcooo's castor project; this standalone repository is built from source. Existing user data — `castor.json` config, `castor_*` environment variables, and book directory layout — remains compatible, and the `castor` command loads existing castor projects directly.
 
 ### Use via OpenClaw 🦞
 
-Upstream InkOS is published as an [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill. This repository is derived from InkOS and inherits the same shared interaction entry; built from source, it is invoked directly:
+Upstream castor is published as an [OpenClaw](https://clawhub.ai/narcooo/castor) Skill. This repository is derived from castor and inherits the same shared interaction entry; built from source, it is invoked directly:
 
 ```bash
 castor interact --json --message "continue the current book, but keep the pacing tighter"
@@ -606,11 +606,11 @@ pnpm typecheck    # Type-check without emitting
 
 ## Star History
 
-<a href="https://www.star-history.com/#Narcooo/inkos&type=date&legend=top-left">
+<a href="https://www.star-history.com/#Narcooo/castor&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Narcooo/inkos&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Narcooo/castor&type=date&legend=top-left" />
  </picture>
 </a>
 
@@ -618,8 +618,8 @@ pnpm typecheck    # Type-check without emitting
 
 <div align="center">
 
-<a href="https://skill-history.com/narcooo/inkos">
-  <img alt="Skills Download History" src="https://skill-history.com/chart/narcooo/inkos.svg" />
+<a href="https://skill-history.com/narcooo/castor">
+  <img alt="Skills Download History" src="https://skill-history.com/chart/narcooo/castor.svg" />
 </a>
 
 </div>
@@ -630,8 +630,8 @@ pnpm typecheck    # Type-check without emitting
 
 ## Contributors
 
-<a href="https://github.com/Narcooo/inkos/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Narcooo/inkos" />
+<a href="https://github.com/Narcooo/castor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Narcooo/castor" />
 </a>
 
 ## Acknowledgments

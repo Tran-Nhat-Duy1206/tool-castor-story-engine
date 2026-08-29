@@ -107,7 +107,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
   });
 
   it("A. prefix25 / manifest25 / current25 → stays 25 (no warning)", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-boot-a-"));
+    root = await mkdtemp(join(tmpdir(), "castor-boot-a-"));
     const bookDir = await seedBook(root, {
       prefixThrough: 25, manifestHead: 25, currentStateChapter: 25,
     });
@@ -117,7 +117,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
   });
 
   it("B. prefix25 / manifest26 / current26 → CONFIRMED structured head preserved at 26, no normalization warning", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-boot-b-"));
+    root = await mkdtemp(join(tmpdir(), "castor-boot-b-"));
     const bookDir = await seedBook(root, {
       prefixThrough: 25, manifestHead: 26, currentStateChapter: 26,
     });
@@ -128,7 +128,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
   });
 
   it("C. prefix25 / manifest26 / current25 → disagreement is NOT trusted; clamped back to 25 WITH warning", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-boot-c-"));
+    root = await mkdtemp(join(tmpdir(), "castor-boot-c-"));
     const bookDir = await seedBook(root, {
       prefixThrough: 25, manifestHead: 26, currentStateChapter: 25,
     });
@@ -138,7 +138,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
   });
 
   it("D. prefix25 / structured25 / markdown claims chapter 999 → stays 25 (markdown can never lead)", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-boot-d-"));
+    root = await mkdtemp(join(tmpdir(), "castor-boot-d-"));
     const bookDir = await seedBook(root, {
       prefixThrough: 25, manifestHead: 25, currentStateChapter: 25,
       markdownSummariesRow999: true,
@@ -149,7 +149,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
   });
 
   it("E. prefix25 / structured20 → existing normalization UP to the durable prefix still works", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-boot-e-"));
+    root = await mkdtemp(join(tmpdir(), "castor-boot-e-"));
     const bookDir = await seedBook(root, {
       prefixThrough: 25, manifestHead: 20, currentStateChapter: 20,
     });
@@ -158,7 +158,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
   });
 
   it("F. initial/empty book → unchanged initial semantics (head 0, file created)", async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-boot-f-"));
+    root = await mkdtemp(join(tmpdir(), "castor-boot-f-"));
     const bookDir = join(root, "books", "empty-book");
     await mkdir(join(bookDir), { recursive: true });
     await writeIf(join(bookDir, "book.json"), JSON.stringify({

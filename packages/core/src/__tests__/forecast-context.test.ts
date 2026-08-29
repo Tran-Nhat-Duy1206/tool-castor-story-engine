@@ -43,7 +43,7 @@ describe("buildForecastContext", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-forecast-ctx-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-forecast-ctx-"));
     await writeFixtureBook(bookDir);
   });
   afterEach(async () => {
@@ -165,7 +165,7 @@ describe("buildForecastContext", () => {
   });
 
   it("never creates missing canonical files on an empty book", async () => {
-    const emptyDir = await mkdtemp(join(tmpdir(), "inkos-forecast-empty-"));
+    const emptyDir = await mkdtemp(join(tmpdir(), "castor-forecast-empty-"));
     try {
       const context = await buildForecastContext({ bookDir: emptyDir, bookId: "empty" });
       expect(context.baseChapter).toBe(0);
@@ -193,7 +193,7 @@ describe("computeContextFingerprint", () => {
 
 describe("renderForecastContextMarkdown", () => {
   it("renders populated sections and skips empty ones", async () => {
-    const bookDir = await mkdtemp(join(tmpdir(), "inkos-forecast-md-"));
+    const bookDir = await mkdtemp(join(tmpdir(), "castor-forecast-md-"));
     try {
       await writeFixtureBook(bookDir);
       const context = await buildForecastContext({ bookDir, bookId: "demo" });

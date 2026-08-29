@@ -74,7 +74,7 @@ async function mainRuleUnitId(): Promise<string> {
 }
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-conflicts-"));
+  root = await mkdtemp(join(tmpdir(), "castor-conflicts-"));
   bookDir = join(root, "books", "conflicts-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "state"), { recursive: true });

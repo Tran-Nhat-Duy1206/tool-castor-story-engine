@@ -13,7 +13,7 @@ import { loadProjectConfigFile, saveProjectConfigFile } from "../config/project-
 /**
  * Castor runtime directory contract (Checkpoint 4, plan Tasks 4.2-4.4).
  *
- * Canonical runtime state lives in .castor/. Legacy .inkos/ is read only for
+ * Canonical runtime state lives in .castor/. Legacy .castor/ is read only for
  * one-way compatibility: content is copied into the canonical tree when the
  * canonical counterpart is missing; the legacy tree itself is never modified
  * and can never overwrite an existing canonical file. Story authority
@@ -32,7 +32,7 @@ afterEach(async () => {
 });
 
 async function writeLegacy(root: string, rel: string, content: string): Promise<string> {
-  const p = join(root, ".inkos", rel);
+  const p = join(root, ".castor", rel);
   await mkdir(join(p, ".."), { recursive: true });
   await writeFile(p, content, "utf-8");
   return p;
@@ -44,7 +44,7 @@ describe("runtime dir adapter", () => {
     expect(castorRuntimePath("/p", "materials")).toContain(".castor");
   });
 
-  it(".inkos only → resource copied one-way into .castor, legacy byte-identical", async () => {
+  it(".castor only → resource copied one-way into .castor, legacy byte-identical", async () => {
     const root = await tempRoot();
     const legacyRaw = `{"services":{"kkaiapi":{"apiKey":"sk-test-123"}}}`;
     const legacyPath = await writeLegacy(root, "secrets.json", legacyRaw);
@@ -62,7 +62,7 @@ describe("runtime dir adapter", () => {
 
     const resolved = await resolveRuntimePath(root, "secrets.json");
     expect(await readFile(resolved, "utf-8")).toBe("canonical");
-    await expect(access(join(root, ".inkos"))).rejects.toBeTruthy();
+    await expect(access(join(root, ".castor"))).rejects.toBeTruthy();
   });
 
   it("both exist → canonical wins; legacy never overwrites .castor content", async () => {
@@ -101,7 +101,7 @@ describe("runtime dir adapter", () => {
 });
 
 describe("secrets through the runtime adapter", () => {
-  it("legacy .inkos/secrets.json is visible after migration; saves go to .castor only", async () => {
+  it("legacy .castor/secrets.json is visible after migration; saves go to .castor only", async () => {
     const root = await tempRoot();
     const legacyRaw = JSON.stringify({ services: { kkaiapi: { apiKey: "sk-legacy" } } }, null, 2);
     const legacyPath = await writeLegacy(root, "secrets.json", legacyRaw);
@@ -130,7 +130,7 @@ describe("secrets through the runtime adapter", () => {
 });
 
 describe("legacy project authority preservation (Task 4.4 fixture)", () => {
-  it("opening + migrating a legacy project leaves books/, story/state, receipts and .inkos/ byte-identical", async () => {
+  it("opening + migrating a legacy project leaves books/, story/state, receipts and .castor/ byte-identical", async () => {
     const root = await tempRoot();
     // Legacy project: config, runtime resources, and authoritative story state.
     await writeLegacy(root, "secrets.json", JSON.stringify({ services: { custom: { apiKey: "sk-fixed" } } }));
@@ -141,7 +141,7 @@ describe("legacy project authority preservation (Task 4.4 fixture)", () => {
       llm: { provider: "openai", service: "custom", configSource: "studio", baseUrl: "", model: "", apiFormat: "chat", stream: true },
       notify: [],
     }, null, 2);
-    const legacyConfigPath = join(root, "inkos.json");
+    const legacyConfigPath = join(root, "castor.json");
     await writeFile(legacyConfigPath, configRaw, "utf-8");
 
     const stateFile = join(root, "books", "legacy-book", "story", "state", "canon.json");
@@ -157,8 +157,8 @@ describe("legacy project authority preservation (Task 4.4 fixture)", () => {
     const before = {
       canon: await readFile(stateFile, "utf-8"),
       receipt: await readFile(receipt, "utf-8"),
-      legacyConfig: await readFile(join(root, "inkos.json"), "utf-8"),
-      secrets: await readFile(join(root, ".inkos", "secrets.json"), "utf-8"),
+      legacyConfig: await readFile(join(root, "castor.json"), "utf-8"),
+      secrets: await readFile(join(root, ".castor", "secrets.json"), "utf-8"),
     };
 
     // Open through the new Castor public paths (config + runtime + secrets).
@@ -171,8 +171,8 @@ describe("legacy project authority preservation (Task 4.4 fixture)", () => {
     // Authoritative artifacts unchanged.
     expect(await readFile(stateFile, "utf-8")).toBe(before.canon);
     expect(await readFile(receipt, "utf-8")).toBe(before.receipt);
-    expect(await readFile(join(root, "inkos.json"), "utf-8")).toBe(before.legacyConfig);
-    expect(await readFile(join(root, ".inkos", "secrets.json"), "utf-8")).toBe(before.secrets);
+    expect(await readFile(join(root, "castor.json"), "utf-8")).toBe(before.legacyConfig);
+    expect(await readFile(join(root, ".castor", "secrets.json"), "utf-8")).toBe(before.secrets);
 
     // Migration created no authority artifacts and did not advance Canon.
     const castorTree = await readdir(castorRuntimeDir(root));

@@ -9,7 +9,7 @@ describe("Studio prompt pack endpoints", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-studio-prompts-"));
+    root = await mkdtemp(join(tmpdir(), "castor-studio-prompts-"));
   });
 
   afterEach(async () => {

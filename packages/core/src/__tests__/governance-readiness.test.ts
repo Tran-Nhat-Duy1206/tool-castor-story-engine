@@ -124,7 +124,7 @@ let c1Root = "";
 let c1BookDir = "";
 
 async function setupChapter1Book(units: ReadonlyArray<FoundationUnitManifest>, legacyMarkdown = false): Promise<void> {
-  c1Root = await mkdtemp(join(tmpdir(), "inkos-c1-"));
+  c1Root = await mkdtemp(join(tmpdir(), "castor-c1-"));
   c1BookDir = join(c1Root, "books", "c1-book");
   await mkdir(join(c1BookDir, "story", "outline"), { recursive: true });
   await mkdir(join(c1BookDir, "story", "state"), { recursive: true });

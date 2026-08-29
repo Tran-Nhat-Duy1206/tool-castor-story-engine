@@ -413,8 +413,8 @@ vi.mock("@actalk/castor-core", async (importOriginal) => {
     getAllEndpoints: getAllEndpointsMock,
     probeModelsFromUpstream: probeModelsFromUpstreamMock,
     fetchWithProxy: vi.fn((input: Parameters<typeof fetch>[0], init?: RequestInit) => fetch(input, init)),
-    GLOBAL_ENV_PATH: join(tmpdir(), "inkos-global.env"),
-    resolveGlobalEnvPath: async () => join(tmpdir(), "inkos-global.env"),
+    GLOBAL_ENV_PATH: join(tmpdir(), "castor-global.env"),
+    resolveGlobalEnvPath: async () => join(tmpdir(), "castor-global.env"),
     SessionKindSchema: actual.SessionKindSchema,
     DetectionConfigSchema: actual.DetectionConfigSchema,
     normalizeActionSource: actual.normalizeActionSource,
@@ -492,7 +492,7 @@ describe("createStudioServer daemon lifecycle", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-studio-server-"));
+    root = await mkdtemp(join(tmpdir(), "castor-studio-server-"));
     await writeFile(join(root, "castor.json"), JSON.stringify(projectConfig, null, 2), "utf-8");
     schedulerStartMock.mockReset();
     initBookMock.mockReset();
@@ -752,7 +752,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
   afterEach(async () => {
     await rm(root, { recursive: true, force: true });
-    await rm(join(tmpdir(), "inkos-global.env"), { force: true });
+    await rm(join(tmpdir(), "castor-global.env"), { force: true });
   });
 
   it("uses the real core bookId validator in the Studio safety mock", async () => {
@@ -1520,7 +1520,7 @@ describe("createStudioServer daemon lifecycle", () => {
       "CASTOR_LLM_MODEL=gpt-5.4",
       "CASTOR_LLM_API_KEY=sk-project",
     ].join("\n"), "utf-8");
-    await writeFile(join(tmpdir(), "inkos-global.env"), [
+    await writeFile(join(tmpdir(), "castor-global.env"), [
       "CASTOR_LLM_PROVIDER=openai",
       "CASTOR_LLM_BASE_URL=https://global.example.com/v1",
       "CASTOR_LLM_MODEL=gpt-4o",
@@ -1562,7 +1562,7 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("imports detected env config into Studio services without exposing the key", async () => {
-    await writeFile(join(tmpdir(), "inkos-global.env"), [
+    await writeFile(join(tmpdir(), "castor-global.env"), [
       "CASTOR_LLM_PROVIDER=openai",
       "CASTOR_LLM_BASE_URL=https://api.kkaiapi.com/v1",
       "CASTOR_LLM_MODEL=deepseek-v4-flash",
@@ -2516,7 +2516,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const unsupportedRoot = await app.request("http://localhost/api/v1/project/files/books/demo/cover.png");
     expect(unsupportedRoot.status).toBe(400);
 
-    const traversal = await app.request("http://localhost/api/v1/project/files/../inkos.json");
+    const traversal = await app.request("http://localhost/api/v1/project/files/../castor.json");
     expect([400, 404]).toContain(traversal.status);
   });
 
@@ -2551,7 +2551,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const unsupportedRoot = await app.request("http://localhost/api/v1/project/artifacts/books/demo/story_bible.md");
     expect(unsupportedRoot.status).toBe(400);
 
-    const traversal = await app.request("http://localhost/api/v1/project/artifacts/interactive-films/%2e%2e/inkos.json");
+    const traversal = await app.request("http://localhost/api/v1/project/artifacts/interactive-films/%2e%2e/castor.json");
     expect([400, 404]).toContain(traversal.status);
   });
 

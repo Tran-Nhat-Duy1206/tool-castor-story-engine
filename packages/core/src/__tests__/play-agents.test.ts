@@ -14,7 +14,7 @@ import { PlayMutationSchema } from "../models/play.js";
 const ctx = {
   client: { provider: "openai" } as never,
   model: "test-model",
-  projectRoot: "/tmp/inkos-play-test",
+  projectRoot: "/tmp/castor-play-test",
 };
 
 describe("play agents", () => {
@@ -192,7 +192,7 @@ describe("play agents", () => {
   });
 
   it("loads project Play prompt-pack overrides into the mutator system prompt", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-prompt-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-prompt-"));
     try {
       await mkdir(join(root, "prompt", "play"), { recursive: true });
       await writeFile(join(root, "prompt", "play", "mutator.md"), "PROJECT MUTATOR OVERRIDE: honor lantern rarity by atmosphere.");
@@ -274,7 +274,7 @@ describe("play agents", () => {
   });
 
   it("loads project Play prompt-pack overrides into the renderer system prompt", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-play-renderer-prompt-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-play-renderer-prompt-"));
     try {
       await mkdir(join(root, "prompt", "play"), { recursive: true });
       await writeFile(join(root, "prompt", "play", "renderer.md"), "PROJECT RENDERER OVERRIDE: render romance props through distance and touch.");

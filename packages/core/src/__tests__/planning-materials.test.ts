@@ -10,7 +10,7 @@ describe("gatherPlanningMaterials", () => {
   let storyDir: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-planning-materials-"));
+    root = await mkdtemp(join(tmpdir(), "castor-planning-materials-"));
     bookDir = join(root, "books", "harbor-book");
     storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });

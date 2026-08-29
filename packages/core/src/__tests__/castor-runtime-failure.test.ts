@@ -13,7 +13,7 @@ vi.mock("node:fs/promises", async (importOriginal) => {
   return {
     ...actual,
     cp: (async (src: Parameters<typeof actual.cp>[0], dest: Parameters<typeof actual.cp>[1], opts?: Parameters<typeof actual.cp>[2]) => {
-      if (cpState.failNext && String(src).includes(".inkos")) {
+      if (cpState.failNext && String(src).includes(".castor")) {
         cpState.failNext = false;
         throw new Error("Injected IO failure during migration copy");
       }
@@ -38,7 +38,7 @@ afterEach(async () => {
 describe("runtime migration failure injection", () => {
   it("directory resource: failed copy leaves no canonical residue; retry succeeds", async () => {
     const root = await tempRoot();
-    const legacyDir = join(root, ".inkos", "materials");
+    const legacyDir = join(root, ".castor", "materials");
     await mkdir(legacyDir, { recursive: true });
     await writeFile(join(legacyDir, "b.md"), "legacy content", "utf-8");
 
@@ -53,7 +53,7 @@ describe("runtime migration failure injection", () => {
 
   it("file resource: failed copy leaves no canonical residue; retry succeeds", async () => {
     const root = await tempRoot();
-    const legacyDir = join(root, ".inkos");
+    const legacyDir = join(root, ".castor");
     await mkdir(legacyDir, { recursive: true });
     await writeFile(join(legacyDir, "secrets.json"), '{"services":{}}', "utf-8");
 
@@ -67,7 +67,7 @@ describe("runtime migration failure injection", () => {
 
   it("staging debris from a failed attempt does not leak into the canonical tree", async () => {
     const root = await tempRoot();
-    const legacyDir = join(root, ".inkos", "materials");
+    const legacyDir = join(root, ".castor", "materials");
     await mkdir(legacyDir, { recursive: true });
     await writeFile(join(legacyDir, "b.md"), "legacy content", "utf-8");
 

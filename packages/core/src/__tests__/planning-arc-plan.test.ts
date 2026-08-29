@@ -58,7 +58,7 @@ function sampleDraft(draftId = "draft-a", arcId = "arc-1"): ArcPlanDraftRecord {
 }
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-arc-plan-"));
+  root = await mkdtemp(join(tmpdir(), "castor-arc-plan-"));
   bookDir = join(root, "books", "demo-book");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await writeFile(bookPath(), `${JSON.stringify({

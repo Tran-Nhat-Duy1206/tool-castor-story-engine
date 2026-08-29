@@ -8,7 +8,7 @@ describe("PlayFileDB", () => {
   let dir: string;
 
   beforeEach(async () => {
-    dir = await mkdtemp(join(tmpdir(), "inkos-play-file-db-"));
+    dir = await mkdtemp(join(tmpdir(), "castor-play-file-db-"));
   });
 
   afterEach(async () => {

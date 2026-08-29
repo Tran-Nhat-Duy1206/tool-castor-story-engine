@@ -8,7 +8,7 @@ describe("Studio skill endpoints", () => {
   let root: string;
 
   beforeEach(async () => {
-    root = await mkdtemp(join(tmpdir(), "inkos-studio-skills-"));
+    root = await mkdtemp(join(tmpdir(), "castor-studio-skills-"));
   });
 
   afterEach(async () => {

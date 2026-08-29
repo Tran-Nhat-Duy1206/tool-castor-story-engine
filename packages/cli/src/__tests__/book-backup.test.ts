@@ -20,7 +20,7 @@ async function exists(path: string): Promise<boolean> {
 }
 
 async function setupBook(bookId: string): Promise<string> {
-  projectRoot = await mkdtemp(join(tmpdir(), "inkos-book-backup-"));
+  projectRoot = await mkdtemp(join(tmpdir(), "castor-book-backup-"));
   const bookDir = join(projectRoot, "books", bookId);
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await mkdir(join(bookDir, "story"), { recursive: true });

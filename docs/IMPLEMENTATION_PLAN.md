@@ -1,7 +1,7 @@
-# InkOS V1 Implementation Plan
+# castor V1 Implementation Plan
 
 **Status:** PLAN — implementation planning only. No code, tests, schemas, prompts, or migrations are changed by this document.
-**Sources of truth used:** `docs/PROJECT_VISION.md` (long-term intent) · `docs/V1_SPEC.md` (APPROVED V1 requirements) · `docs/ARCHITECTURE_AUDIT.md` (verified InkOS 1.8.0 facts).
+**Sources of truth used:** `docs/PROJECT_VISION.md` (long-term intent) · `docs/V1_SPEC.md` (APPROVED V1 requirements) · `docs/ARCHITECTURE_AUDIT.md` (verified castor 1.8.0 facts).
 **Rule invoked throughout:** REUSE → EXPOSE → EXTEND before DUPLICATE → REPLACE → REWRITE (V1_SPEC §61). Every task below names the exact existing symbols it reuses; where it extends, it says exactly what is added.
 
 ---
@@ -88,7 +88,7 @@ Each decision below was derived from named audit findings; these bind all later 
 ## 3. Phases and Tasks
 
 Task template: **Goal / Files / Reuse / Interface / Tests-first / Minimal impl / Verify / Commit boundary.**
-Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vitest run src/__tests__/<t>` · STUDIO-F(t): `pnpm --filter @actalk/inkos-studio exec vitest run src/__tests__/<t>` · BOUNDARY: `pnpm --filter @actalk/inkos-core test && pnpm --filter @actalk/inkos-cli test && pnpm --filter @actalk/inkos-studio test && pnpm typecheck && pnpm build`.
+Verification shorthand — CORE-F(t): `pnpm --filter @actalk/castor-core exec vitest run src/__tests__/<t>` · STUDIO-F(t): `pnpm --filter @actalk/castor-studio exec vitest run src/__tests__/<t>` · BOUNDARY: `pnpm --filter @actalk/castor-core test && pnpm --filter @actalk/castor-cli test && pnpm --filter @actalk/castor-studio test && pnpm typecheck && pnpm build`.
 
 ### Phase 0 — Test scaffolding (risk: LOW)
 
@@ -112,7 +112,7 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 
 **T1.2 Barrel export.**
 - Files: MODIFY `packages/core/src/index.ts` (append export line near runtime-state exports :30-52).
-- Verify: `pnpm --filter @actalk/inkos-core build` (subpath exports intact), `pnpm typecheck`.
+- Verify: `pnpm --filter @actalk/castor-core build` (subpath exports intact), `pnpm typecheck`.
 
 **T1.3 Studio read route.**
 - Files: MODIFY `packages/studio/src/api/server.ts` (new route beside book routes ~:2800); CREATE `packages/studio/src/__tests__/canon-route.test.ts`.
@@ -133,7 +133,7 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 - Content strictly mirrors existing schemas — three tabs: **Current State** (slot table from the 6 patch slots via alias matching + "Additional facts" list showing subject/predicate/object + validity chapters), **Hooks** (FULL 13-column table incl. `dependsOn/payoffTiming/coreHook/halfLife/promoted` — deliberately unlike the lossy client-side `lib/truth-display.ts#parsePendingHooks` cards), **Chapter Summaries** (8-column table). Technical fields displayed but marked system-managed (per V1_SPEC §43).
 - Do NOT invent timeline/relationship/clue/secret models (audit §3.9: none exist).
 - Tests-first: `pages/story-state/StoryStatePage.test.tsx` — renders mocked canon; hooks table shows promoted column; empty-state for missing sections.
-- Verify: STUDIO-F(StoryStatePage) + `pnpm --filter @actalk/inkos-studio build`.
+- Verify: STUDIO-F(StoryStatePage) + `pnpm --filter @actalk/castor-studio build`.
 
 ### Phase 3 — Safe manual current-state editing (C, D, K) — FINAL AMENDED DESIGN (risk: MEDIUM; P3A persistence/reconciliation elevated)
 
@@ -192,7 +192,7 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
   - `commitCanonEdits(bookDir, request: CanonCommitRequest, deps?): Promise<CommitResult>`; injectable `deps` = `{renameFile?, rebuildNarrativeMemoryIndex?, rebuildCurrentStateFactHistory?, invalidateDerivedMemory?}` (test seams only).
 - LOCK OWNERSHIP (explicit, not ambiguous): the CALLER must hold `StateManager.acquireBookLock(bookId)` for the ENTIRE sequence — the Studio server owns lock orchestration in P3B; pipeline callers hold their own. TSDoc states this requirement; Core introduces no second locking mechanism.
 - Sequence: pure read (`readStoryCanon` — never bootstraps; missing/corrupt ⇒ `CanonUnavailableError`) → `computeCanonRevision(current)` ≠ `request.expectedRevision` ⇒ throw `CanonConflictError` (ZERO writes) → `E = resolveDurableStoryProgress(bookDir) + 1` → apply edits → `validateRuntimeState(after)` + `validateCanonEditedState(...)` → render `current_state.md` via `renderCurrentStateProjection(after.currentState, manifest.language)` → assemble the write list IN MEMORY: live `story/state/current_state.json` + regenerated `story/current_state.md` + snapshot mirrors `story/snapshots/N/state/current_state.json` + `story/snapshots/N/current_state.md`; if `isSnapshotComplete(bookDir, N)` is false, overlay those two entries onto the COMPLETE `buildSnapshotFileSet(bookDir, N)` reconstruction (still in memory) → **ONE `commitAtomicFileSet({ rootDir: bookDir, writes, renameFile? })`** covering every integrity-boundary target. `saveRuntimeStateSnapshot` is deliberately NOT used (four independent writes = partial-write risk). There is NO `snapshotStateAt` call, NO writeFile/mkdir materialization, NO bootstrap, and NO projection write before the transaction. → extracted memory fns (T3A.6) with failure handling (T3A.8) → return `{appliedEdits, closedFacts, effectiveChapter, previousRevision, revision: computeCanonRevision(after), warnings}`.
-- Tests-first (canon-edits.test.ts §preview/§commit): preview purity via sha+len+mtime metadata capture; happy path asserts exact bytes of live JSON, projection equality with renderer output, and BOTH snapshot mirrors; inflated-manifest fixture (durable 15, manifest claims 20) ⇒ E = 16; missing/incomplete snapshot N ⇒ complete reconstruction created inside the transaction; stale `expectedRevision` ⇒ `CanonConflictError` and ALL project files hash+len+mtime identical; missing/corrupt canon ⇒ `CanonUnavailableError`, nothing written; injected `renameFile` failure at the LIVE-target stage AND at the SNAPSHOT-target stage ⇒ every touched path in BOTH trees unchanged, no `.inkos-file-txn-*` residue, no partial snapshot remains; spy/module assertions prove NO `snapshotStateAt` or other mutating preparatory call precedes the transaction.
+- Tests-first (canon-edits.test.ts §preview/§commit): preview purity via sha+len+mtime metadata capture; happy path asserts exact bytes of live JSON, projection equality with renderer output, and BOTH snapshot mirrors; inflated-manifest fixture (durable 15, manifest claims 20) ⇒ E = 16; missing/incomplete snapshot N ⇒ complete reconstruction created inside the transaction; stale `expectedRevision` ⇒ `CanonConflictError` and ALL project files hash+len+mtime identical; missing/corrupt canon ⇒ `CanonUnavailableError`, nothing written; injected `renameFile` failure at the LIVE-target stage AND at the SNAPSHOT-target stage ⇒ every touched path in BOTH trees unchanged, no `.castor-file-txn-*` residue, no partial snapshot remains; spy/module assertions prove NO `snapshotStateAt` or other mutating preparatory call precedes the transaction.
 - Verify: CORE-F(canon-edits).
 
 **T3A.6 Memory/fact-history sync extraction (behavior-preserving).**
@@ -234,7 +234,7 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 - UX (BINDING): inline edit/add/remove on slot fields + additional facts → **Save posts the commit request directly; Save is the ONE and ONLY user confirmation.** NO preview dialog and NO second Confirm action; automatic/debounced validation MAY surface warnings inline but must never gate Save behind another click. Validity integers, manifest, and system-managed fields render READ-ONLY (V1_SPEC §43). Errors/conflicts render inline issue lists; success refetches (fresh revision).
 - Explicitly out of scope: chapter-summary editing, hook editing (hooks arrive with T6.5), any post-chapter review workflow.
 - Tests-first: model-layer edit-collection→payload specs + route-level coverage (jsdom/.tsx test harness unavailable in this repo — standing disclosed deviation from plan-default UI testing).
-- Verify: STUDIO-F(canon-edits-model) + `pnpm --filter @actalk/inkos-studio build`.
+- Verify: STUDIO-F(canon-edits-model) + `pnpm --filter @actalk/castor-studio build`.
 
 **▶ CHECKPOINT P3B:** Studio API + editing UI complete and independently reviewed. STOP. Only then does Phase 4 consume this commit engine (T6.1 `confirmChapterState` reuses the same atomic live+snapshot pattern).
 
@@ -366,7 +366,7 @@ Verification shorthand — CORE-F(t): `pnpm --filter @actalk/inkos-core exec vit
 - Verify: STUDIO-F(ChapterStateReview).
 
 **T6.4 CLI parity commands (minimal).**
-- Files: MODIFY `packages/cli/src/commands/review.ts` (+ `inkos review state [book] [chapter]` listing proposals, `--accept-all/--reject-all` flags delegating to runner commands) — keeps CLI valuable without duplicating UI (vision §26).
+- Files: MODIFY `packages/cli/src/commands/review.ts` (+ `castor review state [book] [chapter]` listing proposals, `--accept-all/--reject-all` flags delegating to runner commands) — keeps CLI valuable without duplicating UI (vision §26).
 - Tests-first: `cli/src/__tests__/review-state-command.test.ts` with stubbed runner.
 - Verify: CLI-F(review-state-command).
 
@@ -461,14 +461,14 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 ### Phase 9 — Chinese → vi/en migration (P) (risk: HIGH)
 
 **T9.1 Detection + dry-run planner.**
-- Files: CREATE `packages/core/src/migration/detect.ts` (+ `planLanguageMigration(projectRoot, target): MigrationPlan`); CLI `commands/migrate-language.ts` (`inkos migrate-language [--book id] --to vi|en --dry-run`); program registration.
+- Files: CREATE `packages/core/src/migration/detect.ts` (+ `planLanguageMigration(projectRoot, target): MigrationPlan`); CLI `commands/migrate-language.ts` (`castor migrate-language [--book id] --to vi|en --dry-run`); program registration.
 - Output: per-file action list (translate / rewrite / relabel / untouched) with counts; NEVER mutates in dry-run.
-- Whitelist logic encodes V1_SPEC §26/§27: translate chapters, foundation md, roles sheets, outlines, summaries cells, hook notes/types, state VALUES, planning artifacts; NEVER ids/schema keys/hashes/snapshot dirs/enum values (except `manifest.language`/`book.language`/`inkos.json.language` which the finalize step rewrites explicitly).
+- Whitelist logic encodes V1_SPEC §26/§27: translate chapters, foundation md, roles sheets, outlines, summaries cells, hook notes/types, state VALUES, planning artifacts; NEVER ids/schema keys/hashes/snapshot dirs/enum values (except `manifest.language`/`book.language`/`castor.json.language` which the finalize step rewrites explicitly).
 - Tests-first: `src/__tests__/migrate-detect.test.ts` on a zh fixture book (T0.1 variant) — exact plan contents; en book ⇒ empty plan.
 - Verify: CORE-F(migrate-detect).
 
 **T9.2 Backup + journal.**
-- Files: MODIFY `cli/src/book-backup.ts` (expose project-level backup of inkos.json alongside per-book backups); CREATE `migration/journal.ts` (`MigrationJournal` — append-only JSONL at `.inkos/migrations/<ts>-<target>.jsonl`, entries {file, action, status, backupRef}; supports resume + rollback listing).
+- Files: MODIFY `cli/src/book-backup.ts` (expose project-level backup of castor.json alongside per-book backups); CREATE `migration/journal.ts` (`MigrationJournal` — append-only JSONL at `.castor/migrations/<ts>-<target>.jsonl`, entries {file, action, status, backupRef}; supports resume + rollback listing).
 - Tests-first: journal append/resume/rollback-list unit tests; backup created before any mutation (integration).
 - Verify: CORE-F(migration-journal).
 
@@ -478,7 +478,7 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 - Verify: CORE-F(migrate-translate).
 
 **T9.4 Finalize + verify.**
-- Files: CREATE `migration/finalize.ts` — per book: write translated artifacts via `commitAtomicFileSet`, update `inkos.json`/`book.json`/`manifest.json` language fields LAST, regenerate all three projections via renderers, run `loadRuntimeStateSnapshot` validation + `doctor`-style checks; print summary; `--rollback <journal>` restores backups (T9.2) — the ONLY sanctioned undo.
+- Files: CREATE `migration/finalize.ts` — per book: write translated artifacts via `commitAtomicFileSet`, update `castor.json`/`book.json`/`manifest.json` language fields LAST, regenerate all three projections via renderers, run `loadRuntimeStateSnapshot` validation + `doctor`-style checks; print summary; `--rollback <journal>` restores backups (T9.2) — the ONLY sanctioned undo.
 - Tests-first: `src/__tests__/migrate-finalize.test.ts` — migrated fixture passes canon validation; projections match renderers; IDs/hashes byte-identical pre/post; failure mid-finalize ⇒ atomic per-book rollback; explicit zh→vi manifest flip drives vi alias order correctly (reducer test).
 - Verify: CORE-F(migrate-finalize) + CORE-F(runtime-state-store).
 
@@ -511,7 +511,7 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 ## 5. Testing Strategy
 
 - **Per task:** named failing test → minimal implementation → focused vitest filter (commands inline above).
-- **Per phase boundary:** `pnpm --filter @actalk/inkos-core test` (+ cli/studio when touched), `pnpm typecheck`, `pnpm build`.
+- **Per phase boundary:** `pnpm --filter @actalk/castor-core test` (+ cli/studio when touched), `pnpm typecheck`, `pnpm build`.
 - **Milestones (after P3A/P3B/C2/C3/C4):** full `pnpm test -r`; baseline discipline — 1856 passing + new tests; ONLY the 2 known `skill-agent-tool.test.ts` symlink EPERM failures excluded.
 - **Regression anchors reused constantly:** `pipeline-runner.test.ts`, `writer.test.ts`, `reviser.test.ts`, `runtime-state-store.test.ts`, `state-manager.test.ts`, `chapter-delete.test.ts`, `atomic-file-set.test.ts`, `production-harness.test.ts`, `short-fiction-en.test.ts` (pattern source for leak tests), `localization.test.ts`.
 - Offline determinism: LLM-dependent tests use the existing `agent/llm-stub.ts` harness; no network in CI tasks.

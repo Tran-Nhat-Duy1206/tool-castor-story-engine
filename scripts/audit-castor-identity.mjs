@@ -2,7 +2,7 @@
 /**
  * Castor identity audit (Checkpoint 1, Task 1.2).
  *
- * Scans tracked production/user-facing files for legacy InkOS identity
+ * Scans tracked production/user-facing files for legacy castor identity
  * occurrences and fails when any occurrence remains outside an explicitly
  * allowlisted bucket. Buckets follow the approved migration plan:
  *
@@ -44,12 +44,12 @@ export const PATH_ALLOWLIST = [
   { bucket: "LEGACY-COMPAT", pattern: /^packages\/cli\/src\/book-backup\.ts$/ },
   // Bootstrap detects legacy projects and refuses to shadow legacy configs.
   { bucket: "LEGACY-COMPAT", pattern: /^packages\/cli\/src\/project-bootstrap\.ts$/ },
-  // Reads pre-rename plan caches carrying INKOS_PLAN_* markers.
+  // Reads pre-rename plan caches carrying castor_PLAN_* markers.
   { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/pipeline\/persisted-governed-plan\.ts$/ },
   { bucket: "LEGACY-COMPAT", pattern: /^scripts\/audit-castor-identity\.mjs$/ },
   // Must keep ignoring legacy-named runtime artifacts created by older versions.
   { bucket: "LEGACY-COMPAT", pattern: /^\.gitignore$/ },
-  // E2E seeder for the legacy test-project fixture (reads legacy .inkos data).
+  // E2E seeder for the legacy test-project fixture (reads legacy .castor data).
   { bucket: "LEGACY-COMPAT", pattern: /^packages\/studio\/e2e\/fixtures\// },
 ];
 
@@ -59,7 +59,7 @@ const ATTRIBUTION_LINE = /(Narcooo|upstream|derived|attribution|AGPL|licen[cs]e|
 /** Basenames that must not carry the legacy name once the migration completes. */
 export function isLegacyFilename(relPath) {
   const base = relPath.split("/").pop() ?? relPath;
-  return /inkos/i.test(base);
+  return /castor/i.test(base);
 }
 
 /** Files out of audit scope: tests are not user-facing production surfaces. */
@@ -90,7 +90,7 @@ export function scanContent(relPath, content) {
   let allowedCount = 0;
   let attributionLines = 0;
   lines.forEach((line, idx) => {
-    if (!/inkos/i.test(line)) return;
+    if (!/castor/i.test(line)) return;
     if (pathClass.allowed) {
       allowedCount += 1;
       return;

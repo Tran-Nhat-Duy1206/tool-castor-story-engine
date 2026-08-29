@@ -16,7 +16,7 @@ let root = "";
 let bookDir = "";
 
 async function setupBook(): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-foundation-manifest-"));
+  root = await mkdtemp(join(tmpdir(), "castor-foundation-manifest-"));
   bookDir = join(root, "books", "manifest-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "roles", "major"), { recursive: true });

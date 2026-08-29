@@ -20,7 +20,7 @@ describe("commitAtomicFileSet", () => {
   });
 
   async function createBookFixture(): Promise<string> {
-    const root = await mkdtemp(join(tmpdir(), "inkos-file-set-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-file-set-"));
     roots.push(root);
     await Promise.all([
       mkdir(join(root, "chapters"), { recursive: true }),

@@ -1,16 +1,16 @@
 # Tool Castor Story Engine — Product Vision
 
 **Status:** Product direction / source of intent
-**Purpose:** Define what this fork of InkOS is intended to become.
+**Purpose:** Define what this fork of castor is intended to become.
 **Important:** This document is NOT an implementation plan and does not prescribe specific architecture unless explicitly stated.
 
 ---
 
 # 1. Core Vision
 
-This project will **evolve the existing InkOS codebase**, not rebuild it from scratch.
+This project will **evolve the existing castor codebase**, not rebuild it from scratch.
 
-The strongest capability of InkOS is its automation:
+The strongest capability of castor is its automation:
 
 > Idea → Story Foundation → Planning → Long-form Writing → Audit → Story State Update → Continue Writing
 
@@ -20,7 +20,7 @@ The main limitation we want to solve is that the user currently has too little d
 
 The future product should therefore combine:
 
-> **InkOS-level automation + human-visible, human-editable story control.**
+> **castor-level automation + human-visible, human-editable story control.**
 
 The AI should do most of the repetitive work, while the user remains the final authority over the story.
 
@@ -33,9 +33,9 @@ The ideal workflow is:
 ```text
 User provides an idea as text
         ↓
-InkOS builds the story foundation
+castor builds the story foundation
         ↓
-InkOS creates planning material
+castor creates planning material
         ↓
 User can inspect and modify the generated information
         ↓
@@ -93,7 +93,7 @@ If prose or generated state conflicts with Canon, the system should expose the c
 
 The system should remain highly automated.
 
-We do NOT want to turn InkOS into a workflow where the user has to approve every minor detail.
+We do NOT want to turn castor into a workflow where the user has to approve every minor detail.
 
 The intended behavior is:
 
@@ -128,11 +128,11 @@ Examples:
 * world rules
 * major plot twists
 
-The exact approval rules may evolve after the existing InkOS architecture is understood.
+The exact approval rules may evolve after the existing castor architecture is understood.
 
 ---
 
-# 5. What Must Be Preserved From InkOS
+# 5. What Must Be Preserved From castor
 
 Unless there is a strong technical reason otherwise, preserve and improve existing working systems rather than replacing them.
 
@@ -161,7 +161,7 @@ Do not replace a working subsystem simply because a new implementation looks cle
 
 # 6. Main Problems We Want to Solve
 
-The current InkOS workflow is powerful but too opaque for the desired use case.
+The current castor workflow is powerful but too opaque for the desired use case.
 
 The user needs to be able to see and correct what the system believes about the story.
 
@@ -189,7 +189,7 @@ The project should progressively improve visibility and editability of informati
 * continuity state
 * relevant AI memory/context
 
-Before creating new systems for these concepts, investigate what InkOS already contains and reuse existing structured state whenever possible.
+Before creating new systems for these concepts, investigate what castor already contains and reuse existing structured state whenever possible.
 
 ---
 
@@ -295,7 +295,7 @@ Source: INFERRED
 
 An inference should not automatically become permanent Canon without sufficient justification.
 
-The existing InkOS state model must be studied before designing this feature.
+The existing castor state model must be studied before designing this feature.
 
 ---
 
@@ -368,7 +368,7 @@ Chapter 20
 
 The AI may need access to the secret for foreshadowing while still being forbidden from revealing it early through the POV character.
 
-Before adding a new Secret system, investigate whether InkOS already has equivalent truth/hook/subplot/governance mechanisms.
+Before adding a new Secret system, investigate whether castor already has equivalent truth/hook/subplot/governance mechanisms.
 
 ---
 
@@ -421,7 +421,7 @@ Resolved
 Abandoned
 ```
 
-Do not create duplicate systems if InkOS already tracks these concepts.
+Do not create duplicate systems if castor already tracks these concepts.
 
 ---
 
@@ -444,7 +444,7 @@ Dr. Harrow arrives
 
 Timeline inconsistencies should be detectable.
 
-The user should also be able to correct timeline data directly when InkOS or the LLM makes a mistake.
+The user should also be able to correct timeline data directly when castor or the LLM makes a mistake.
 
 ---
 
@@ -482,7 +482,7 @@ but automation should create these by default.
 
 # 15. Vietnamese + English Only
 
-This fork of InkOS will support **two primary story languages only**:
+This fork of castor will support **two primary story languages only**:
 
 ```text
 Vietnamese — vi-VN
@@ -491,7 +491,7 @@ English    — en
 
 Chinese is **not part of the target product direction**.
 
-The original InkOS codebase may currently contain Chinese-specific:
+The original castor codebase may currently contain Chinese-specific:
 
 * prompts
 * system instructions
@@ -515,7 +515,7 @@ These existing Chinese-oriented components must be identified during the reposit
 The long-term direction is:
 
 ```text
-Original InkOS
+Original castor
 
 Chinese
 English
@@ -558,7 +558,7 @@ There should not be a Chinese story-language option in the final target product.
 
 ## Vietnamese Must Replace Chinese Where Chinese Is Currently the Default
 
-If the existing InkOS system currently assumes Chinese as its default language, the fork should progressively replace that behavior with Vietnamese.
+If the existing castor system currently assumes Chinese as its default language, the fork should progressively replace that behavior with Vietnamese.
 
 Conceptually:
 
@@ -811,13 +811,13 @@ Target ≈ 3,000 words
 
 Existing Chinese character-count assumptions should not silently carry into Vietnamese projects.
 
-The repository audit must determine whether InkOS already has language-aware length metrics that can be reused.
+The repository audit must determine whether castor already has language-aware length metrics that can be reused.
 
 ---
 
 ## Backward Compatibility With Old Chinese Projects
 
-Removing Chinese from the target product does not automatically mean old InkOS Chinese projects should be destroyed or become unreadable.
+Removing Chinese from the target product does not automatically mean old castor Chinese projects should be destroyed or become unreadable.
 
 During migration, distinguish between:
 
@@ -828,7 +828,7 @@ Creating new Chinese projects
 and:
 
 ```text
-Reading legacy Chinese InkOS projects
+Reading legacy Chinese castor projects
 ```
 
 Target behavior:
@@ -891,7 +891,7 @@ Do not mix these two requirements.
 The target language architecture is:
 
 ```text
-                     InkOS Core
+                     castor Core
                          │
                   Language Config
                          │
@@ -947,7 +947,7 @@ This will help diagnose:
 * model limits
 * continuity failures
 
-Do not redesign the context builder before understanding the current InkOS implementation.
+Do not redesign the context builder before understanding the current castor implementation.
 
 ---
 
@@ -961,7 +961,7 @@ The long-term direction is:
 
 For example, a chapter involving three characters should not automatically require full detailed biographies of forty unrelated characters.
 
-However, context optimization should happen only after the current InkOS context and memory systems have been audited.
+However, context optimization should happen only after the current castor context and memory systems have been audited.
 
 ---
 
@@ -996,7 +996,7 @@ Important principles:
 * retries should not silently replace good content
 * state updates should not corrupt the story when later pipeline stages fail
 
-InkOS already contains recovery and persistence mechanisms.
+castor already contains recovery and persistence mechanisms.
 
 Investigate and preserve them before adding new behavior.
 
@@ -1021,7 +1021,7 @@ State Update   pending
 
 If generation fails during Scene 3, the system should reuse valid completed work whenever possible.
 
-Existing InkOS recovery mechanisms must be understood before designing replacements.
+Existing castor recovery mechanisms must be understood before designing replacements.
 
 ---
 
@@ -1080,13 +1080,13 @@ Minor safe changes may remain automatic.
 
 Major Canon changes should ultimately be reviewable.
 
-The exact implementation should build on existing InkOS state-reduction and persistence mechanisms where possible.
+The exact implementation should build on existing castor state-reduction and persistence mechanisms where possible.
 
 ---
 
 # 23. Backward Compatibility
 
-Existing InkOS books are valuable and should not be broken unnecessarily.
+Existing castor books are valuable and should not be broken unnecessarily.
 
 Progressive migration is preferred.
 
@@ -1106,7 +1106,7 @@ Where necessary, old and new representations may temporarily coexist.
 
 # 24. Progressive Evolution
 
-This project should evolve InkOS in stages.
+This project should evolve castor in stages.
 
 General philosophy:
 
@@ -1129,7 +1129,7 @@ Do not begin by replacing the core generation engine.
 Whenever possible:
 
 ```text
-Existing working InkOS system
+Existing working castor system
         ↓
 Expose it
         ↓
@@ -1161,7 +1161,7 @@ Before implementing any new:
 * memory system
 * context system
 
-first determine whether InkOS already has an equivalent or partially equivalent system.
+first determine whether castor already has an equivalent or partially equivalent system.
 
 Prefer:
 
@@ -1191,7 +1191,7 @@ A useful principle is:
 
 > Studio and CLI should operate on the same underlying story engine and story state.
 
-The UI should not become a completely separate implementation of InkOS behavior.
+The UI should not become a completely separate implementation of castor behavior.
 
 ---
 
@@ -1224,7 +1224,7 @@ Not current priorities:
 * TTS production pipeline
 * dozens of autonomous agents
 * complete Novelcrafter clone
-* rewriting InkOS from zero
+* rewriting castor from zero
 
 These may be considered separately in the future if needed.
 
@@ -1265,7 +1265,7 @@ in one change.
 At the beginning of this fork's evolution:
 
 ```text
-InkOS: 1.8.0
+castor: 1.8.0
 Platform: Windows
 Node: 24.19.0
 pnpm: 9.15.9
@@ -1300,7 +1300,7 @@ Do not change production behavior merely to eliminate those two baseline failure
 
 The next step is NOT implementation.
 
-The next step is to audit the existing InkOS repository and understand:
+The next step is to audit the existing castor repository and understand:
 
 * current architecture
 * current story data
@@ -1356,7 +1356,7 @@ Do not modify anything during this audit.
 
 The intended product can be summarized as:
 
-> **InkOS should remain an automated AI story engine, but it should no longer be a black box.**
+> **castor should remain an automated AI story engine, but it should no longer be a black box.**
 
 The user provides an idea and AI handles most of the work.
 

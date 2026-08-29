@@ -25,7 +25,7 @@ describe("ReviserAgent", () => {
   });
 
   it("prefers book language override when building revision prompts", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-lang-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-lang-test-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
     await mkdir(join(root, "prompt", "longform"), { recursive: true });
@@ -101,7 +101,7 @@ describe("ReviserAgent", () => {
   });
 
   it("keeps rewrite mode local-first instead of encouraging full-chapter replacement", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-rewrite-guardrail-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-rewrite-guardrail-test-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 
@@ -159,7 +159,7 @@ describe("ReviserAgent", () => {
   });
 
   it("tells the model to preserve the target range when a length spec is provided", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-test-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 
@@ -231,7 +231,7 @@ describe("ReviserAgent", () => {
   });
 
   it("reconstructs revised content from spot-fix patches and preserves untouched text", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-spotfix-patch-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-spotfix-patch-test-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 
@@ -307,7 +307,7 @@ describe("ReviserAgent", () => {
   });
 
   it("ignores REVISED_CONTENT for auto mode when issues are local-only and PATCHES are available", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-auto-local-only-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-auto-local-only-test-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 
@@ -376,7 +376,7 @@ describe("ReviserAgent", () => {
   });
 
   it("keeps REVISED_CONTENT available for auto mode when issues are whole-chapter", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-auto-whole-chapter-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-auto-whole-chapter-test-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 
@@ -443,7 +443,7 @@ describe("ReviserAgent", () => {
   });
 
   it("sanitizes reduced governed control input so raw hook ids and source labels do not enter reviser prompts", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-governed-sanitize-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-governed-sanitize-test-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 
@@ -548,7 +548,7 @@ describe("ReviserAgent", () => {
   });
 
   it("uses selected summary and hook evidence instead of full long-history markdown in governed mode", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-governed-test-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-governed-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
@@ -716,7 +716,7 @@ describe("ReviserAgent", () => {
   });
 
   it("routes structural issues to REVISED_CONTENT (rewrite-only) and rejects stray PATCHES", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-route-structural-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-route-structural-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 
@@ -795,7 +795,7 @@ describe("ReviserAgent", () => {
   });
 
   it("routes local issues to PATCHES (patch-only) and rejects stray REVISED_CONTENT", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-reviser-route-local-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-reviser-route-local-"));
     const bookDir = join(root, "book");
     await mkdir(join(bookDir, "story"), { recursive: true });
 

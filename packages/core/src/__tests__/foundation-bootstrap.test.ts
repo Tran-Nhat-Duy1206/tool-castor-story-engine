@@ -15,7 +15,7 @@ let root = "";
 let bookDir = "";
 
 async function setupLegacyBook(governance?: Record<string, string>): Promise<void> {
-  root = await mkdtemp(join(tmpdir(), "inkos-bootstrap-"));
+  root = await mkdtemp(join(tmpdir(), "castor-bootstrap-"));
   bookDir = join(root, "books", "bootstrap-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "roles", "major"), { recursive: true });

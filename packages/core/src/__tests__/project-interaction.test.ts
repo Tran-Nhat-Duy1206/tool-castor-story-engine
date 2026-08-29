@@ -13,7 +13,7 @@ let projectRoot: string;
 
 describe("project interaction control", () => {
   beforeAll(async () => {
-    projectRoot = await mkdtemp(join(tmpdir(), "inkos-project-control-"));
+    projectRoot = await mkdtemp(join(tmpdir(), "castor-project-control-"));
     await mkdir(join(projectRoot, "books", "harbor"), { recursive: true });
     await writeFile(join(projectRoot, "books", "harbor", "book.json"), "{}", "utf-8");
   });

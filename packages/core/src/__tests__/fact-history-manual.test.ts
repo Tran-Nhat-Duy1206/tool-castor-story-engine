@@ -20,7 +20,7 @@ const ageFact = (object: string, from: number) => ({
 });
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-fact-history-manual-"));
+  root = await mkdtemp(join(tmpdir(), "castor-fact-history-manual-"));
   bookDir = join(root, "books", "demo");
   await mkdir(join(bookDir, "chapters"), { recursive: true });
 });

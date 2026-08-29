@@ -23,7 +23,7 @@ const {
     },
     _apiKey: "secret",
   })),
-  findProjectRootMock: vi.fn(() => "/tmp/inkos-project"),
+  findProjectRootMock: vi.fn(() => "/tmp/castor-project"),
   loadConfigMock: vi.fn(async () => ({
     llm: {
       provider: "openai",
@@ -76,7 +76,7 @@ describe("interact command", () => {
 
     expect(runAgentSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectRoot: "/tmp/inkos-project",
+        projectRoot: "/tmp/castor-project",
         bookId: "harbor",
         sessionKind: "book",
         actionSource: "free-text",

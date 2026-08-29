@@ -140,7 +140,7 @@ describe("Phase 5 cleanup (1) — volume_outline.md mirror removed", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-cleanup-1-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-cleanup-1-"));
   });
 
   afterEach(async () => {
@@ -189,7 +189,7 @@ describe("Phase 5 cleanup (1) — volume_outline.md mirror removed", () => {
   });
 
   it("isCompleteBookDirectory accepts the new outline/ layout (no legacy mirror needed)", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "inkos-cleanup-1-proj-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "castor-cleanup-1-proj-"));
     try {
       const targetBookDir = join(projectRoot, "books", "cleanup-book");
       const storyDir = join(targetBookDir, "story");
@@ -214,7 +214,7 @@ describe("Phase 5 cleanup (1) — volume_outline.md mirror removed", () => {
   });
 
   it("isCompleteBookDirectory still accepts the pre-cleanup layout (legacy flat files)", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "inkos-cleanup-1-legacy-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "castor-cleanup-1-legacy-"));
     try {
       const targetBookDir = join(projectRoot, "books", "legacy-book");
       const storyDir = join(targetBookDir, "story");
@@ -243,7 +243,7 @@ describe("Phase 5 cleanup (2) — architect no longer seeds runtime log files", 
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-cleanup-2-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-cleanup-2-"));
   });
 
   afterEach(async () => {
@@ -273,7 +273,7 @@ describe("Phase 5 cleanup (3) — book_rules is authoritative Markdown", () => {
   let bookDir: string;
 
   beforeEach(async () => {
-    bookDir = await mkdtemp(join(tmpdir(), "inkos-cleanup-3-"));
+    bookDir = await mkdtemp(join(tmpdir(), "castor-cleanup-3-"));
   });
 
   afterEach(async () => {

@@ -1,10 +1,10 @@
-# InkOS Evolution — V1 Specification
+# castor Evolution — V1 Specification
 
 **Status:** FINAL v1.0
-**Project:** InkOS Evolution Fork
+**Project:** castor Evolution Fork
 **Default Story Language:** Vietnamese (`vi`)
 **Supported Story Languages:** Vietnamese (`vi`) and English (`en`)
-**Purpose:** Define the first implementation milestone for transforming InkOS into a highly automated but human-controllable long-form story system.
+**Purpose:** Define the first implementation milestone for transforming castor into a highly automated but human-controllable long-form story system.
 
 > This document defines WHAT V1 must achieve.
 > It is NOT an implementation plan.
@@ -13,7 +13,7 @@
 
 # 1. Product Goal
 
-V1 must preserve the strongest part of InkOS:
+V1 must preserve the strongest part of castor:
 
 > **High automation from idea to long-form story.**
 
@@ -41,7 +41,7 @@ Generate Next Chapter
 
 The fundamental improvement is:
 
-> InkOS must no longer behave like a black box whose story knowledge the author cannot inspect or correct.
+> castor must no longer behave like a black box whose story knowledge the author cannot inspect or correct.
 
 The AI performs most of the work.
 
@@ -53,7 +53,7 @@ The human remains the final authority over the story.
 
 ## AI automates. Human owns Canon.
 
-InkOS may:
+castor may:
 
 * generate facts;
 * infer relationships;
@@ -78,14 +78,14 @@ User-confirmed Canon has higher authority than AI assumptions.
 
 ---
 
-# 3. Do Not Rebuild InkOS
+# 3. Do Not Rebuild castor
 
-This project is a progressive evolution of the existing InkOS repository.
+This project is a progressive evolution of the existing castor repository.
 
 We are NOT:
 
 ```text
-Deleting InkOS
+Deleting castor
       ↓
 Building another story engine
 ```
@@ -93,7 +93,7 @@ Building another story engine
 We are doing:
 
 ```text
-Existing InkOS
+Existing castor
       ↓
 Understand
       ↓
@@ -112,7 +112,7 @@ Existing working subsystems must be reused whenever practical.
 
 # 4. Existing Canon Architecture
 
-The repository audit confirmed that InkOS already uses structured canonical state under:
+The repository audit confirmed that castor already uses structured canonical state under:
 
 ```text
 story/state/*.json
@@ -130,7 +130,7 @@ The conceptual architecture remains:
                          │
              ┌───────────┴───────────┐
              ↓                       ↓
-       InkOS Automation            Studio
+       castor Automation            Studio
              ↓                       ↓
        Write / Audit           Inspect / Edit
              │                       │
@@ -155,7 +155,7 @@ with competing mutable truths.
 
 # 5. State Projections
 
-The audit confirmed that InkOS contains projection logic such as:
+The audit confirmed that castor contains projection logic such as:
 
 ```text
 state-projections.ts
@@ -181,7 +181,7 @@ Manual edits should target structured Canon through proper Core/server APIs.
 
 # 6. Preserve Existing Persistence Safety
 
-InkOS already contains:
+castor already contains:
 
 ```text
 commitAtomicFileSet
@@ -205,7 +205,7 @@ A failed write must leave the previous valid state intact.
 
 # 7. Story State Visibility
 
-Studio must gain visibility into the structured story state InkOS actually uses.
+Studio must gain visibility into the structured story state castor actually uses.
 
 A future structure may look conceptually like:
 
@@ -223,7 +223,7 @@ Story State
 └── Other Canonical State
 ```
 
-The exact categories must follow the real InkOS schemas.
+The exact categories must follow the real castor schemas.
 
 Do not invent duplicate structures solely because they exist in `PROJECT_VISION.md`.
 
@@ -235,7 +235,7 @@ The user has decided:
 
 > If a piece of story state is wrong or does not follow the intended story direction, the author must be able to correct it.
 
-Therefore V1 should not permanently prohibit editing an author-relevant Canon category merely because InkOS generated it.
+Therefore V1 should not permanently prohibit editing an author-relevant Canon category merely because castor generated it.
 
 Examples include:
 
@@ -271,7 +271,7 @@ should not normally be edited directly by the author.
 
 The user edits the **story meaning**.
 
-InkOS updates the necessary technical representation.
+castor updates the necessary technical representation.
 
 ---
 
@@ -329,7 +329,7 @@ Chapter 16+:
 Elara.age = 23
 ```
 
-If InkOS incorrectly keeps:
+If castor incorrectly keeps:
 
 ```text
 Elara.age = 22
@@ -365,7 +365,7 @@ Elara.age = 22
 Elara.age = 23
 ```
 
-InkOS does NOT automatically rewrite previous prose.
+castor does NOT automatically rewrite previous prose.
 
 Old chapters remain historical story artifacts.
 
@@ -377,7 +377,7 @@ If necessary, later versions may provide historical conflict tools, but automati
 
 # 12. Automatic Chapter Generation Remains the Default
 
-V1 must not turn InkOS into a manual scene-by-scene writing application.
+V1 must not turn castor into a manual scene-by-scene writing application.
 
 The main user action remains conceptually:
 
@@ -385,7 +385,7 @@ The main user action remains conceptually:
 Generate Next Chapter
 ```
 
-InkOS may internally perform:
+castor may internally perform:
 
 ```text
 Plan
@@ -409,7 +409,7 @@ Human intervention happens primarily **after the chapter pipeline finishes**.
 
 This is a core V1 feature.
 
-After InkOS finishes generating and auditing a chapter, it must identify important story-state changes.
+After castor finishes generating and auditing a chapter, it must identify important story-state changes.
 
 Example:
 
@@ -443,7 +443,7 @@ Edit
 Reject
 ```
 
-The user may also manually add a state change that InkOS failed to detect.
+The user may also manually add a state change that castor failed to detect.
 
 ---
 
@@ -499,7 +499,7 @@ The AI extractor is not assumed to be perfect.
 
 During post-chapter review, the user may notice:
 
-> InkOS forgot that Elara learned a particular secret.
+> castor forgot that Elara learned a particular secret.
 
 The user must be able to add that information manually before confirming the chapter state.
 
@@ -634,13 +634,13 @@ The DSH audit identified code paths where state may be:
 
 Implementation must trace these overwrite paths carefully.
 
-A confirmed user correction must not disappear because InkOS later reads a stale projection or older derived state.
+A confirmed user correction must not disappear because castor later reads a stale projection or older derived state.
 
 ---
 
 # 21. Preserve Fact History
 
-V1 should reuse InkOS existing:
+V1 should reuse castor existing:
 
 * fact history;
 * structured runtime state;
@@ -721,7 +721,7 @@ Chinese must not remain a normal new-project option.
 
 Chinese is not retained indefinitely as a legacy story language.
 
-When an existing Chinese InkOS project is encountered, the migration target is:
+When an existing Chinese castor project is encountered, the migration target is:
 
 ```text
 Chinese Project
@@ -833,7 +833,7 @@ There is no final three-language target.
 Final architecture:
 
 ```text
-             InkOS Core
+             castor Core
                  │
           Language Layer
                  │
@@ -1015,7 +1015,7 @@ Only minimal changes required to support V1 should touch them.
 
 # 37. Context System
 
-InkOS already contains substantial context infrastructure including systems such as:
+castor already contains substantial context infrastructure including systems such as:
 
 * ComposerAgent;
 * governed working sets;
@@ -1184,7 +1184,7 @@ Do not build separate state behavior for Studio.
 Desired:
 
 ```text
-              InkOS Core
+              castor Core
               /        \
              /          \
            CLI         Studio
@@ -1330,7 +1330,7 @@ V1 does NOT require:
 * replacing Planner;
 * replacing Audit;
 * replacing Context Builder;
-* rewriting InkOS from scratch.
+* rewriting castor from scratch.
 
 ---
 
@@ -1431,7 +1431,7 @@ Touched code does not break current recovery mechanisms.
 Initial baseline before implementation:
 
 ```text
-InkOS: 1.8.0
+castor: 1.8.0
 
 Node:
 24.19.0
@@ -1513,7 +1513,7 @@ Elara.age = 22
 
 Chapter contains a one-year time skip.
 
-InkOS fails to update age.
+castor fails to update age.
 
 User opens Story State:
 
@@ -1685,7 +1685,7 @@ or:
 en
 ```
 
-The converted project continues through the normal InkOS pipeline.
+The converted project continues through the normal castor pipeline.
 
 PASS.
 
@@ -1695,7 +1695,7 @@ PASS.
 
 V1 succeeds when the user can truthfully say:
 
-> **I can still give InkOS an idea and let it automatically build and write my long-form story. After each chapter, I can see what InkOS thinks changed, approve or correct those changes, add anything it missed, and only then continue. If InkOS later gets the story state wrong, I can open Studio and fix the current Canon myself without rewriting old chapters. The next chapter respects my correction. The system is Vietnamese-first, also supports English, and Chinese projects are migrated into one of those two languages.**
+> **I can still give castor an idea and let it automatically build and write my long-form story. After each chapter, I can see what castor thinks changed, approve or correct those changes, add anything it missed, and only then continue. If castor later gets the story state wrong, I can open Studio and fix the current Canon myself without rewriting old chapters. The next chapter respects my correction. The system is Vietnamese-first, also supports English, and Chinese projects are migrated into one of those two languages.**
 
 That is V1.
 
@@ -1705,7 +1705,7 @@ That is V1.
 
 Every implementation decision should begin with:
 
-> **Does InkOS already have a working mechanism for this?**
+> **Does castor already have a working mechanism for this?**
 
 If yes:
 
@@ -1760,5 +1760,5 @@ Only after the implementation plan is reviewed and approved should code changes 
 
 # Final Principle
 
-> **Do not make InkOS less automatic.
+> **Do not make castor less automatic.
 > Make its automation visible, reviewable, correctable and author-controlled.**

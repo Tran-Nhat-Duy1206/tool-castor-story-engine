@@ -35,7 +35,7 @@
 
 ### Release Focus
 
-Agent Skills 兼容与单一 Skill 内核更新：InkOS 现在直接读取标准 `SKILL.md` 能力包，Chat Agent 可以根据用户意图自主调用，也可以由用户通过输入框 `+` 按钮或 `@skill-id` 强制启用。旧的 InkOS 私有 Skill 协议、关键词触发器和并行上下文规划器已被完整替换，不再叠加两套实现。
+Agent Skills 兼容与单一 Skill 内核更新：castor 现在直接读取标准 `SKILL.md` 能力包，Chat Agent 可以根据用户意图自主调用，也可以由用户通过输入框 `+` 按钮或 `@skill-id` 强制启用。旧的 castor 私有 Skill 协议、关键词触发器和并行上下文规划器已被完整替换，不再叠加两套实现。
 
 ### Agent Skills
 
@@ -47,7 +47,7 @@ Agent Skills 兼容与单一 Skill 内核更新：InkOS 现在直接读取标准
 
 ### Compatibility
 
-- 删除旧 `.inkos/skills` 私有加载路径，以及 `whenToUse`、`promptPacks`、`toolHints`、`contextNeeds` 等 InkOS 专用字段
+- 删除旧 `.castor/skills` 私有加载路径，以及 `whenToUse`、`promptPacks`、`toolHints`、`contextNeeds` 等 castor 专用字段
 - 提示词包继续由 Studio“项目设置 → 提示词”独立管理，不再伪装成 Skill 能力
 - 旧 Skill 请迁移为标准目录：保留 `SKILL.md` 与静态参考资料，通过 Studio 重新导入或放入 `.agents/skills/`
 
@@ -61,7 +61,7 @@ Agent Skills 兼容与单一 Skill 内核更新：InkOS 现在直接读取标准
 
 - 新增长篇剧情多线推演：基于当前正史生成 2-5 条隔离分支，比较未来章节节拍、人物决定、预计变化、风险、作者意图匹配度和不确定项
 - Studio Chat 新增横向分支比较卡，可采用候选、重新核验过期推演；采用后只写入 `selected-branch-plan.md`，不会修改正文、设定、大纲或运行时正史
-- CLI 新增 `inkos forecast create / show / select`，与 Core 的推演 schema、存储、上下文指纹、agent 和 runner 共用同一套非正史边界
+- CLI 新增 `castor forecast create / show / select`，与 Core 的推演 schema、存储、上下文指纹、agent 和 runner 共用同一套非正史边界
 - 新增整书备份 / 恢复与最新章节安全删除；删除章节时同步回滚章节状态，避免正文和运行时状态错位
 
 ### Collaboration And Task Reliability
@@ -89,14 +89,14 @@ Agent Skills 兼容与单一 Skill 内核更新：InkOS 现在直接读取标准
 
 - 新增翻译 / 本地化工作流：支持导入 EPUB、文本型 PDF、TXT 和 Markdown，按章节与语义段翻译，维护术语表并执行章节审校，可导出 TXT、Markdown 或 EPUB
 - Studio 新增翻译工作台：可使用自然语言填写任意源语言 / 目标语言，创建项目、运行翻译、在网页内对照查看原文与译文、阅读审校报告并导出完整文件
-- CLI 新增 `inkos translate init / run / export`；Studio Chat 也可通过确认动作创建翻译项目，不要求用户记忆 `zh`、`en` 等语言缩写
+- CLI 新增 `castor translate init / run / export`；Studio Chat 也可通过确认动作创建翻译项目，不要求用户记忆 `zh`、`en` 等语言缩写
 - 短篇、剧本、分镜和互动影游管线新增英文提示词分支；Studio 动态界面与 CLI 环境语言回退同步补齐，英文不再只是外层 UI 翻译
 - Chat 新增 `import_chapters` 工具：可把本地文件 / 目录及对话附件中的已有小说导入为真实章节，自动逆向生成设定并重放章节状态；与只保存参考资料的 `ingest_material` 明确分工（#324）
 
 ### Collaboration And Control
 
 - 修订判断标准新增 `writing.revisionGate`：支持 strict、lenient、always 三档，并可按项目或单本书覆盖；未落盘时返回前后审稿指标和具体剩余问题（#326）
-- CLI 遵守单本书的 `writing.reviewMode`；新增 `inkos auto [book-id] <目标章号>` 连续写作到指定章节（#307）
+- CLI 遵守单本书的 `writing.reviewMode`；新增 `castor auto [book-id] <目标章号>` 连续写作到指定章节（#307）
 - 通知渠道支持纯文本格式；`write next / write rewrite / auto / revise / audit` 支持通过 `--notify` 发送完成或失败通知（#308）
 - Studio 可默认展开操作详情，read / grep 等工具结果也能直接查看，降低“做了但看不到结果”的不透明感（#306）
 
@@ -112,7 +112,7 @@ Agent Skills 兼容与单一 Skill 内核更新：InkOS 现在直接读取标准
 
 ### Hotfix
 
-- 修复 `@actalk/inkos@1.6.2` / `@actalk/inkos-studio@1.6.2` 发布到 npm 时 registry manifest 泄漏 `workspace:*` 的问题；Windows / npm 全局升级请直接安装 `1.6.3` 或更新到 `latest`
+- 修复 `@actalk/castor@1.6.2` / `@actalk/castor-studio@1.6.2` 发布到 npm 时 registry manifest 泄漏 `workspace:*` 的问题；Windows / npm 全局升级请直接安装 `1.6.3` 或更新到 `latest`
 - 发布校验现在会拒绝 publishable manifest 中的 `workspace:` 依赖，避免同类安装错误复发
 - MiniMax 官方 OpenAI-compatible 接入新增 `MiniMax-M3` 模型卡，并对 `MiniMax-M3*` 默认发送 `thinking: { "type": "disabled" }`，减少接口默认返回 thinking 内容的问题
 
@@ -142,7 +142,7 @@ Chat 协作与可调提示词热更新：在 v1.6.0 的互动影游 / Skill 系�
 
 ### Release Focus
 
-互动影游与 Skill 系统大版本：把 InkOS 的创作入口从“小说 + Play”继续扩展到互动影游、剧本、分镜和可插拔专业能力。Studio Chat 现在可以按用户意图调用外部 / 内置 skills，也能在需要真实资料时生成可追溯研究报告，同时修复几类影响长任务继续推进和用户协作编辑的稳定性问题。
+互动影游与 Skill 系统大版本：把 castor 的创作入口从“小说 + Play”继续扩展到互动影游、剧本、分镜和可插拔专业能力。Studio Chat 现在可以按用户意图调用外部 / 内置 skills，也能在需要真实资料时生成可追溯研究报告，同时修复几类影响长任务继续推进和用户协作编辑的稳定性问题。
 
 ### Major Features
 
@@ -157,17 +157,17 @@ Chat 协作与可调提示词热更新：在 v1.6.0 的互动影游 / Skill 系�
 - 修复 `patch_chapter_text` 只能精确命中文本的问题；现在轻微改写的目标段落可用高置信段落定位兜底，仍无法确认时继续明确失败，避免误改
 - 修复审计 / 多章操作失败时可能把 `chapters/index.json` 写成空数组的问题；保存层会从磁盘章节文件重建索引，防止已有章节在 UI 中消失
 - 修复多渠道同模型切换后会话丢失 bookId 的回归风险，并补充测试锁定 session-bound bookId 传递
-- 研究报告保存为 `.inkos/research/` 下的参考材料，不直接污染 story truth、角色卡或正文
+- 研究报告保存为 `.castor/research/` 下的参考材料，不直接污染 story truth、角色卡或正文
 
 ## v1.5.0
 
 ### Release Focus
 
-InkOS Play 与创作工作台大版本：把 InkOS 从“自动写下一章”的管线工具推进到更完整的 Story Creation AI Agent。长篇、短篇、同人、番外、仿写、续写、封面和开放世界互动开始共享同一套 Studio Chat / CLI / TUI 交互内核，并围绕指令遵循、上下文管理和可视化体验做了系统性整理。
+castor Play 与创作工作台大版本：把 castor 从“自动写下一章”的管线工具推进到更完整的 Story Creation AI Agent。长篇、短篇、同人、番外、仿写、续写、封面和开放世界互动开始共享同一套 Studio Chat / CLI / TUI 交互内核，并围绕指令遵循、上下文管理和可视化体验做了系统性整理。
 
 ### Major Features
 
-- 新增 **InkOS Play** 开放世界 / 分支互动入口：支持自由动作、可点击选择、世界契约、非固定时间推进、角色 agent、物品 / 证据 / 关系状态、HUD 和自动配图
+- 新增 **castor Play** 开放世界 / 分支互动入口：支持自由动作、可点击选择、世界契约、非固定时间推进、角色 agent、物品 / 证据 / 关系状态、HUD 和自动配图
 - Studio 创作入口重组为一等入口：长篇小说、短篇小说、同人创作、番外创作、仿写创作、续写创作、分支互动、开放世界都可从工作台直接启动
 - Play 世界状态可视化升级：侧边 HUD 展示世界时间、当前位置、面对对象、持有物、关系和配图；生成图进入对话流，可滚动回看
 - 新增 / 完善番外、仿写、续写等创作链路，让已有 IP、设定和文风可以继续派生新内容
@@ -186,7 +186,7 @@ InkOS Play 与创作工作台大版本：把 InkOS 从“自动写下一章”�
 
 - Studio 左侧导航、Play 对话区、查看世界面板、配图按钮、生成物预览和字体尺寸做了整体整理
 - Play 配图支持角色、物品、证据、时刻等对象，图像显示在对话上下文里，不再只作为固定面板预览
-- 模型配置、封面服务、聚合 API 入口和错误提示进一步区分：InkOS 执行错误、模型供应商错误和图片生成错误不再混在一起
+- 模型配置、封面服务、聚合 API 入口和错误提示进一步区分：castor 执行错误、模型供应商错误和图片生成错误不再混在一起
 - README 和 Skill 文档同步更新为 Story Creation AI Agent 定位，并展示 v1.5.0 Studio Play 实测截图
 
 ### Bug Fixes
@@ -205,7 +205,7 @@ Windows / provider 热修与长篇写作提速配置化：修复 MiniMax 默认�
 
 ### Improvements
 
-- 长篇章节写作的自动审稿修稿轮数新增 `writing.reviewRetries` 项目配置，默认仍为 1；需要更强修稿时可执行 `inkos config set writing.reviewRetries 3`
+- 长篇章节写作的自动审稿修稿轮数新增 `writing.reviewRetries` 项目配置，默认仍为 1；需要更强修稿时可执行 `castor config set writing.reviewRetries 3`
 - Studio 写章链路会读取同一项目配置，CLI 和 Studio 行为保持一致
 - README / 开发说明同步 v1.4.1 的 MiniMax 与长篇写作配置变化
 
@@ -225,7 +225,7 @@ Windows / provider 热修与长篇写作提速配置化：修复 MiniMax 默认�
 - 新增独立短篇写作链路：Studio Chat 和 CLI 可生成完整短篇正文、大纲记录、审稿记录、简介卖点和封面提示词
 - 新增封面制作能力：支持单独生成 / 重做封面，并在 Studio 消息中直接预览生成后的封面图
 - Studio 普通聊天支持项目级持久化 session，刷新或重启后可继续查看、切换、改名和删除会话
-- Chat 可直接编辑项目内生成文本产物，适合调整章节、封面提示词、简介等文件后再继续使用 InkOS 写作链路
+- Chat 可直接编辑项目内生成文本产物，适合调整章节、封面提示词、简介等文件后再继续使用 castor 写作链路
 - 服务配置页新增封面生成配置区，封面文本模型和图片模型分工更清晰
 
 ### Bug Fixes
@@ -394,13 +394,13 @@ v13 书籍创建流程迁移：建书输出升级为段落式架构稿、卷级�
 - **恢复 `architect` foundation 输出预算**：重新固定 `maxTokens: 16384`，降低本地模型与 LM Studio 在建书阶段因输出截断导致 foundation 缺段的概率
 - **恢复旧的 OpenAI-compatible 兼容路径**：`provider=openai + 自定义兼容 baseUrl` 不再被错误送入更激进的 `custom fetch` 路径，Google/Gemma 一类旧兼容场景回归
 - **自定义 Anthropic-compatible 原生 transport**：`service=custom` 且 `provider=anthropic` 也改走原生请求链，不再强绑 SDK
-- **Windows Studio 启动修复**：`inkos studio` 在 Windows 下不再因绝对路径 loader 被当成非法 ESM URL 而崩溃
-- **Bootstrap 项目回退到 env 配置**：空目录 auto-init 后的 Studio 项目，在未配置服务时会回退到全局 `.inkos/.env`，`book create` 不再先死在缺 key
+- **Windows Studio 启动修复**：`castor studio` 在 Windows 下不再因绝对路径 loader 被当成非法 ESM URL 而崩溃
+- **Bootstrap 项目回退到 env 配置**：空目录 auto-init 后的 Studio 项目，在未配置服务时会回退到全局 `.castor/.env`，`book create` 不再先死在缺 key
 - **统一服务路由真相**：`config-loader`、`service-resolver`、Studio 服务探测、`doctor` 统一从同一份 `service-presets` 读取 provider/api/chatBaseUrl/modelsBaseUrl，减少同一服务在不同链路上各猜一遍的问题
 
 ### 改进
 
-- **空目录直接启动**：`inkos` / `inkos studio` 现在会自动初始化最小项目骨架并启动 Studio，不再要求显式先跑 `init`
+- **空目录直接启动**：`castor` / `castor studio` 现在会自动初始化最小项目骨架并启动 Studio，不再要求显式先跑 `init`
 - **Studio 自动探测 transport**：服务测试会自动尝试候选模型、`chat/responses` 与流式开关组合，尽量自动匹配可用配置
 - **`doctor` 增强**：不再只死盯当前单一模型/单一组合，支持多 model、多协议、多流式探测
 - **建书聊天 fresh session**：再次进入“创建书籍”时会清空旧对话，不再沿用上一次建书聊天记录
@@ -433,13 +433,13 @@ v13 书籍创建流程迁移：建书输出升级为段落式架构稿、卷级�
 
 ### Release Focus
 
-Studio 2.0 正式发布。`inkos` 现在默认直接启动 Studio，本地 Web 工作台成为主入口；TUI 保留为 `inkos tui`。
+Studio 2.0 正式发布。`castor` 现在默认直接启动 Studio，本地 Web 工作台成为主入口；TUI 保留为 `castor tui`。
 
 ### 新功能
 
-- **Studio 2.0 默认入口**：`inkos` 直接启动 Studio，首页、服务商管理、写作工作台统一为新的主交互入口
+- **Studio 2.0 默认入口**：`castor` 直接启动 Studio，首页、服务商管理、写作工作台统一为新的主交互入口
 - **自定义 OpenAI-compatible 服务**：Studio 现支持自定义 `baseUrl`、协议类型（`chat` / `responses`）与流式开关，兼容更多中转站和聚合网关
-- **配置来源切换**：Studio 新增 `.env` 与 Studio 配置的显式切换，不再只能被目录里的 `INKOS_LLM_*` 被动覆盖
+- **配置来源切换**：Studio 新增 `.env` 与 Studio 配置的显式切换，不再只能被目录里的 `castor_LLM_*` 被动覆盖
 - **原生 custom transport**：对 `custom` 服务新增原生 fetch 请求链，减少对 SDK 路径的单点依赖，提升兼容性
 
 ### 改进
@@ -453,24 +453,24 @@ Studio 2.0 正式发布。`inkos` 现在默认直接启动 Studio，本地 Web �
 
 - 修复 `llm.services + defaultModel + secrets` 与运行时加载契约不一致的问题
 - 修复 `custom:*` 服务在测试连接、模型列表与 `/api/v1/agent` 之间链路不一致的问题
-- 修复 `inkos` 启动 Studio 时因未设置默认模型而直接抛出 `llm.model` 校验错误
+- 修复 `castor` 启动 Studio 时因未设置默认模型而直接抛出 `llm.model` 校验错误
 - 修复自定义服务非流式 / SSE 返回被误当作普通 JSON 解析的问题
 
 ## v1.2.0
 
 ### Release Focus
 
-统一交互内核——TUI、Studio、`inkos interact`、OpenClaw Skill 共享同一套自然语言理解和执行运行时。
+统一交互内核——TUI、Studio、`castor interact`、OpenClaw Skill 共享同一套自然语言理解和执行运行时。
 
 ### 新功能
 
 - **共享交互运行时**（`packages/core/src/interaction/`）：自然语言路由器（15+ intent）、会话管理、编辑事务控制器、事件追踪、阶段遥测
-- **Ink TUI 仪表盘**：`inkos` 直接进入全屏 Ink + React 仪表盘，对话式创作，slash 命令 Tab 补全，主题动效（writing/auditing/revising/planning 各有独立动画），i18n 中英双语
+- **Ink TUI 仪表盘**：`castor` 直接进入全屏 Ink + React 仪表盘，对话式创作，slash 命令 Tab 补全，主题动效（writing/auditing/revising/planning 各有独立动画），i18n 中英双语
 - **Studio 助手面板**：右侧 AI 助手接入共享交互内核，自然语言操作书籍（写章、改名、审计、导出），SSE 实时状态推送，执行阶段图标
 - **对话式建书**：通过 Studio 助手自然语言对话逐步构思书籍概念、设定、目标章数，草稿就绪后一键创建
 - **全书实体改名**：`把林烬改成张三` / `/rename 林烬 => 张三`，全量扫描章节 + 真相文件一次替换
 - **单章文本替换**：`/replace 5 旧文本 => 新文本`，精确修补指定章节
-- **`inkos interact --json`**：共享交互 JSON 入口，返回 request / response / session / events，供 OpenClaw 和外部 Agent 直接调用
+- **`castor interact --json`**：共享交互 JSON 入口，返回 request / response / session / events，供 OpenClaw 和外部 Agent 直接调用
 - **Thinking 模型温度夹制**（PR #174）：kimi-k2.5 等 thinking 模型自动 temperature=1，兼容 per-call 温度调参，每模型只 warn 一次
 
 ### 改进
@@ -525,8 +525,8 @@ Studio 2.0 正式发布。`inkos` 现在默认直接启动 Studio，本地 Web �
 - **Foundation Reviewer**：建书时新增独立审核 Agent，5 维度百分制打分（原作 DNA 保留、新叙事空间、核心冲突、开篇节奏、节奏可行性），不达 80 分自动驳回并将审核意见反馈给 Architect 重新生成
 - **新时空要求**：同人模式（canon/au/ooc/cp）必须设计原创分岔点，不允许复述原作剧情
 - **Hook Seed Excerpt**：伏笔回收时，Composer 从 chapter_summaries 提取原始种子场景的原文片段注入 Writer 上下文，替代了复杂的 lifecycle pressure 系统
-- **Review Reject 回滚**：`inkos review reject` 回滚 state 到被拒章节之前的快照，丢弃下游章节和记忆索引
-- **State Validation Recovery**：state 校验失败自动重试 settler，仍失败则降级保存，支持 `inkos write repair-state` 手动修复
+- **Review Reject 回滚**：`castor review reject` 回滚 state 到被拒章节之前的快照，丢弃下游章节和记忆索引
+- **State Validation Recovery**：state 校验失败自动重试 settler，仍失败则降级保存，支持 `castor write repair-state` 手动修复
 - **Audit Drift 隔离**：审计纠偏写入独立的 `audit_drift.md`，不再追加到 `current_state.md`
 - **标题坍缩修复**：检测近期标题主题聚集，从正文提取新关键词重生标题
 - **Hook 预算提示**：活跃伏笔 ≥10 时显示预算警告，引导优先回收旧债
@@ -534,7 +534,7 @@ Studio 2.0 正式发布。`inkos` 现在默认直接启动 Studio，本地 Web �
 - **情绪/节奏检测**：mood 单调和标题聚集检测，序列级 warning 不计入修订 blockingCount
 - **同人风格提取**：`fanfic init` 和 `import chapters` 自动生成 style_guide.md + style_profile.json
 - **Governed 路径补全**：续写/同人的 parent_canon.md 和 fanfic_canon.md 通过 Governed 路径注入 Writer
-- **自定义 HTTP Headers**：`INKOS_LLM_HEADERS` 环境变量注入自定义 HTTP 头
+- **自定义 HTTP Headers**：`castor_LLM_HEADERS` 环境变量注入自定义 HTTP 头
 
 ### Bug Fixes
 
@@ -556,11 +556,11 @@ Studio 2.0 正式发布。`inkos` 现在默认直接启动 Studio，本地 Web �
 
 ## v1.0.0
 
-InkOS Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
+castor Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
 
-### InkOS Studio
+### castor Studio
 
-- `inkos studio` 启动本地 Web 工作台（Vite + React + Hono，默认端口 4567）
+- `castor studio` 启动本地 Web 工作台（Vite + React + Hono，默认端口 4567）
 - 书籍管理：创建、删除、导出（TXT/MD/EPUB）、配置
 - 章节审阅与编辑：批准/拒绝、行内编辑、多模式修订（polish/spot-fix/rewrite/anti-detect）
 - 实时写作进度：SSE 推送生成状态
@@ -605,7 +605,7 @@ InkOS Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
 - **#111** — SKILL.md 补齐 13 个缺失命令（eval, consolidate, write rewrite, book update/delete, plan/compose, studio, fanfic show/refresh, genre create/copy）
 - **#95** — doctor 命令新增版本迁移检测（识别 pre-v0.6 旧格式书籍）
 - **#103** — 补充 rewrite 端到端回归测试（rewrite 2 → next 应为 3）
-- 新增 `inkos eval` 命令 — 结构化质量评估报告
+- 新增 `castor eval` 命令 — 结构化质量评估报告
 - SKILL.md 版本升级到 2.1.0
 
 ## v0.6.2
@@ -667,7 +667,7 @@ InkOS Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
 
 ### Bug 修复
 
-- 用户 `INKOS_LLM_MAX_TOKENS` 作为全局上限生效（#87）
+- 用户 `castor_LLM_MAX_TOKENS` 作为全局上限生效（#87）
 - `stripReservedKeys` 防止 `llm.extra` 覆盖 max_tokens / temperature
 - 章节摘要去重：append 前去重 + bootstrap 加载时去重 + JSON 自动修复
 - `consolidate` 正则支持全角括号卷边界格式
@@ -700,8 +700,8 @@ InkOS Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
 
 ### CLI 增强
 
-- `inkos book delete <id>`：删除书籍及全部数据（`--force` 跳过确认）
-- `inkos status --chapters`：显示每章状态和 failed 章节的 critical issues
+- `castor book delete <id>`：删除书籍及全部数据（`--force` 跳过确认）
+- `castor status --chapters`：显示每章状态和 failed 章节的 critical issues
 - 审计 JSON 解析容错（#51）
 - `write_truth_file` agent 工具（#53）
 - 审计漂移纠偏自动注入状态卡（#52）
@@ -715,7 +715,7 @@ InkOS Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
 ### 结构化日志
 
 - 新增 Logger 模块：ANSI 颜色输出（INFO=cyan, WARN=yellow, ERROR=red），JSON Lines 文件日志
-- `inkos up` 自动写入 `inkos.log`，守护进程重启后可追溯
+- `castor up` 自动写入 `castor.log`，守护进程重启后可追溯
 - `write next`、`draft`、`up` 支持 `-q, --quiet` 静默模式
 - LLM 流式心跳：模型思考期间每 30 秒汇报进度（已接收字符数、中文字数）
 - 管线内 17 处 `process.stderr.write` 替换为结构化 logger
@@ -725,7 +725,7 @@ InkOS Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
 - Stream 自动降级：streaming 失败时自动用 sync 重试，中转站不支持 SSE 也能用
 - 流中断部分内容恢复：已接收 ≥500 字符时返回截断内容而非报错（#21）
 - 错误诊断增强：400/401/403/429/Connection error 附带 baseUrl、model 上下文和排查建议
-- `inkos doctor` 失败时给出针对性 hints（检查 baseUrl、试 stream:false、检查 API Key）
+- `castor doctor` 失败时给出针对性 hints（检查 baseUrl、试 stream:false、检查 API Key）
 
 ### Bug 修复
 
@@ -746,13 +746,13 @@ InkOS Studio + 稳定性加固。从 CLI 工具升级为 CLI + Web 工作台。
 
 ### 续写已有作品
 
-把已有的小说（单文件或章节目录）导入 InkOS，系统自动拆章、逆向工程生成全套真相文件（世界状态、伏笔、角色矩阵等），之后直接 `write next` 续写。
+把已有的小说（单文件或章节目录）导入 castor，系统自动拆章、逆向工程生成全套真相文件（世界状态、伏笔、角色矩阵等），之后直接 `write next` 续写。
 
 ```bash
-inkos import chapters 我的小说 --from 已有章节/        # 从目录导入
-inkos import chapters 我的小说 --from 全书.txt          # 从单文件导入（自动按"第X章"拆分）
-inkos import chapters 我的小说 --from 全书.txt --split "Chapter\\s+\\d+"  # 自定义分章正则
-inkos write next 我的小说                               # 无缝续写
+castor import chapters 我的小说 --from 已有章节/        # 从目录导入
+castor import chapters 我的小说 --from 全书.txt          # 从单文件导入（自动按"第X章"拆分）
+castor import chapters 我的小说 --from 全书.txt --split "Chapter\\s+\\d+"  # 自定义分章正则
+castor write next 我的小说                               # 无缝续写
 ```
 
 单文件模式自动按 `第X章` 分章，也支持 `--split <regex>` 自定义。导入中断可用 `--resume-from <n>` 断点续导。
@@ -762,8 +762,8 @@ inkos write next 我的小说                               # 无缝续写
 基于已有书创建前传、后传、外传或 if 线。番外和正传共享世界观和角色，但有独立剧情线。
 
 ```bash
-inkos import canon 烈焰前传 --from 吞天魔帝   # 导入正传正典到番外
-inkos write next 烈焰前传                     # 写手自动读取正典约束
+castor import canon 烈焰前传 --from 吞天魔帝   # 导入正传正典到番外
+castor write next 烈焰前传                     # 写手自动读取正典约束
 ```
 
 导入后生成 `story/parent_canon.md`，包含正传的世界规则、角色快照（含信息边界）、关键事件时间线、伏笔状态。写手在动笔前参照正典，审计员自动激活 4 个番外专属维度：
@@ -782,8 +782,8 @@ inkos write next 烈焰前传                     # 写手自动读取正典约�
 喂入真人小说片段，系统提取统计指纹 + 生成风格指南，后续每章自动注入写手 prompt。
 
 ```bash
-inkos style analyze 参考小说.txt                     # 分析：句长、TTR、修辞特征
-inkos style import 参考小说.txt 吞天魔帝 --name 某作者  # 导入文风到书
+castor style analyze 参考小说.txt                     # 分析：句长、TTR、修辞特征
+castor style import 参考小说.txt 吞天魔帝 --name 某作者  # 导入文风到书
 ```
 
 产出两个文件：
@@ -826,16 +826,16 @@ inkos style import 参考小说.txt 吞天魔帝 --name 某作者  # 导入文�
 不同 agent 可以走不同 API 提供商——不只是换模型名，是完全不同的 API 地址和 Key。例如写手用便宜模型高速出稿，审计员用强模型精审：
 
 ```bash
-inkos config set-model writer gpt-4o-mini                                    # 简单模型覆盖
-inkos config set-model auditor gemini-2.5-flash \
+castor config set-model writer gpt-4o-mini                                    # 简单模型覆盖
+castor config set-model auditor gemini-2.5-flash \
   --base-url https://generativelanguage.googleapis.com/v1beta/openai \
   --provider openai \
   --api-key-env GEMINI_API_KEY                                                # 走 Gemini API
-inkos config set-model reviser claude-sonnet-4-20250514 \
+castor config set-model reviser claude-sonnet-4-20250514 \
   --base-url https://api.anthropic.com \
   --provider anthropic \
   --api-key-env ANTHROPIC_API_KEY                                             # 走 Anthropic API
-inkos config show-models                                                      # 查看路由全景
+castor config show-models                                                      # 查看路由全景
 ```
 
 每个 agent 独立配置 `--base-url`、`--provider`、`--api-key-env`、`--no-stream`。未覆盖的 agent 使用项目默认模型。
@@ -843,8 +843,8 @@ inkos config show-models                                                      # 
 ### 数据分析
 
 ```bash
-inkos analytics 吞天魔帝          # 审计通过率、高频问题类别、问题最多的章节
-inkos analytics 吞天魔帝 --json   # 结构化输出
+castor analytics 吞天魔帝          # 审计通过率、高频问题类别、问题最多的章节
+castor analytics 吞天魔帝 --json   # 结构化输出
 ```
 
 ### 其他 v0.4 变更
@@ -855,7 +855,7 @@ inkos analytics 吞天魔帝 --json   # 结构化输出
 - 修订者新增 `spot-fix` 模式（定点修复）
 - `book_rules.md` 的 `additionalAuditDimensions` 支持中文名称匹配
 - 全部 5 个题材激活 dim 24-26（支线停滞/弧线平坦/节奏单调）
-- `inkos export` 支持 `--format md`、`--output <path>`、`--approved-only`
+- `castor export` 支持 `--format md`、`--output <path>`、`--approved-only`
 - 写后验证器「连续了字」阈值从 4 句上调至 6 句（减少中文叙事误报）
 - 安全加固：`init`/`book create`/`import chapters` 防覆盖检查、`config set` 类型推断 + key 校验、`update` 防降级、`doctor` 项目外可测 API、状态显示一致性、`genre show` 拒绝无效 ID
 
@@ -881,16 +881,16 @@ Writer 每章自动生成摘要、更新支线/情感/角色矩阵，全部追�
 | 功能 | 说明 |
 |------|------|
 | AI 痕迹审计 | 纯规则检测（不走 LLM）：段落等长、套话密度、公式化转折、列表式结构，自动合并到审计结果 |
-| AIGC 检测 API | 外部 API 集成（GPTZero / Originality / 自定义端点），`inkos detect` 命令 |
+| AIGC 检测 API | 外部 API 集成（GPTZero / Originality / 自定义端点），`castor detect` 命令 |
 | 文风指纹学习 | 从参考文本提取 StyleProfile（句长、TTR、修辞特征），注入 Writer prompt |
 | 反检测改写 | ReviserAgent `anti-detect` 模式，检测→改写→重检测循环 |
-| 检测反馈闭环 | `detection_history.json` 记录每次检测/改写结果，`inkos detect --stats` 查看统计 |
+| 检测反馈闭环 | `detection_history.json` 记录每次检测/改写结果，`castor detect --stats` 查看统计 |
 
 ```bash
-inkos style analyze reference.txt         # 分析参考文本文风
-inkos style import reference.txt 吞天魔帝  # 导入文风到书
-inkos detect 吞天魔帝 --all               # 全书 AIGC 检测
-inkos detect --stats                      # 检测统计
+castor style analyze reference.txt         # 分析参考文本文风
+castor style import reference.txt 吞天魔帝  # 导入文风到书
+castor detect 吞天魔帝 --all               # 全书 AIGC 检测
+castor detect --stats                      # 检测统计
 ```
 
 ### Webhook + 智能调度
@@ -912,16 +912,16 @@ inkos detect --stats                      # 检测统计
 创建书时指定题材，对应规则自动生效：
 
 ```bash
-inkos book create --title "吞天魔帝" --genre xuanhuan
+castor book create --title "吞天魔帝" --genre xuanhuan
 ```
 
 题材规则可以查看、复制到项目中修改、或从零创建：
 
 ```bash
-inkos genre list                      # 查看所有题材
-inkos genre show xuanhuan             # 查看玄幻的完整规则
-inkos genre copy xuanhuan             # 复制到项目中，随意改
-inkos genre create wuxia --name 武侠   # 从零创建新题材
+castor genre list                      # 查看所有题材
+castor genre show xuanhuan             # 查看玄幻的完整规则
+castor genre copy xuanhuan             # 复制到项目中，随意改
+castor genre create wuxia --name 武侠   # 从零创建新题材
 ```
 
 复制到项目后，增删禁忌、调整疲劳词、修改节奏规则、自定义语言铁律——改完下次写章自动生效。
@@ -980,5 +980,5 @@ dim 20-23（AI 痕迹）+ dim 27（敏感词）由纯规则引擎检测，不消
 - 无数值系统的题材不生成资源账本
 - 所有命令支持 `--json` 结构化输出，OpenClaw / 外部 Agent 可直接解析
 - book-id 自动检测：项目只有一本书时省略 book-id
-- `inkos update` 一键更新、`inkos init` 支持当前目录初始化
-- API 错误附带中文诊断提示，`inkos doctor` 含 API 连通性测试
+- `castor update` 一键更新、`castor init` 支持当前目录初始化
+- API 错误附带中文诊断提示，`castor doctor` 含 API 连通性测试

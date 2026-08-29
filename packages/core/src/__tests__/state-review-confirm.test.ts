@@ -1208,7 +1208,7 @@ describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
     await expect(findReceiptByReviewId(fixture.bookDir, 16, REVIEW_ID)).resolves.toBeNull();
     expect(existsSync(join(fixture.bookDir, "story/snapshots/26"))).toBe(false);
     const rootEntries = await readdir(fixture.bookDir);
-    expect(rootEntries.some((name) => name.startsWith(".inkos-file-txn-"))).toBe(false);
+    expect(rootEntries.some((name) => name.startsWith(".castor-file-txn-"))).toBe(false);
     expect(t12.syncCalls.rebuildIndex).toBe(0);
     expect(t12.syncCalls.rebuildHistory).toBe(0);
 

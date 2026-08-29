@@ -12,7 +12,7 @@ let bookDir = "";
 const STORY_FILES_SEEDED = ["current_state.md", "pending_hooks.md", "chapter_summaries.md", "character_matrix.md"] as const;
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "inkos-snapshot-set-"));
+  root = await mkdtemp(join(tmpdir(), "castor-snapshot-set-"));
   bookDir = join(root, "books", "demo");
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   // Seed only SOME of the fixed slots — the rest must be skipped by the

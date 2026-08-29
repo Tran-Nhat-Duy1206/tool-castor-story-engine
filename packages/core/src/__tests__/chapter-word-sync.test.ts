@@ -26,7 +26,7 @@ async function setupBook(params: {
   readonly chapters: ReadonlyArray<{ readonly file: string; readonly content: string }>;
   readonly index: ReadonlyArray<ChapterMeta>;
 }): Promise<{ readonly root: string; readonly bookDir: string }> {
-  const root = await mkdtemp(join(tmpdir(), "inkos-word-sync-"));
+  const root = await mkdtemp(join(tmpdir(), "castor-word-sync-"));
   const bookDir = join(root, "books", params.bookId);
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await writeFile(

@@ -16,7 +16,7 @@ function noopBookLock() {
 
 describe("interaction tools", () => {
   beforeAll(async () => {
-    projectRoot = await mkdtemp(join(tmpdir(), "inkos-core-interaction-tools-"));
+    projectRoot = await mkdtemp(join(tmpdir(), "castor-core-interaction-tools-"));
     await mkdir(join(projectRoot, "books", "harbor", "story"), { recursive: true });
   });
 
@@ -80,7 +80,7 @@ describe("interaction tools", () => {
   });
 
   it("takes the book lock before deterministic text edit transactions", async () => {
-    const root = await mkdtemp(join(tmpdir(), "inkos-core-interaction-lock-"));
+    const root = await mkdtemp(join(tmpdir(), "castor-core-interaction-lock-"));
     try {
       await mkdir(join(root, "books", "harbor", "story"), { recursive: true });
       await mkdir(join(root, "books", "harbor", "chapters"), { recursive: true });

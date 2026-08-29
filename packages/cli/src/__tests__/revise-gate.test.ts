@@ -36,7 +36,7 @@ vi.mock("../utils.js", () => ({
   logError: logErrorMock,
 }));
 
-describe("inkos revise revision gate", () => {
+describe("castor revise revision gate", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     reviseDraftMock.mockResolvedValue({

@@ -421,7 +421,7 @@ describe("state-review-regenerate", () => {
     expectOnlyPathsChanged(before, await captureBookMetadata(fixture.root), []);
     expect(await readDurableProse(fixture, 16)).toBe(`${PROSE_P2}\n`);
     expect((await readdir(join(fixture.bookDir, "story", "runtime")))
-      .filter((name) => name.startsWith(".tmp") || name.includes(".inkos-")))
+      .filter((name) => name.startsWith(".tmp") || name.includes(".castor-")))
       .toEqual([]);
   });
   // -------------------------------------------------------------------------

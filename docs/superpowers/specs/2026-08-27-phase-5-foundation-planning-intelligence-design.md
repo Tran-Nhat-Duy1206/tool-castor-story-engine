@@ -970,7 +970,7 @@ implementation planning.
 
 ### 7.5 Legacy compatibility
 
-Keep existing: `inkos.json`, `INKOS_*` env vars, `.inkos/` paths, existing book layouts,
+Keep existing: `castor.json`, `castor_*` env vars, `.castor/` paths, existing book layouts,
 existing package compatibility contracts — unless a real migration requires otherwise.
 
 Books need explicit governance capability/version markers conceptually:
@@ -1177,7 +1177,7 @@ authority or the fully committed new authority** — never half authority.
 
 ### 9.7 Compatibility & parity
 
-- Legacy regression fixtures cover existing `inkos.json`, `.inkos`, Foundation files,
+- Legacy regression fixtures cover existing `castor.json`, `.castor`, Foundation files,
   ChapterIntent, ChapterMemo, chapters, Canon/state.
 - Legacy → V2 upgrade must **not** change chapter prose hashes or historical Canon.
 - Studio/Core/CLI parity is tested; CLI cannot bypass gates.

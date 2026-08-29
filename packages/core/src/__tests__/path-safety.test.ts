@@ -3,7 +3,7 @@ import { join, resolve } from "node:path";
 import { safeChildPath } from "../utils/path-safety.js";
 
 describe("path safety", () => {
-  const root = resolve("/tmp/inkos/books");
+  const root = resolve("/tmp/castor/books");
 
   it("allows paths inside the root", () => {
     expect(safeChildPath(root, "book-a/story/book_rules.md"))
@@ -16,7 +16,7 @@ describe("path safety", () => {
   });
 
   it("blocks sibling-prefix bypasses", () => {
-    expect(() => safeChildPath(root, "/tmp/inkos/books2/secret.md"))
+    expect(() => safeChildPath(root, "/tmp/castor/books2/secret.md"))
       .toThrow("Path traversal blocked");
   });
 });
