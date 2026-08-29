@@ -169,7 +169,7 @@ export async function launchStudioEntry(
 ): Promise<void> {
   const prepared = await prepareStudioRoot(root);
   if (prepared.initialized) {
-    log(`No inkos.json found in ${root}. Initialized a minimal InkOS project for Studio.`);
+    log(`No project config found in ${root}. Initialized a minimal Castor project for Studio.`);
   }
 
   if (hooks.launchStudio) {

@@ -124,6 +124,26 @@ export {
   type ConfirmStateReviewResult,
 } from "./state/state-review-finalize.js";
 export { assertCanAdvanceStory } from "./state/advancement-gate.js";
+
+// Castor canonical identity constants + project config file boundary
+export {
+  CASTOR_PRODUCT_NAME,
+  CASTOR_PRODUCT_SHORT_NAME,
+  CASTOR_STUDIO_NAME,
+  CASTOR_DOCTOR_NAME,
+  CASTOR_CLI_COMMAND,
+  CASTOR_CONFIG_FILENAME,
+  LEGACY_INKOS_CONFIG_FILENAME,
+  CASTOR_RUNTIME_DIRNAME,
+  LEGACY_INKOS_RUNTIME_DIRNAME,
+} from "./config/product-identity.js";
+export {
+  loadProjectConfigFile,
+  saveProjectConfigFile,
+  hasProjectConfigFile,
+  ConfigNotFoundError,
+  type LoadedProjectConfig,
+} from "./config/project-config-file.js";
 export { computeProseRevision } from "./utils/prose-revision.js";
 export {
   type PlayActionKind,

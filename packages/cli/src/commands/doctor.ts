@@ -132,12 +132,11 @@ export const doctorCommand = new Command("doctor")
       ...await inspectNodeRuntimePinFiles(root),
     });
 
-    // 2. Check inkos.json exists
-    try {
-      await readFile(join(root, "inkos.json"), "utf-8");
-      checks.push({ name: "inkos.json", ok: true, detail: "Found" });
-    } catch {
-      checks.push({ name: "inkos.json", ok: false, detail: "Not found. Run 'castor init'" });
+    // 2. Check the project config file exists
+    {
+      const { hasProjectConfigFile } = await import("@actalk/castor-core");
+      const found = await hasProjectConfigFile(root);
+      checks.push({ name: "castor.json", ok: found, detail: found ? "Found" : "Not found. Run 'castor init'" });
     }
 
     // 3. Check .env exists

@@ -232,7 +232,7 @@ async function createShortRuntime(
       onStreamProgress: pipelineConfig.onStreamProgress,
     };
   } catch (e) {
-    if (!String(e).includes("inkos.json not found")) throw e;
+    if (!String(e).includes("Project config not found")) throw e;
     const llmConfig = buildEnvLLMConfig(options);
     return {
       client: createLLMClient(llmConfig),

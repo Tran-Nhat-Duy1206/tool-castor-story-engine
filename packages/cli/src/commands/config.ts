@@ -2,11 +2,23 @@ import { Command } from "commander";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { findProjectRoot, log, logError, GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH } from "../utils.js";
-import { listModelsForService } from "@actalk/castor-core";
+import { listModelsForService, loadProjectConfigFile, saveProjectConfigFile } from "@actalk/castor-core";
 import { formatListModelsEmpty, formatListModelsHeader, resolveCliLanguage } from "../localization.js";
 
 export const configCommand = new Command("config")
   .description("Manage project configuration");
+
+// JSON config trees are traversed and patched dynamically here (same
+// permissiveness the previous JSON.parse-any behavior provided).
+type JsonConfig = { [key: string]: any };
+
+async function loadProjectJson(root: string): Promise<JsonConfig> {
+  return (await loadProjectConfigFile(root)).config as JsonConfig;
+}
+
+async function saveProjectJson(root: string, config: JsonConfig): Promise<void> {
+  await saveProjectConfigFile(root, config);
+}
 
 configCommand
   .command("set")
@@ -15,11 +27,9 @@ configCommand
   .argument("<value>", "Config value")
   .action(async (key: string, value: string) => {
     const root = findProjectRoot();
-    const configPath = join(root, "inkos.json");
 
     try {
-      const raw = await readFile(configPath, "utf-8");
-      const config = JSON.parse(raw);
+      const config = await loadProjectJson(root);
 
       const keys = key.split(".");
 
@@ -80,7 +90,7 @@ configCommand
         target[finalKey] = value;
       }
 
-      await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
+      await saveProjectJson(root, config);
       log(`Set ${key} = ${value}`);
     } catch (e) {
       logError(`Failed to update config: ${e}`);
@@ -146,11 +156,9 @@ configCommand
   .description("Show current project configuration")
   .action(async () => {
     const root = findProjectRoot();
-    const configPath = join(root, "inkos.json");
 
     try {
-      const raw = await readFile(configPath, "utf-8");
-      const config = JSON.parse(raw);
+      const config = await loadProjectJson(root);
       // Mask API key
       if (config.llm?.apiKey) {
         const key = config.llm.apiKey;
@@ -199,11 +207,9 @@ configCommand
     }
 
     const root = findProjectRoot();
-    const configPath = join(root, "inkos.json");
 
     try {
-      const raw = await readFile(configPath, "utf-8");
-      const config = JSON.parse(raw);
+      const config = await loadProjectJson(root);
       const overrides = config.modelOverrides ?? {};
 
       const hasProviderOpts = opts.baseUrl || opts.provider || opts.apiKeyEnv || opts.stream === false;
@@ -218,7 +224,7 @@ configCommand
         config.modelOverrides = { ...overrides, [agent]: model };
       }
 
-      await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
+      await saveProjectJson(root, config);
       log(`Model override: ${agent} → ${model}${opts.baseUrl ? ` (${opts.baseUrl})` : ""}`);
     } catch (e) {
       logError(`Failed to update config: ${e}`);
@@ -232,11 +238,9 @@ configCommand
   .argument("<agent>", "Agent name")
   .action(async (agent: string) => {
     const root = findProjectRoot();
-    const configPath = join(root, "inkos.json");
 
     try {
-      const raw = await readFile(configPath, "utf-8");
-      const config = JSON.parse(raw);
+      const config = await loadProjectJson(root);
       const overrides = config.modelOverrides;
       if (!overrides || !(agent in overrides)) {
         log(`No model override for "${agent}".`);
@@ -244,7 +248,7 @@ configCommand
       }
       const { [agent]: _, ...rest } = overrides;
       config.modelOverrides = Object.keys(rest).length > 0 ? rest : undefined;
-      await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
+      await saveProjectJson(root, config);
       log(`Removed model override for ${agent}. Will use default model.`);
     } catch (e) {
       logError(`Failed to update config: ${e}`);
@@ -258,11 +262,9 @@ configCommand
   .option("--json", "Output JSON")
   .action(async (opts) => {
     const root = findProjectRoot();
-    const configPath = join(root, "inkos.json");
 
     try {
-      const raw = await readFile(configPath, "utf-8");
-      const config = JSON.parse(raw);
+      const config = await loadProjectJson(root);
       const defaultModel = config.llm?.model ?? "(not set)";
       const overrides: Record<string, unknown> = config.modelOverrides ?? {};
 

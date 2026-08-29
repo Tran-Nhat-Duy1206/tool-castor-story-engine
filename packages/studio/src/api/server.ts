@@ -1937,13 +1937,13 @@ function syncTopLevelLlmMirror(llm: Record<string, unknown>): void {
 }
 
 async function loadRawConfig(root: string): Promise<Record<string, unknown>> {
-  const configPath = join(root, "inkos.json");
-  const raw = await readFile(configPath, "utf-8");
-  return JSON.parse(raw) as Record<string, unknown>;
+  const { loadProjectConfigFile } = await import("@actalk/castor-core");
+  return (await loadProjectConfigFile(root)).config;
 }
 
 async function saveRawConfig(root: string, config: Record<string, unknown>): Promise<void> {
-  await writeFile(join(root, "inkos.json"), JSON.stringify(config, null, 2), "utf-8");
+  const { saveProjectConfigFile } = await import("@actalk/castor-core");
+  await saveProjectConfigFile(root, config);
 }
 
 type ChapterReviewMode = "auto" | "manual";
@@ -6035,13 +6035,13 @@ export function createStudioServer(
     let raw: Record<string, unknown>;
     try {
       currentConfig = await loadCurrentProjectConfig({ requireApiKey: false });
-      // Check if language was explicitly set in inkos.json (not just the schema default)
-      raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8")) as Record<string, unknown>;
+      // Check if language was explicitly set in the project config (not just the schema default)
+      raw = await loadRawConfig(root);
     } catch (error) {
       throw new ApiError(
         500,
         "PROJECT_CONFIG_INVALID",
-        `Failed to load inkos.json: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to load castor.json: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
     const languageExplicit = "language" in raw && raw.language !== "";
@@ -6175,10 +6175,8 @@ export function createStudioServer(
 
   app.put("/api/v1/project", async (c) => {
     const updates = await c.req.json<Record<string, unknown>>();
-    const configPath = join(root, "inkos.json");
     try {
-      const raw = await readFile(configPath, "utf-8");
-      const existing = JSON.parse(raw);
+      const existing = await loadRawConfig(root) as { llm?: Record<string, unknown>; language?: string };
       // Merge LLM settings
       if (updates.temperature !== undefined) {
         existing.llm.temperature = updates.temperature;
@@ -6189,8 +6187,7 @@ export function createStudioServer(
       if (updates.language === "zh" || updates.language === "en") {
         existing.language = updates.language;
       }
-      const { writeFile: writeFileFs } = await import("node:fs/promises");
-      await writeFileFs(configPath, JSON.stringify(existing, null, 2), "utf-8");
+      await saveRawConfig(root, existing);
       return c.json({ ok: true });
     } catch (e) {
       return c.json({ error: String(e) }, 500);
@@ -6198,14 +6195,13 @@ export function createStudioServer(
   });
 
   app.get("/api/v1/project/detection", async (c) => {
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = await loadRawConfig(root);
     return c.json({ detection: raw.detection ?? null });
   });
 
   app.put("/api/v1/project/detection", async (c) => {
     const { detection } = await c.req.json<{ detection?: unknown }>();
-    const configPath = join(root, "inkos.json");
-    const raw = JSON.parse(await readFile(configPath, "utf-8"));
+    const raw = await loadRawConfig(root) as { detection?: unknown };
     if (detection === null) {
       delete raw.detection;
     } else {
@@ -6215,8 +6211,7 @@ export function createStudioServer(
       }
       raw.detection = parsed.data;
     }
-    const { writeFile: writeFileFs } = await import("node:fs/promises");
-    await writeFileFs(configPath, JSON.stringify(raw, null, 2), "utf-8");
+    await saveRawConfig(root, raw);
     return c.json({ ok: true, detection: raw.detection ?? null });
   });
 
@@ -7353,13 +7348,10 @@ export function createStudioServer(
 
   app.post("/api/v1/project/language", async (c) => {
     const { language } = await c.req.json<{ language: "zh" | "en" }>();
-    const configPath = join(root, "inkos.json");
     try {
-      const raw = await readFile(configPath, "utf-8");
-      const existing = JSON.parse(raw);
+      const existing = await loadRawConfig(root);
       existing.language = language;
-      const { writeFile: writeFileFs } = await import("node:fs/promises");
-      await writeFileFs(configPath, JSON.stringify(existing, null, 2), "utf-8");
+      await saveRawConfig(root, existing);
       return c.json({ ok: true, language });
     } catch (e) {
       return c.json({ error: String(e) }, 500);
@@ -7532,17 +7524,15 @@ export function createStudioServer(
   // --- Model overrides ---
 
   app.get("/api/v1/project/model-overrides", async (c) => {
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = await loadRawConfig(root);
     return c.json({ overrides: raw.modelOverrides ?? {} });
   });
 
   app.put("/api/v1/project/model-overrides", async (c) => {
     const { overrides } = await c.req.json<{ overrides: Record<string, unknown> }>();
-    const configPath = join(root, "inkos.json");
-    const raw = JSON.parse(await readFile(configPath, "utf-8"));
+    const raw = await loadRawConfig(root);
     raw.modelOverrides = overrides;
-    const { writeFile: writeFileFs } = await import("node:fs/promises");
-    await writeFileFs(configPath, JSON.stringify(raw, null, 2), "utf-8");
+    await saveRawConfig(root, raw);
     return c.json({ ok: true });
   });
 
@@ -7674,17 +7664,15 @@ export function createStudioServer(
   // --- Notify channels ---
 
   app.get("/api/v1/project/notify", async (c) => {
-    const raw = JSON.parse(await readFile(join(root, "inkos.json"), "utf-8"));
+    const raw = await loadRawConfig(root);
     return c.json({ channels: raw.notify ?? [] });
   });
 
   app.put("/api/v1/project/notify", async (c) => {
     const { channels } = await c.req.json<{ channels: unknown[] }>();
-    const configPath = join(root, "inkos.json");
-    const raw = JSON.parse(await readFile(configPath, "utf-8"));
+    const raw = await loadRawConfig(root);
     raw.notify = channels;
-    const { writeFile: writeFileFs } = await import("node:fs/promises");
-    await writeFileFs(configPath, JSON.stringify(raw, null, 2), "utf-8");
+    await saveRawConfig(root, raw);
     return c.json({ ok: true });
   });
 
@@ -8299,7 +8287,7 @@ export function createStudioServer(
     const { GLOBAL_ENV_PATH } = await import("@actalk/castor-core");
 
     const checks = {
-      inkosJson: existsSync(join(root, "inkos.json")),
+      projectConfigFile: existsSync(join(root, "castor.json")) || existsSync(join(root, "inkos.json")),
       projectEnv: existsSync(join(root, ".env")),
       globalEnv: existsSync(GLOBAL_ENV_PATH),
       booksDir: existsSync(join(root, "books")),

@@ -157,8 +157,8 @@ export function buildAutoInitMessages(projectName: string, locale: TuiLocale): {
 }
 
 export async function ensureProject(cwd: string): Promise<SetupResult> {
-  const configPath = join(cwd, "inkos.json");
-  const hasConfig = await fileExists(configPath);
+  const { hasProjectConfigFile } = await import("@actalk/castor-core");
+  const hasConfig = await hasProjectConfigFile(cwd);
 
   if (!hasConfig) {
     await autoInit(cwd);
@@ -283,11 +283,8 @@ async function autoInit(cwd: string): Promise<void> {
     },
   };
 
-  await writeFile(
-    join(cwd, "inkos.json"),
-    JSON.stringify(config, null, 2),
-    "utf-8",
-  );
+  const { saveProjectConfigFile } = await import("@actalk/castor-core");
+  await saveProjectConfigFile(cwd, config);
 
   const hasGlobal = await hasGlobalConfig();
   if (!hasGlobal) {
@@ -360,8 +357,8 @@ export async function detectModelInfo(projectRoot: string): Promise<ModelInfo | 
 
 export async function detectProjectLanguage(projectRoot: string): Promise<string | undefined> {
   try {
-    const raw = await readFile(join(projectRoot, "inkos.json"), "utf-8");
-    const parsed = JSON.parse(raw) as { language?: string };
+    const { loadProjectConfigFile } = await import("@actalk/castor-core");
+    const parsed = (await loadProjectConfigFile(projectRoot)).config as { language?: string };
     return parsed.language;
   } catch {
     return undefined;

@@ -146,9 +146,9 @@ export function App() {
           </div>
           {/* 项目配置没加载出来，语言未知，所以这屏中英双语并排展示。 */}
           <p className="text-sm text-muted-foreground">
-            请检查项目根目录下的 inkos.json 是否存在且为合法 JSON，然后重试。
+            请检查项目根目录下的 castor.json 是否存在且为合法 JSON，然后重试。
             <br />
-            Check that inkos.json in the project root exists and is valid JSON, then retry.
+            Check that castor.json in the project root exists and is valid JSON, then retry.
           </p>
           <button
             type="button"

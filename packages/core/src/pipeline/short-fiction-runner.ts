@@ -823,8 +823,8 @@ async function readProjectCoverConfig(root: string): Promise<{
   readonly baseUrl?: string;
 } | undefined> {
   try {
-    const raw = await readFile(join(root, "inkos.json"), "utf-8");
-    const parsed = JSON.parse(raw) as {
+    const { loadProjectConfigFile } = await import("../config/project-config-file.js");
+    const parsed = (await loadProjectConfigFile(root)).config as {
       llm?: { cover?: { service?: unknown; model?: unknown; baseUrl?: unknown } };
     };
     const service = typeof parsed.llm?.cover?.service === "string" ? parsed.llm.cover.service : "";

@@ -395,14 +395,13 @@ export class StateManager {
   }
 
   async loadProjectConfig(): Promise<Record<string, unknown>> {
-    const configPath = join(this.projectRoot, "inkos.json");
-    const raw = await readFile(configPath, "utf-8");
-    return JSON.parse(raw);
+    const { loadProjectConfigFile } = await import("../config/project-config-file.js");
+    return (await loadProjectConfigFile(this.projectRoot)).config;
   }
 
   async saveProjectConfig(config: Record<string, unknown>): Promise<void> {
-    const configPath = join(this.projectRoot, "inkos.json");
-    await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
+    const { saveProjectConfigFile } = await import("../config/project-config-file.js");
+    await saveProjectConfigFile(this.projectRoot, config);
   }
 
   async loadBookConfig(bookId: string): Promise<BookConfig> {

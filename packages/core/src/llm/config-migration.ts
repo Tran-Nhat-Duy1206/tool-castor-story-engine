@@ -1,5 +1,3 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { saveSecrets, loadSecrets } from "./secrets.js";
 import { guessServiceFromBaseUrl } from "./service-presets.js";
 
@@ -8,23 +6,27 @@ export interface MigrationResult {
 }
 
 export async function migrateConfig(projectRoot: string): Promise<MigrationResult> {
-  const configPath = join(projectRoot, "inkos.json");
-  let raw: string;
+  const { loadProjectConfigFile, saveProjectConfigFile } = await import("../config/project-config-file.js");
+  let config: Record<string, unknown>;
   try {
-    raw = await readFile(configPath, "utf-8");
+    config = (await loadProjectConfigFile(projectRoot)).config;
   } catch {
     return { migrated: false };
   }
 
-  const config = JSON.parse(raw);
-  const llm = config.llm;
+  const llm = config.llm as Record<string, unknown> | undefined;
   if (!llm) return { migrated: false };
 
   // Already new format
   if (Array.isArray(llm.services)) return { migrated: false };
 
   // Old format: llm.provider, llm.model, llm.baseUrl, llm.apiKey
-  const { provider, model, baseUrl, apiKey, ...restLlm } = llm;
+  const { provider, model, baseUrl, apiKey, ...restLlm } = llm as {
+    provider?: string;
+    model?: string;
+    baseUrl?: string;
+    apiKey?: string;
+  } & Record<string, unknown>;
   if (!model && !provider) return { migrated: false };
 
   // Determine service from baseUrl
@@ -44,7 +46,7 @@ export async function migrateConfig(projectRoot: string): Promise<MigrationResul
     services: [serviceEntry],
     defaultModel: model,
   };
-  await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
+  await saveProjectConfigFile(projectRoot, config);
 
   // Move apiKey to secrets
   if (apiKey) {

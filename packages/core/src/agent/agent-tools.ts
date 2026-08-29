@@ -1986,7 +1986,8 @@ function slugResearchTopic(topic: string): string {
 
 async function readResearchSearchConfig(projectRoot: string) {
   try {
-    const raw = JSON.parse(await readFile(join(projectRoot, "inkos.json"), "utf-8")) as Record<string, unknown>;
+    const { loadProjectConfigFile } = await import("../config/project-config-file.js");
+    const raw = (await loadProjectConfigFile(projectRoot)).config;
     return ResearchSearchConfigSchema.parse(raw.researchSearch ?? {});
   } catch {
     return ResearchSearchConfigSchema.parse({});

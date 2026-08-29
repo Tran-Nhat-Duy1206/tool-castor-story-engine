@@ -120,20 +120,17 @@ export async function resolveEffectiveLLMConfig(
 }
 
 async function readProjectConfig(root: string): Promise<Record<string, unknown>> {
-  const configPath = join(root, "inkos.json");
+  const { loadProjectConfigFile, ConfigNotFoundError } = await import("../config/project-config-file.js");
   try {
-    await access(configPath);
-  } catch {
-    throw new Error(
-      `inkos.json not found in ${root}.\nMake sure you are inside an InkOS project directory (cd into the project created by 'inkos init').`,
-    );
-  }
-
-  const raw = await readFile(configPath, "utf-8");
-  try {
-    return JSON.parse(raw) as Record<string, unknown>;
-  } catch {
-    throw new Error(`inkos.json in ${root} is not valid JSON. Check the file for syntax errors.`);
+    return (await loadProjectConfigFile(root)).config;
+  } catch (error) {
+    if (error instanceof ConfigNotFoundError) {
+      throw new Error(
+        `Project config (castor.json) not found in ${root}.\n` +
+          `Make sure you are inside a Castor project directory (cd into the project created by 'castor init').`,
+      );
+    }
+    throw error;
   }
 }
 

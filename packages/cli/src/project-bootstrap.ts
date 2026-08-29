@@ -125,10 +125,10 @@ export async function initializeProjectDirectory(
 ): Promise<void> {
   const language = options.language ?? "zh";
   const overwriteSupportFiles = options.overwriteSupportFiles ?? true;
-  const configPath = join(projectDir, "inkos.json");
+  const configPath = join(projectDir, "castor.json");
 
   if (await exists(configPath)) {
-    throw new Error(`inkos.json already exists in ${projectDir}. Use a different directory or delete the existing project.`);
+    throw new Error(`castor.json already exists in ${projectDir}. Use a different directory or delete the existing project.`);
   }
 
   await mkdir(projectDir, { recursive: true });
@@ -155,8 +155,8 @@ export async function ensureProjectDirectoryInitialized(
   projectDir: string,
   options: Omit<ProjectBootstrapOptions, "overwriteSupportFiles"> = {},
 ): Promise<boolean> {
-  const configPath = join(projectDir, "inkos.json");
-  if (await exists(configPath)) {
+  const { hasProjectConfigFile } = await import("@actalk/castor-core");
+  if (await hasProjectConfigFile(projectDir)) {
     return false;
   }
 
