@@ -448,3 +448,285 @@ The migration is technically complete only when all are true:
 12. Real-provider black-box Chapter 1 acceptance completes successfully.
 13. Independent review reports Critical 0 / Important 0.
 14. No push/tag/release occurs without separate Human approval.
+
+## 21. Localization and language architecture
+
+### 21.1 Product locale policy
+
+Castor supports exactly two active product locales in this migration milestone:
+
+- `vi-VN` — default locale;
+- `en-US` — user-selectable English locale.
+
+Active Chinese (`zh`, `zh-CN`, Chinese-first navigation/help/docs) is removed from normal product surfaces for this milestone.
+
+This does not require deleting historical Chinese text from upstream history, fixtures, archived documentation, or compatibility tests when that text is evidence or required for regression coverage.
+
+### 21.2 UI locale is independent from book language
+
+The following invariant is mandatory:
+
+```text
+UI locale != Book language
+```
+
+Examples:
+
+```text
+UI locale: vi-VN
+Book language: en
+=> Studio/CLI labels are Vietnamese, generated chapter prose remains English.
+```
+
+```text
+UI locale: en-US
+Book language: vi
+=> Studio/CLI labels are English, generated chapter prose remains Vietnamese.
+```
+
+Changing product locale must never mutate:
+
+- book language;
+- Foundation language/meaning;
+- Arc/Plan authority;
+- Canon;
+- prompt language selection for book output;
+- chapter prose;
+- Authorization or Human decisions.
+
+Book output language remains an explicit per-book/story concern.
+
+### 21.3 User-facing localization boundary
+
+Localize normal user-facing product surfaces, including where applicable:
+
+- Castor Studio navigation, forms, buttons, labels, tooltips, empty states, dialogs, banners, progress text, validation text, and recoverable error messages;
+- CLI help, command descriptions, common status/progress output, and user-actionable errors;
+- Castor Doctor headings and actionable diagnostics;
+- TUI menus/help/statuses where retained;
+- onboarding/setup text;
+- normal documentation and quick-start instructions.
+
+Do not localize source identifiers, function names, TypeScript types, JSON schema property names, protocol keys, machine event IDs, status enum values, file format keys, or API contracts merely to make the source look Vietnamese.
+
+Source code and machine-readable contracts remain English.
+
+### 21.4 Localization implementation shape
+
+Do not scatter hard-coded Vietnamese/English pairs across components.
+
+Use a centralized locale catalog with stable semantic keys, conceptually:
+
+```text
+locales/
+  vi-VN.json
+  en-US.json
+```
+
+Example semantic keys:
+
+```text
+book.create
+foundation.publish
+arc.publish
+chapter.write
+review.stateReview
+review.finalConfirm
+provider.notConfigured
+studio.startupFailure
+```
+
+Product code calls a translation resolver such as `t("chapter.write")` rather than embedding duplicate language conditionals.
+
+Locale fallback order:
+
+1. explicit saved user preference;
+2. explicit project/session preference when a surface supports it;
+3. `vi-VN` default.
+
+Missing translation keys must fail visibly in development/test and must not silently display unrelated Chinese fallback strings.
+
+### 21.5 Locale persistence
+
+Studio locale preference is user/product preference, not story authority.
+
+It may be persisted in a non-Canon Castor preference/config location.
+
+Changing locale must not dirty story Canon or generate a new Foundation/Arc/Plan revision.
+
+CLI may support an explicit locale preference/config and `CASTOR_LOCALE` with allowed values `vi-VN` and `en-US`.
+
+If an unsupported locale is supplied, fail to `vi-VN` with an actionable warning rather than guessing.
+
+### 21.6 Documentation languages
+
+Canonical documentation targets for this milestone:
+
+- `README.md` — Vietnamese-first;
+- `README.en.md` — English.
+
+Chinese/Japanese active README navigation may be removed if it is no longer maintained.
+
+Historical/upstream references may remain when needed for attribution or migration documentation.
+
+New user documentation should not default to Chinese.
+
+### 21.7 Machine prompts
+
+Production machine-facing prompts should converge on English as the canonical maintenance language where practical.
+
+The goal is:
+
+```text
+User-facing product language: vi-VN / en-US
+Machine prompt contract language: English canonical
+Book output language: per-book setting
+```
+
+Chinese production prompts must not be mechanically translated and committed in bulk without behavior verification.
+
+Each prompt family migrated from Chinese to English requires:
+
+- preservation of required schema/format instructions;
+- preservation of authority and safety semantics;
+- preservation of language-routing behavior for the target book;
+- targeted regression/golden tests where existing tests support them;
+- real-model verification for high-risk Planner/Writer/Auditor contracts.
+
+Prompt-language migration must be staged independently from package/config rename checkpoints so failures can be attributed correctly.
+
+### 21.8 Prompt output-language invariant
+
+English canonical machine prompts must still instruct the model to honor the book's configured language.
+
+The implementation must not infer output language from Studio locale.
+
+At minimum verify:
+
+- `vi-VN` UI + English book => English Foundation/Plan/Chapter where book contract requires English;
+- `en-US` UI + Vietnamese book => Vietnamese Foundation/Plan/Chapter where book contract requires Vietnamese.
+
+### 21.9 Chinese active-surface removal
+
+Remove Chinese from active normal surfaces such as:
+
+- Studio navigation and dialogs;
+- CLI/TUI help and product banners;
+- Doctor/user-facing diagnostics;
+- default README/quick-start flow;
+- new-book templates intended for normal users;
+- active locale selector/options.
+
+Do not delete Chinese blindly from:
+
+- historical Git content;
+- upstream attribution;
+- legacy fixtures;
+- tests whose purpose is multilingual/legacy compatibility;
+- story data explicitly authored in Chinese;
+- imported user content.
+
+Castor must continue to treat user-authored Chinese story/reference content as data, not as obsolete product branding.
+
+## 22. Localization testing strategy
+
+### 22.1 Studio locale tests
+
+Verify the same representative Studio journey in both locales:
+
+```text
+vi-VN:
+Create Book -> Foundation -> Arc -> Plan -> Write -> Audit -> State Review -> Final Confirm
+```
+
+All product-owned visible labels/messages in the tested journey are Vietnamese except proper nouns, technical identifiers intentionally exposed, model/user content, and legal attribution.
+
+Repeat with `en-US` and verify equivalent English UI.
+
+### 22.2 Cross-language independence matrix
+
+Required matrix:
+
+| UI locale | Book language | Expected product UI | Expected story output |
+|---|---|---|---|
+| `vi-VN` | English | Vietnamese | English |
+| `en-US` | Vietnamese | English | Vietnamese |
+| `vi-VN` | Vietnamese | Vietnamese | Vietnamese |
+| `en-US` | English | English | English |
+
+No row may change authority semantics.
+
+### 22.3 Locale persistence tests
+
+Verify:
+
+- default first launch is `vi-VN`;
+- switching to `en-US` persists across Studio restart;
+- locale switch does not modify book files/Canon;
+- unsupported locale fails safely to `vi-VN` with warning;
+- `CASTOR_LOCALE` works for CLI where applicable.
+
+### 22.4 Translation completeness audit
+
+For active Studio/CLI/Doctor locale keys:
+
+- every required key exists in `vi-VN`;
+- every required key exists in `en-US`;
+- no active key falls back to Chinese;
+- no user-facing raw translation key is displayed.
+
+### 22.5 Chinese surface audit
+
+Perform repository/runtime scans for active product Chinese strings and classify each occurrence.
+
+Allowed remaining Chinese categories:
+
+1. user-authored/imported story data;
+2. historical/upstream attribution/reference;
+3. legacy/multilingual fixture or test data;
+4. machine prompt pending an explicitly staged, tested prompt migration checkpoint.
+
+Any Chinese string in an active normal UI/help/Doctor/default-doc surface outside those buckets blocks localization completion.
+
+### 22.6 Prompt migration verification
+
+For every high-risk prompt family converted to English canonical, verify at least:
+
+- structured output/schema compatibility;
+- output language routing;
+- no authority instruction regression;
+- no internal instruction leakage into prose;
+- representative real-model execution where cost permits.
+
+Planner, Writer, Auditor/Reviewer, Foundation generation/review, and State Review extraction are high-risk families.
+
+## 23. Localization non-goals
+
+Localization does not:
+
+- translate TypeScript identifiers or JSON protocol keys into Vietnamese;
+- force all books to Vietnamese;
+- remove the ability to write Chinese user-authored stories if the existing book-language system supports them;
+- claim Chinese source/history never existed;
+- combine prompt rewrites with unrelated story-quality redesign;
+- change Human authority semantics;
+- make UI locale part of Canon.
+
+The active product locale set is `vi-VN` and `en-US`; supported story languages remain a separate capability and may be broader.
+
+## 24. Extended acceptance criteria
+
+In addition to Section 20, completion of the Castor identity/localization migration requires:
+
+1. `vi-VN` is the default product locale.
+2. `en-US` can be selected and persists as a user preference.
+3. Active normal Studio/CLI/Doctor surfaces have no Chinese default UI.
+4. `README.md` is Vietnamese-first and `README.en.md` is English.
+5. UI locale changes do not modify book language or Canon.
+6. The four-row UI-locale/book-language matrix passes.
+7. Production machine prompts targeted by this milestone are English canonical or explicitly documented as pending a staged prompt-migration checkpoint; no unreviewed mechanical translation is accepted.
+8. Chinese story/imported user content remains valid data and is not deleted by branding/localization cleanup.
+9. Translation catalogs are complete for representative production journeys in both locales.
+10. Real-user Chapter 1 acceptance is executed at least once with `vi-VN` UI and an English-language book to prove UI/output separation.
+11. Independent review reports Critical 0 / Important 0 for the localization boundary.
+12. No push/tag/release occurs without separate Human approval.
