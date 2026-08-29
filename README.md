@@ -1,7 +1,7 @@
 <h1 align="center">Tool Castor Story Engine</h1>
 
 <p align="center">
-  <strong>面向长短篇小说、剧本剧作、互动影游、IP 内容与多语言翻译的 AI 创作智能体系统（CLI：<code>castor</code>）</strong>
+  <strong>Hệ thống AI agent sáng tác cho tiểu thuyết dài và ngắn, kịch bản, phim-game tương tác, nội dung IP và dịch thuật đa ngôn ngữ (CLI: <code>castor</code>)</strong>
 </p>
 
 <p align="center">
@@ -10,69 +10,69 @@
 </p>
 
 <p align="center">
-  <a href="README.en.md">English</a> | 中文 | <a href="README.ja.md">日本語</a>
+  <a href="README.en.md">English</a> | <a href="README.md">中文</a> | <a href="README.ja.md">日本語</a>
 </p>
 
 ---
 
-> **派生项目声明 / Derived project notice**
+> **Thông báo dự án phái sinh / Derived project notice**
 >
-> Tool Castor Story Engine（Castor）由 [InkOS](https://github.com/Narcooo/inkos)（作者 Narcooo）派生，经过了大量修改与演进，已成为独立的长篇 AI 故事写作系统。本项目保留 InkOS 的 Git 历史、版权声明与 AGPL-3.0 许可证义务；上游 InkOS 代码并非本项目作者编写。本修改版本同样以 [AGPL-3.0](LICENSE) 许可发布。
+> Tool Castor Story Engine (Castor) được phái sinh từ [InkOS](https://github.com/Narcooo/inkos) (tác giả Narcooo), sau đó đã được chỉnh sửa và phát triển mạnh mẽ, trở thành một hệ thống viết truyện AI dài kỳ độc lập. Dự án này giữ lại lịch sử Git, thông báo bản quyền và các nghĩa vụ giấy phép AGPL-3.0 của InkOS; mã nguồn InkOS thượng nguồn không phải do tác giả của dự án này viết. Phiên bản chỉnh sửa này cũng được phát hành theo giấy phép [AGPL-3.0](LICENSE).
 >
 > *Tool Castor Story Engine (Castor) is derived from [InkOS](https://github.com/Narcooo/inkos) by Narcooo and has been substantially modified and evolved into an independent long-form AI story-writing system. This project preserves InkOS's Git history, copyright notices and AGPL-3.0 obligations. The original InkOS code was not authored by the maintainers of this project. This modified work remains licensed under AGPL-3.0.*
 
 ---
 
-Tool Castor Story Engine（Castor）是一个面向故事创作与多语言翻译的 AI Agent 系统：长篇连载、独立短篇、剧本剧作、同人番外、仿写续写、互动影游、开放世界和长文翻译，都可以从同一个工作台开始。支持 Studio、TUI、CLI（`castor`）交互形式，把创意、设定、角色、记忆、审稿、修订、封面、互动状态和跨语言交付交给智能体统一管理。核心包含 **Phase 4 人工治理的章节状态复核（Human-Governed Post-Chapter State Review）**：AI 只生成提案，人工决定后原子确认，正文编辑立即触发复核。
+Tool Castor Story Engine (Castor) là một hệ thống AI agent dành cho sáng tác truyện và dịch thuật đa ngôn ngữ: truyện dài kỳ, truyện ngắn độc lập, kịch bản, ngoại truyện dựa trên tác phẩm gốc, viết tiếp mô phỏng phong cách, phim-game tương tác, thế giới mở và dịch văn bản dài — tất cả đều bắt đầu từ cùng một bàn làm việc. Hỗ trợ các hình thức tương tác Studio, TUI và CLI (`castor`), giao cho agent quản lý thống nhất ý tưởng, bối cảnh thiết lập, nhân vật, bộ nhớ, duyệt bản nháp, chỉnh sửa, bìa, trạng thái tương tác và bàn giao đa ngôn ngữ. Điểm cốt lõi là **Phase 4 – Quy trình con người kiểm duyệt trạng thái sau mỗi chương (Human-Governed Post-Chapter State Review)**: AI chỉ tạo đề xuất, con người quyết định rồi xác nhận theo kiểu nguyên tử; mọi chỉnh sửa nội dung chính đều lập tức kích hoạt quy trình duyệt lại.
 
-## v1.8.0 - 统一 Pi Agent Harness 与专业创作内核
+## v1.8.0 - Hợp nhất Pi Agent Harness và lõi sáng tác chuyên nghiệp
 
-Castor 1.8.0 把“Chat Agent 调工具”和“各类作品管线”收敛成一套围绕 pi-agent 的生产 harness。模型负责理解、提议和调用能力；Castor 负责确认、上下文、状态、原子落盘和产物真实性。长篇、短篇、剧本、分镜、互动影游、Play 与翻译继续保留各自的专业方法，但共享同一套执行、检索、观测和恢复基础设施。
+Castor 1.8.0 gộp "chat agent gọi công cụ" và "các pipeline loại tác phẩm" thành một harness sản xuất thống nhất xoay quanh pi-agent. Mô hình chịu trách nhiệm hiểu, đề xuất và gọi năng lực; Castor chịu trách nhiệm xác nhận, ngữ cảnh, trạng thái, ghi đĩa nguyên tử và tính xác thực của sản phẩm. Truyện dài, truyện ngắn, kịch bản, phân cảnh, phim-game tương tác, Play và dịch thuật vẫn giữ phương pháp chuyên biệt riêng, nhưng dùng chung một hạ tầng thực thi, truy xuất, quan sát và phục hồi.
 
-- **模型配置**：Studio 内置多服务配置、模型路由和封面服务配置；支持 [kkaiapi](https://kkaiapi.com/) / OpenRouter 等全球主流模型聚合入口，以及自定义 OpenAI-compatible 服务。
-- **单一生产 Harness**：Studio Chat、TUI、`castor interact` 与生产 worker 共用 pi-agent 工具循环和结构化 action/result；既有 pipeline 降为可直接调用、可中断、可观测的确定性能力，不再维护平行的自然语言决策内核。
-- **15 个内置专业 Skills**：长篇写作 / 审稿、商业短篇、Play、剧本、分镜、互动影游、翻译、拆稿、市场研究、导入、封面与去 AI 味都拥有独立 `SKILL.md`；各作品类型复用 Skill 架构，不复用不适合自己的长篇提示词。
-- **统一本地检索**：故事记忆、材料库和 Skill 参考资料共用 SQLite FTS5 / BM25 检索投影；原始文件仍是权威来源，索引可重建，检索结果保留来源与位置。
-- **书籍参考资料绑定**：导入材料可以显式绑定到某本书并声明用途，写作时按当前任务检索相关段落，而不是把所有文件全文塞进上下文。
-- **安全章节工作区**：正文、状态、伏笔和运行快照先在章节工作区内校验，再原子提交；失败不会出现“状态已推进、正文未落盘”。Studio 可查看改写工作区和真实审稿问题。
-- **跨作品生产一致性**：Short、剧本、分镜、互动影游、Play 与翻译接入统一 run snapshot、Skill 绑定、字数观测、取消信号和失败恢复，同时保留各自的状态模型与创作规则。
-- **长任务与模型调用更稳**：多章写作按一个可恢复任务顺序执行；首 Token / 流式空闲超时、过期状态修复和原子文件集降低被动卡住或半完成的概率。
-- **TUI 对齐 Studio**：新增 `/new`、`/short`、`/play`、`/cover`、`/write` 明确入口，结构化 `/confirm` / `/cancel`，会话级 `/model` 切换和明暗终端自适应配色；普通自由文本仍交给 Agent 理解。
-- **模型与工作台补齐**：新增 LM Studio 本地服务，动态模型目录和外部母本导入可持久化；Studio 支持自定义封面 Base URL、宽屏章节预览和安全章节重写。
-
-<p align="center">
-  <img src="assets/interactive-film-e2e.png" width="440" alt="Castor 互动影游剧情树实测截图">
-  <img src="assets/studio-play-1-5.png" width="440" alt="Castor Play Studio 开放世界界面">
-</p>
-
-### 主要创作形态
-
-**长篇小说** — 从创作简报建书，生成世界观、角色、卷纲、章节意图，按“写作 → 审稿 → 必要修订 → 状态结算”推进。上下文按 protected / compressible 分层组织，避免长书越写越乱。
-
-**剧情多线推演** — 在写下一章前，基于当前正史生成 2-5 条彼此隔离的未来分支，并在 Studio Chat 中横向比较章节节拍、人物决定、预计变化、风险和作者意图匹配度。采用分支只会保存 `selected-branch-plan.md` 候选计划，不会修改正文、大纲或正史状态；正史变化后旧推演会标记为过期。
-
-**Castor Short** — Studio Chat 和 CLI 可以直接产出独立短篇：完整正文、大纲记录、审稿记录、简介卖点、封面提示词，并在配置封面服务后生成封面图。
-
-**Castor Play** — 新增开放世界与分支互动。你可以用自然语言指定世界契约、时间推进方式、角色 agent、物品 / 证据 / 关系规则和视觉风格；系统维护世界状态、可点击选择、自由动作、HUD 和自动配图。
-
-**Studio Chat** — 普通聊天、建书、短篇、封面、互动世界都走同一套 action surface。重动作先确认，生成物可预览，可通过聊天修改章节、封面提示词、世界状态和持久化文本产物。
-
-**Native English novel writing now supported！** Set `--lang en` to write in English. See [English README](README.en.md) for details.
-
-## 欢迎交流
-
-> 当前更新相对频繁，后续会持续新增功能与优化写作效果。
-> 欢迎加群反馈问题、提出需求，也欢迎关注项目动态 — 我们的目标是做最强的基于小说的内容生态创作 AI Agent。
+- **Cấu hình mô hình**: Studio tích hợp sẵn cấu hình nhiều nhà cung cấp, định tuyến mô hình và cấu hình dịch vụ bìa; hỗ trợ các cổng tổng hợp mô hình toàn cầu như [kkaiapi](https://kkaiapi.com/) / OpenRouter, cùng dịch vụ tùy chỉnh tương thích OpenAI.
+- **Harness sản xuất thống nhất**: Studio Chat, TUI, `castor interact` và production worker dùng chung vòng lặp công cụ pi-agent với action/result có cấu trúc; các pipeline cũ trở thành năng lực xác định, gọi trực tiếp được, có thể ngắt và quan sát được, không còn duy trì một nhân quyết định ngôn ngữ tự nhiên song song.
+- **15 Skills chuyên nghiệp tích hợp sẵn**: viết truyện dài / duyệt bản nháp, truyện ngắn thương mại, Play, kịch bản, phân cảnh, phim-game tương tác, dịch thuật, tách bản, nghiên cứu thị trường, nhập liệu, bìa và khử dấu vết AI đều có `SKILL.md` riêng; mỗi loại tác phẩm tái sử dụng kiến trúc Skill chứ không tái sử dụng prompt truyện dài không phù hợp với mình.
+- **Truy xuất cục bộ thống nhất**: bộ nhớ truyện, kho tài liệu và tài liệu tham khảo của Skill dùng chung lớp chiếu truy xuất SQLite FTS5 / BM25; tệp gốc vẫn là nguồn chính thống, chỉ mục có thể xây dựng lại, kết quả truy xuất giữ nguồn và vị trí.
+- **Gắn tài liệu tham khảo với sách**: tài liệu nhập vào có thể gắn rõ ràng với một cuốn sách kèm khai báo mục đích; khi viết, hệ thống truy xuất các đoạn liên quan theo nhiệm vụ hiện tại thay vì nhét toàn văn mọi tệp vào ngữ cảnh.
+- **Không gian làm việc chương an toàn**: nội dung, trạng thái, tiền bố và ảnh chụp trạng thái runtime được xác thực trong không gian làm việc của chương trước khi commit nguyên tử; khi thất bại sẽ không xảy ra hiện tượng "trạng thái đã tiến nhưng nội dung chưa ghi đĩa". Studio có thể xem không gian làm việc viết lại và các vấn đề duyệt bản nháp thực tế.
+- **Nhất quán sản xuất xuyên tác phẩm**: Short, kịch bản, phân cảnh, phim-game tương tác, Play và dịch thuật đều nối vào run snapshot thống nhất, gắn Skill, quan sát số chữ, tín hiệu hủy và phục hồi lỗi, đồng thời giữ mô hình trạng thái và quy tắc sáng tác riêng.
+- **Nhiệm vụ dài và gọi mô hình ổn định hơn**: viết nhiều chương chạy theo một nhiệm vụ có thể phục hồi theo thứ tự; thời gian chờ token đầu / idle khi stream, tự sửa trạng thái hết hạn và tập tệp nguyên tử giảm khả năng bị treo hoặc dở dang.
+- **TUI ngang hàng Studio**: bổ sung các lối vào rõ ràng `/new`, `/short`, `/play`, `/cover`, `/write`, `/confirm` / `/cancel` có cấu trúc, chuyển `/model` theo phiên và bảng màu tự thích ứng terminal sáng/tối; văn bản tự do thông thường vẫn do Agent tự hiểu.
+- **Bổ sung mô hình và bàn làm việc**: thêm dịch vụ cục bộ LM Studio; danh mục mô hình động và nhập bản gốc từ bên ngoài có thể lưu lâu dài; Studio hỗ trợ Base URL bìa tùy chỉnh, xem trước chương màn hình rộng và viết lại chương an toàn.
 
 <p align="center">
-  <img src="assets/wechat-group-v23.jpg" width="300" alt="微信交流群">
+  <img src="assets/interactive-film-e2e.png" width="440" alt="Ảnh chụp thử nghiệm cây cốt truyện phim-game tương tác của Castor">
+  <img src="assets/studio-play-1-5.png" width="440" alt="Giao diện thế giới mở Castor Play Studio">
 </p>
 
-## 快速开始
+### Các hình thức sáng tác chính
 
-### 安装
+**Tiểu thuyết dài kỳ** — tạo sách từ brief sáng tác, sinh thế giới quan, nhân vật, đại cương tập và ý định chương, tiến hành theo chu trình "viết → duyệt → chỉnh sửa khi cần → kết toán trạng thái". Ngữ cảnh được tổ chức theo lớp protected / compressible để tránh cuốn sách càng dài càng rối.
 
-需要 **Node.js 22 或更高版本**。
+**Suy diễn đa nhánh cốt truyện** — trước khi viết chương tiếp theo, dựa trên chính thống hiện tại sinh ra 2-5 nhánh tương lai tách biệt nhau, so sánh ngang trong Studio Chat về nhịp chương, quyết định nhân vật, thay đổi dự kiến, rủi ro và mức khớp ý đồ tác giả. Chấp nhận một nhánh chỉ lưu kế hoạch ứng viên `selected-branch-plan.md`, không sửa nội dung, đại cương hay trạng thái chính thống; khi chính thống thay đổi, các suy diễn cũ sẽ bị đánh dấu hết hạn.
+
+**Castor Short** — Studio Chat và CLI có thể tạo truyện ngắn độc lập trực tiếp: nội dung hoàn chỉnh, bản ghi đại cương, bản ghi duyệt bản nháp, giới thiệu bán hàng, prompt bìa, và sinh ảnh bìa sau khi cấu hình dịch vụ bìa.
+
+**Castor Play** — bổ sung thế giới mở và tương tác phân nhánh. Bạn có thể dùng ngôn ngữ tự nhiên để chỉ định hợp đồng thế giới, cách thời gian trôi, agent nhân vật, quy tắc vật phẩm / bằng chứng / quan hệ và phong cách thị giác; hệ thống duy trì trạng thái thế giới, lựa chọn bấm được, hành động tự do, HUD và ảnh minh họa tự động.
+
+**Studio Chat** — chat thông thường, tạo sách, truyện ngắn, bìa, thế giới tương tác đều đi qua cùng một action surface. Hành động nặng phải xác nhận trước, sản phẩm sinh ra có thể xem trước, có thể chỉnh chương, prompt bìa, trạng thái thế giới và sản phẩm văn bản lưu lâu dài qua chat.
+
+**Hỗ trợ viết tiểu thuyết tiếng Anh gốc!** Đặt `--lang en` để viết bằng tiếng Anh. Xem [README tiếng Anh](README.en.md) để biết chi tiết.
+
+## Cùng trao đổi
+
+> Hiện tại cập nhật khá thường xuyên, sau này sẽ tiếp tục bổ sung tính năng và tối ưu chất lượng viết.
+> Rất hoan nghênh bạn vào nhóm phản hồi lỗi, đề xuất nhu cầu, và theo dõi tiến độ dự án — mục tiêu của chúng ta là xây dựng AI Agent sáng tác nội dung dựa trên tiểu thuyết mạnh nhất.
+
+<p align="center">
+  <img src="assets/wechat-group-v23.jpg" width="300" alt="Nhóm trao đổi WeChat">
+</p>
+
+## Bắt đầu nhanh
+
+### Cài đặt
+
+Cần **Node.js 22 trở lên**.
 
 ```bash
 git clone https://github.com/Tran-Nhat-Duy1206/tool-castor-story-engine.git
@@ -81,35 +81,35 @@ pnpm install
 pnpm build
 ```
 
-> 上游 InkOS 的 npm 包（`@actalk/inkos`）与 [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) 仍然属于 Narcooo 的 InkOS 项目；本独立仓库从源码构建使用。历史用户数据、`castor.json` 配置、`INKOS_*` 环境变量与书籍目录结构保持兼容，`castor` 命令可直接加载既有 InkOS 项目。
+> Gói npm của InkOS thượng nguồn (`@actalk/inkos`) và [OpenClaw Skill](https://clawhub.ai/narcooo/inkos) vẫn thuộc về dự án InkOS của Narcooo; kho độc lập này xây dựng và sử dụng từ mã nguồn. Dữ liệu người dùng cũ, cấu hình `castor.json`, biến môi trường `INKOS_*` và cấu trúc thư mục sách vẫn giữ tương thích; lệnh `castor` có thể nạp trực tiếp các dự án InkOS có sẵn.
 
-### 通过 OpenClaw 使用 🦞
+### Dùng qua OpenClaw 🦞
 
-上游 InkOS 已发布为 [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill。本仓库派生自 InkOS，继承了同一套共享交互入口；从源码构建后可直接调用：
+InkOS thượng nguồn đã được phát hành dưới dạng [OpenClaw](https://clawhub.ai/narcooo/inkos) Skill. Kho này phái sinh từ InkOS và kế thừa cùng một bộ lối vào tương tác chia sẻ; sau khi xây từ mã nguồn có thể gọi trực tiếp:
 
 ```bash
-castor interact --json --message "继续当前书，但把节奏再收紧一点"
+castor interact --json --message "Tiếp tục cuốn sách hiện tại nhưng siết nhịp lại một chút"
 ```
 
-这条入口直接走和项目 TUI 相同的交互执行内核，因此 OpenClaw、TUI、Studio 共用同一套控制脑。当前 JSON 输出包含 assistant 文本回复和 interaction session 信息；真正的执行结果以工具结果和落盘文件为准，不从模型口头声明推断完成。
+Lối vào này đi thẳng vào nhân thực thi tương tác giống hệt TUI của dự án, vì vậy OpenClaw, TUI và Studio dùng chung một "bộ não điều khiển". Hiện tại đầu ra JSON gồm phản hồi văn bản của assistant và thông tin interaction session; kết quả thực thi thực sự căn cứ vào tool result và tệp ghi đĩa, không suy diễn hoàn thành từ lời mô hình.
 
-`plan chapter` / `compose chapter` / `draft` / `audit` / `revise` / `write next` 这些原子命令仍然保留，但更适合作为底层工具，而不是 OpenClaw 的首选入口。
+Các lệnh nguyên tử `plan chapter` / `compose chapter` / `draft` / `audit` / `revise` / `write next` vẫn được giữ lại, nhưng phù hợp hơn làm công cụ tầng dưới thay vì lối vào ưu tiên của OpenClaw.
 
 ### Agent Skills
 
-Castor 直接使用标准 `SKILL.md` 作为专业能力扩展，不再维护一套 Castor 私有 Skill 协议。Skill 只向 Chat Agent 提供专业说明和静态参考资料，不会增加执行权限；创建、写入、编辑和生成图片仍然由 Castor 工具与确认闸门控制。
+Castor sử dụng trực tiếp chuẩn `SKILL.md` làm phần mở rộng năng lực chuyên môn, không còn duy trì một giao thức Skill riêng tư của Castor. Skill chỉ cung cấp hướng dẫn chuyên môn và tài liệu tham khảo tĩnh cho Chat Agent, không tăng quyền thực thi; việc tạo, ghi, chỉnh sửa và sinh ảnh vẫn do công cụ của Castor và cổng xác nhận kiểm soát.
 
-可用方式：
+Cách sử dụng:
 
-- 放到标准目录：项目 `skills/`、`.agents/skills/`，或用户目录 `~/.agents/skills/`、`~/.openclaw/skills/`。Studio 也可以导入包含 `SKILL.md` 的完整文件夹和静态参考资料；项目导入统一保存到 `.agents/skills/`。
-- 或设置 `CASTOR_SKILL_DIRS=/abs/path/to/skills`，可指向单个 skill 目录，也可指向包含多个 skill 子目录的目录。多个目录按系统分隔符分隔。
-- 在 Chat 里用 `@skill-id` 强制本轮使用，例如：`@detective-play 做一个证据链驱动的开放世界`。
-- 不写 `@skill-id` 时，Chat Agent 根据用户当前意图决定是否调用 `use_skill`；不再通过 session 类型、关键词或字符串包含匹配机械启用。
-- 外部 Skill 只提供指令和静态参考资料，Castor 不会自动执行其中的脚本；它也不会绕过现有工具权限与确认闸门。
+- Đặt vào thư mục chuẩn: `skills/` của dự án, `.agents/skills/`, hoặc thư mục người dùng `~/.agents/skills/`, `~/.openclaw/skills/`. Studio cũng có thể nhập cả thư mục chứa `SKILL.md` và tài liệu tham khảo tĩnh; nhập ở mức dự án được lưu thống nhất vào `.agents/skills/`.
+- Hoặc đặt `CASTOR_SKILL_DIRS=/abs/path/to/skills`, có thể trỏ tới một thư mục skill đơn lẻ hoặc thư mục chứa nhiều thư mục con skill. Nhiều thư mục phân tách bằng dấu phân cách hệ thống.
+- Trong Chat dùng `@skill-id` để ép dùng trong lượt này, ví dụ: `@detective-play làm một thế giới mở dựa trên chuỗi bằng chứng`.
+- Khi không viết `@skill-id`, Chat Agent sẽ tự quyết định có gọi `use_skill` hay không dựa trên ý định hiện tại của người dùng; không còn bật máy móc theo loại session, từ khóa hay khớp chuỗi con.
+- Skill bên ngoài chỉ cung cấp chỉ dẫn và tài liệu tham khảo tĩnh; Castor không tự thực thi script trong đó, cũng không vượt qua quyền công cụ và cổng xác nhận hiện có.
 
-提示词配置不是 Skill。Studio 的 **项目设置 → 提示词** 单独管理 prompt packs，项目级覆盖文件写入 `prompt/<pack>/<prompt>.md`，例如 `prompt/play/renderer.md`、`prompt/longform/writer.md`。
+Cấu hình prompt không phải là Skill. Studio quản lý riêng prompt packs tại **Cài đặt dự án → Prompt**, tệp ghi đè cấp dự án ghi vào `prompt/<pack>/<prompt>.md`, ví dụ `prompt/play/renderer.md`, `prompt/longform/writer.md`.
 
-最小 `SKILL.md` 示例：
+Ví dụ `SKILL.md` tối thiểu:
 
 ```md
 ---
@@ -119,13 +119,13 @@ description: Detective evidence and suspect-board play.
 Use evidence chains; do not turn clues into generic atmosphere.
 ```
 
-### 配置
+### Cấu hình
 
-当前 Castor 将 LLM 配置分成两条清晰路径：**Studio 用可视化服务配置**，**CLI / daemon / 部署环境支持 env 覆盖**。两者不会互相污染。
+Hiện tại Castor chia cấu hình LLM thành hai lộ trình rõ ràng: **Studio dùng cấu hình dịch vụ trực quan**, **CLI / daemon / môi trường triển khai hỗ trợ ghi đè bằng env**. Hai bên không làm nhiễu lẫn nhau.
 
-#### 方式一：Studio 服务配置（推荐）
+#### Cách 1: Cấu hình dịch vụ trong Studio (khuyến nghị)
 
-适合本地写作、Web 工作台和可视化管理。
+Phù hợp cho viết cục bộ, bàn làm việc Web và quản lý trực quan.
 
 ```bash
 castor init my-novel
@@ -133,38 +133,38 @@ cd my-novel
 castor
 ```
 
-打开 Studio 后进入「模型配置」：
+Mở Studio và vào "Cấu hình mô hình":
 
-1. 选择服务商，例如 Google Gemini、Moonshot、MiniMax、智谱、百炼或自定义端点。
-2. 粘贴 API Key，点击「测试连接」。
-3. 选择可用模型，保存配置。
-4. 回到书籍页面开始写作。
+1. Chọn nhà cung cấp, ví dụ Google Gemini, Moonshot, MiniMax, Zhipu, Bailian hoặc endpoint tùy chỉnh.
+2. Dán API Key, bấm "Kiểm tra kết nối".
+3. Chọn mô hình khả dụng, lưu cấu hình.
+4. Quay lại trang sách và bắt đầu viết.
 
-Studio 运行时只使用：
+Khi chạy, Studio chỉ dùng:
 
 ```text
-provider bank 默认值
-→ castor.json 里的 services / 当前 service / defaultModel
-→ .castor/secrets.json 里的 service API Key
+giá trị mặc định provider bank
+→ services / service hiện tại / defaultModel trong castor.json
+→ API Key của service trong .castor/secrets.json
 ```
 
-即使检测到 `~/.castor/.env` 或项目 `.env`，Studio 也只会展示提示，不会用 env 覆盖 service、model、baseUrl 或 API Key。API Key 存在项目内的 `.castor/secrets.json`，不会写进 `castor.json`。
+Dù phát hiện thấy `~/.castor/.env` hoặc `.env` của dự án, Studio cũng chỉ hiển thị gợi ý, không dùng env để ghi đè service, model, baseUrl hay API Key. API Key được lưu trong `.castor/secrets.json` của dự án, không ghi vào `castor.json`.
 
-#### 方式二：CLI / daemon / 部署环境的 env 配置
+#### Cách 2: Cấu hình env cho CLI / daemon / môi trường triển khai
 
-适合终端批处理、服务器部署、CI、Docker、守护进程和一次性切模型。
+Phù hợp cho xử lý lô trên terminal, triển khai máy chủ, CI, Docker, daemon và chuyển mô hình tức thời.
 
-全局 env：
+Env toàn cục:
 
 ```bash
 castor config set-global \
   --provider <openai|anthropic|custom> \
-  --base-url <API 地址> \
-  --api-key <你的 API Key> \
-  --model <模型名>
+  --base-url <địa chỉ API> \
+  --api-key <API Key của bạn> \
+  --model <tên mô hình>
 ```
 
-也可以手动写 `~/.castor/.env` 或项目 `.env`：
+Cũng có thể tự ghi `~/.castor/.env` hoặc `.env` của dự án:
 
 ```bash
 CASTOR_LLM_PROVIDER=custom
@@ -172,308 +172,300 @@ CASTOR_LLM_BASE_URL=https://api.moonshot.cn/v1
 CASTOR_LLM_API_KEY=sk-...
 CASTOR_LLM_MODEL=kimi-k2.5
 
-# 可选
-CASTOR_LLM_SERVICE=moonshot                         # 推荐写；不写时会尽量从 baseUrl 自动识别
+# Tùy chọn
+CASTOR_LLM_SERVICE=moonshot                         # Khuyến nghị ghi; nếu không ghi sẽ tự nhận diện từ baseUrl
 CASTOR_LLM_TEMPERATURE=0.7
 CASTOR_LLM_THINKING_BUDGET=0
 CASTOR_DEFAULT_LANGUAGE=zh
 CASTOR_LLM_EXTRA_top_p=0.9
 ```
 
-CLI 合成顺序：
+Thứ tự hợp thành của CLI:
 
 ```text
-Studio/project service 配置
-→ .castor/secrets.json service key
+Cấu hình service của Studio/dự án
+→ service key trong .castor/secrets.json
 → global ~/.castor/.env
 → project .env
-→ 当前进程环境变量
-→ CLI 参数
+→ biến môi trường tiến trình hiện tại
+→ tham số CLI
 ```
 
-也就是说，CLI 默认可以复用 Studio 配好的服务和密钥；如果 env 里声明了 `CASTOR_LLM_SERVICE`、`CASTOR_LLM_MODEL`、`CASTOR_LLM_BASE_URL` 或 `CASTOR_LLM_API_KEY`，则作为覆盖层生效。旧 env 只写 `baseUrl + model + apiKey` 也能继续用，Castor 会尽量从 baseUrl 反推 service。
+Nghĩa là CLI mặc định có thể tái sử dụng service và key đã cấu hình trong Studio; nếu env khai báo `CASTOR_LLM_SERVICE`, `CASTOR_LLM_MODEL`, `CASTOR_LLM_BASE_URL` hoặc `CASTOR_LLM_API_KEY`, chúng sẽ có hiệu lực như một lớp ghi đè. Env cũ chỉ ghi `baseUrl + model + apiKey` vẫn dùng được, Castor sẽ cố suy ra service từ baseUrl.
 
-一次性指定服务或模型：
+Chỉ định service hoặc mô hình cho một lần chạy:
 
 ```bash
 castor write next --service google --model gemini-2.5-flash
 castor write next --service moonshot --model kimi-k2.5 --no-stream
-castor agent "继续写下一章" --api-key-env MOONSHOT_API_KEY
+castor agent "Viết tiếp chương sau" --api-key-env MOONSHOT_API_KEY
 castor doctor --service minimaxCodingPlan --model MiniMax-M2.7
 ```
 
-`--service` 会从 provider bank 自动推导 baseUrl、协议和兼容策略；`--model` 必须属于最终 service，否则会直接报错，避免把 Kimi 模型发到 Gemini 这类错配问题。
+`--service` tự suy ra baseUrl, giao thức và chiến lược tương thích từ provider bank; `--model` phải thuộc về service cuối cùng, nếu không sẽ báo lỗi ngay để tránh lỗi gửi mô hình Kimi sang Gemini.
 
-#### 方式三：多模型路由（可选）
+#### Cách 3: Định tuyến đa mô hình (tùy chọn)
 
-给不同 Agent 分配不同模型，按需平衡质量与成本：
+Gán mô hình khác nhau cho các agent khác nhau, cân bằng chất lượng và chi phí theo nhu cầu:
 
 ```bash
-# 给不同 agent 配不同模型/提供商
+# Cấu hình mô hình/nhà cung cấp khác nhau cho từng agent
 castor config set-model writer <model> --provider <provider> --base-url <url> --api-key-env <ENV_VAR>
 castor config set-model auditor <model> --provider <provider>
-castor config show-models        # 查看当前路由
+castor config show-models        # Xem định tuyến hiện tại
 ```
 
-未单独配置的 Agent 自动使用全局模型。
+Agent nào không cấu hình riêng sẽ tự dùng mô hình toàn cục.
 
-#### 配置排查
+#### Chẩn đoán cấu hình
 
 ```bash
 castor doctor
 ```
 
-`doctor` 会显示当前 effective config mode、service/model/API Key 来源，并尝试 API 连通性。常见模式：
+`doctor` hiển thị effective config mode hiện tại, nguồn của service/model/API Key, và thử kiểm tra kết nối API. Các mode thường gặp:
 
+| Mode             | Ý nghĩa                                                            |
+| ---------------- | ------------------------------------------------------------------ |
+| `studio-project` | Khi Studio chạy: chỉ dùng cấu hình Studio/dự án và secrets          |
+| `cli-project`    | Khi CLI chạy: dựa trên cấu hình Studio, cộng thêm env và tham số CLI |
+| `legacy-env`     | Mode env cũ: tương thích cấu hình thuần `.env` của dự án cũ          |
 
-| 模式               | 含义                                        |
-| ---------------- | ----------------------------------------- |
-| `studio-project` | Studio 运行时：只使用 Studio/project 配置和 secrets |
-| `cli-project`    | CLI 运行时：以 Studio 配置为基础，再叠加 env 和 CLI 参数   |
-| `legacy-env`     | 旧 env 模式：兼容老项目的纯 `.env` 配置                |
+Nếu kiểm tra service thất bại, ưu tiên kiểm tra nhà cung cấp, mô hình và giao thức có khớp không. API Key AI Studio của Google Gemini dùng được cho endpoint tương thích OpenAI của Gemini; Castor sẽ tự tắt tham số `store` của OpenAI mà Google không hỗ trợ. MiniMax mặc định đi qua `/v1/chat/completions` tương thích OpenAI chính thức, và ưu tiên transport không stream hoạt động được, tránh lỗi stream trả usage nhưng không có nội dung; `MiniMax-M3*` mặc định tắt trả về thinking, còn thinking của M2.x do giới hạn thượng nguồn không tắt được.
 
+### Cập nhật cấu hình LLM
 
-如果服务测试失败，优先检查服务商、模型和协议是否匹配。Google Gemini 的 AI Studio API Key 可用于 Gemini OpenAI-compatible endpoint；Castor 会自动禁用 Google 不支持的 OpenAI `store` 参数。MiniMax 默认走官方 OpenAI-compatible `/v1/chat/completions`，并优先使用可工作的非流式 transport，避免流式返回 usage 但无正文的问题；`MiniMax-M3*` 会默认关闭 thinking 返回，M2.x thinking 由上游限制无法关闭。
+- **Cách ly cấu hình Studio / CLI**: Studio cố định dùng cấu hình trang dịch vụ và `.castor/secrets.json`; CLI, daemon, môi trường triển khai hỗ trợ ghi đè env và tham số lệnh tức thời.
+- **Bảng năng lực provider bank**: tích hợp sẵn baseUrl, giao thức, mô hình và chiến lược tương thích của các service Google Gemini, Moonshot, MiniMax, Zhipu, Bailian, DeepSeek, SiliconFlow, Volcano, Tencent Hunyuan, Wenxin, iFlytek Spark, OpenRouter, kkaiapi, Ollama, CodingPlan, v.v.
+- **Kiểm tra quyền sở hữu mô hình**: cấu hình sai như `--service google --model kimi-k2.5` sẽ báo lỗi ngay, tránh gửi yêu cầu đến sai nhà cung cấp.
+- **Sửa lỗi tương thích Google Gemini**: API Key AI Studio dùng trực tiếp được cho endpoint tương thích OpenAI của Gemini; Castor tự tắt tham số `store` của OpenAI mà Google không hỗ trợ.
+- **Dò transport MiniMax**: MiniMax / MiniMax CodingPlan dùng lối vào `/v1` tương thích OpenAI chính thức, và tự động dùng transport không stream hoạt động được, né lỗi stream usage bình thường nhưng nội dung rỗng.
+- **Tương thích env cũ**: bộ `CASTOR_LLM_BASE_URL + CASTOR_LLM_MODEL + CASTOR_LLM_API_KEY` cũ vẫn dùng được cho CLI; thiếu `CASTOR_LLM_SERVICE` sẽ thử suy nhà cung cấp từ baseUrl.
 
-### LLM 配置更新
+### Các lối vào tương tác hiện tại
 
-- **Studio / CLI 配置隔离**：Studio 固定使用服务页配置和 `.castor/secrets.json`；CLI、daemon、部署环境支持 env 覆盖和一次性命令参数。
-- **Provider bank 能力表**：内置 Google Gemini、Moonshot、MiniMax、智谱、百炼、DeepSeek、硅基流动、火山、腾讯混元、文心、讯飞星火、OpenRouter、kkaiapi、Ollama、CodingPlan 等服务的 baseUrl、协议、模型和兼容策略。
-- **模型归属校验**：`--service google --model kimi-k2.5` 这类错配会直接报错，避免把请求发到错误服务商。
-- **Google Gemini 兼容修复**：AI Studio API Key 可直接用于 Gemini OpenAI-compatible endpoint，Castor 会自动禁用 Google 不支持的 OpenAI `store` 参数。
-- **MiniMax transport 探测**：MiniMax / MiniMax CodingPlan 使用官方 OpenAI-compatible `/v1` 入口，并自动使用可工作的非流式 transport，规避流式 usage 正常但正文为空的问题。
-- **旧 env 兼容**：老的 `CASTOR_LLM_BASE_URL + CASTOR_LLM_MODEL + CASTOR_LLM_API_KEY` 仍可用于 CLI；没有 `CASTOR_LLM_SERVICE` 时会尝试从 baseUrl 反推服务商。
+**Studio Chat + CLI + TUI dùng chung một mặt thực thi**
 
-### 当前交互入口
+- **Studio Chat**: thảo luận, tạo sách, truyện ngắn, bìa, Play, chỉnh tệp lưu lâu dài đều khởi phát từ cùng một lối vào hội thoại; hành động nặng sẽ hiện thẻ xác nhận trước.
+- **Lối vào bắt đầu sáng tác**: truyện dài, truyện ngắn, fanfic, ngoại truyện, mô phỏng phong cách, viết tiếp, tương tác phân nhánh, thế giới mở đều vào từ khu vực đầu trang của Studio.
+- **Bảng điều khiển TUI**: `castor tui` để vào tương tác toàn màn hình terminal; hỗ trợ `/new`, `/short`, `/play`, `/cover`, `/write`, `/confirm`, `/cancel` và `/model <tên mô hình>` theo phiên.
+- **Lối vào agent bên ngoài**: `castor interact --json --message "..."` vẫn là lối vào có cấu trúc cho OpenClaw / các agent khác.
+- **Giữ nguyên lệnh nguyên tử**: `plan` / `compose` / `draft` / `audit` / `revise` / `write next` vẫn phù hợp cho script và người dùng nâng cao.
 
-**Studio Chat + CLI + TUI 共用同一套执行面**
-
-- **Studio Chat**：讨论、建书、短篇、封面、Play、编辑持久化文件都从同一个对话入口发起；重动作会先展示确认卡。
-- **开始创作入口**：长篇小说、短篇小说、同人创作、番外创作、仿写创作、续写创作、分支互动、开放世界都可以从 Studio 顶部入口进入。
-- **TUI 仪表盘**：`castor tui` 进入终端全屏交互；支持 `/new`、`/short`、`/play`、`/cover`、`/write`、`/confirm`、`/cancel` 和会话级 `/model <模型名>`。
-- **外部 Agent 入口**：`castor interact --json --message "..."` 仍是 OpenClaw / 其他 agent 的结构化入口。
-- **原子命令保留**：`plan` / `compose` / `draft` / `audit` / `revise` / `write next` 仍适合脚本和高级用户。
-
-### 写第一本书
+### Viết cuốn sách đầu tiên
 
 ```bash
-castor book create --title "吞天魔帝" --genre xuanhuan  # 创建新书
-castor write next 吞天魔帝      # 写下一章（草稿 → 审计 → 按配置修订）
-castor status                   # 查看状态
-castor review list 吞天魔帝     # 审阅草稿
-castor review approve-all 吞天魔帝  # 批量通过
-castor export 吞天魔帝          # 导出全书
-castor export 吞天魔帝 --format epub  # 导出 EPUB（手机/Kindle 阅读）
+castor book create --title "Ma Đế Thôn Thiên" --genre xuanhuan  # Tạo sách mới
+castor write next Ma Đế Thôn Thiên      # Viết chương tiếp (nháp → audit → chỉnh sửa theo cấu hình)
+castor status                   # Xem trạng thái
+castor review list Ma Đế Thôn Thiên     # Duyệt bản nháp
+castor review approve-all Ma Đế Thôn Thiên  # Duyệt hàng loạt
+castor export Ma Đế Thôn Thiên          # Xuất bản toàn bộ sách
+castor export Ma Đế Thôn Thiên --format epub  # Xuất EPUB (đọc trên điện thoại/Kindle)
 ```
 
-### 写完整短篇
+### Viết truyện ngắn hoàn chỉnh
 
-想直接生成一篇完整短篇，可以在 Studio 对话里说：
+Muốn tạo trực tiếp một truyện ngắn hoàn chỉnh, có thể nói trong hội thoại Studio:
 
 ```text
-写一篇 12 章短篇，方向是：都市婚姻反转，女主拿到账本证据后反杀。
+Viết truyện ngắn 12 chương, hướng là: đảo ngược tình huống hôn nhân đô thị, nữ chính cầm bằng chứng sổ sách rồi phản kích.
 ```
 
-也可以走 CLI：
+Hoặc đi qua CLI:
 
 ```bash
 castor short run \
-  --direction "都市短篇 婚姻反转 女主证据反杀" \
+  --direction "Truyện ngắn đô thị đảo ngược hôn nhân nữ chính dùng bằng chứng phản kích" \
   --chapters 12 \
   --chars 1000
 ```
 
-生成物会落在 `shorts/<故事名>/final/`，包含 `full.md`、`sales-package.md`、`cover-prompt.md`，配置封面服务后还会生成 `cover.png`。
+Sản phẩm sẽ nằm trong `shorts/<tên truyện>/final/`, gồm `full.md`, `sales-package.md`, `cover-prompt.md`; sau khi cấu hình dịch vụ bìa còn sinh thêm `cover.png`.
 
-### 单独制作封面
+### Làm riêng một cái bìa
 
-如果只想给已有标题或简介做封面，不需要重跑短篇正文，在 Studio 对话里直接说：
-
-```text
-给《她签下离婚协议那天，他悔疯了》生成一张短篇封面，偏现代都市、强反转。
-```
-
-封面工具会独立生成 `covers/<标题>/cover-prompt.md` 和 `covers/<标题>/cover.png`。如果还没有配置封面服务，先在 Studio 的模型配置里设置封面服务和 API Key。
-
-生成后也可以继续通过 chat 改封面提示词，例如“把人物拉近一点、标题字更大、表情更冷笑”。系统会用新的 `coverPrompt` 重写 `cover-prompt.md` 并重生成封面，不需要重新写短篇。
-
-
-
-### 启动开放世界 / 分支互动
-
-在 Studio Chat 里选择「开放世界」或「分支互动」，直接用自然语言描述你想玩的世界：
+Nếu chỉ muốn làm bìa cho tiêu đề hoặc giới thiệu có sẵn, không cần chạy lại nội dung truyện ngắn, hãy nói trực tiếp trong hội thoại Studio:
 
 ```text
-做一个魔兽风格的边境哨塔开放世界。时间不是固定回合，巡逻是一小时，练功可以跨几天。装备有稀有度，但不要数值面板，用材质和光泽体现。
+Sinh một cái bìa truyện ngắn cho "Ngày cô ấy ký đơn ly hôn, anh ấy hối hận phát điên", thiên hiện đại đô thị, đảo ngược mạnh.
 ```
 
-系统会生成世界、角色、物品、证据、关系、当前场景和可选动作。开放世界支持自由输入动作；分支互动会给出可点击选项。配置封面 / 图片服务后，角色、物品、证据、场景都可以生成图，并在对话流里滚动显示。
+Công cụ bìa sẽ độc lập sinh `covers/<tiêu đề>/cover-prompt.md` và `covers/<tiêu đề>/cover.png`. Nếu chưa cấu hình dịch vụ bìa, hãy thiết lập dịch vụ bìa và API Key trong phần cấu hình mô hình của Studio trước.
+
+Sau khi sinh, có thể tiếp tục chỉnh prompt bìa qua chat, ví dụ "đưa nhân vật lại gần hơn, chữ tiêu đề to hơn, biểu cảm lạnh lùng hơn". Hệ thống sẽ dùng `coverPrompt` mới ghi đè `cover-prompt.md` và sinh lại bìa, không cần viết lại truyện ngắn.
+
+### Khởi động thế giới mở / tương tác phân nhánh
+
+Trong Studio Chat chọn "Thế giới mở" hoặc "Tương tác phân nhánh", mô tả trực tiếp bằng ngôn ngữ tự nhiên thế giới bạn muốn chơi:
+
+```text
+Làm một thế giới mở kiểu Warcraft với tháp canh biên giới. Thời gian không theo lượt cố định, tuần tra một giờ, tu luyện có thể kéo dài vài ngày. Trang bị có độ hiếm, nhưng không cần bảng số liệu, thể hiện qua chất liệu và độ bóng.
+```
+
+Hệ thống sẽ sinh thế giới, nhân vật, vật phẩm, bằng chứng, quan hệ, cảnh hiện tại và các hành động khả dụng. Thế giới mở hỗ trợ nhập hành động tự do; tương tác phân nhánh sẽ đưa ra các lựa chọn bấm được. Sau khi cấu hình dịch vụ bìa / ảnh, nhân vật, vật phẩm, bằng chứng, cảnh vật đều có thể sinh ảnh và hiển thị cuộn trong dòng hội thoại.
 
 ---
 
-## 核心特性
+## Tính năng cốt lõi
 
 ### Studio Chat + Action Surface
 
-Studio Chat 不再只是问答框。它可以创建长篇、跑短篇、生成封面、启动 Play、编辑持久化文本文件，并在需要执行重动作前给出确认。普通讨论会直接回答；明确创作动作才进入工具执行。
+Studio Chat không còn chỉ là khung hỏi đáp. Nó có thể tạo truyện dài, chạy truyện ngắn, sinh bìa, khởi động Play, chỉnh tệp văn bản lưu lâu dài, và đưa ra xác nhận trước khi thực hiện hành động nặng. Thảo luận thông thường được trả lời trực tiếp; chỉ các hành động sáng tác rõ ràng mới vào thực thi công cụ.
 
-### Castor Play：开放世界与分支互动
+### Castor Play: thế giới mở và tương tác phân nhánh
 
-Play 维护一个可持续推进的世界状态：角色、地点、物品、证据、关系、时间、场景和 HUD。它不是固定 RPG 模板，你可以用自然语言定义世界契约：修仙装备可以有稀有感，恋爱本可以有心动层级，侦探本可以有证据生命周期。系统把这些规则写进世界状态，再用于后续叙事和配图。
+Play duy trì một trạng thái thế giới có thể tiếp tục phát triển: nhân vật, địa điểm, vật phẩm, bằng chứng, quan hệ, thời gian, cảnh và HUD. Đây không phải mẫu RPG cứng nhắc — bạn có thể định nghĩa hợp đồng thế giới bằng ngôn ngữ tự nhiên: trang bị tu tiên có thể có cảm giác độ hiếm, truyện ngôn tình có thể có các tầng động lòng, truyện trinh thám có thể có vòng đời bằng chứng. Hệ thống ghi các quy tắc này vào trạng thái thế giới, rồi dùng cho phần kể chuyện và minh họa sau đó.
 
-### 多维度审计 + 去 AI 味
+### Audit đa chiều + khử dấu vết AI
 
-连续性审计员从 37 个维度检查每一章草稿：角色记忆、物资连续性、伏笔回收、大纲偏离、叙事节奏、情感弧线等。内置 AI 痕迹检测维度，自动识别"LLM 味"表达（高频词、句式单调、过度总结）。默认长篇写作链路最多自动修订一次；如果你更看重自动闭环，可以通过 `writing.reviewRetries` 调整修订轮数。
+Auditor liên tục kiểm tra từng bản nháp chương theo 37 chiều: trí nhớ nhân vật, tính liên tục vật tư, thu hồi tiền bố, lệch đại cương, nhịp kể chuyện, cung cảm xúc, v.v. Có sẵn chiều phát hiện dấu vết AI, tự nhận diện biểu đạt "mùi LLM" (từ tần suất cao, câu đơn điệu, tổng kết quá mức). Chuỗi viết truyện dài mặc định tự chỉnh sửa tối đa một lần; nếu bạn coi trọng vòng khép kín tự động hơn, có thể điều chỉnh số vòng chỉnh sửa qua `writing.reviewRetries`.
 
-去 AI 味规则内置于写手 agent 的 prompt 层——词汇疲劳词表、禁用句式、文风指纹注入，从源头减少 AI 生成痕迹。`revise --mode anti-detect` 可对已有章节做专门的反检测改写。
+Quy tắc khử dấu vết AI được nhúng ngay trong lớp prompt của agent viết — danh sách từ mệt mỏi, các mẫu câu bị cấm, tiêm "dấu vân tay văn phong", giảm dấu vết AI ngay từ nguồn. `revise --mode anti-detect` có thể viết lại chuyên biệt chống phát hiện cho các chương có sẵn.
 
-### 文风仿写
+### Mô phỏng văn phong
 
-`castor style analyze` 分析参考文本，提取统计指纹（句长分布、词频特征、节奏模式）和 LLM 风格指南。`castor style import` 将指纹注入指定书籍，后续所有章节自动采用该风格，修订者也会用风格标准做审计。
+`castor style analyze` phân tích văn bản tham khảo, trích xuất dấu vân tay thống kê (phân bố độ dài câu, đặc trưng tần suất từ, mẫu nhịp điệu) và hướng dẫn phong cách LLM. `castor style import` tiêm dấu vân tay vào một cuốn sách chỉ định, mọi chương sau đó tự động theo phong cách đó, và reviser cũng dùng chuẩn phong cách để audit.
 
-### 创作简报
+### Brief sáng tác
 
-`castor book create --brief my-ideas.md` 传入你的脑洞、世界观设定、人设文档。建筑师 agent 会基于简报生成故事设定（`story_bible.md`）和创作规则（`book_rules.md`），而非凭空创作；同时把简报落盘到 `story/author_intent.md`，让这本书的长期创作意图不会只在建书时生效一次。
+`castor book create --brief my-ideas.md` truyền vào ý tưởng, bối cảnh thế giới quan, tài liệu nhân vật của bạn. Agent kiến trúc sư sẽ sinh thiết lập truyện (`story_bible.md` - kinh thánh truyện) và quy tắc sáng tác (`book_rules.md` - quy tắc sách) dựa trên brief thay vì tự sáng tác; đồng thời lưu brief vào `story/author_intent.md`, để ý định sáng tác lâu dài của cuốn sách không chỉ có hiệu lực một lần lúc tạo sách.
 
-### 输入治理控制面
+### Mặt điều khiển đầu vào (Input Governance)
 
-每本书现在都有两份长期可编辑的 Markdown 控制文档：
+Mỗi cuốn sách giờ có hai tài liệu điều khiển Markdown có thể chỉnh sửa lâu dài:
 
-- `story/author_intent.md`：这本书长期想成为什么
-- `story/current_focus.md`：最近 1-3 章要把注意力拉回哪里
+- `story/author_intent.md`: cuốn sách này muốn trở thành gì trong dài hạn
+- `story/current_focus.md`: 1-3 chương gần nhất cần kéo sự chú ý về đâu
 
-写作前可以先跑：
+Trước khi viết có thể chạy trước:
 
 ```bash
-castor plan chapter 吞天魔帝 --context "本章先把注意力拉回师徒矛盾"
-castor compose chapter 吞天魔帝
+castor plan chapter Ma Đế Thôn Thiên --context "Chương này kéo chú ý trở lại mâu thuẫn sư đồ"
+castor compose chapter Ma Đế Thôn Thiên
 ```
 
-这会生成 `story/runtime/chapter-XXXX.intent.md`、`context.json`、`rule-stack.yaml`、`trace.json`。其中 `intent.md` 给人看，其他文件给系统执行和调试。`plan` 会调用 LLM 生成章节意图；`compose` 只编译本地文档和状态，可在没配好 API Key 前先验证控制输入。
+Lệnh này sinh `story/runtime/chapter-XXXX.intent.md`, `context.json`, `rule-stack.yaml`, `trace.json`. Trong đó `intent.md` cho người đọc, các tệp còn lại cho hệ thống thực thi và gỡ lỗi. `plan` sẽ gọi LLM sinh ý định chương; `compose` chỉ biên dịch tài liệu và trạng thái cục bộ, có thể chạy để kiểm chứng đầu vào điều khiển trước khi cấu hình API Key.
 
-### 字数治理
+### Quản trị số chữ
 
-`draft`、`write next`、`revise` 现在共享同一套保守型字数治理：
+`draft`, `write next`, `revise` giờ dùng chung một cơ chế quản trị số chữ kiểu bảo thủ:
 
-- `--words` 指定的是目标字数，系统会自动推导一个允许区间，不承诺逐字精确命中
-- 中文默认按 `zh_chars` 计数，英文默认按 `en_words` 计数
-- 如果正文超出允许区间，Castor 最多只会追加 1 次纠偏归一化（压缩或补足），不会直接硬截断正文
-- 如果 1 次纠偏后仍然超出 hard range，章节照常保存，但会在结果和 chapter index 里留下长度 warning / telemetry
+- `--words` chỉ định số chữ mục tiêu, hệ thống tự suy ra một khoảng cho phép, không cam kết trúng chính xác từng chữ
+- Tiếng Trung mặc định đếm theo `zh_chars`, tiếng Anh mặc định đếm theo `en_words`
+- Nếu nội dung vượt khoảng cho phép, Castor tối đa chỉ thêm 1 lần chuẩn hóa sửa sai (nén hoặc bổ sung), không cắt cụt cứng nội dung
+- Nếu sau 1 lần sửa vẫn vượt hard range, chương vẫn được lưu bình thường, nhưng sẽ để lại warning / telemetry về độ dài trong kết quả và chapter index
 
-### 续写已有作品
+### Viết tiếp tác phẩm có sẵn
 
-`castor import chapters` 从已有小说文本导入章节，自动重建结构化状态、章节摘要、伏笔、角色关系和可读 Markdown 投影，支持 `第X章` 和自定义分割模式、断点续导。导入后 `castor write next` 可继续创作。
+`castor import chapters` nhập chương từ văn bản tiểu thuyết có sẵn, tự dựng lại trạng thái có cấu trúc, tóm tắt chương, tiền bố, quan hệ nhân vật và lớp chiếu Markdown đọc được, hỗ trợ mẫu tách `Chương X` và mẫu tách tùy chỉnh, nhập tiếp từ điểm dừng. Sau khi nhập, `castor write next` có thể viết tiếp.
 
-### 同人创作
+### Sáng tác fanfic
 
-`castor fanfic init --from source.txt --mode canon` 从原作素材创建同人书。支持四种模式：canon（正典延续）、au（架空世界）、ooc（性格重塑）、cp（CP 向）。内置正典导入器、同人专属审计维度和信息边界管控——确保设定不矛盾。
+`castor fanfic init --from source.txt --mode canon` tạo sách fanfic từ tài liệu tác phẩm gốc. Hỗ trợ bốn mode: canon (chính thống), au (thế giới song song), ooc (định hình lại tính cách), cp (hướng cặp đôi). Tích hợp sẵn trình nhập chính thống, các chiều audit riêng cho fanfic và kiểm soát biên thông tin — đảm bảo bối cảnh không mâu thuẫn.
 
-### 多模型路由
+### Định tuyến đa mô hình
 
-不同 Agent 可以走不同模型和 Provider。写手用 Claude（创意强），审计用 GPT-4o（便宜快速），雷达用本地模型（零成本）。`castor config set-model` 按 agent 粒度配置，未配置的自动回退全局模型。
+Các agent khác nhau có thể đi qua các mô hình và nhà cung cấp khác nhau. Writer dùng Claude (giỏi sáng tạo), auditor dùng GPT-4o (rẻ và nhanh), radar dùng mô hình cục bộ (miễn phí). `castor config set-model` cấu hình theo cấp agent, agent nào chưa cấu hình sẽ tự fallback về mô hình toàn cục.
 
-### 守护进程 + 通知推送
+### Daemon + đẩy thông báo
 
-`castor up` 启动后台循环自动写章。管线会自动推进可处理的非关键问题；需要人工判断的问题会暂停并留下可审结果。通知推送支持 Telegram、飞书、企业微信、Webhook（HMAC-SHA256 签名 + 事件过滤）。日志写入 `castor.log`（JSON Lines），`-q` 静默模式。
+`castor up` khởi động vòng lặp nền tự động viết chương. Pipeline tự xử lý các vấn đề không quan trọng có thể xử lý được; các vấn đề cần con người phán đoán sẽ tạm dừng và để lại kết quả có thể duyệt. Đẩy thông báo hỗ trợ Telegram, Feishu, WeChat Work, Webhook (chữ ký HMAC-SHA256 + lọc sự kiện). Log ghi vào `castor.log` (JSON Lines), `-q` chế độ im lặng.
 
-### 本地模型兼容
+### Tương thích mô hình cục bộ
 
-支持任何 OpenAI 兼容接口（Studio 里新增自定义服务，或 CLI 使用 `--provider custom` / `CASTOR_LLM_PROVIDER=custom`）。服务测试会尝试不同协议和流式开关组合，并保存或提示可用 transport。Fallback 解析器处理小模型不规范输出，流中断时自动恢复部分内容。
+Hỗ trợ mọi giao diện tương thích OpenAI (thêm service tùy chỉnh trong Studio, hoặc CLI dùng `--provider custom` / `CASTOR_LLM_PROVIDER=custom`). Kiểm tra service sẽ thử nhiều tổ hợp giao thức và bật/tắt stream, rồi lưu hoặc gợi ý transport khả dụng. Bộ phân tích fallback xử lý đầu ra thiếu chuẩn của mô hình nhỏ, tự khôi phục một phần nội dung khi stream đứt.
 
-### 可靠性保障
+### Đảm bảo độ tin cậy
 
-每章自动创建状态快照，`castor write rewrite` 可回滚任意章节。写手动笔前输出自检表（上下文、资源、伏笔、风险），写完输出结算表，审计员交叉验证。文件锁防止并发写入。写后验证器含跨章重复检测和十余条硬规则自动 spot-fix。
+Mỗi chương tự tạo ảnh chụp trạng thái, `castor write rewrite` có thể rollback bất kỳ chương nào. Trước khi viết, writer xuất bảng tự kiểm (ngữ cảnh, vật tư, tiền bố, rủi ro), viết xong xuất bảng kết toán, auditor kiểm chứng chéo. Khóa tệp ngăn ghi đồng thời. Bộ xác thực sau khi viết gồm phát hiện trùng lặp xuyên chương và hơn mười quy tắc cứng tự spot-fix.
 
-伏笔系统使用 Zod schema 校验——`lastAdvancedChapter` 必须是整数，`status` 只能是 open/progressing/deferred/resolved。LLM 输出的 JSON delta 在写入前经过 `applyRuntimeStateDelta` 做 immutable 更新 + `validateRuntimeState` 结构校验。坏数据直接拒绝，不会滚雪球。
+Hệ thống tiền bố dùng xác thực schema Zod — `lastAdvancedChapter` phải là số nguyên, `status` chỉ nhận open/progressing/deferred/resolved. JSON delta do LLM xuất ra được qua `applyRuntimeStateDelta` cập nhật immutable + xác thực cấu trúc `validateRuntimeState` trước khi ghi. Dữ liệu xấu bị từ chối ngay, không để lăn cầu tuyết.
 
-模型输出上限由 provider bank 的模型卡管理；`llm.extra` / `CASTOR_LLM_EXTRA_*` 中的保留键（max_tokens、temperature、model、messages、stream 等）会被自动过滤，防止意外覆盖核心请求参数。
+Giới hạn đầu ra của mô hình do thẻ mô hình trong provider bank quản lý; các khóa bảo lưu trong `llm.extra` / `CASTOR_LLM_EXTRA_*` (max_tokens, temperature, model, messages, stream, v.v.) sẽ được tự lọc, tránh vô tình ghi đè tham số cốt lõi của yêu cầu.
 
 ---
 
-## 工作原理
+## Cách hoạt động
 
-Castor 以 pi-agent harness 作为统一认知与工具调用内核：Agent 理解用户意图并产生结构化 action，宿主执行确定性工具、确认权限、管理状态并以真实文件和 tool result 判定完成。长篇、短篇、剧本、分镜、互动影游、Play 和翻译复用这套架构，但保留各自的专业 Skill、状态模型与生产步骤。
-
-<p align="center">
-  <img src="assets/arch-system.svg" width="900" alt="Castor 整体系统架构">
-</p>
-
-长篇每一章默认按“规划 → 编排 → 写作 → 审计 → 必要修订 → 状态同步”运行：
+Castor dùng pi-agent harness làm nhân nhận thức và gọi công cụ thống nhất: Agent hiểu ý định người dùng và sinh action có cấu trúc, host thực thi công cụ xác định, xác nhận quyền, quản lý trạng thái và phán đoán hoàn thành dựa trên tệp thật và tool result. Truyện dài, truyện ngắn, kịch bản, phân cảnh, phim-game tương tác, Play và dịch thuật tái sử dụng kiến trúc này, nhưng giữ Skill chuyên biệt, mô hình trạng thái và các bước sản xuất riêng.
 
 <p align="center">
-  <img src="assets/arch-pipeline.svg" width="900" alt="Castor 章节生产管线">
+  <img src="assets/arch-system.svg" width="900" alt="Kiến trúc hệ thống tổng thể của Castor">
 </p>
 
-
-| Agent               | 职责                                                                |
-| ------------------- | ----------------------------------------------------------------- |
-| **雷达 Radar**        | 扫描平台趋势和读者偏好，指导故事方向（可插拔，可跳过）                                       |
-| **规划师 Planner**     | 读取作者意图 + 当前焦点 + 记忆检索结果，产出本章意图（must-keep / must-avoid）             |
-| **编排师 Composer**    | 从结构化状态、控制文档和 Markdown 投影中按任务选择上下文，编译规则栈和运行时产物                     |
-| **建筑师 Architect**   | 建书、导入或番外初始化时生成基础设定：故事框架、规则、角色与长期控制文件                              |
-| **写手 Writer**       | 基于编排后的精简上下文生成正文（字数治理 + 对话引导）                                      |
-| **观察者 Observer**    | 从正文中过度提取 9 类事实（角色、位置、资源、关系、情感、信息、伏笔、时间、物理状态）                      |
-| **反射器 Reflector**   | 输出 JSON delta（而非全量 markdown），由代码层做 Zod schema 校验后 immutable 写入    |
-| **归一化器 Normalizer** | 仅在正文明显偏离 hard range 时单 pass 压缩/扩展                                 |
-| **连续性审计员 Auditor**  | 对照结构化状态、控制文档和章节上下文验证草稿，执行连续性与质量检查                                 |
-| **修订者 Reviser**     | 修复审计发现的关键问题；默认最多自动修订一次，可通过 `writing.reviewRetries` 调整，其他问题标记给人工审核 |
-
-
-如果审计不通过，默认管线只做一次"修订 → 再审计"；仍未解决的问题会保留在结果和状态里，交给人工或后续命令继续处理。需要更强自动闭环时，可以运行 `castor config set writing.reviewRetries 3` 把修订轮数调高。
-
-### 长期记忆
-
-每本书的权威记忆由三层组成：
-
-
-| 层                    | 用途                                                                                          |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| `story/state/*.json` | 权威结构化状态：当前状态、伏笔、章节摘要等，经过 Zod schema 校验                                                      |
-| `story/*.md`         | 人类可读投影：`current_state.md`、`pending_hooks.md`、`chapter_summaries.md`、`character_matrix.md` 等 |
-| `story/memory.db`    | Node 22+ 自动启用的 SQLite 时序记忆库，用于相关事实、伏笔和摘要检索                                                  |
-
-
-连续性审计员对照这些状态检查每一章草稿。如果角色"记起"了从未亲眼见过的事，或者拿出了两章前已经丢失的武器，审计员会捕捉到。
-
-Settler 不再要求模型输出完整 markdown 文件，而是输出 JSON delta，由代码层做 immutable apply + 结构校验后写入。Markdown 文件保留为人类可读投影。旧书首次运行时会从 legacy Markdown 自动迁移到结构化 JSON。
-
-Node 22+ 环境下自动启用 SQLite 时序记忆数据库（`story/memory.db`），支持按相关性检索历史事实、伏笔和章节摘要，避免全量注入导致的上下文膨胀。
+Mỗi chương truyện dài mặc định chạy theo "lập kế hoạch → biên soạn → viết → audit → chỉnh sửa khi cần → đồng bộ trạng thái":
 
 <p align="center">
-  <img src="assets/arch-memory.svg" width="900" alt="Castor 长期记忆与状态">
+  <img src="assets/arch-pipeline.svg" width="900" alt="Pipeline sản xuất chương của Castor">
 </p>
 
-### 控制面与运行时产物
+| Agent                 | Nhiệm vụ                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------- |
+| **Radar**             | Quét xu hướng nền tảng và sở thích độc giả, định hướng truyện (có thể tháo lắp, có thể bỏ qua) |
+| **Planner (Quy hoạch)**   | Đọc ý định tác giả + trọng tâm hiện tại + kết quả truy xuất bộ nhớ, sinh ý định chương này (must-keep / must-avoid) |
+| **Composer (Biên soạn)**  | Chọn ngữ cảnh theo nhiệm vụ từ trạng thái có cấu trúc, tài liệu điều khiển và lớp chiếu Markdown, biên dịch ngăn quy tắc và sản phẩm runtime |
+| **Architect (Kiến trúc sư)** | Khi tạo sách, nhập liệu hoặc khởi tạo ngoại truyện, sinh thiết lập nền: khung truyện, quy tắc, nhân vật và các tệp điều khiển dài hạn |
+| **Writer (Người viết)**   | Sinh nội dung dựa trên ngữ cảnh đã biên soạn tinh gọn (quản trị số chữ + định hướng hội thoại) |
+| **Observer (Quan sát viên)** | Trích xuất thái quá 9 loại sự kiện từ nội dung (nhân vật, vị trí, vật tư, quan hệ, cảm xúc, thông tin, tiền bố, thời gian, trạng thái vật lý) |
+| **Reflector (Phản xạ)**   | Xuất JSON delta (thay vì toàn bộ markdown), do lớp code xác thực schema Zod rồi ghi immutable |
+| **Normalizer (Chuẩn hóa)**  | Chỉ nén/mở rộng một pass khi nội dung lệch rõ ràng khỏi hard range                            |
+| **Auditor (Kiểm toán viên)** | Đối chiếu trạng thái có cấu trúc, tài liệu điều khiển và ngữ cảnh chương để xác thực bản nháp, thực hiện kiểm tra liên tục và chất lượng |
+| **Reviser (Chỉnh sửa)**   | Sửa các vấn đề quan trọng auditor phát hiện; mặc định tự chỉnh tối đa một lần, có thể điều chỉnh qua `writing.reviewRetries`, các vấn đề khác đánh dấu cho người duyệt |
 
-除了运行时状态，Castor 还把“护栏”和“自定义”拆成可审阅的控制层：
+Nếu audit không đạt, pipeline mặc định chỉ làm một vòng "chỉnh sửa → audit lại"; các vấn đề vẫn chưa giải quyết sẽ được giữ trong kết quả và trạng thái, giao cho con người hoặc các lệnh sau tiếp tục xử lý. Khi cần vòng khép kín tự động mạnh hơn, có thể chạy `castor config set writing.reviewRetries 3` để tăng số vòng chỉnh sửa.
 
-- `story/author_intent.md`：长期作者意图
-- `story/current_focus.md`：当前阶段的关注点
-- `story/runtime/chapter-XXXX.intent.md`：本章目标、保留项、避免项、冲突处理
-- `story/runtime/chapter-XXXX.context.json`：本章实际选入的上下文
-- `story/runtime/chapter-XXXX.rule-stack.yaml`：本章的优先级层和覆盖关系
-- `story/runtime/chapter-XXXX.trace.json`：本章输入编译轨迹
+### Bộ nhớ dài hạn
 
-这样 `brief`、卷纲、书级规则、当前任务不再混成一坨 prompt，而是先编译，再写作。
+Bộ nhớ chính thống của mỗi cuốn sách gồm ba tầng:
 
-### 创作规则体系
+| Tầng                   | Mục đích                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `story/state/*.json`   | Trạng thái có cấu trúc chính thống: trạng thái hiện tại, tiền bố, tóm tắt chương, v.v., đã qua xác thực schema Zod |
+| `story/*.md`           | Lớp chiếu đọc được cho người: `current_state.md`, `pending_hooks.md`, `chapter_summaries.md`, `character_matrix.md`, v.v. |
+| `story/memory.db`      | Cơ sở dữ liệu bộ nhớ thời gian SQLite tự bật trên Node 22+, dùng truy xuất sự kiện, tiền bố và tóm tắt liên quan |
 
-写手 agent 内置 ~25 条通用创作规则（人物塑造、叙事技法、逻辑自洽、语言约束、去 AI 味），适用于所有题材。
+Auditor liên tục đối chiếu các trạng thái này với từng bản nháp chương. Nếu nhân vật "nhớ lại" chuyện chưa từng tận mắt chứng kiến, hoặc rút ra một vũ khí đã mất từ hai chương trước, auditor sẽ bắt được.
 
-在此基础上，每个题材有专属规则（禁忌、语言约束、节奏、审计维度），每本书有独立的 `book_rules.md`（主角人设、数值上限、自定义禁令）、`story_bible.md`（世界观设定）、`author_intent.md`（长期方向）和 `current_focus.md`（近期关注点）。`volume_outline.md` 仍然是默认规划，但在 v2 输入治理模式下不再天然压过当前任务意图。
+Settler không còn yêu cầu mô hình xuất tệp markdown hoàn chỉnh, mà xuất JSON delta, do lớp code áp dụng immutable + xác thực cấu trúc rồi ghi. Tệp Markdown được giữ lại làm lớp chiếu đọc được cho người. Sách cũ khi chạy lần đầu sẽ tự động chuyển từ Markdown legacy sang JSON có cấu trúc.
 
-## 使用模式
+Trên môi trường Node 22+, cơ sở dữ liệu bộ nhớ thời gian SQLite (`story/memory.db`) tự bật, hỗ trợ truy xuất sự kiện lịch sử, tiền bố và tóm tắt chương theo mức liên quan, tránh phình ngữ cảnh do nhét toàn bộ.
 
-Castor 提供四种交互方式，底层共享同一组原子操作：
+<p align="center">
+  <img src="assets/arch-memory.svg" width="900" alt="Bộ nhớ dài hạn và trạng thái của Castor">
+</p>
 
-### 1. 完整管线（一键式）
+### Mặt điều khiển và sản phẩm runtime
+
+Ngoài trạng thái runtime, Castor còn tách "rào chắn" và "tùy chỉnh" thành các tầng điều khiển có thể xem xét:
+
+- `story/author_intent.md`: ý định tác giả dài hạn
+- `story/current_focus.md`: trọng tâm của giai đoạn hiện tại
+- `story/runtime/chapter-XXXX.intent.md`: mục tiêu chương này, những gì giữ, tránh, xử lý xung đột
+- `story/runtime/chapter-XXXX.context.json`: ngữ cảnh thực tế được chọn vào chương này
+- `story/runtime/chapter-XXXX.rule-stack.yaml`: các tầng ưu tiên và quan hệ ghi đè của chương này
+- `story/runtime/chapter-XXXX.trace.json`: vết biên dịch đầu vào của chương này
+
+Nhờ vậy `brief`, đại cương tập, quy tắc sách và nhiệm vụ hiện tại không còn trộn lẫn thành một cục prompt, mà được biên dịch trước, rồi mới viết.
+
+### Hệ thống quy tắc sáng tác
+
+Agent viết tích hợp sẵn ~25 quy tắc sáng tác chung (xây dựng nhân vật, kỹ thuật kể chuyện, tính logic nhất quán, ràng buộc ngôn ngữ, khử dấu vết AI), áp dụng cho mọi thể loại.
+
+Trên nền đó, mỗi thể loại có quy tắc riêng (cấm kỵ, ràng buộc ngôn ngữ, nhịp độ, chiều audit); mỗi cuốn sách có `book_rules.md` riêng (nhân vật chính, giới hạn số liệu, lệnh cấm tùy chỉnh), `story_bible.md` (bối cảnh thế giới quan), `author_intent.md` (định hướng dài hạn) và `current_focus.md` (trọng tâm gần đây). `volume_outline.md` vẫn là kế hoạch mặc định, nhưng trong mode quản trị đầu vào v2 không còn tự nhiên lấn át ý định nhiệm vụ hiện tại.
+
+## Các mode sử dụng
+
+Castor cung cấp bốn cách tương tác, tầng dưới dùng chung một nhóm thao tác nguyên tử:
+
+### 1. Pipeline đầy đủ (một nút bấm)
 
 ```bash
-castor write next 吞天魔帝          # 写草稿 → 审计 → 按配置自动修订
-castor write next 吞天魔帝 --count 5 # 连续写 5 章
+castor write next Ma Đế Thôn Thiên          # Viết nháp → audit → tự chỉnh theo cấu hình
+castor write next Ma Đế Thôn Thiên --count 5 # Viết liên tiếp 5 chương
 ```
 
-`write next` 现在默认走 `plan -> compose -> write` 的输入治理链路，审计后的自动修订轮数默认是 1。若你需要回退到旧的 prompt 拼装路径，可在 `castor.json` 中显式设置：
+`write next` giờ mặc định đi qua chuỗi quản trị đầu vào `plan -> compose -> write`, số vòng tự chỉnh sau audit mặc định là 1. Nếu cần quay lại đường ghép prompt cũ, có thể đặt tường minh trong `castor.json`:
 
 ```json
 {
@@ -481,137 +473,135 @@ castor write next 吞天魔帝 --count 5 # 连续写 5 章
 }
 ```
 
-默认值为 `v2`。`legacy` 仅作为显式 fallback 保留。
+Giá trị mặc định là `v2`. `legacy` chỉ giữ lại làm phương án fallback tường minh.
 
-### 2. 原子命令（可组合，适合外部 Agent 调用）
-
-```bash
-castor plan chapter 吞天魔帝 --context "本章重点写师徒矛盾" --json
-castor compose chapter 吞天魔帝 --json
-castor draft 吞天魔帝 --context "本章重点写师徒矛盾" --json
-castor audit 吞天魔帝 31 --json
-castor revise 吞天魔帝 31 --json
-```
-
-每个命令独立执行单一操作，`--json` 输出结构化数据。`plan` / `compose` 负责控制输入，`draft` / `audit` / `revise` 负责正文与质量链路。可被外部 AI Agent 通过 `exec` 调用，也可用于脚本编排。
-
-### 3. 自然语言 Agent 模式
+### 2. Lệnh nguyên tử (kết hợp được, phù hợp agent bên ngoài gọi)
 
 ```bash
-castor agent "帮我写一本都市修仙，主角是个程序员"
-castor agent "写下一章，重点写师徒矛盾"
-castor agent "先扫描市场趋势，然后根据结果创建一本新书"
+castor plan chapter Ma Đế Thôn Thiên --context "Chương này tập trung viết mâu thuẫn sư đồ" --json
+castor compose chapter Ma Đế Thôn Thiên --json
+castor draft Ma Đế Thôn Thiên --context "Chương này tập trung viết mâu thuẫn sư đồ" --json
+castor audit Ma Đế Thôn Thiên 31 --json
+castor revise Ma Đế Thôn Thiên 31 --json
 ```
 
-Agent 模式暴露的是按场景收窄后的工具集：建书、读写控制面、规划、编排、写作、审稿、修订、短篇、封面、Play 等能力会按当前 session 类型开放。推荐的 Agent 工作流是：先调整控制面，再 `plan` / `compose`，最后决定写草稿还是跑完整管线。
+Mỗi lệnh thực thi một thao tác đơn lẻ độc lập, `--json` xuất dữ liệu có cấu trúc. `plan` / `compose` phụ trách đầu vào điều khiển, `draft` / `audit` / `revise` phụ trách nội dung và chuỗi chất lượng. Có thể được AI agent bên ngoài gọi qua `exec`, hoặc dùng để biên đạo script.
 
-### 4. Studio Play 模式
+### 3. Mode Agent ngôn ngữ tự nhiên
 
-Studio 里的「开放世界」和「分支互动」是交互式创作入口。它们不要求你先建书，也不要求写死 RPG 数值。你可以描述“世界怎样运行、时间怎样推进、角色是否自主行动、物品和证据怎样影响故事”，系统会生成可继续玩的世界，并把每回合状态写回本地。
+```bash
+castor agent "Giúp tôi viết một cuốn tu tiên đô thị, nhân vật chính là lập trình viên"
+castor agent "Viết chương tiếp, tập trung viết mâu thuẫn sư đồ"
+castor agent "Quét xu hướng thị trường trước, rồi dựa trên kết quả tạo một cuốn sách mới"
+```
 
-## Studio 实测截图与生成结果
+Mode agent phơi ra một bộ công cụ được thu hẹp theo tình huống: tạo sách, đọc ghi mặt điều khiển, lập kế hoạch, biên soạn, viết, duyệt bản nháp, chỉnh sửa, truyện ngắn, bìa, Play, v.v. sẽ mở theo loại session hiện tại. Quy trình agent được khuyến nghị: chỉnh mặt điều khiển trước, rồi `plan` / `compose`, cuối cùng quyết định viết nháp hay chạy pipeline đầy đủ.
+
+### 4. Mode Studio Play
+
+"Thế giới mở" và "Tương tác phân nhánh" trong Studio là các lối vào sáng tác tương tác. Chúng không đòi bạn tạo sách trước, cũng không bắt ghi cứng số liệu RPG. Bạn có thể mô tả "thế giới vận hành thế nào, thời gian trôi thế nào, nhân vật có tự chủ hành động không, vật phẩm và bằng chứng ảnh hưởng truyện ra sao", hệ thống sẽ sinh một thế giới chơi tiếp được, và ghi trạng thái mỗi lượt về máy cục bộ.
+
+## Ảnh chụp Studio thực tế và kết quả sinh
 
 <p align="center">
-  <img src="assets/studio-dashboard.png" width="760" alt="Castor Studio 开始创作入口">
+  <img src="assets/studio-dashboard.png" width="760" alt="Lối vào bắt đầu sáng tác Castor Studio">
 </p>
 
 <p align="center">
-  <strong>Castor Short 手机封面</strong><br>
-  <img src="assets/castor-short-demo-cover.png" width="260" alt="短篇封面">
+  <strong>Bìa điện thoại Castor Short</strong><br>
+  <img src="assets/castor-short-demo-cover.png" width="260" alt="Bìa truyện ngắn">
 </p>
 
 <p align="center">
-  <strong>Castor Play 恋爱互动</strong><br>
-  <img src="assets/play-openworld-romance.png" width="560" alt="恋爱互动">
+  <strong>Tương tác ngôn tình Castor Play</strong><br>
+  <img src="assets/play-openworld-romance.png" width="560" alt="Tương tác ngôn tình">
 </p>
 
 <p align="center">
-  <strong>Castor Play 侦探互动</strong><br>
-  <img src="assets/play-openworld-detective.png" width="560" alt="侦探互动">
+  <strong>Tương tác trinh thám Castor Play</strong><br>
+  <img src="assets/play-openworld-detective.png" width="560" alt="Tương tác trinh thám">
 </p>
 
 <p align="center">
-  <strong>Castor Play 物品配图</strong><br>
-  <img src="assets/play-item-warcraft.png" width="560" alt="物品配图">
+  <strong>Ảnh minh họa vật phẩm Castor Play</strong><br>
+  <img src="assets/play-item-warcraft.png" width="560" alt="Ảnh minh họa vật phẩm">
 </p>
 
-第一张是当前 Studio 的本地实测截图。后面四张来自 Castor Short 和 Castor Play 的真实本地生成结果：短篇封面用于手机端缩略图点击，Play 图用于展示开放世界、侦探证据、互动场景和物品视觉能力。
+Ảnh đầu tiên là ảnh chụp thực tế cục bộ của Studio hiện tại. Bốn ảnh sau đến từ kết quả sinh thực tế cục bộ của Castor Short và Castor Play: bìa truyện ngắn dùng làm hình thu nhỏ bấm trên di động, ảnh Play dùng để minh họa năng lực thế giới mở, bằng chứng trinh thám, cảnh tương tác và thị giác vật phẩm.
 
-## 命令参考
+## Tham chiếu lệnh
 
+| Lệnh                                          | Mô tả                                                                                          |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `castor init [name]`                          | Khởi tạo dự án (bỏ qua name sẽ khởi tạo trong thư mục hiện tại)                                   |
+| `castor book create`                          | Tạo sách mới (`--genre`, `--platform`, `--chapter-words`, `--target-chapters`, `--brief <file>` truyền brief sáng tác) |
+| `castor book update [id]`                     | Sửa cài đặt sách (`--chapter-words`, `--target-chapters`, `--status`)                             |
+| `castor book list`                            | Liệt kê tất cả sách                                                                              |
+| `castor book delete <id>`                     | Xóa sách cùng toàn bộ dữ liệu (`--force` bỏ qua xác nhận)                                        |
+| `castor genre list/show/copy/create`          | Xem, sao chép, tạo thể loại                                                                      |
+| `castor plan chapter [id]`                    | Sinh `intent.md` cho chương tiếp theo (`--context` / `--context-file` truyền chỉ dẫn hiện tại)    |
+| `castor compose chapter [id]`                 | Sinh `context.json`, `rule-stack.yaml`, `trace.json` cho chương tiếp theo                        |
+| `castor write next [id]`                      | Pipeline đầy đủ viết chương tiếp (`--words` ghi đè số chữ, `--count` viết liên tiếp, `-q` im lặng) |
+| `castor write rewrite [id] <n>`               | Viết lại chương N (khôi phục ảnh chụp trạng thái, `--force` bỏ qua xác nhận, `--words` ghi đè số chữ) |
+| `castor draft [id]`                           | Chỉ viết bản nháp (`--words` ghi đè số chữ, `-q` im lặng)                                        |
+| `castor audit [id] [n]`                       | Audit chương chỉ định                                                                            |
+| `castor revise [id] [n]`                      | Chỉnh sửa chương chỉ định                                                                        |
+| `castor agent <instruction>`                  | Mode agent ngôn ngữ tự nhiên                                                                     |
+| `castor review list [id]`                     | Duyệt bản nháp                                                                                   |
+| `castor review approve-all [id]`              | Duyệt hàng loạt                                                                                  |
+| `castor status [id]`                          | Trạng thái dự án                                                                                 |
+| `castor export [id]`                          | Xuất bản sách (`--format txt/md/epub`, `--output <path>`, `--approved-only`)                     |
+| `castor radar scan`                           | Quét xu hướng nền tảng                                                                           |
+| `castor fanfic init`                          | Tạo sách fanfic từ tài liệu tác phẩm gốc (`--from`, `--mode canon/au/ooc/cp`)                    |
+| `castor short run`                            | Sinh gói truyện ngắn độc lập (nội dung, giới thiệu bán hàng, prompt bìa, ảnh bìa tùy chọn)        |
+| `castor eval [id]`                            | Sinh báo cáo đánh giá chất lượng (hỗ trợ `--json`, khoảng chương)                                 |
+| `castor consolidate [id]`                     | Hợp nhất tóm tắt chương truyện dài, giảm áp lực ngữ cảnh cho sách dài                             |
+| `castor forecast create/show/select`          | Sinh, xác thực và chọn nhánh cốt truyện phi chính thống của truyện dài; việc chọn chỉ lưu kế hoạch ứng viên, không sửa chính thống |
+| `castor interact`                             | Lối vào ngôn ngữ tự nhiên cho agent / CLI bên ngoài (`--json`, `--message`, `--book`)             |
+| `castor config set-global`                    | Đặt env LLM toàn cục cho CLI / daemon / môi trường triển khai (`~/.castor/.env`)                  |
+| `castor config show-global`                   | Xem cấu hình toàn cục                                                                            |
+| `castor config set/show`                      | Xem/cập nhật cấu hình dự án                                                                      |
+| `castor config set-model <agent> <model>`     | Đặt ghi đè mô hình cho agent chỉ định (`--base-url`, `--provider`, `--api-key-env` hỗ trợ định tuyến đa Provider) |
+| `castor config remove-model <agent>`          | Xóa ghi đè mô hình của agent (quay về mặc định)                                                  |
+| `castor config show-models`                   | Xem định tuyến mô hình hiện tại                                                                  |
+| `castor doctor`                               | Chẩn đoán vấn đề cấu hình (hiển thị effective config mode, nguồn, khả năng kết nối API và gợi ý tương thích nhà cung cấp) |
+| `castor detect [id] [n]`                      | Phát hiện AIGC (`--all` toàn bộ chương, `--stats` thống kê)                                      |
+| `castor style analyze <file>`                 | Phân tích văn bản tham khảo, trích dấu vân tay văn phong                                          |
+| `castor style import <file> [id]`             | Nhập dấu vân tay văn phong vào sách chỉ định                                                      |
+| `castor import canon [id] --from <parent>`    | Nhập chính thống bản chính vào sách ngoại truyện                                                  |
+| `castor import chapters [id] --from <path>`   | Nhập chương có sẵn để viết tiếp (`--split`, `--resume-from`)                                      |
+| `castor analytics [id]` / `castor stats [id]` | Phân tích dữ liệu sách (tỷ lệ đạt audit, vấn đề tần suất cao, xếp hạng chương, mức dùng token)    |
+| `castor update`                               | Cập nhật lên phiên bản mới nhất                                                                   |
+| `castor studio` / `castor`                    | Khởi động bàn làm việc Web (`-p` chỉ định cổng, mặc định 4567; Studio dùng cấu hình trang dịch vụ, không dùng ghi đè env) |
+| `castor tui`                                  | Khởi động TUI toàn màn hình terminal                                                              |
+| `castor up / down`                            | Khởi động/dừng daemon (`-q` im lặng, tự ghi `castor.log`)                                         |
 
-| 命令                                          | 说明                                                                                         |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `castor init [name]`                         | 初始化项目（省略 name 在当前目录初始化）                                                                    |
-| `castor book create`                         | 创建新书（`--genre`、`--platform`、`--chapter-words`、`--target-chapters`、`--brief <file>` 传入创作简报） |
-| `castor book update [id]`                    | 修改书设置（`--chapter-words`、`--target-chapters`、`--status`）                                    |
-| `castor book list`                           | 列出所有书籍                                                                                     |
-| `castor book delete <id>`                    | 删除书籍及全部数据（`--force` 跳过确认）                                                                  |
-| `castor genre list/show/copy/create`         | 查看、复制、创建题材                                                                                 |
-| `castor plan chapter [id]`                   | 生成下一章的 `intent.md`（`--context` / `--context-file` 传入当前指令）                                  |
-| `castor compose chapter [id]`                | 生成下一章的 `context.json`、`rule-stack.yaml`、`trace.json`                                       |
-| `castor write next [id]`                     | 完整管线写下一章（`--words` 覆盖字数，`--count` 连写，`-q` 静默模式）                                            |
-| `castor write rewrite [id] <n>`              | 重写第 N 章（恢复状态快照，`--force` 跳过确认，`--words` 覆盖字数）                                              |
-| `castor draft [id]`                          | 只写草稿（`--words` 覆盖字数，`-q` 静默模式）                                                             |
-| `castor audit [id] [n]`                      | 审计指定章节                                                                                     |
-| `castor revise [id] [n]`                     | 修订指定章节                                                                                     |
-| `castor agent <instruction>`                 | 自然语言 Agent 模式                                                                              |
-| `castor review list [id]`                    | 审阅草稿                                                                                       |
-| `castor review approve-all [id]`             | 批量通过                                                                                       |
-| `castor status [id]`                         | 项目状态                                                                                       |
-| `castor export [id]`                         | 导出书籍（`--format txt/md/epub`、`--output <path>`、`--approved-only`）                           |
-| `castor radar scan`                          | 扫描平台趋势                                                                                     |
-| `castor fanfic init`                         | 从原作素材创建同人书（`--from`、`--mode canon/au/ooc/cp`）                                              |
-| `castor short run`                           | 生成独立短篇包（正文、简介卖点、封面提示词、可选封面图）                                                               |
-| `castor eval [id]`                           | 生成质量评估报告（支持 `--json`、章节范围）                                                                 |
-| `castor consolidate [id]`                    | 归并长篇章节摘要，降低长书上下文压力                                                                         |
-| `castor forecast create/show/select`          | 生成、核验并选择长篇的非正史剧情分支；选择只保存候选计划，不修改正史                                                        |
-| `castor interact`                            | 外部 agent / CLI 自然语言入口（`--json`、`--message`、`--book`）                                       |
-| `castor config set-global`                   | 设置 CLI / daemon / 部署环境的全局 LLM env（`~/.castor/.env`）                                         |
-| `castor config show-global`                  | 查看全局配置                                                                                     |
-| `castor config set/show`                     | 查看/更新项目配置                                                                                  |
-| `castor config set-model <agent> <model>`    | 为指定 agent 设置模型覆盖（`--base-url`、`--provider`、`--api-key-env` 支持多 Provider 路由）                |
-| `castor config remove-model <agent>`         | 移除 agent 模型覆盖（回退到默认）                                                                       |
-| `castor config show-models`                  | 查看当前模型路由                                                                                   |
-| `castor doctor`                              | 诊断配置问题（显示 effective config mode、来源、API 连通性和提供商兼容性提示）                                       |
-| `castor detect [id] [n]`                     | AIGC 检测（`--all` 全部章节，`--stats` 统计）                                                         |
-| `castor style analyze <file>`                | 分析参考文本提取文风指纹                                                                               |
-| `castor style import <file> [id]`            | 导入文风指纹到指定书                                                                                 |
-| `castor import canon [id] --from <parent>`   | 导入正传正典到番外书                                                                                 |
-| `castor import chapters [id] --from <path>`  | 导入已有章节续写（`--split`、`--resume-from`）                                                        |
-| `castor analytics [id]` / `castor stats [id]` | 书籍数据分析（审计通过率、高频问题、章节排名、token 用量）                                                           |
-| `castor update`                              | 更新到最新版本                                                                                    |
-| `castor studio` / `castor`                    | 启动 Web 工作台（`-p` 指定端口，默认 4567；Studio 使用服务页配置，不使用 env 覆盖）                                    |
-| `castor tui`                                 | 启动终端全屏 TUI                                                                                 |
-| `castor up / down`                           | 启动/停止守护进程（`-q` 静默模式，自动写入 `castor.log`）                                                      |
+Tham số `[id]` có thể bỏ qua khi dự án chỉ có một cuốn sách, sẽ tự nhận diện. Mọi lệnh hỗ trợ `--json` xuất dữ liệu có cấu trúc. `draft` / `write next` / `plan chapter` / `compose chapter` hỗ trợ `--context` truyền hướng dẫn sáng tác, `--words` ghi đè số chữ mục tiêu mỗi chương. `book create` hỗ trợ `--brief <file>` truyền brief sáng tác (tài liệu ý tưởng/thiết lập của bạn), Architect sẽ sinh thiết lập dựa trên đó thay vì tự sáng tác. `plan chapter` gọi LLM sinh ý định chương; `compose chapter` không yêu cầu LLM online, có thể kiểm tra kết quả quản trị đầu vào trước khi cấu hình API Key.
 
-
-`[id]` 参数在项目只有一本书时可省略，自动检测。所有命令支持 `--json` 输出结构化数据。`draft` / `write next` / `plan chapter` / `compose chapter` 支持 `--context` 传入创作指导，`--words` 覆盖每章目标字数。`book create` 支持 `--brief <file>` 传入创作简报（你的脑洞/设定文档），Architect 会基于此生成设定而非凭空创作。`plan chapter` 会调用 LLM 生成章节意图；`compose chapter` 不要求在线 LLM，可在配置 API Key 之前先检查输入治理结果。
-
-CLI 运行时还支持一次性 LLM 覆盖参数：`--service`、`--model`、`--api-key-env`、`--base-url`、`--api-format <chat|responses>`、`--stream`、`--no-stream`。例如：
+CLI runtime còn hỗ trợ tham số ghi đè LLM tức thời: `--service`, `--model`, `--api-key-env`, `--base-url`, `--api-format <chat|responses>`, `--stream`, `--no-stream`. Ví dụ:
 
 ```bash
 castor write next --service google --model gemini-2.5-flash
 castor up --service moonshot --model kimi-k2.5 --api-key-env MOONSHOT_API_KEY
 ```
 
-## 路线图
+## Lộ trình
 
-- ~~`packages/studio` Web UI 工作台（Vite + React + Hono）~~ — 已发布，`castor` 或 `castor studio` 启动
-- ~~互动小说 / 开放世界（分支叙事 + 自由动作 + 自动配图）~~ — Studio Play 已落地
-- 局部干预（重写半章 + 级联更新后续 truth 文件）
-- 自定义 agent 插件系统
-- 平台格式导出（起点、番茄等）
+- ~~`packages/studio` bàn làm việc Web UI (Vite + React + Hono)~~ — đã phát hành, khởi động bằng `castor` hoặc `castor studio`
+- ~~Tiểu thuyết tương tác / thế giới mở (kể chuyện phân nhánh + hành động tự do + minh họa tự động)~~ — Studio Play đã hoàn thành
+- Can thiệp cục bộ (viết lại nửa chương + cập nhật dây chuyền các tệp truth phía sau)
+- Hệ thống plugin agent tùy chỉnh
+- Xuất bản theo định dạng nền tảng (Qidian, Tomato, v.v.)
 
-## 参与贡献
+## Đóng góp
 
-欢迎贡献代码。提 issue 或 PR。
+Hoan nghênh đóng góp code. Mở issue hoặc PR.
 
 ```bash
 pnpm install
-pnpm dev          # 监听模式
-pnpm test         # 运行测试
-pnpm typecheck    # 类型检查
+pnpm dev          # Chế độ watch
+pnpm test         # Chạy test
+pnpm typecheck    # Kiểm tra kiểu
 ```
 
 ## Star History
@@ -645,12 +635,12 @@ pnpm typecheck    # 类型检查
   <img src="https://contrib.rocks/image?repo=Narcooo/inkos" alt="Contributors" />
 </a>
 
-## 致谢
+## Lời cảm ơn
 
-Castor 的 agent 运行时构建在 [pi](https://github.com/badlogic/pi-mono)（`@mariozechner/pi-ai` 与 `@mariozechner/pi-agent-core`，作者 Mario Zechner）之上。感谢 pi 提供的扎实底座。
+Runtime agent của Castor được xây dựng trên [pi](https://github.com/badlogic/pi-mono) (`@mariozechner/pi-ai` và `@mariozechner/pi-agent-core`, tác giả Mario Zechner). Cảm ơn pi đã cung cấp một nền móng vững chắc.
 
-本开源项目已链接并认可 [LINUX DO](https://linux.do/) 社区，感谢社区成员的反馈、测试与讨论。
+Dự án mã nguồn mở này đã liên kết và ghi nhận cộng đồng [LINUX DO](https://linux.do/), cảm ơn các thành viên cộng đồng vì phản hồi, kiểm thử và thảo luận.
 
-## 许可证
+## Giấy phép
 
 [AGPL-3.0](LICENSE)
