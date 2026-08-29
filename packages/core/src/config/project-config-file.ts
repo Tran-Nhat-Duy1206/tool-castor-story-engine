@@ -1,4 +1,4 @@
-import { access, readFile, rename, writeFile } from "node:fs/promises";
+import { access, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { CASTOR_CONFIG_FILENAME, LEGACY_CASTOR_CONFIG_FILENAME } from "./product-identity.js";
 
@@ -73,15 +73,26 @@ async function readJsonFile(path: string): Promise<Record<string, unknown>> {
 }
 
 /** Atomic single-file write consistent with the repository's staging pattern. */
-async function writeFileAtomic(target: string, content: string): Promise<void> {
+/**
+ * Stage-then-rename write. Never clobbers a canonical file that appeared
+ * concurrently during MIGRATION: if the target exists after a failed rename,
+ * the canonical file wins and the migration is skipped (the caller re-reads
+ * the target). For explicit saves (intended overwrite) pass overwrite:true.
+ */
+async function writeFileAtomic(target: string, content: string, overwrite: boolean): Promise<void> {
   const staging = `${target}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   await writeFile(staging, content, "utf-8");
   try {
     await rename(staging, target);
-  } catch (error) {
-    await writeFile(target, content, "utf-8").catch(() => {
-      throw error;
-    });
+  } catch (renameError) {
+    if (!overwrite && (await exists(target))) {
+      // Lost a create race — the canonical file is authoritative.
+      await rm(staging, { force: true }).catch(() => undefined);
+      return;
+    }
+    // Retried overwrite save with a transient rename failure (Windows EBUSY/EPERM).
+    await rm(staging, { force: true }).catch(() => undefined);
+    throw renameError;
   }
 }
 
@@ -138,7 +149,7 @@ export async function loadProjectConfigFile(root: string): Promise<LoadedProject
 
   if (await exists(legacyPath(root))) {
     const legacy = await readJsonFile(legacyPath(root)); // invalid legacy → fail closed, no partial castor.json
-    await writeFileAtomic(castorPath(root), serialize(legacy));
+    await writeFileAtomic(castorPath(root), serialize(legacy), false);
     return {
       config: await readJsonFile(castorPath(root)),
       source: "legacy-migrated",
@@ -157,7 +168,7 @@ export async function loadProjectConfigFile(root: string): Promise<LoadedProject
  * legacy file is never updated again (spec §6.2).
  */
 export async function saveProjectConfigFile(root: string, config: Record<string, unknown>): Promise<void> {
-  await writeFileAtomic(castorPath(root), serialize(config));
+  await writeFileAtomic(castorPath(root), serialize(config), true);
 }
 
 /** True when the project has a config file in canonical or legacy form. */

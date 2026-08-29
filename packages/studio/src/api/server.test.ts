@@ -333,7 +333,6 @@ vi.mock("@actalk/castor-core", async (importOriginal) => {
     loadProjectConfigFile: actual.loadProjectConfigFile,
     saveProjectConfigFile: actual.saveProjectConfigFile,
     hasProjectConfigFile: actual.hasProjectConfigFile,
-    resolveGlobalEnvPath: actual.resolveGlobalEnvPath,
     castorEnv: actual.castorEnv,
     processProjectInteractionRequest: processProjectInteractionRequestMock,
     createInteractionToolsFromDeps: createInteractionToolsFromDepsMock,

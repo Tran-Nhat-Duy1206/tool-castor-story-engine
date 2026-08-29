@@ -162,7 +162,8 @@ function renderList(items: ReadonlyArray<string>): string {
 }
 
 function extractMarkedBlock(markdown: string, name: string): string | undefined {
-  const match = markdown.match(new RegExp(`<!--\\s*CASTOR_PLAN_${name}_START\\s*-->\\s*([\\s\\S]*?)\\s*<!--\\s*CASTOR_PLAN_${name}_END\\s*-->`, "m"));
+  // Pre-rename plan caches carried INKOS_PLAN_* markers; accept both on read.
+  const match = markdown.match(new RegExp(`<!--\\s*(?:CASTOR|INKOS)_PLAN_${name}_START\\s*-->\\s*([\\s\\S]*?)\\s*<!--\\s*(?:CASTOR|INKOS)_PLAN_${name}_END\\s*-->`, "m"));
   return match?.[1]?.trim();
 }
 

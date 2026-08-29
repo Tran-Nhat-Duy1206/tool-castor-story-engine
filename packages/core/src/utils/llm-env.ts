@@ -1,7 +1,8 @@
-import { copyFile, mkdir, readFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rename, rm } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 import { parse } from "dotenv";
 import { access } from "node:fs/promises";
 
@@ -134,26 +135,39 @@ async function fileExists(path: string): Promise<boolean> {
 /**
  * Resolve the global .env path with one-way legacy migration: if the
  * canonical ~/.castor/.env is missing but the legacy ~/.inkos/.env exists,
- * the legacy file is copied once. Secrets are copied as opaque file content
- * and never echoed. The legacy file is never modified.
+ * the legacy file is copied once via staging + rename (fail closed: a failed
+ * copy leaves no half-written canonical file). Secrets are copied as opaque
+ * file content and never echoed. The legacy file is never modified.
  */
 export async function resolveGlobalEnvPath(): Promise<string> {
   if (await fileExists(GLOBAL_ENV_PATH)) return GLOBAL_ENV_PATH;
   if (await fileExists(LEGACY_GLOBAL_ENV_PATH)) {
     await mkdir(GLOBAL_CONFIG_DIR, { recursive: true });
-    // force:false keeps an existing canonical file authoritative under races.
-    await copyFile(LEGACY_GLOBAL_ENV_PATH, GLOBAL_ENV_PATH).catch(() => undefined);
+    const staging = join(GLOBAL_CONFIG_DIR, `.env.migrate-${Date.now()}-${randomUUID().slice(0, 8)}`);
+    try {
+      await copyFile(LEGACY_GLOBAL_ENV_PATH, staging);
+      try {
+        await rename(staging, GLOBAL_ENV_PATH);
+      } catch {
+        // Canonical won a concurrent race → it stays authoritative.
+        await rm(staging, { force: true }).catch(() => undefined);
+      }
+    } catch (error) {
+      await rm(staging, { force: true }).catch(() => undefined);
+      // Fail open with an actionable, non-secret diagnostic, and keep the
+      // runtime working by reading the untouched legacy file directly.
+      console.warn(
+        `[castor] Failed to migrate legacy global env ${LEGACY_GLOBAL_ENV_PATH} to ${GLOBAL_ENV_PATH}: ` +
+          `${error instanceof Error ? error.message : String(error)}. ` +
+          `Copy the file manually to keep global provider settings.`,
+      );
+      return LEGACY_GLOBAL_ENV_PATH;
+    }
   }
   return GLOBAL_ENV_PATH;
 }
 
 export type LLMEnvMap = Record<string, string | undefined>;
-
-export interface LLMEnvLayers {
-  readonly global: LLMEnvMap;
-  readonly project: LLMEnvMap;
-  readonly process: LLMEnvMap;
-}
 
 export interface LLMEnvLayers {
   readonly global: LLMEnvMap;

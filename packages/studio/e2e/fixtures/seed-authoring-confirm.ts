@@ -35,16 +35,19 @@ export async function seedAuthoringConfirm(): Promise<void> {
   // Delete all stale sessions for this project from previous test runs.
   // ChatPage picks the most-recently-updated session (ids[0] from listBookSessions);
   // stale sessions with old message history can confuse the test.
-  const sessionsDir = resolve(E2E_ROOT, ".inkos", "sessions");
-  try {
-    const files = await readdir(sessionsDir);
-    await Promise.all(
-      files
-        .filter((f) => f.startsWith(`e2e-confirm-seed-`) && f.endsWith(".jsonl"))
-        .map((f) => rm(resolve(sessionsDir, f), { force: true })),
-    );
+  // Sessions now live canonically under .castor/sessions; the pre-rename
+  // .inkos/sessions location is cleaned too for older runs.
+  for (const dir of [resolve(E2E_ROOT, ".castor", "sessions"), resolve(E2E_ROOT, ".inkos", "sessions")]) {
+    try {
+      const files = await readdir(dir);
+      await Promise.all(
+        files
+          .filter((f) => f.startsWith(`e2e-confirm-seed-`) && f.endsWith(".jsonl"))
+          .map((f) => rm(resolve(dir, f), { force: true })),
+      );
   } catch {
     // sessions dir may not exist on first run — ignore
+  }
   }
 
   // Write a minimal story graph so StoryGraphTree can load the film page

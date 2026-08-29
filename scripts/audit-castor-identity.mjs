@@ -42,6 +42,10 @@ export const PATH_ALLOWLIST = [
   { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/config\/project-config-file\.ts$/ },
   { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/config\/runtime-dir\.ts$/ },
   { bucket: "LEGACY-COMPAT", pattern: /^packages\/cli\/src\/book-backup\.ts$/ },
+  // Bootstrap detects legacy projects and refuses to shadow legacy configs.
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/cli\/src\/project-bootstrap\.ts$/ },
+  // Reads pre-rename plan caches carrying INKOS_PLAN_* markers.
+  { bucket: "LEGACY-COMPAT", pattern: /^packages\/core\/src\/pipeline\/persisted-governed-plan\.ts$/ },
   { bucket: "LEGACY-COMPAT", pattern: /^scripts\/audit-castor-identity\.mjs$/ },
   // Must keep ignoring legacy-named runtime artifacts created by older versions.
   { bucket: "LEGACY-COMPAT", pattern: /^\.gitignore$/ },
