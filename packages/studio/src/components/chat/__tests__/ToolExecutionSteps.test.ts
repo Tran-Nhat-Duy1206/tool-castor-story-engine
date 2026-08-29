@@ -175,7 +175,7 @@ describe("groupChronologically", () => {
 
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
 
-    expect(html).toContain("查看操作结果");
+    expect(html).toContain("Xem kết quả thao tác");
     expect(html).toContain("已完成第 1 章：雨棚");
   });
 
@@ -208,10 +208,10 @@ describe("groupChronologically", () => {
       auditPassed: false,
     }));
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
-    expect(html).toContain("第 1 章修订");
-    expect(html).toContain("仍需复核");
+    expect(html).toContain("Chỉnh sửa chương 1");
+    expect(html).toContain("Vẫn cần soát lại");
     expect(html).toContain("第一句仍未直接落到孙玉珍抱钟进店");
-    expect(html).not.toContain("查看操作结果");
+    expect(html).not.toContain("Xem kết quả thao tác");
   });
 
   it("renders chapter state resync audit status and concrete issues", () => {
@@ -240,10 +240,10 @@ describe("groupChronologically", () => {
       auditPassed: false,
     }));
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
-    expect(html).toContain("第 1 章状态已同步");
-    expect(html).toContain("仍需修订");
+    expect(html).toContain("Đã đồng bộ trạng thái chương 1");
+    expect(html).toContain("Vẫn cần chỉnh sửa");
     expect(html).toContain("末段还没有体现 H012 的十一分钟证据");
-    expect(html).not.toContain("查看操作结果");
+    expect(html).not.toContain("Xem kết quả thao tác");
   });
 
   it("renders the writer retrieval trace from structured tool details", () => {
@@ -282,12 +282,12 @@ describe("groupChronologically", () => {
 
     expect(getChapterContextTraceDetails(exec)).toHaveLength(1);
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
-    expect(html).toContain("本轮参考依据");
+    expect(html).toContain("Ngữ cảnh dùng trong lượt này");
     expect(html).toContain("longform-pacing");
     expect(html).toContain("sqlite-fts5-bm25");
     expect(html).toContain("story/author_intent.md");
     expect(html).toContain("runtime/chapter-0008.trace.json");
-    expect(html).toContain("语义压缩");
+    expect(html).toContain("Nén ngữ nghĩa");
   });
 
   it("shows the actual professional Skill for non-chapter production tools", () => {
@@ -304,7 +304,7 @@ describe("groupChronologically", () => {
 
     expect(getExecutionSkillIds(exec)).toEqual(["castor-play-world"]);
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
-    expect(html).toContain("专业 Skill");
+    expect(html).toContain("Skill chuyên dụng");
     expect(html).toContain("castor-play-world");
   });
 
@@ -361,11 +361,11 @@ describe("groupChronologically", () => {
     });
 
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
-    expect(html).toContain("互动影游已生成");
-    expect(html).toContain("剧情图谱");
-    expect(html).toContain("剧情树");
-    expect(html).toContain("变量旗标");
-    expect(html).toContain("图片资产");
+    expect(html).toContain("Đã tạo phim tương tác");
+    expect(html).toContain("Đồ thị truyện");
+    expect(html).toContain("Cây truyện");
+    expect(html).toContain("Cờ biến");
+    expect(html).toContain("Tài nguyên hình ảnh");
   });
 
   it("extracts play scene details from play tools", () => {
@@ -556,11 +556,11 @@ describe("groupChronologically", () => {
     expect(details).not.toBeNull();
     expect(getProposedActionContractRows(details!)).toEqual([
       {
-        label: "世界契约",
+        label: "Khế ước thế giới",
         value: expect.stringContaining("时间是世界同步轴"),
       },
       {
-        label: "视觉契约",
+        label: "Khế ước thị giác",
         value: expect.stringContaining("不要绿蓝紫橙边框"),
       },
     ]);
@@ -588,7 +588,7 @@ describe("tool details default-open preference", () => {
 
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
 
-    expect(html).toContain("查看操作结果");
+    expect(html).toContain("Xem kết quả thao tác");
     expect(html).toContain("<details open");
   });
 
@@ -599,7 +599,7 @@ describe("tool details default-open preference", () => {
     }));
 
     // The block is still there (manually expandable), just not open by default.
-    expect(html).toContain("查看操作结果");
+    expect(html).toContain("Xem kết quả thao tác");
     expect(html).toContain("已完成第 1 章：雨棚");
     expect(html).not.toContain("<details open");
   });
@@ -620,7 +620,7 @@ describe("English app language", () => {
   });
 
   afterEach(() => {
-    setAppLanguage("zh");
+    setAppLanguage("vi");
   });
 
   it("renders pipeline status, result summary, and file-operation group in English", () => {
@@ -641,7 +641,7 @@ describe("English app language", () => {
     expect(html).toContain("View result");
     expect(html).toContain("1 file operation");
     expect(html).not.toContain("已完成");
-    expect(html).not.toContain("查看操作结果");
+    expect(html).not.toContain("Xem kết quả thao tác");
   });
 
   it("renders interactive-film artifacts and proposal contract rows in English", () => {
@@ -661,7 +661,7 @@ describe("English app language", () => {
     expect(html).toContain("Interactive film generated");
     expect(html).toContain("Story graph");
     expect(html).toContain("Story tree");
-    expect(html).not.toContain("互动影游已生成");
+    expect(html).not.toContain("Đã tạo phim tương tác");
 
     const proposalExec = makeExec({
       id: "proposal-en-1",

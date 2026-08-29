@@ -508,7 +508,7 @@ describe("chat message actions", () => {
 
     expect(store.getState().sessions[sessionId]?.messages[0]?.toolExecutions?.[0]).toMatchObject({
       status: "error",
-      error: "已由用户停止",
+      error: "Người dùng đã dừng",
       completedAt: expect.any(Number),
     });
     expect(fetchJson).toHaveBeenCalledWith(`/sessions/${sessionId}/abort`, { method: "POST" });
@@ -552,7 +552,7 @@ describe("chat message actions", () => {
     expect(taskExecutions).toEqual([
       expect.objectContaining({
         status: "error",
-        error: "已由用户停止",
+        error: "Người dùng đã dừng",
       }),
     ]);
     expect(store.getState().sessions[sessionId]?.messages).not.toContainEqual(
@@ -1401,7 +1401,7 @@ describe("chat message actions", () => {
       protectedTokens: 1200,
     });
     expect(findTaskExecution(store, sessionId)?.stages).toEqual([
-      expect.objectContaining({ label: "压缩故事上下文", status: "active" }),
+      expect.objectContaining({ label: "Nén ngữ cảnh truyện", status: "active" }),
     ]);
     // 不产生聊天流内容：没有 context-* 伪工具卡被写进消息
     expect(allExecutions().some((execution) => execution.id.startsWith("context-"))).toBe(false);
@@ -1413,7 +1413,7 @@ describe("chat message actions", () => {
       phase: "end",
     });
     expect(findTaskExecution(store, sessionId)?.stages).toEqual([
-      expect.objectContaining({ label: "压缩故事上下文", status: "completed" }),
+      expect.objectContaining({ label: "Nén ngữ cảnh truyện", status: "completed" }),
     ]);
 
     // id 指向的卡不存在：事件丢弃，同样不写进聊天流

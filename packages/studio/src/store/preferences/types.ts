@@ -1,6 +1,6 @@
 export interface PreferencesStore {
   /**
-   * Whether pipeline tool result blocks ("查看操作结果") in chat render
+   * Whether pipeline tool result blocks ("Xem kết quả thao tác") in chat render
    * expanded by default. Persisted per browser via localStorage.
    */
   toolDetailsDefaultOpen: boolean;

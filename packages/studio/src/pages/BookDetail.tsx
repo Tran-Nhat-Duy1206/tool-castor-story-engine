@@ -206,7 +206,7 @@ export function BookDetail({
     const brief = window.prompt(
       data?.book.language === "en"
         ? "Optional rewrite brief for this run only. Leave blank to use existing focus."
-        : "可选：输入这次重写要遵循的补充想法。留空则沿用现有 focus。",
+        : "Tùy chọn: nhập ý tưởng bổ sung cho lần viết lại này. Để trống sẽ giữ nguyên focus hiện tại.",
       "",
     );
     if (brief === null) return;
@@ -229,7 +229,7 @@ export function BookDetail({
     const brief = window.prompt(
       data?.book.language === "en"
         ? "Optional revise brief for this run only. Leave blank to use existing focus."
-        : "可选：输入这次修订要遵循的补充想法。留空则沿用现有 focus。",
+        : "Tùy chọn: nhập ý tưởng bổ sung cho lần chỉnh sửa này. Để trống sẽ giữ nguyên focus hiện tại.",
       "",
     );
     if (brief === null) return;
@@ -252,7 +252,7 @@ export function BookDetail({
     const brief = window.prompt(
       data?.book.language === "en"
         ? "Optional sync brief for interpreting the edited chapter body. Leave blank to sync directly from the text."
-        : "可选：输入这次同步时要遵循的补充说明。留空则直接按正文同步。",
+        : "Tùy chọn: nhập ghi chú bổ sung cho lần đồng bộ này. Để trống sẽ đồng bộ trực tiếp theo phần thân.",
       "",
     );
     if (brief === null) return;
@@ -349,7 +349,7 @@ export function BookDetail({
       });
       return data?.book.language === "en"
         ? `Consolidated ${result.archivedVolumes ?? 0} volume(s). Retained ${result.retainedChapters ?? 0} recent chapter summaries.`
-        : `已归并 ${result.archivedVolumes ?? 0} 个卷摘要，保留最近 ${result.retainedChapters ?? 0} 条章节摘要。`;
+        : `Đã hợp nhất ${result.archivedVolumes ?? 0} bản tóm tắt tập, giữ lại ${result.retainedChapters ?? 0} bản tóm tắt chương gần nhất.`;
     });
   };
 
@@ -357,7 +357,7 @@ export function BookDetail({
     const feedback = window.prompt(
       data?.book.language === "en"
         ? "Foundation revision feedback. This rewrites the book foundation, not chapter body."
-        : "输入重修基础设定的反馈。此操作会重写基础设定，不直接改正文。",
+        : "Nhập phản hồi để sửa lại nền tảng. Thao tác này sẽ viết lại nền tảng, không sửa trực tiếp phần thân.",
       "",
     );
     if (!feedback?.trim()) return;
@@ -367,7 +367,7 @@ export function BookDetail({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ feedback }),
       });
-      return data?.book.language === "en" ? "Foundation revised." : "基础设定已重修。";
+      return "Nền tảng đã được sửa lại.";
     });
   };
 
@@ -375,7 +375,7 @@ export function BookDetail({
     const context = window.prompt(
       data?.book.language === "en"
         ? "Optional planning context for the next chapter."
-        : "可选：下一章规划补充说明。",
+        : "Tùy chọn: ghi chú bổ sung cho việc lập kế hoạch chương tiếp theo.",
       "",
     );
     if (context === null) return;
@@ -387,7 +387,7 @@ export function BookDetail({
       });
       return data?.book.language === "en"
         ? `Planned chapter ${result.chapterNumber ?? "?"}: ${result.title ?? ""}`
-        : `已计划第 ${result.chapterNumber ?? "?"} 章：${result.title ?? ""}`;
+        : `Đã lập kế hoạch chương ${result.chapterNumber ?? "?"}: ${result.title ?? ""}`;
     });
   };
 
@@ -395,7 +395,7 @@ export function BookDetail({
     const context = window.prompt(
       data?.book.language === "en"
         ? "Optional compose context for the next chapter."
-        : "可选：下一章组装补充说明。",
+        : "Tùy chọn: ghi chú bổ sung cho việc lắp ghép chương tiếp theo.",
       "",
     );
     if (context === null) return;
@@ -407,14 +407,14 @@ export function BookDetail({
       });
       return data?.book.language === "en"
         ? `Composed chapter ${result.chapterNumber ?? "?"}: ${result.title ?? ""}`
-        : `已组装第 ${result.chapterNumber ?? "?"} 章：${result.title ?? ""}`;
+        : `Đã lắp ghép chương ${result.chapterNumber ?? "?"}: ${result.title ?? ""}`;
     });
   };
 
   const handleRepairState = async (chapterNum: number) => {
     await runBookAction(`repair-state-${chapterNum}`, async () => {
       await fetchJson(`/books/${bookId}/repair-state/${chapterNum}`, { method: "POST" });
-      return data?.book.language === "en" ? `Chapter ${chapterNum} state repaired.` : `第 ${chapterNum} 章状态已修复。`;
+      return `Đã sửa trạng thái cho chương ${chapterNum}.`;
     });
   };
 
@@ -501,12 +501,12 @@ export function BookDetail({
           <button
             onClick={handleToggleReviewMode}
             title={reviewMode === "manual"
-              ? "手动审查：写完即停，由你点 审稿/修订/通过（更快、更可控）。点此切回自动。"
-              : "自动审查：写完自动审校并按需重写（更省心，但更慢）。点此切到手动·写完即停。"}
+              ? "Soát thủ công: dừng ngay sau khi viết xong, bạn tự nhấp Duyệt/Chỉnh sửa/Thông qua (nhanh hơn, kiểm soát tốt hơn). Nhấp để chuyển về tự động."
+              : "Soát tự động: tự động soát lỗi và viết lại khi cần sau khi viết xong (nhàn hơn nhưng chậm hơn). Nhấp để chuyển sang thủ công — dừng ngay khi viết xong."}
             className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-secondary/60 text-foreground rounded-xl border border-border/50 hover:bg-secondary transition-all"
           >
             {reviewMode === "manual" ? <Hand size={16} /> : <Settings2 size={16} />}
-            {reviewMode === "manual" ? "审查：手动·写完即停" : "审查：自动"}
+            {reviewMode === "manual" ? "Soát: thủ công · dừng khi viết xong" : "Soát: tự động"}
           </button>
           <button
             onClick={() => setConfirmDeleteOpen(true)}
@@ -787,7 +787,7 @@ export function BookDetail({
                         onClick={() => handleSync(ch.number)}
                         disabled={syncingChapters.includes(ch.number) || ch.number !== latestPersistedChapter}
                         className="p-2 rounded-lg bg-secondary text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all shadow-sm disabled:opacity-50"
-                        title={data?.book.language === "en" ? "Sync truth/state from edited chapter" : "根据已编辑章节同步 truth/state"}
+                        title="Đồng bộ truth/state từ chương đã chỉnh sửa"
                       >
                         {syncingChapters.includes(ch.number)
                           ? <div className="w-3.5 h-3.5 border-2 border-muted-foreground/20 border-t-muted-foreground rounded-full animate-spin" />

@@ -1,8 +1,9 @@
-// 全局应用语言：非 React 模块（store slice、parts-builder、error-copy 等）无法用
-// useI18n hook，从这里读取。App.tsx 在项目配置加载/切换语言时调用 setAppLanguage 同步。
-export type AppLanguage = "zh" | "en";
+// Ứng dụng ngôn ngữ toàn cục: các module không phải React (store slice,
+// parts-builder, error-copy, v.v.) không dùng được hook useI18n, nên đọc từ đây.
+// App.tsx gọi setAppLanguage khi tải/đổi ngôn ngữ cấu hình dự án để đồng bộ.
+export type AppLanguage = "vi" | "en";
 
-let current: AppLanguage = "zh";
+let current: AppLanguage = "vi";
 
 export function setAppLanguage(lang: AppLanguage): void {
   current = lang;
@@ -12,7 +13,7 @@ export function getAppLanguage(): AppLanguage {
   return current;
 }
 
-/** 内联双语：tr("中文", "English")。默认中文，保持既有测试与默认体验不变。 */
-export function tr(zh: string, en: string): string {
-  return current === "en" ? en : zh;
+/** Song ngữ nội tuyến: tr("Tiếng Việt", "English"). Mặc định tiếng Việt; yêu cầu ngôn ngữ zh cũ cũng rơi về tiếng Việt. */
+export function tr(vi: string, en: string): string {
+  return current === "en" ? en : vi;
 }

@@ -216,7 +216,7 @@ export default function FlowView({
     if (conn.source === conn.target) return;
     const src = graph.nodes.find((g) => g.id === conn.source);
     if (!src) return;
-    await post(addChoiceDelta(src, { id: genChoiceId(), text: tr("新选项", "New choice"), targetNodeId: conn.target }));
+    await post(addChoiceDelta(src, { id: genChoiceId(), text: tr("Lựa chọn mới", "New choice"), targetNodeId: conn.target }));
   };
 
   const onNodesDelete = async (deleted: Array<{ id: string }>) => {
@@ -246,7 +246,7 @@ export default function FlowView({
       addNodeDelta({
         id: genNodeId(),
         type: "normal",
-        title: tr("新节点", "New node"),
+        title: tr("Nút mới", "New node"),
         choices: [],
         position: { x: 80, y: 80 },
       } as never),
@@ -280,7 +280,7 @@ export default function FlowView({
           onClick={() => setEditing((v) => !v)}
           className={`ml-auto px-3 py-1 rounded text-xs ${c.btnSecondary}`}
         >
-          {editing ? tr("完成编辑", "Done editing") : tr("编辑", "Edit")}
+          {editing ? tr("Xong chỉnh sửa", "Done editing") : tr("Chỉnh sửa", "Edit")}
         </button>
         {editing && (
           <button
@@ -288,7 +288,7 @@ export default function FlowView({
             onClick={onAddNode}
             className={`px-3 py-1 rounded text-xs ${c.btnSecondary}`}
           >
-            {tr("加节点", "Add node")}
+            {tr("Thêm nút", "Add node")}
           </button>
         )}
       </div>
@@ -302,22 +302,22 @@ export default function FlowView({
           data-testid="flow-stats"
           className="flex items-center gap-4 text-xs text-muted-foreground border border-border rounded px-3 py-1.5 bg-card shrink-0"
         >
-          <span>{tr("总节点", "Nodes")} {stats.total}</span>
-          <span>{tr("分支", "Branches")} {stats.branch}</span>
-          <span>{tr("结局", "Endings")} {stats.ending}</span>
-          <span>{tr("死路", "Dead ends")} {stats.deadEnd}</span>
+          <span>{tr("Tổng nút", "Nodes")} {stats.total}</span>
+          <span>{tr("Nhánh", "Branches")} {stats.branch}</span>
+          <span>{tr("Kết", "Endings")} {stats.ending}</span>
+          <span>{tr("Đường cụt", "Dead ends")} {stats.deadEnd}</span>
           <span className="ml-auto flex items-center gap-3">
             <span className="flex items-center gap-1">
               <span style={{ display: "inline-block", width: 20, height: 2, background: "#9ca3af", borderRadius: 1 }} />
-              {tr("默认", "Default")}
+              {tr("Mặc định", "Default")}
             </span>
             <span className="flex items-center gap-1">
               <span style={{ display: "inline-block", width: 20, height: 2, background: "#f59e0b", borderRadius: 1 }} />
-              {tr("结局边", "Ending edge")}
+              {tr("Cạnh kết thúc", "Ending edge")}
             </span>
             <span className="flex items-center gap-1">
               <span style={{ display: "inline-block", width: 20, height: 2, background: "#8b5cf6", borderRadius: 1 }} />
-              {tr("悬停路径", "Hover path")}
+              {tr("Đường đi khi rê chuột", "Hover path")}
             </span>
           </span>
         </div>

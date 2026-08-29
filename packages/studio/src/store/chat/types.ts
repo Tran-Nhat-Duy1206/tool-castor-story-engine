@@ -32,8 +32,8 @@ export interface ToolExecution {
   logs?: string[];
   startedAt: number;
   completedAt?: number;
-  // 后台生产任务的工具卡（来自带 background 标记的 tool:start 或任务快照恢复）。
-  // 无 executionId 事件的回退路由据此跳过任务卡，只挂聊天轮工具卡。
+  // Thẻ công cụ của tác vụ sản xuất nền (từ tool:start có cờ background hoặc khôi phục snapshot tác vụ).
+  // Định tuyến dự phòng cho sự kiện không có executionId dựa vào đây để bỏ qua thẻ tác vụ, chỉ gắn thẻ công cụ của lượt chat.
   background?: boolean;
 }
 
@@ -143,8 +143,8 @@ export interface SendMessageOptions {
   readonly playMode?: PlayMode;
 }
 
-// 一次失败的聊天轮发送的原样参数（sendMessage 的 text 与 options），
-// 供"重试"按钮一键重发。
+// Tham số nguyên vẹn của lượt gửi chat thất bại (text và options của sendMessage),
+// để nút "Thử lại" gửi lại chỉ với một cú nhấp.
 export interface FailedSendRecord {
   readonly text: string;
   readonly options?: SendMessageOptions;
@@ -166,17 +166,17 @@ export interface SessionRuntime {
   readonly title: string | null;
   readonly messages: ReadonlyArray<Message>;
   readonly stream: EventSource | null;
-  // isStreaming = 聊天轮流式中 或 后台生产任务运行中（面向"会话是否忙"的读取方）。
+  // isStreaming = đang stream lượt chat HOẶC tác vụ sản xuất nền đang chạy (cho người đọc "phiên có bận không").
   readonly isStreaming: boolean;
-  // isChatStreaming 只表示聊天轮本身在流式中；后台任务运行期间它是 false，
-  // 用户仍可继续发消息。
+  // isChatStreaming chỉ báo lượt chat đang stream; khi tác vụ nền chạy nó là false,
+  // người dùng vẫn có thể gửi tin nhắn tiếp.
   readonly isChatStreaming: boolean;
   readonly lastError: string | null;
-  // 上一条失败的聊天轮发送记录：请求失败（fetch 拒绝、/agent 返回 error 等）时写入，
-  // 新一轮发送开始时清除。用户主动停止与后台生产任务轮的失败不记录
-  //（任务卡有自己的失败展示）。存在且非聊天流式中时 UI 显示"重试"按钮。
+  // Bản ghi lượt gửi chat thất bại gần nhất: ghi khi yêu cầu thất bại (fetch bị từ chối, /agent trả về error, v.v.),
+  // xóa khi một lượt gửi mới bắt đầu. Việc người dùng chủ động dừng và thất bại của lượt tác vụ nền không được ghi
+  // (thẻ tác vụ có hiển thị thất bại riêng). Khi tồn tại và không stream chat, UI hiển thị nút "Thử lại".
   readonly lastFailedSend?: FailedSendRecord;
-  // 仅前端存在、尚未持久化到磁盘的草稿会话。发送第一条消息时才调 POST /sessions 把它落盘。
+  // Phiên nháp chỉ tồn tại ở frontend, chưa được lưu xuống đĩa. Chỉ khi gửi tin nhắn đầu tiên mới gọi POST /sessions để lưu xuống.
   readonly isDraft: boolean;
 }
 
@@ -223,7 +223,7 @@ export interface MessageActions {
   deleteSession: (sessionId: string) => Promise<void>;
   loadSessionDetail: (sessionId: string) => Promise<void>;
   sendMessage: (sessionId: string, text: string, options?: SendMessageOptions) => Promise<void>;
-  // 用 lastFailedSend 记录的原样参数重发上一条失败的消息；无记录或聊天轮流式中时不做任何事。
+  // Gửi lại tin nhắn thất bại gần nhất bằng tham số nguyên vẹn trong lastFailedSend; không làm gì nếu không có bản ghi hoặc đang stream chat.
   retryLastSend: (sessionId: string) => Promise<void>;
   // User stop aborts the complete workflow; navigation uses chat scope so a
   // background production task can keep running after its Pi turn is cancelled.

@@ -104,14 +104,14 @@ export function SummarySection({ bookId }: SummarySectionProps) {
     return (
       <>
         {legacy.world && (
-          <SidebarCard title={tr("世界观", "World")}>
+          <SidebarCard title={tr("Thế giới quan", "World")}>
             <Streamdown className={SIDEBAR_MD_CLASS} plugins={streamdownPlugins}>
               {legacy.world}
             </Streamdown>
           </SidebarCard>
         )}
         {(legacy.protagonist || legacy.cast) && (
-          <SidebarCard title={tr("角色", "Characters")}>
+          <SidebarCard title={tr("Nhân vật", "Characters")}>
             {legacy.protagonist && (
               <Streamdown className={SIDEBAR_MD_CLASS} plugins={streamdownPlugins}>
                 {legacy.protagonist}
@@ -130,27 +130,27 @@ export function SummarySection({ bookId }: SummarySectionProps) {
     );
   }
 
-  // Worldview etc. is a section inside story_frame.md ("故事基石"); these
+  // Worldview etc. is a section inside story_frame.md ("Nền tảng truyện"); these
   // summary cards are a glance, so offer a button to open the full file.
   const openFull = (
     <button
       onClick={() => openArtifact("outline/story_frame.md")}
       className="mt-2 text-[15px] leading-6 text-primary hover:underline font-['SimSun','Songti_SC','STSong',serif]"
     >
-      {tr("查看完整设定 →", "View full foundation →")}
+      {tr("Xem toàn bộ nền tảng →", "View full foundation →")}
     </button>
   );
 
   return (
     <>
       {cards.length > 0 && (
-        <SidebarCard title={tr("故事基石", "Story Foundation")}>
+        <SidebarCard title={tr("Nền tảng truyện", "Story Foundation")}>
           <FrontmatterCards cards={cards} />
           {!worldOverview && openFull}
         </SidebarCard>
       )}
       {worldOverview && (
-        <SidebarCard title={tr("世界观", "World")}>
+        <SidebarCard title={tr("Thế giới quan", "World")}>
           <Streamdown className={SIDEBAR_MD_CLASS} plugins={streamdownPlugins}>
             {worldOverview}
           </Streamdown>

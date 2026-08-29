@@ -70,7 +70,7 @@ function numberOrZero(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
-/** 服务端给后台生产任务的进度事件附加的 execution id；聊天轮事件不带。 */
+/** Execution id attached by the server to background production task progress events; chat-turn events have none. */
 function eventExecutionId(data: unknown): string | undefined {
   const executionId = (data as { executionId?: unknown } | null)?.executionId;
   return typeof executionId === "string" && executionId ? executionId : undefined;
@@ -112,8 +112,10 @@ export function appendBoundedToolLogs(
 }
 
 /**
- * 倒序找最近一个运行中的聊天轮工具卡；跳过带 background 标记的后台任务卡。
- * 无 id 的回退事件只属于聊天轮，落到任务卡上会把聊天日志串排进任务里。
+ * Find the most recent running chat-turn tool card (reverse order); skip
+ * background task cards flagged with background. Fallback events without an id
+ * belong to the chat turn only - applying them to a task card would mix chat
+ * logs into the task.
  */
 function findRunningChatToolPart(
   parts: ReadonlyArray<MessagePart>,
@@ -128,11 +130,12 @@ function findRunningChatToolPart(
 }
 
 /**
- * 倒序扫描消息，找到最近一个仍在运行的聊天轮工具卡并更新它。
- * 任务与聊天并行时，后台任务卡（execution.background）被跳过——无 id 的
- * 回退事件不属于任务；跳过后没有可挂的卡时返回 null，事件整体丢弃
- *（任务快照重放会带回任务自己的累积日志，不丢信息）。
- * update 返回 null 表示这张卡不需要更新（整体视为 no-op）。
+ * Scan messages in reverse for the latest still-running chat-turn tool card and
+ * update it. When a task runs in parallel with chat, background task cards
+ * (execution.background) are skipped - id-less fallback events never belong to
+ * a task. If no card can host the update, return null and drop the event (task
+ * snapshot replay brings back the task's own accumulated logs, so nothing is
+ * lost). update returning null means the card needs no change (treated as no-op).
  */
 export function updateLatestRunningToolMessage(
   messages: ReadonlyArray<Message>,
@@ -287,10 +290,11 @@ export function attachSessionStreamListeners({
     ),
   });
 
-  // llm:progress 按事件里的 executionId 路由：带 id 的事件（后台生产任务）按 id
-  // 精确定位工具卡；不带 id 的维持"最近一张运行中的卡"回退（聊天轮工具与旧版
-  // 事件）。每个 id 一个独立节流器：任务与聊天并行时，双方进度不会在同一个
-  // "只保留最新事件"的节流器里互相覆盖。
+  // Route llm:progress by the executionId carried in the event: id-bearing events
+  // (background production tasks) locate their tool card precisely; id-less ones
+  // keep the "most recent running card" fallback (chat-turn tools and legacy
+  // events). Each id gets its own throttler so parallel task/chat progress never
+  // overwrite each other inside a single "keep latest event" throttle.
   const progressThrottles = new Map<string, ProgressThrottle>();
   const progressThrottleFor = (executionId: string | undefined): ProgressThrottle => {
     const key = executionId ?? "";
@@ -320,13 +324,15 @@ export function attachSessionStreamListeners({
   streamEs.addEventListener("draft:complete", flushTextDeltas);
   streamEs.addEventListener("draft:error", flushTextDeltas);
 
-  // agent:complete / agent:error / agent:aborted 都是"某一轮请求结束"的信号，
-  // 但事件本身分不清结束的是聊天轮还是后台任务轮（两者共享 sessionId）：
-  // - 聊天轮还在进行（isChatStreaming=true）时不能关连接——事件既可能属于
-  //   聊天轮自己（随后 sendMessage 的 finally 会收尾），也可能属于后台任务
-  //   （聊天要继续）；
-  // - 聊天轮已结束时，只要消息里还有 in-flight 的任务卡，连接也要保持，
-  //   等任务自己的终态事件（tool:end → agent:complete）到来再关闭。
+  // agent:complete / agent:error / agent:aborted all signal "some request turn
+  // ended", but the event cannot tell a chat turn from a background task turn
+  // (they share a sessionId):
+  // - While the chat turn is in flight (isChatStreaming=true) the connection must
+  //   stay open - the event may belong to the chat turn itself (sendMessage's
+  //   finally finalizes it) or to the background task (chat continues);
+  // - Once the chat turn ended, the connection must stay while any in-flight task
+  //   card remains, and close only after the task's own final events arrive
+  //   (tool:end -> agent:complete).
   const finishSessionStream = (event: MessageEvent) => {
     try {
       const data = event.data ? JSON.parse(event.data) : null;
@@ -363,16 +369,19 @@ export function attachSessionStreamListeners({
       const startedByCurrentRequest = running
         && typeof sourceRequestId === "string"
         && data.sourceRequestId === sourceRequestId;
-      // 服务端在每次 SSE 连接建立时都会重放该会话的任务快照。终态快照只用于
-      // 收尾一个当前确实还在运行中的任务卡（刷新恢复场景）；如果本会话没有在
-      // 跟踪这个任务，说明它是上一轮已结束任务的残留快照，直接忽略——否则
-      // 会把本轮新建立的流关掉，导致后续实时事件全部丢失。
+      // The server replays the session's task snapshots on every SSE connect. A
+      // final snapshot is only used to finalize a task card that is genuinely still
+      // running (page-refresh recovery); if this session is not tracking the task,
+      // it is a leftover snapshot of an already-finished task - ignore it, or it
+      // would close the newly established stream and lose all subsequent live events.
       if (!running && !hasInFlightExecution(get().sessions[sessionId]?.messages ?? [], execution.id)) {
         return;
       }
-      // 聊天轮正在流式时收到终态快照（任务刚结束、新连接建立时服务端重放）：
-      // 只收尾任务卡，连接与流式状态保持不动，由聊天轮自己收尾——否则会把
-      // 正在跑的聊天流关掉，本轮增量全部丢失。
+      // Final snapshot received while the chat turn is streaming (task just ended,
+      // server replayed on new connection): finalize only the task card; keep the
+      // connection and streaming state untouched and let the chat turn finish
+      // itself - otherwise the running chat stream would be closed and this
+      // turn's deltas lost.
       const chatStreaming = Boolean(get().sessions[sessionId]?.isChatStreaming);
       const keepStream = running || chatStreaming;
       set((state) => ({
@@ -455,12 +464,13 @@ export function attachSessionStreamListeners({
     try {
       const data = event.data ? JSON.parse(event.data) : null;
       if (!sessionMatchesEvent(sessionId, data) || !data?.tool) return;
-      // 服务端在确认式生产任务的 tool:start 上带 background: true。free-text
-      // 命中服务端写章启发式时，前端发送时把这轮当成了聊天轮
-      //（isChatStreaming=true）；收到该标记说明这轮实际按后台任务执行，
-      // 需要重分类：isChatStreaming 归 false（停止按钮据此走 scope=all 才能
-      // 拿到任务控制器，用户也可以继续聊天），isStreaming 维持 true（任务在跑）。
-      // 挂起的 fetch 返回后由 sendMessage 的 finally 按"是否还有任务在跑"收尾。
+      // The server sends background: true on tool:start for confirmed production
+      // tasks. When free text hit the server's write-chapter heuristic, the client
+      // treated this turn as a chat turn (isChatStreaming=true) at send time; this
+      // flag means it actually runs as a background task and must be reclassified:
+      // isChatStreaming -> false (so the stop button uses scope=all to get the task
+      // controller, and the user can keep chatting), isStreaming stays true (task
+      // running). sendMessage's finally finalizes based on remaining tasks.
       const background = data.background === true;
       const belongsToCurrentRequest = typeof sourceRequestId === "string"
         && data.sourceRequestId === sourceRequestId;
@@ -538,7 +548,7 @@ export function attachSessionStreamListeners({
       flushProgressThrottles();
       set((state) => ({
         sessions: updateSession(state.sessions, sessionId, (runtime) => {
-          // 按 execution id 全量定位：并行聊天时任务卡在更早的消息里
+          // Locate by execution id across all messages: with parallel chat the task card sits in an earlier message.
           const messages = updateToolPartById(runtime.messages, data.id as string, (previous) => {
             const execution = { ...previous };
             execution.status = data.isError ? "error" : "completed";
@@ -580,9 +590,10 @@ export function attachSessionStreamListeners({
             ...execution,
             logs: appendBoundedToolLogs(execution.logs, [message]),
           });
-          // 带 executionId 的日志（后台生产任务）按 id 精确定位工具卡；卡还没
-          // 出现时直接丢弃这条（任务快照重放会带回累积的 logs），不能回退到
-          // "最近一张运行中的卡"——那会把任务日志串排进并行聊天轮的工具卡。
+          // Logs with an executionId (background production tasks) locate their card
+          // by id; if the card has not appeared yet, drop the entry (task snapshot
+          // replay brings back the accumulated logs). Never fall back to "most recent
+          // running card" - that would mix task logs into a parallel chat-turn card.
           const messages = executionId
             ? updateToolPartById(runtime.messages, executionId, appendLog)
             : updateLatestRunningToolMessage(runtime.messages, appendLog);
@@ -619,9 +630,10 @@ export function attachSessionStreamListeners({
       const executionId = eventExecutionId(data);
       set((state) => ({
         sessions: updateSession(state.sessions, sessionId, (runtime) => {
-          // 带 executionId 的压缩事件（后台生产任务的 pipeline）：作为阶段挂到
-          // 对应的任务卡上；卡不存在时丢弃这条（任务快照重放会带回状态），
-          // 绝不写进聊天流消息——并行时会把任务状态串排进聊天轮。
+          // Compression events with an executionId (background production pipeline):
+          // attach as a stage to the matching task card; drop when the card is
+          // missing (snapshot replay restores state). Never write into the chat
+          // stream - in parallel runs that would leak task state into the chat turn.
           if (executionId) {
             const messages = updateToolPartById(runtime.messages, executionId, (execution) =>
               applyContextCompressionToExecution(execution, category, phase, data),
@@ -643,23 +655,23 @@ export function attachSessionStreamListeners({
 
 function compressionLabel(category: ContextCompressionCategory): string {
   return category === "session_context"
-    ? tr("整理会话记忆", "Organize session memory")
-    : tr("压缩故事上下文", "Compress story context");
+    ? tr("Sắp xếp ký ức phiên", "Organize session memory")
+    : tr("Nén ngữ cảnh truyện", "Compress story context");
 }
 
 function compressionSourceSummary(sources: readonly string[] | undefined): string {
   if (!sources || sources.length === 0) return "";
   const preview = sources.slice(0, 3).join(", ");
   const suffix = sources.length > 3 ? ` +${sources.length - 3}` : "";
-  return `${tr("来源", "sources")} ${sources.length}: ${preview}${suffix}`;
+  return `${tr("Nguồn", "sources")} ${sources.length}: ${preview}${suffix}`;
 }
 
 function compressionProgress(data: ContextCompressionEventPayload): PipelineStage["progress"] | undefined {
   if (data.phase !== "start") return undefined;
   const parts = [
-    data.protectedTokens !== undefined ? `${tr("保护", "protected")} ${data.protectedTokens}` : "",
-    data.compressibleTokens !== undefined ? `${tr("可压缩", "compressible")} ${data.compressibleTokens}` : "",
-    data.budgetTokens !== undefined ? `${tr("预算", "budget")} ${data.budgetTokens}` : "",
+    data.protectedTokens !== undefined ? `${tr("Được bảo vệ", "protected")} ${data.protectedTokens}` : "",
+    data.compressibleTokens !== undefined ? `${tr("Có thể nén", "compressible")} ${data.compressibleTokens}` : "",
+    data.budgetTokens !== undefined ? `${tr("Ngân sách", "budget")} ${data.budgetTokens}` : "",
     compressionSourceSummary(data.sources),
   ].filter(Boolean);
   return {
@@ -692,7 +704,7 @@ function findRunningExecution(parts: MessagePart[]): ToolExecution | undefined {
   return running?.execution;
 }
 
-/** 按 id 定位到的任务卡：把压缩事件作为阶段挂上去（不可变更新）。 */
+/** Task card located by id: attach the compression event as a stage (immutable update). */
 function applyContextCompressionToExecution(
   execution: ToolExecution,
   category: ContextCompressionCategory,
@@ -705,7 +717,7 @@ function applyContextCompressionToExecution(
       ...execution,
       stages,
       status: "error",
-      error: data.message ?? `${compressionLabel(category)}${tr("失败", " failed")}`,
+      error: data.message ?? `${compressionLabel(category)}${tr(" thất bại", " failed")}`,
     };
   }
   return { ...execution, stages };
@@ -722,7 +734,7 @@ function applyContextCompressionToParts(
     running.stages = upsertCompressionStage(running.stages, category, phase, data);
     if (phase === "error") {
       running.status = "error";
-      running.error = data.message ?? `${compressionLabel(category)}${tr("失败", " failed")}`;
+      running.error = data.message ?? `${compressionLabel(category)}${tr(" thất bại", " failed")}`;
     }
     return;
   }
@@ -744,6 +756,6 @@ function applyContextCompressionToParts(
   execution.label = compressionLabel(category);
   execution.stages = upsertCompressionStage(execution.stages, category, phase, data);
   if (phase !== "start") execution.completedAt = Date.now();
-  if (phase === "error") execution.error = data.message ?? `${compressionLabel(category)}${tr("失败", " failed")}`;
+  if (phase === "error") execution.error = data.message ?? `${compressionLabel(category)}${tr(" thất bại", " failed")}`;
   if (!existing) parts.push({ type: "tool", execution });
 }

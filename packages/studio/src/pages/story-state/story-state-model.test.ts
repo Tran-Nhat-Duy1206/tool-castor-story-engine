@@ -39,13 +39,13 @@ describe("resolveCanonRequestUrl", () => {
 
 describe("formatValidityInterval", () => {
   it("formats open intervals as starting at a chapter", () => {
-    expect(formatValidityInterval(fact(), "zh")).toBe("第11章 起");
+    expect(formatValidityInterval(fact(), "vi")).toBe("từ chương 11");
     expect(formatValidityInterval(fact(), "en")).toBe("from ch.11");
   });
 
   it("formats closed intervals as chapter ranges without rewriting history", () => {
     const closed = fact({ validFromChapter: 1, validUntilChapter: 10 });
-    expect(formatValidityInterval(closed, "zh")).toBe("第1–10章");
+    expect(formatValidityInterval(closed, "vi")).toBe("Chương 1–10");
     expect(formatValidityInterval(closed, "en")).toBe("ch.1–10");
   });
 });
@@ -63,7 +63,7 @@ describe("slotRows", () => {
         },
         { key: "currentGoal", label: "当前目标", value: null, selected: null, superseded: [] },
       ],
-      "zh",
+      "vi",
     );
 
     expect(rows).toHaveLength(2);
@@ -72,7 +72,7 @@ describe("slotRows", () => {
       label: "当前位置",
       value: "东城公寓",
       supersededCount: 1,
-      validity: "第11章 起",
+      validity: "từ chương 11",
     });
     expect(rows[1]).toMatchObject({ value: null, supersededCount: 0, validity: null });
   });
@@ -80,12 +80,12 @@ describe("slotRows", () => {
 
 describe("additionalFactRows", () => {
   it("attaches validity text to every non-slot fact so nothing is silently hidden", () => {
-    const rows = additionalFactRows([fact({ subject: "林晚", predicate: "身份", object: "卧底记者", validFromChapter: 4 })], "zh");
+    const rows = additionalFactRows([fact({ subject: "林晚", predicate: "身份", object: "卧底记者", validFromChapter: 4 })], "vi");
     expect(rows[0]).toMatchObject({
       subject: "林晚",
       predicate: "身份",
       object: "卧底记者",
-      validity: "第4章 起",
+      validity: "từ chương 4",
     });
   });
 });
@@ -145,7 +145,7 @@ describe("manifestSummary", () => {
       bookId: "demo",
       manifest: {
         schemaVersion: 2,
-        language: "zh",
+        language: "vi",
         lastAppliedChapter: 12,
         projectionVersion: 3,
         migrationWarnings: ["legacy row repaired"],
@@ -157,7 +157,7 @@ describe("manifestSummary", () => {
     });
     expect(summary).toEqual({
       schemaVersion: 2,
-      language: "zh",
+      language: "vi",
       lastAppliedChapter: 12,
       projectionVersion: 3,
       warningCount: 1,
@@ -208,7 +208,7 @@ describe("saveOutcomeToUi", () => {
   it("maps a clean success to a success banner without refetch demand", () => {
     const view = saveOutcomeToUi(
       { status: "success", bookId: "demo", revision: "r2", appliedEdits: 1, effectiveChapter: 13, warnings: [] },
-      "zh",
+      "vi",
     );
     expect(view.tone).toBe("success");
     expect(view.showRefetch).toBe(false);
@@ -225,7 +225,7 @@ describe("saveOutcomeToUi", () => {
         effectiveChapter: 13,
         warnings: [DERIVED_MEMORY_WARNING_TEXT],
       },
-      "zh",
+      "vi",
     );
     expect(view.tone).toBe("warning");
     expect(view.saved).toBe(true);
@@ -235,7 +235,7 @@ describe("saveOutcomeToUi", () => {
   it("maps canon_conflict to a stale-state banner that demands refetch and re-apply", () => {
     const view = saveOutcomeToUi(
       { status: "canon_conflict", currentRevision: "aaaabbbbccccdddd", message: "Canon changed" },
-      "zh",
+      "vi",
     );
     expect(view.tone).toBe("conflict");
     expect(view.showRefetch).toBe(true);
@@ -245,10 +245,10 @@ describe("saveOutcomeToUi", () => {
   });
 
   it("maps lock, unavailable, invalid and unexpected outcomes to non-success tones", () => {
-    expect(saveOutcomeToUi({ status: "book_write_locked", message: "busy" }, "zh").tone).toBe("locked");
-    expect(saveOutcomeToUi({ status: "canon_unavailable", issues: [], message: "x" }, "zh").tone).toBe("error");
-    expect(saveOutcomeToUi({ status: "invalid_request", issues: [{ scope: "edits.0.subject", message: "required" }], message: "bad" }, "zh").issues[0]).toContain("required");
-    expect(saveOutcomeToUi({ status: "unexpected", message: "boom" }, "zh").tone).toBe("error");
+    expect(saveOutcomeToUi({ status: "book_write_locked", message: "busy" }, "vi").tone).toBe("locked");
+    expect(saveOutcomeToUi({ status: "canon_unavailable", issues: [], message: "x" }, "vi").tone).toBe("error");
+    expect(saveOutcomeToUi({ status: "invalid_request", issues: [{ scope: "edits.0.subject", message: "required" }], message: "bad" }, "vi").issues[0]).toContain("required");
+    expect(saveOutcomeToUi({ status: "unexpected", message: "boom" }, "vi").tone).toBe("error");
   });
 });
 

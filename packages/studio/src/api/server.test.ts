@@ -1670,7 +1670,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(save.status).toBe(400);
     await expect(save.json()).resolves.toMatchObject({
-      error: expect.stringContaining("Studio 运行时不支持"),
+      error: expect.stringContaining("không hỗ trợ chuyển sang env"),
     });
   });
 
@@ -1774,7 +1774,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toMatchObject({
       ok: false,
-      error: expect.stringContaining("无法自动确定模型"),
+      error: expect.stringContaining("Không thể tự xác định mô hình"),
     });
     expect(chatCompletionMock).not.toHaveBeenCalled();
   });
@@ -2252,9 +2252,9 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(response.status).toBe(400);
     const json = await response.json() as { error?: string };
-    expect(json.error).toContain("Google Gemini 测试连接失败");
-    expect(json.error).toContain("测试模型：gemini-2.5-flash");
-    expect(json.error).toContain("API Key 是否来自 Google AI Studio");
+    expect(json.error).toContain("Thử kết nối Google Gemini thất bại");
+    expect(json.error).toContain("Mô hình thử: gemini-2.5-flash");
+    expect(json.error).toContain("từ Google AI Studio");
     expect(json.error).toContain("Gemini API");
     expect(json.error).not.toContain("Moonshot");
     expect(json.error).not.toMatch(/kkaiapi/i);
@@ -3973,7 +3973,7 @@ describe("createStudioServer daemon lifecycle", () => {
     await expect(second.json()).resolves.toMatchObject({
       error: {
         code: "PRODUCTION_TASK_ALREADY_RUNNING",
-        message: expect.stringContaining("生产任务"),
+        message: expect.stringContaining("tác vụ sản xuất đang chạy"),
       },
     });
     // 第二个任务没有真正启动
@@ -4102,8 +4102,8 @@ describe("createStudioServer daemon lifecycle", () => {
     const agentCall = runAgentSessionMock.mock.calls.at(-1);
     const config = agentCall?.[0] as { backgroundTaskContext?: string; suppressProductionTools?: boolean };
     // 任务状态块注入到了 agent 上下文（含任务名和运行状态），用户指令原样传递
-    expect(config.backgroundTaskContext).toContain("建书");
-    expect(config.backgroundTaskContext).toContain("运行中");
+    expect(config.backgroundTaskContext).toContain("Tạo sách");
+    expect(config.backgroundTaskContext).toContain("đang chạy");
     // 任务运行期间聊天 agent 的生产工具被 host 侧禁用，提示词同步说明
     expect(config.backgroundTaskContext).toContain("生产类工具已临时不可用");
     expect(config.suppressProductionTools).toBe(true);
@@ -5756,7 +5756,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toMatchObject({
-      error: expect.stringContaining("不适合文本聊天"),
+      error: expect.stringContaining("không phù hợp để chat/viết văn bản"),
       response: expect.stringContaining("gemini-3.1-flash-image-preview"),
     });
     expect(resolveServiceModelMock).not.toHaveBeenCalled();
@@ -5864,7 +5864,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(response.status).toBe(500);
     const json = await response.json() as { error: { code: string; message: string }; response: string };
     expect(json.error.code).toBe("AGENT_INTERNAL_ERROR");
-    expect(json.error.message).toContain("Castor 内部流程错误");
+    expect(json.error.message).toContain("Lỗi quy trình nội bộ của Castor");
     expect(json.error.message).toContain("missing YAML frontmatter delimiters");
     expect(json.error.message).not.toMatch(/kkaiapi/i);
     expect(json.response).toBe(json.error.message);
@@ -5917,9 +5917,9 @@ describe("createStudioServer daemon lifecycle", () => {
     await expect(response.json()).resolves.toMatchObject({
       error: {
         code: "AGENT_EMPTY_RESPONSE",
-        message: expect.stringContaining("模型未返回文本内容"),
+        message: expect.stringContaining("Mô hình không trả về nội dung văn bản"),
       },
-      response: expect.stringContaining("模型未返回文本内容"),
+      response: expect.stringContaining("Mô hình không trả về nội dung văn bản"),
     });
     expect(chatCompletionMock).not.toHaveBeenCalled();
   });

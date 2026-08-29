@@ -144,9 +144,9 @@ export function TruthFiles({ bookId, nav, theme, t }: { bookId: string; nav: Nav
                   data-testid="legacy-shim-warning"
                   className="mb-3 px-3 py-2 rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 text-xs leading-relaxed"
                 >
-                  <div className="font-medium">兼容层只读 / Read-only compat shim</div>
+                  <div className="font-medium">Lớp tương thích chỉ đọc / Read-only compat shim</div>
                   <div className="mt-1">
-                    本文件已废弃，仅供外部读取。权威来源：
+                    Tệp này đã ngừng sử dụng, chỉ phục vụ đọc từ bên ngoài. Nguồn chính thức:
                     <code className="ml-1 px-1 py-0.5 rounded bg-background/40 font-mono">
                       {SHIM_AUTHORITATIVE_PATH[selected] ?? "outline/"}
                     </code>
@@ -158,9 +158,9 @@ export function TruthFiles({ bookId, nav, theme, t }: { bookId: string; nav: Nav
                   data-testid="runtime-diagnostic-warning"
                   className="mb-3 px-3 py-2 rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 text-xs leading-relaxed"
                 >
-                  <div className="font-medium">运行时诊断文件 / Runtime diagnostic</div>
+                  <div className="font-medium">Tệp chẩn đoán runtime / Runtime diagnostic</div>
                   <div className="mt-1">
-                    这里展示本章写作时的上下文选择、保护层、可压缩层和预算 trace。它只用于追溯系统看了什么，不作为可编辑设定。
+                    Nơi đây hiển thị lựa chọn ngữ cảnh, lớp bảo vệ, lớp có thể nén và trace ngân sách khi viết chương này. Nó chỉ dùng để truy vết hệ thống đã đọc gì, không phải cài đặt có thể chỉnh sửa.
                   </div>
                 </div>
               )}

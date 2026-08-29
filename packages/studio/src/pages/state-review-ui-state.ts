@@ -19,7 +19,7 @@ import type {
   StateReviewMutationOutcome,
 } from "../lib/state-review-api";
 
-export type UiLanguage = "zh" | "en";
+export type UiLanguage = "vi" | "en";
 
 // ---------------------------------------------------------------------------
 // Lifecycle
@@ -42,15 +42,15 @@ export function lifecycleOf(review: StateReviewArtifact | null): StateReviewLife
 // Kind labels + change summaries (design §26: meaning, never raw JSON)
 // ---------------------------------------------------------------------------
 
-const KIND_LABELS: Record<ReviewItem["kind"], { zh: string; en: string }> = {
-  "current-state-fact": { zh: "当前状态事实", en: "Current-state fact" },
-  "hook-upsert": { zh: "伏笔更新", en: "Hook update" },
-  "hook-mention": { zh: "伏笔提及", en: "Hook mention" },
-  "hook-resolve": { zh: "伏笔回收", en: "Hook resolve" },
-  "hook-defer": { zh: "伏笔推迟", en: "Hook defer" },
-  "new-hook-candidate": { zh: "新伏笔候选", en: "New hook candidate" },
-  "chapter-summary": { zh: "章节摘要", en: "Chapter summary" },
-  note: { zh: "备注", en: "Note" },
+const KIND_LABELS: Record<ReviewItem["kind"], { vi: string; en: string }> = {
+  "current-state-fact": { vi: "Sự kiện trạng thái hiện tại", en: "Current-state fact" },
+  "hook-upsert": { vi: "Cập nhật tiền để", en: "Hook update" },
+  "hook-mention": { vi: "Nhắc đến tiền để", en: "Hook mention" },
+  "hook-resolve": { vi: "Thu hồi tiền để", en: "Hook resolve" },
+  "hook-defer": { vi: "Hoãn tiền để", en: "Hook defer" },
+  "new-hook-candidate": { vi: "Ứng viên tiền để mới", en: "New hook candidate" },
+  "chapter-summary": { vi: "Tóm tắt chương", en: "Chapter summary" },
+  note: { vi: "Ghi chú", en: "Note" },
 };
 
 export function reviewKindLabel(kind: ReviewItem["kind"], lang: UiLanguage): string {
@@ -67,47 +67,47 @@ function joinNonEmpty(parts: ReadonlyArray<string>): string {
  * type marker instead of crashing or dumping raw JSON structures.
  */
 export function describeProposalChange(change: ProposalChange, lang: UiLanguage): string {
-  const zh = lang === "zh";
+  const vi = lang === "vi";
   switch (change.type) {
     case "fact": {
       if (change.change.action === "remove") {
-        return zh
-          ? `移除事实：${change.change.subject}·${change.change.predicate}`
+        return vi
+          ? `Xóa sự kiện: ${change.change.subject}·${change.change.predicate}`
           : `Remove fact: ${change.change.subject} · ${change.change.predicate}`;
       }
       return joinNonEmpty([
-        zh ? "设定事实" : "Set fact",
+        vi ? "Thiết lập sự kiện" : "Set fact",
         `${change.change.subject}·${change.change.predicate}`,
         change.change.object ?? "",
       ]);
     }
     case "hook-upsert":
       return joinNonEmpty([
-        zh ? "更新伏笔" : "Update hook",
+        vi ? "Cập nhật tiền để" : "Update hook",
         change.hook.hookId,
         change.hook.status,
         typeof change.hook.expectedPayoff === "string" ? change.hook.expectedPayoff : "",
       ]);
     case "hook-op":
       return joinNonEmpty([
-        zh ? `伏笔操作：${change.op}` : `Hook ${change.op}`,
+        vi ? `Thao tác tiền để: ${change.op}` : `Hook ${change.op}`,
         change.hookId,
       ]);
     case "new-hook-candidate":
       return joinNonEmpty([
-        zh ? "新伏笔候选" : "New hook candidate",
+        vi ? "Ứng viên tiền để mới" : "New hook candidate",
         change.candidate.type,
         change.candidate.expectedPayoff,
         change.candidate.notes,
       ]);
     case "chapter-summary":
       return joinNonEmpty([
-        zh ? `第${change.row.chapter}章摘要` : `Ch.${change.row.chapter} summary`,
+        vi ? `Tóm tắt chương ${change.row.chapter}` : `Ch.${change.row.chapter} summary`,
         change.row.title,
         change.row.events,
       ]);
     case "none":
-      return zh ? "无语义变更" : "No semantic change";
+      return vi ? "Không có thay đổi ngữ nghĩa" : "No semantic change";
     default:
       // Deterministic fallback for shapes this V1 build does not know.
       return `${(change as { type?: string }).type ?? "unknown"}`;
@@ -127,7 +127,7 @@ export type StateReviewGroupKey =
 
 export interface StateReviewGroupDto {
   key: StateReviewGroupKey;
-  zh: string;
+  vi: string;
   en: string;
   items: ReviewItem[];
 }
@@ -140,12 +140,12 @@ const HOOK_KINDS: ReadonlyArray<ReviewItem["kind"]> = [
   "new-hook-candidate",
 ];
 
-const GROUP_ORDER: ReadonlyArray<{ key: StateReviewGroupKey; zh: string; en: string }> = [
-  { key: "current-state", zh: "当前状态", en: "Current State" },
-  { key: "hooks-subplots", zh: "伏笔 / 支线", en: "Hooks / Subplots" },
-  { key: "chapter-summary", zh: "章节摘要", en: "Chapter Summary" },
-  { key: "notes", zh: "备注", en: "Notes" },
-  { key: "user-added", zh: "手动添加的修改", en: "User Added Changes" },
+const GROUP_ORDER: ReadonlyArray<{ key: StateReviewGroupKey; vi: string; en: string }> = [
+  { key: "current-state", vi: "Trạng thái hiện tại", en: "Current State" },
+  { key: "hooks-subplots", vi: "Tiền để / Nhánh phụ", en: "Hooks / Subplots" },
+  { key: "chapter-summary", vi: "Tóm tắt chương", en: "Chapter Summary" },
+  { key: "notes", vi: "Ghi chú", en: "Notes" },
+  { key: "user-added", vi: "Thay đổi thêm thủ công", en: "User Added Changes" },
 ];
 
 /**

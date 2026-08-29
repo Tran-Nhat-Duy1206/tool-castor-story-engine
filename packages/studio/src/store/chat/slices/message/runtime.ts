@@ -15,29 +15,29 @@ const NULL_BOOK_KEY = "__null__";
 // [zh, en] tuples resolved through tr() at call time so labels follow the
 // current app language instead of the language active at module load.
 const AGENT_LABELS: Record<string, readonly [string, string]> = {
-  architect: ["建书", "Create book"],
-  writer: ["写作", "Write"],
-  auditor: ["审计", "Audit"],
-  reviser: ["修订", "Revise"],
-  exporter: ["导出", "Export"],
+  architect: ["Tạo sách", "Create book"],
+  writer: ["Viết", "Write"],
+  auditor: ["Kiểm tra", "Audit"],
+  reviser: ["Chỉnh sửa", "Revise"],
+  exporter: ["Xuất", "Export"],
 };
 
 const TOOL_LABELS: Record<string, readonly [string, string]> = {
-  read: ["读取文件", "Read file"],
-  edit: ["编辑文件", "Edit file"],
-  grep: ["搜索", "Search"],
-  ls: ["列目录", "List directory"],
-  context_compression: ["整理上下文", "Organize context"],
-  propose_action: ["确认动作", "Confirm action"],
-  short_fiction_run: ["短篇生产", "Short fiction run"],
-  generate_cover: ["生成封面", "Generate cover"],
-  script_create: ["剧本创作", "Create script"],
-  storyboard_create: ["分镜创作", "Create storyboard"],
-  interactive_film_create: ["互动影游", "Interactive film"],
-  play_edit: ["编辑互动世界", "Edit interactive world"],
-  play_start: ["启动互动世界", "Start interactive world"],
-  play_revise: ["重做互动回合", "Redo play turn"],
-  play_step: ["推进互动世界", "Advance interactive world"],
+  read: ["Đọc tệp", "Read file"],
+  edit: ["Sửa tệp", "Edit file"],
+  grep: ["Tìm kiếm", "Search"],
+  ls: ["Liệt kê thư mục", "List directory"],
+  context_compression: ["Sắp xếp ngữ cảnh", "Organize context"],
+  propose_action: ["Xác nhận hành động", "Confirm action"],
+  short_fiction_run: ["Chạy truyện ngắn", "Short fiction run"],
+  generate_cover: ["Tạo bìa", "Generate cover"],
+  script_create: ["Tạo kịch bản", "Create script"],
+  storyboard_create: ["Tạo storyboard", "Create storyboard"],
+  interactive_film_create: ["Phim tương tác", "Interactive film"],
+  play_edit: ["Sửa thế giới tương tác", "Edit interactive world"],
+  play_start: ["Khởi động thế giới tương tác", "Start interactive world"],
+  play_revise: ["Làm lại lượt tương tác", "Redo play turn"],
+  play_step: ["Đẩy thế giới tương tác", "Advance interactive world"],
 };
 
 export function bookKey(bookId: string | null | undefined): string {
@@ -275,8 +275,9 @@ export function mergeTaskExecution(
   messages: ReadonlyArray<Message>,
   taskExecution: ToolExecution,
 ): ReadonlyArray<Message> {
-  // 任务快照必然来自后台生产任务：恢复出的卡带 background 标记，供无 id
-  // 事件的回退路由跳过它。终态快照替换整个 execution，标记也要跟着补回来。
+  // Task snapshots always come from background production tasks: the restored card
+  // carries the background flag so fallback routing for id-less events skips it.
+  // A final snapshot replaces the whole execution, so the flag must be restored too.
   const execution: ToolExecution = taskExecution.background
     ? taskExecution
     : { ...taskExecution, background: true };
@@ -298,9 +299,10 @@ export function hasInFlightExecution(
 }
 
 /**
- * 消息里是否还有任何 running/processing 的工具执行。
- * 聊天轮结束时用它判断"后台生产任务是否还在跑"：只有全部执行都到终态，
- * 才允许关闭 SSE 连接并把 isStreaming 置回 false。
+ * Whether any tool execution is still running/processing across messages.
+ * Used at chat-turn end to decide whether a background production task is still
+ * running: the SSE connection may only close and isStreaming reset once every
+ * execution reached a final state.
  */
 export function hasAnyInFlightExecution(messages: ReadonlyArray<Message>): boolean {
   const inFlight = (execution: ToolExecution): boolean =>
@@ -313,8 +315,9 @@ export function hasAnyInFlightExecution(messages: ReadonlyArray<Message>): boole
 }
 
 /**
- * 按 execution id 在全部消息里定位工具卡并更新（并行聊天时任务卡挂在更早的
- * 任务轮消息上，不能只在当前 streamTs 的消息里找）。找不到时返回 null。
+ * Locate a tool card by execution id across all messages and update it (with
+ * parallel chat, task cards attach to earlier task-turn messages, so searching
+ * only the current streamTs is not enough). Returns null when not found.
  */
 export function updateToolPartById(
   messages: ReadonlyArray<Message>,

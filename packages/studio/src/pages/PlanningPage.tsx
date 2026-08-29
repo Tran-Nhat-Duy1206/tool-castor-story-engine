@@ -40,13 +40,13 @@ interface PlanningPageProps {
   readonly bookId: string;
 }
 
-type Lang = "zh" | "en";
-function pick(lang: Lang, zh: string, en: string): string {
-  return lang === "zh" ? zh : en;
+type Lang = "vi" | "en";
+function pick(lang: Lang, vi: string, en: string): string {
+  return lang === "vi" ? vi : en;
 }
 
 export function PlanningPage({ bookId }: PlanningPageProps) {
-  const [lang, setLang] = useState<Lang>("zh");
+  const [lang, setLang] = useState<Lang>("vi");
   const cacheKey = useMemo(() => {
     try { return planningCacheKey(bookId); } catch { return `planning:invalid:${bookId}`; }
   }, [bookId]);
@@ -150,7 +150,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     setMessage(null);
     try {
       const res = await createArcDraft(bookId, {});
-      setMessage(pick(lang, `已创建草稿 ${String((res as { draftId?: string }).draftId ?? "")}`, `Created draft ${String((res as { draftId?: string }).draftId ?? "")}`));
+      setMessage(pick(lang, `Đã tạo bản nháp ${String((res as { draftId?: string }).draftId ?? "")}`, `Created draft ${String((res as { draftId?: string }).draftId ?? "")}`));
       await reload();
     } catch (e) {
       const msg = e instanceof ApiError ? `${e.message} (${e.code ?? e.status})` : e instanceof Error ? e.message : String(e);
@@ -161,12 +161,12 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
   const handlePublish = async () => {
     if (busy || !selectedDraftId) return;
     const draftId = selectedDraftId ?? (drafts[0] as { draftId?: string } | undefined)?.draftId;
-    if (!draftId) { setMessage(pick(lang, "请选择要发布的草稿", "Select a draft to publish")); return; }
+    if (!draftId) { setMessage(pick(lang, "Hãy chọn bản nháp cần xuất bản", "Select a draft to publish")); return; }
     setBusy("publish");
     setMessage(null);
     try {
       const res = await publishArc(bookId, { draftId, humanActor: "human" });
-      setMessage(pick(lang, `发布成功 ${JSON.stringify(res).slice(0, 80)}`, `Published ${JSON.stringify(res).slice(0, 80)}`));
+      setMessage(pick(lang, `Xuất bản thành công ${JSON.stringify(res).slice(0, 80)}`, `Published ${JSON.stringify(res).slice(0, 80)}`));
       await reload();
     } catch (e) {
       const msg = e instanceof ApiError ? `${e.message} (${e.code ?? e.status})` : e instanceof Error ? e.message : String(e);
@@ -181,7 +181,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     try {
       const res = await parseDirection(bookId, { text: directionText.trim() });
       setPendingDirection(res as Record<string, unknown>);
-      setMessage(pick(lang, "已解析为待确认提案", "Parsed as pending proposal"));
+      setMessage(pick(lang, "Đã phân tích thành đề xuất chờ xác nhận", "Parsed as pending proposal"));
       await reload();
     } catch (e) {
       const msg = e instanceof ApiError ? `${e.message} (${e.code ?? e.status})` : e instanceof Error ? e.message : String(e);
@@ -195,7 +195,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     setMessage(null);
     try {
       const res = await confirmDirection(bookId, dirId, { humanActor: "human" });
-      setMessage(pick(lang, `已确认方向 ${String((res as { directionId?: string }).directionId ?? dirId)}`, `Confirmed direction ${String((res as { directionId?: string }).directionId ?? dirId)}`));
+      setMessage(pick(lang, `Đã xác nhận hướng ${String((res as { directionId?: string }).directionId ?? dirId)}`, `Confirmed direction ${String((res as { directionId?: string }).directionId ?? dirId)}`));
       setPendingDirection(null);
       setDirectionText("");
       await reload();
@@ -211,7 +211,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     setBusy("resolve");
     try {
       await resolveDirectionConflict(bookId, { directionId: dirId, resolution: strategy, strategy });
-      setMessage(pick(lang, `已通过 ${strategy} 解决冲突`, `Resolved conflict via ${strategy}`));
+      setMessage(pick(lang, `Đã giải quyết xung đột bằng ${strategy}`, `Resolved conflict via ${strategy}`));
       setPendingDirection(null);
       await reload();
     } catch (e) {
@@ -225,7 +225,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     setBusy("createAuth");
     try {
       const res = await createAuthorization(bookId, { kind: authKind, scope: authScope || undefined, humanActor: "human" });
-      setMessage(pick(lang, `已创建授权 ${String((res as { authorizationId?: string }).authorizationId ?? (res as { id?: string }).id ?? "")} 待确认`, `Created authorization ${String((res as { authorizationId?: string }).authorizationId ?? (res as { id?: string }).id ?? "")} pending`));
+      setMessage(pick(lang, `Đã tạo ủy quyền ${String((res as { authorizationId?: string }).authorizationId ?? (res as { id?: string }).id ?? "")} chờ xác nhận`, `Created authorization ${String((res as { authorizationId?: string }).authorizationId ?? (res as { id?: string }).id ?? "")} pending`));
       await reload();
     } catch (e) {
       const msg = e instanceof ApiError ? `${e.message} (${e.code ?? e.status})` : e instanceof Error ? e.message : String(e);
@@ -238,7 +238,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     setBusy(`confirmAuth:${authId}`);
     try {
       await confirmAuthorization(bookId, authId, { humanActor: "human" });
-      setMessage(pick(lang, `已确认授权 ${authId}`, `Confirmed authorization ${authId}`));
+      setMessage(pick(lang, `Đã xác nhận ủy quyền ${authId}`, `Confirmed authorization ${authId}`));
       await reload();
     } catch (e) {
       const msg = e instanceof ApiError ? `${e.message} (${e.code ?? e.status})` : e instanceof Error ? e.message : String(e);
@@ -252,7 +252,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     setMessage(null);
     try {
       const res = await writeChapter(bookId, {});
-      setMessage(pick(lang, `写作成功 ${JSON.stringify(res).slice(0, 120)}`, `Write succeeded ${JSON.stringify(res).slice(0, 120)}`));
+      setMessage(pick(lang, `Viết thành công ${JSON.stringify(res).slice(0, 120)}`, `Write succeeded ${JSON.stringify(res).slice(0, 120)}`));
       await reload();
     } catch (e) {
       // Surface CONFLICT / AUTHOR_DECISION / UNCERTAIN / budget errors, no fallback
@@ -266,7 +266,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     setBusy("regenerate");
     try {
       const res = await regeneratePlan(bookId, {});
-      setMessage(pick(lang, `已重新生成 ${JSON.stringify(res).slice(0, 80)}`, `Regenerated ${JSON.stringify(res).slice(0, 80)}`));
+      setMessage(pick(lang, `Đã tạo lại ${JSON.stringify(res).slice(0, 80)}`, `Regenerated ${JSON.stringify(res).slice(0, 80)}`));
       await reload();
     } catch (e) {
       const msg = e instanceof ApiError ? `${e.message} (${e.code ?? e.status})` : e instanceof Error ? e.message : String(e);
@@ -284,17 +284,17 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
     <div key={bookId} data-testid="planning-page" data-cache-key={cacheKey} className="mx-auto w-full max-w-[1200px] space-y-6 p-6 fade-in">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{pick(lang, "规划 · Planning", "Planning")}</h1>
+          <h1 className="text-xl font-semibold text-foreground">{pick(lang, "Lập kế hoạch", "Planning")}</h1>
           <p className="mt-1 text-xs text-muted-foreground">bookId: <span className="font-mono">{bookId}</span> · cacheKey: <span className="font-mono">{cacheKey}</span> · tab: {selectedTab}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "已发布权威 vs 草稿 — 明确区分；发布需显式操作", "PUBLISHED AUTHORITY vs DRAFT — clearly separated; Publish is explicit")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "Bản chính thức đã xuất bản vs bản nháp — phân tách rõ ràng; xuất bản là thao tác tường minh", "PUBLISHED AUTHORITY vs DRAFT — clearly separated; Publish is explicit")}</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5 rounded-lg bg-muted/50 p-0.5">
-            {(["zh", "en"] as const).map((v) => (
-              <button key={v} onClick={() => setLang(v)} className={`rounded-md px-2.5 py-1 text-xs font-medium ${lang === v ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{v === "zh" ? "中" : "EN"}</button>
+            {(["vi", "en"] as const).map((v) => (
+              <button key={v} onClick={() => setLang(v)} className={`rounded-md px-2.5 py-1 text-xs font-medium ${lang === v ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{v === "vi" ? "VI" : "EN"}</button>
             ))}
           </div>
-          <button onClick={() => void reload()} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground">{pick(lang, "刷新", "Refresh")}</button>
+          <button onClick={() => void reload()} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground">{pick(lang, "Làm mới", "Refresh")}</button>
         </div>
       </header>
 
@@ -305,13 +305,13 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
         ))}
       </div>
 
-      {loading && <div className="py-8 text-center text-sm text-muted-foreground">{pick(lang, "加载中…", "Loading…")}</div>}
+      {loading && <div className="py-8 text-center text-sm text-muted-foreground">{pick(lang, "Đang tải…", "Loading…")}</div>}
       {error && <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</div>}
       {message && <div role="status" className="rounded-xl border border-border/50 bg-card/50 p-3 text-sm text-foreground break-words">{message}</div>}
 
       {/* Gate Panel — Task 49 invariants */}
       <section className="rounded-2xl border border-border/50 bg-card/50 p-4">
-        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "规划门禁 · Planning Gate", "Planning Gate")}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "Cổng lập kế hoạch", "Planning Gate")}</h2>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className={`rounded-full px-3 py-1 text-xs font-bold border ${
             gatePanel === "safe" ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/30" :
@@ -319,34 +319,34 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
             gatePanel === "author_decision" ? "bg-sky-500/10 text-sky-700 border-sky-500/30" :
             "bg-destructive/10 text-destructive border-destructive/30"
           }`}>Gate: {gatePanel.toUpperCase()} · {String(gate?.verdict ?? gate?.outcome ?? "unknown")}</span>
-          <span className="text-xs text-muted-foreground">{pick(lang, "允许动作：", "Valid actions: ")} {validActions.join(", ") || "—"}</span>
+          <span className="text-xs text-muted-foreground">{pick(lang, "Hành động được phép: ", "Valid actions: ")} {validActions.join(", ") || "—"}</span>
         </div>
 
         {/* SAFE: no Approve Plan, show Write */}
         {gatePanel === "safe" && (
           <div className="mt-3 space-y-2">
-            <p className="text-xs text-muted-foreground">{pick(lang, "SAFE：门禁通过，可写作。无需批准计划。", "SAFE: gate passed, write allowed. No Approve Plan needed.")}</p>
+            <p className="text-xs text-muted-foreground">{pick(lang, "SAFE: cổng đã thông qua, được viết. Không cần phê duyệt kế hoạch.", "SAFE: gate passed, write allowed. No Approve Plan needed.")}</p>
             {/* Ensure no element with text "Approve Plan" */}
             {showWrite && (
-              <button onClick={() => void handleWrite()} disabled={!!busy} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50">{busy === "write" ? pick(lang, "写作中…", "Writing…") : pick(lang, "写作下一章 · Write Chapter", "Write Chapter")}</button>
+              <button onClick={() => void handleWrite()} disabled={!!busy} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50">{busy === "write" ? pick(lang, "Đang viết…", "Writing…") : pick(lang, "Viết chương tiếp theo", "Write Chapter")}</button>
             )}
           </div>
         )}
         {gatePanel === "uncertain" && (
           <div className="mt-3 space-y-2">
-            <p className="text-sm text-amber-700">{pick(lang, "UNCERTAIN：存在需人工复核的顾虑，暂不可写作。请解决顾虑后重试。", "UNCERTAIN: concerns need human review, write blocked. Resolve concerns.")}</p>
+            <p className="text-sm text-amber-700">{pick(lang, "UNCERTAIN: có vấn đề cần người kiểm tra lại, tạm thời không được viết. Hãy xử lý xong rồi thử lại.", "UNCERTAIN: concerns need human review, write blocked. Resolve concerns.")}</p>
             {Array.isArray((gate as { concerns?: unknown[] })?.concerns) && ((gate as { concerns: unknown[] }).concerns.length > 0) && (
               <ul className="list-disc pl-5 text-xs text-muted-foreground">
                 {((gate as { concerns: string[] }).concerns).map((c, i) => <li key={i}>{String(c)}</li>)}
               </ul>
             )}
             {/* No Write button for UNCERTAIN */}
-            <button onClick={() => void handleRegenerate()} disabled={!!busy} className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-500/20 disabled:opacity-50">{pick(lang, "重新生成计划 · Regenerate", "Regenerate Plan")}</button>
+            <button onClick={() => void handleRegenerate()} disabled={!!busy} className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-500/20 disabled:opacity-50">{pick(lang, "Tạo lại kế hoạch", "Regenerate Plan")}</button>
           </div>
         )}
         {gatePanel === "author_decision" && (
           <div className="mt-3 space-y-2">
-            <p className="text-sm text-sky-700">{pick(lang, "AUTHOR_DECISION：需要作者授权。请选择缺失类型并创建授权。", "AUTHOR_DECISION: author authorization required. Create authorization for missing kinds.")}</p>
+            <p className="text-sm text-sky-700">{pick(lang, "AUTHOR_DECISION: cần tác giả ủy quyền. Hãy chọn loại còn thiếu và tạo ủy quyền.", "AUTHOR_DECISION: author authorization required. Create authorization for missing kinds.")}</p>
             {Array.isArray((gate as { missing?: unknown[] })?.missing) && (
               <div className="flex flex-wrap gap-1">
                 {((gate as { missing: string[] }).missing).map((m, i) => <span key={i} className="rounded-full bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 text-xs text-sky-700">{String(m)}</span>)}
@@ -354,26 +354,26 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
             )}
             <div className="flex gap-2">
               <input value={authKind} onChange={(e) => setAuthKind(e.target.value)} placeholder="authorization kind" className="rounded-lg border border-border/50 bg-background px-3 py-1.5 text-xs" />
-              <button onClick={() => void handleCreateAuth()} disabled={!!busy} className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500 disabled:opacity-50">{pick(lang, "创建授权 · Create Authorization", "Create Authorization")}</button>
+              <button onClick={() => void handleCreateAuth()} disabled={!!busy} className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500 disabled:opacity-50">{pick(lang, "Tạo ủy quyền", "Create Authorization")}</button>
             </div>
             {/* No Write */}
           </div>
         )}
         {gatePanel === "conflict" && (
           <div className="mt-3 space-y-2">
-            <p className="text-sm text-destructive font-medium">{pick(lang, "CONFLICT：硬性阻断，存在确定性冲突。不可写作，亦无绕过。", "CONFLICT: hard block, deterministic conflict. Write blocked, no bypass.")}</p>
+            <p className="text-sm text-destructive font-medium">{pick(lang, "CONFLICT: chặn cứng, có xung đột tất yếu. Không được viết và không có cách đi vòng.", "CONFLICT: hard block, deterministic conflict. Write blocked, no bypass.")}</p>
             {Array.isArray((gate as { evidence?: unknown[] })?.evidence) && (
               <ul className="list-disc pl-5 text-xs text-muted-foreground">
                 {((gate as { evidence: unknown[] }).evidence).map((ev, i) => <li key={i} className="break-words">{String(ev)}</li>)}
               </ul>
             )}
             {/* Must not show Write Anyway */}
-            <p className="text-xs text-muted-foreground">{pick(lang, "不提供“仍要写作”按钮", "No Write Anyway button")}</p>
+            <p className="text-xs text-muted-foreground">{pick(lang, "Không cung cấp nút \"vẫn viết\"","No Write Anyway button")}</p>
           </div>
         )}
         {/* Raw gate JSON for debug */}
         <details className="mt-3">
-          <summary className="cursor-pointer text-xs text-muted-foreground">{pick(lang, "查看门禁详情", "View gate report")}</summary>
+          <summary className="cursor-pointer text-xs text-muted-foreground">{pick(lang, "Xem báo cáo cổng", "View gate report")}</summary>
           <pre className="mt-2 max-h-48 overflow-auto rounded-lg bg-secondary/20 p-3 text-xs">{JSON.stringify(gate, null, 2)}</pre>
         </details>
       </section>
@@ -381,35 +381,35 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
       {/* Published Arc vs Draft */}
       <section className="grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-700">{pick(lang, "已发布弧计划 · PUBLISHED ARC PLAN", "PUBLISHED ARC PLAN")}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">{publishedVsDraft.publishedIsAuthority ? pick(lang, "权威（已发布）", "Authority (published)") : pick(lang, "暂无已发布", "No published arc")}</p>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-700">{pick(lang, "KẾ HOẠCH CUNG ĐÃ XUẤT BẢN", "PUBLISHED ARC PLAN")}</h3>
+          <p className="mt-1 text-xs text-muted-foreground">{publishedVsDraft.publishedIsAuthority ? pick(lang, "Chính thức (đã xuất bản)", "Authority (published)") : pick(lang, "Chưa có bản đã xuất bản", "No published arc")}</p>
           <div className="mt-3 rounded-xl bg-background p-3 text-xs">
-            {publishedArc ? <pre className="max-h-48 overflow-auto text-xs">{JSON.stringify(publishedArc, null, 2)}</pre> : <p className="text-muted-foreground">{pick(lang, "暂无", "None")}</p>}
+            {publishedArc ? <pre className="max-h-48 overflow-auto text-xs">{JSON.stringify(publishedArc, null, 2)}</pre> : <p className="text-muted-foreground">{pick(lang, "Không có", "None")}</p>}
           </div>
           {publishedArc && (
-            <p className="mt-2 text-xs text-muted-foreground">{pick(lang, "已发布为权威，草稿非权威", "Published is authority; draft is not")}</p>
+            <p className="mt-2 text-xs text-muted-foreground">{pick(lang, "Bản đã xuất bản là chính thức; bản nháp không phải", "Published is authority; draft is not")}</p>
           )}
         </div>
         <div className="rounded-2xl border border-sky-500/30 bg-sky-500/5 p-4">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-sky-700">{pick(lang, "弧草稿 · ARC DRAFT", "ARC DRAFT")}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "草稿非权威，需显式发布", "Draft is not authority; explicit Publish required")}</p>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-sky-700">{pick(lang, "BẢN NHÁP CUNG", "ARC DRAFT")}</h3>
+          <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "Bản nháp không phải chính thức; cần xuất bản tường minh", "Draft is not authority; explicit Publish required")}</p>
           <div className="mt-3 flex gap-2">
-            <button onClick={() => void handleCreateDraft()} disabled={!!busy} className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground disabled:opacity-50">{busy === "createDraft" ? pick(lang, "创建中…", "Creating…") : pick(lang, "创建草稿", "Create Draft")}</button>
-            <button onClick={() => void handlePublish()} disabled={!!busy || !selectedDraftId} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-40 hover:bg-emerald-500">{pick(lang, "发布 · Publish", "Publish")}</button>
+            <button onClick={() => void handleCreateDraft()} disabled={!!busy} className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground disabled:opacity-50">{busy === "createDraft" ? pick(lang, "Đang tạo…", "Creating…") : pick(lang, "Tạo bản nháp", "Create Draft")}</button>
+            <button onClick={() => void handlePublish()} disabled={!!busy || !selectedDraftId} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-40 hover:bg-emerald-500">{pick(lang, "Xuất bản", "Publish")}</button>
           </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">{pick(lang, "不会自动发布 — 仅点击发布按钮触发", "No auto-Publish — only explicit button")}</p>
+          <p className="mt-2 text-[11px] text-muted-foreground">{pick(lang, "Không tự động xuất bản — chỉ kích hoạt khi nhấn nút", "No auto-Publish — only explicit button")}</p>
           <div className="mt-3 space-y-2">
-            {drafts.length === 0 && <p className="text-xs text-muted-foreground">{pick(lang, "暂无草稿", "No drafts")}</p>}
+            {drafts.length === 0 && <p className="text-xs text-muted-foreground">{pick(lang, "Chưa có bản nháp", "No drafts")}</p>}
             {drafts.map((d) => {
               const did = String((d as { draftId?: string; id?: string }).draftId ?? (d as { id?: string }).id ?? "");
               const isSelected = did === selectedDraftId;
               return (
                 <div key={did || JSON.stringify(d).slice(0, 12)} className={`rounded-xl border p-3 ${isSelected ? "border-primary bg-primary/5" : "border-border/50 bg-background"}`}>
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-semibold">{did || pick(lang, "草稿", "Draft")}</span>
+                    <span className="font-mono text-xs font-semibold">{did || pick(lang, "Bản nháp", "Draft")}</span>
                     <span className="text-[11px] text-muted-foreground">{String((d as { status?: string }).status ?? "")}</span>
                   </div>
-                  <button onClick={() => setSelectedDraftId(did)} className="mt-2 rounded-lg border border-border/50 px-2 py-1 text-xs text-muted-foreground hover:text-foreground">{pick(lang, "选中", "Select")}</button>
+                  <button onClick={() => setSelectedDraftId(did)} className="mt-2 rounded-lg border border-border/50 px-2 py-1 text-xs text-muted-foreground hover:text-foreground">{pick(lang, "Chọn", "Select")}</button>
                   <pre className="mt-2 max-h-24 overflow-auto text-[11px] text-muted-foreground">{JSON.stringify(d, null, 2)}</pre>
                 </div>
               );
@@ -417,7 +417,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
           </div>
           {preflight && (
             <div className="mt-3 rounded-xl bg-background p-3">
-              <h4 className="text-xs font-medium">{pick(lang, "发布前检查 · Preflight", "Preflight")}</h4>
+              <h4 className="text-xs font-medium">{pick(lang, "Kiểm tra trước khi xuất bản", "Preflight")}</h4>
               <pre className="mt-1 max-h-32 overflow-auto text-xs text-muted-foreground">{JSON.stringify(preflight, null, 2)}</pre>
             </div>
           )}
@@ -426,8 +426,8 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
 
       {/* Beats */}
       <section className="rounded-2xl border border-border/50 bg-card/40 p-4">
-        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "重大节拍进度 · Major Beat Progress", "Major Beat Progress")}</h2>
-        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "必填/可选、状态、正史证据", "required/optional, state, Canon evidence")}</p>
+        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "Tiến độ các nhịp chính", "Major Beat Progress")}</h2>
+        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "bắt buộc/tùy chọn, trạng thái, bằng chứng chính thống", "required/optional, state, Canon evidence")}</p>
         <div className="mt-3">
           {beats ? (
             <div className="space-y-3">
@@ -444,14 +444,14 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
               ))}
               {!Array.isArray((beats as { beats?: unknown[] }).beats) && <pre className="max-h-48 overflow-auto text-xs text-muted-foreground">{JSON.stringify(beats, null, 2)}</pre>}
             </div>
-          ) : <p className="text-xs text-muted-foreground">{pick(lang, "暂无节拍", "No beats")}</p>}
+          ) : <p className="text-xs text-muted-foreground">{pick(lang, "Chưa có nhịp nào", "No beats")}</p>}
         </div>
       </section>
 
       {/* Lookahead — advisory, no Approve/Publish */}
       <section className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
-        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "滚动前瞻 · Rolling Lookahead", "Rolling Lookahead")} <span className="ml-2 rounded-full bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-700">{pick(lang, "仅建议", "Advisory Only")}</span></h2>
-        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "前瞻为建议性，非权威；无批准/发布按钮", "Lookahead is advisory, not authority; no Approve/Publish")}</p>
+        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "Dự báo cuốn chiếu", "Rolling Lookahead")} <span className="ml-2 rounded-full bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-700">{pick(lang, "Chỉ mang tính tham khảo", "Advisory Only")}</span></h2>
+        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "Dự báo chỉ mang tính tham khảo, không phải chính thức; không có nút phê duyệt/xuất bản", "Lookahead is advisory, not authority; no Approve/Publish")}</p>
         {lookahead && (
           <div className="mt-2 flex flex-wrap gap-2 text-xs">
             <span className={`rounded-full px-2 py-0.5 border ${isLookaheadStale(lookahead as unknown as import("./planning-ui-state").LookaheadState) ? "bg-amber-500/10 text-amber-700 border-amber-500/20" : "bg-emerald-500/10 text-emerald-700 border-emerald-500/20"}`}>{getLookaheadStatus(lookahead as unknown as import("./planning-ui-state").LookaheadState)}</span>
@@ -461,15 +461,15 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
           </div>
         )}
         <div className="mt-3 rounded-xl bg-background p-3">
-          {lookahead ? <pre className="max-h-48 overflow-auto text-xs text-muted-foreground">{JSON.stringify(lookahead, null, 2)}</pre> : <p className="text-xs text-muted-foreground">{pick(lang, "暂无前瞻", "No lookahead")}</p>}
+          {lookahead ? <pre className="max-h-48 overflow-auto text-xs text-muted-foreground">{JSON.stringify(lookahead, null, 2)}</pre> : <p className="text-xs text-muted-foreground">{pick(lang, "Chưa có dự báo", "No lookahead")}</p>}
         </div>
         {/* Explicitly no Approve/Publish for lookahead */}
-        <p className="mt-2 text-[11px] text-muted-foreground">{pick(lang, "不提供批准/发布前瞻的按钮", "No Approve/Publish button for lookahead")}</p>
+        <p className="mt-2 text-[11px] text-muted-foreground">{pick(lang, "Không cung cấp nút phê duyệt/xuất bản cho dự báo", "No Approve/Publish button for lookahead")}</p>
       </section>
 
       {/* Detailed Plan */}
       <section className="rounded-2xl border border-border/50 bg-card/40 p-4">
-        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "详细计划 · Detailed Plan", "Detailed Plan")}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "Kế hoạch chi tiết", "Detailed Plan")}</h2>
         {detailedPlan ? (
           <div className="mt-3 space-y-2 text-xs">
             <div className="rounded-xl bg-background p-3">
@@ -479,42 +479,42 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
                 <span>status: {String((detailedPlan as { status?: string }).status ?? "—")}</span>
               </div>
               <div className="mt-2">
-                <h4 className="font-semibold text-foreground">{pick(lang, "意图 · Intent", "Intent")}</h4>
+                <h4 className="font-semibold text-foreground">{pick(lang, "Ý định", "Intent")}</h4>
                 <pre className="mt-1 max-h-32 overflow-auto text-muted-foreground">{JSON.stringify((detailedPlan as { intent?: unknown }).intent ?? "—", null, 2)}</pre>
               </div>
               <div className="mt-2">
-                <h4 className="font-semibold text-foreground">{pick(lang, "备忘 · Memo", "Memo")}</h4>
+                <h4 className="font-semibold text-foreground">{pick(lang, "Ghi nhớ", "Memo")}</h4>
                 <pre className="mt-1 max-h-32 overflow-auto text-muted-foreground">{JSON.stringify((detailedPlan as { memo?: unknown }).memo ?? "—", null, 2)}</pre>
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
-                <span className="text-muted-foreground">{pick(lang, "依据 · Bases：", "Bases:")} {JSON.stringify((detailedPlan as { bases?: unknown }).bases ?? (detailedPlan as { basis?: unknown }).basis ?? "—")}</span>
+                <span className="text-muted-foreground">{pick(lang, "Căn cứ: ", "Bases:")} {JSON.stringify((detailedPlan as { bases?: unknown }).bases ?? (detailedPlan as { basis?: unknown }).basis ?? "—")}</span>
               </div>
               <div className="mt-1">
-                <span className="text-muted-foreground">{pick(lang, "引用 · Refs：", "Refs:")} {JSON.stringify((detailedPlan as { refs?: unknown }).refs ?? (detailedPlan as { references?: unknown }).references ?? "—")}</span>
+                <span className="text-muted-foreground">{pick(lang, "Tham chiếu: ", "Refs:")} {JSON.stringify((detailedPlan as { refs?: unknown }).refs ?? (detailedPlan as { references?: unknown }).references ?? "—")}</span>
               </div>
               <details className="mt-2">
-                <summary className="cursor-pointer text-muted-foreground">{pick(lang, "查看完整计划", "View full plan")}</summary>
+                <summary className="cursor-pointer text-muted-foreground">{pick(lang, "Xem toàn bộ kế hoạch", "View full plan")}</summary>
                 <pre className="mt-2 max-h-48 overflow-auto">{JSON.stringify(detailedPlan, null, 2)}</pre>
               </details>
             </div>
             {detailedPlan && (detailedPlan as { gateReport?: unknown }).gateReport !== undefined && (
               <div className="rounded-xl bg-background p-3">
-                <h4 className="font-semibold text-foreground">{pick(lang, "门禁报告 · Gate Report", "Gate Report")}</h4>
+                <h4 className="font-semibold text-foreground">{pick(lang, "Báo cáo cổng", "Gate Report")}</h4>
                 <pre className="mt-1 max-h-32 overflow-auto text-muted-foreground">{JSON.stringify((detailedPlan as { gateReport: unknown }).gateReport, null, 2)}</pre>
               </div>
             )}
           </div>
-        ) : <p className="text-xs text-muted-foreground">{pick(lang, "暂无详细计划", "No detailed plan")}</p>}
-        <button onClick={() => void handleRegenerate()} disabled={!!busy} className="mt-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/20 disabled:opacity-50">{busy === "regenerate" ? pick(lang, "重新生成中…", "Regenerating…") : pick(lang, "重新生成计划 · Regenerate", "Regenerate Plan")}</button>
+        ) : <p className="text-xs text-muted-foreground">{pick(lang, "Chưa có kế hoạch chi tiết", "No detailed plan")}</p>}
+        <button onClick={() => void handleRegenerate()} disabled={!!busy} className="mt-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/20 disabled:opacity-50">{busy === "regenerate" ? pick(lang, "Đang tạo lại…", "Regenerating…") : pick(lang, "Tạo lại kế hoạch", "Regenerate Plan")}</button>
       </section>
 
       {/* Human Direction NL */}
       <section className="rounded-2xl border border-border/50 bg-card/40 p-4">
-        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "人类指令 · Human Direction", "Human Direction")}</h2>
-        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "自然语言输入 → 解析为待确认提案 → 确认； pending 非权威", "NL input → parse to pending proposal → confirm; pending is not authority")}</p>
+        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "Chỉ dẫn của con người", "Human Direction")}</h2>
+        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "Nhập ngôn ngữ tự nhiên → phân tích thành đề xuất chờ xác nhận → xác nhận; bản chờ không phải chính thức", "NL input → parse to pending proposal → confirm; pending is not authority")}</p>
         <div className="mt-3 flex gap-2">
-          <input value={directionText} onChange={(e) => setDirectionText(e.target.value)} placeholder={pick(lang, "输入自然语言指令…", "Enter natural language direction…")} className="flex-1 rounded-xl border border-border/50 bg-background px-3 py-2 text-sm" />
-          <button onClick={() => void handleParseDirection()} disabled={!!busy || !directionText.trim()} className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground disabled:opacity-50">{busy === "parse" ? pick(lang, "解析中…", "Parsing…") : pick(lang, "解析 · Parse", "Parse")}</button>
+          <input value={directionText} onChange={(e) => setDirectionText(e.target.value)} placeholder={pick(lang, "Nhập chỉ dẫn bằng ngôn ngữ tự nhiên…", "Enter natural language direction…")} className="flex-1 rounded-xl border border-border/50 bg-background px-3 py-2 text-sm" />
+          <button onClick={() => void handleParseDirection()} disabled={!!busy || !directionText.trim()} className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground disabled:opacity-50">{busy === "parse" ? pick(lang, "Đang phân tích…", "Parsing…") : pick(lang, "Phân tích", "Parse")}</button>
         </div>
         {pendingDirection && (
           <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
@@ -524,19 +524,19 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
             </div>
             <pre className="mt-2 max-h-24 overflow-auto text-xs text-muted-foreground">{JSON.stringify(pendingDirection, null, 2)}</pre>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button onClick={() => void handleConfirmDirection(String((pendingDirection as { directionId?: string }).directionId ?? ""))} disabled={!!busy} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50">{pick(lang, "确认 · Confirm", "Confirm")}</button>
-              <button onClick={() => void handleResolveConflict("override")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "覆盖 override", "Override")}</button>
-              <button onClick={() => void handleResolveConflict("replace")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "替换 replace", "Replace")}</button>
-              <button onClick={() => void handleResolveConflict("keep")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "保留 keep", "Keep")}</button>
-              <button onClick={() => void handleResolveConflict("edit")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "编辑 edit", "Edit")}</button>
+              <button onClick={() => void handleConfirmDirection(String((pendingDirection as { directionId?: string }).directionId ?? ""))} disabled={!!busy} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50">{pick(lang, "Xác nhận", "Confirm")}</button>
+              <button onClick={() => void handleResolveConflict("override")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "Ghi đè (override)", "Override")}</button>
+              <button onClick={() => void handleResolveConflict("replace")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "Thay thế (replace)", "Replace")}</button>
+              <button onClick={() => void handleResolveConflict("keep")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "Giữ lại (keep)", "Keep")}</button>
+              <button onClick={() => void handleResolveConflict("edit")} disabled={!!busy} className="rounded-lg border border-border/50 px-3 py-1.5 text-xs hover:bg-secondary/40">{pick(lang, "Chỉnh sửa (edit)", "Edit")}</button>
             </div>
-            <p className="mt-2 text-[11px] text-muted-foreground">{pick(lang, "冲突通过上述策略解决", "Conflict resolved via strategies above")}</p>
+            <p className="mt-2 text-[11px] text-muted-foreground">{pick(lang, "Xung đột được giải quyết bằng các chiến lược trên", "Conflict resolved via strategies above")}</p>
           </div>
         )}
         <div className="mt-3">
-          <h4 className="text-xs font-medium text-foreground">{pick(lang, "待定方向 · Pending Directions", "Pending Directions")}</h4>
+          <h4 className="text-xs font-medium text-foreground">{pick(lang, "Hướng đang chờ", "Pending Directions")}</h4>
           <div className="mt-2 space-y-2">
-            {directions.length === 0 && <p className="text-xs text-muted-foreground">{pick(lang, "暂无", "None")}</p>}
+            {directions.length === 0 && <p className="text-xs text-muted-foreground">{pick(lang, "Không có", "None")}</p>}
             {directions.map((d) => {
               const did = String((d as { directionId?: string; id?: string }).directionId ?? (d as { id?: string }).id ?? "");
               const status = String((d as { status?: string }).status ?? "");
@@ -546,10 +546,10 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
                     <span className="font-mono text-xs font-semibold">{did}</span>
                     <span className="rounded-full bg-secondary/40 px-2 py-0.5 text-xs">{status}</span>
                     <span className="text-xs text-muted-foreground">{getPendingDirectionDisplay(d as unknown as import("./planning-ui-state").HumanDirectionState)}</span>
-                    {pendingIsNotAuthority && <span className="text-[11px] text-muted-foreground">({pick(lang, "pending 非权威", "pending not authority")})</span>}
+                    {pendingIsNotAuthority && <span className="text-[11px] text-muted-foreground">({pick(lang, "bản chờ không phải chính thức", "pending not authority")})</span>}
                   </div>
                   <pre className="mt-1 max-h-24 overflow-auto text-xs text-muted-foreground">{JSON.stringify(d, null, 2)}</pre>
-                  {status === "pending" && <button onClick={() => void handleConfirmDirection(did)} disabled={!!busy} className="mt-2 rounded-lg bg-primary px-3 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50">{pick(lang, "确认", "Confirm")}</button>}
+                  {status === "pending" && <button onClick={() => void handleConfirmDirection(did)} disabled={!!busy} className="mt-2 rounded-lg bg-primary px-3 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50">{pick(lang, "Xác nhận", "Confirm")}</button>}
                 </div>
               );
             })}
@@ -559,15 +559,15 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
 
       {/* Authorization UI */}
       <section className="rounded-2xl border border-border/50 bg-card/40 p-4">
-        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "授权 · Authorization", "Authorization")}</h2>
-        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "创建 pending → 确认；展示生命周期；无消费", "create pending → confirm; show lifecycle; no consume")}</p>
+        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "Ủy quyền", "Authorization")}</h2>
+        <p className="mt-1 text-xs text-muted-foreground">{pick(lang, "tạo bản chờ → xác nhận; hiển thị vòng đời; không tiêu thụ", "create pending → confirm; show lifecycle; no consume")}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <input value={authKind} onChange={(e) => setAuthKind(e.target.value)} placeholder="kind (e.g. major_character_death)" className="rounded-lg border border-border/50 bg-background px-3 py-1.5 text-xs" />
           <input value={authScope} onChange={(e) => setAuthScope(e.target.value)} placeholder="scope (optional)" className="rounded-lg border border-border/50 bg-background px-3 py-1.5 text-xs" />
-          <button onClick={() => void handleCreateAuth()} disabled={!!busy} className="rounded-xl bg-sky-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-sky-500 disabled:opacity-50">{pick(lang, "创建授权", "Create Authorization")}</button>
+          <button onClick={() => void handleCreateAuth()} disabled={!!busy} className="rounded-xl bg-sky-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-sky-500 disabled:opacity-50">{pick(lang, "Tạo ủy quyền", "Create Authorization")}</button>
         </div>
         <div className="mt-3 space-y-2">
-          {authorizations.length === 0 && <p className="text-xs text-muted-foreground">{pick(lang, "暂无授权", "No authorizations")}</p>}
+          {authorizations.length === 0 && <p className="text-xs text-muted-foreground">{pick(lang, "Chưa có ủy quyền", "No authorizations")}</p>}
           {authorizations.map((a) => {
             const aid = String((a as { authorizationId?: string; id?: string }).authorizationId ?? (a as { id?: string }).id ?? "");
             const status = String((a as { status?: string }).status ?? (a as { lifecycle?: string }).lifecycle ?? "");
@@ -581,7 +581,7 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
                   <span className="text-xs text-muted-foreground">kind: {String((a as { kind?: string }).kind ?? "—")}</span>
                 </div>
                 <pre className="mt-1 max-h-24 overflow-auto text-xs text-muted-foreground">{JSON.stringify(a, null, 2)}</pre>
-                {(status === "pending" || lifecycle === "pending") && <button onClick={() => void handleConfirmAuth(aid)} disabled={!!busy} className="mt-2 rounded-lg bg-primary px-3 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50">{pick(lang, "确认授权 · Confirm", "Confirm")}</button>}
+                {(status === "pending" || lifecycle === "pending") && <button onClick={() => void handleConfirmAuth(aid)} disabled={!!busy} className="mt-2 rounded-lg bg-primary px-3 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50">{pick(lang, "Xác nhận ủy quyền", "Confirm")}</button>}
                 {/* No consume button — lifecycle is confirm-only */}
               </div>
             );
@@ -591,16 +591,16 @@ export function PlanningPage({ bookId }: PlanningPageProps) {
 
       {/* Write Chapter & Regenerate already surfaced above; also standalone */}
       <section className="rounded-2xl border border-border/50 bg-card/40 p-4">
-        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "写作与再生 · Write & Regenerate", "Write & Regenerate")}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{pick(lang, "Viết & tạo lại", "Write & Regenerate")}</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          <button onClick={() => void handleWrite()} disabled={!!busy || !showWrite} title={showWrite ? "" : pick(lang, "门禁未通过，写作被阻断", "Gate blocked, write disabled")} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed">{pick(lang, "写作下一章 · Write Chapter", "Write Chapter")}</button>
-          <button onClick={() => void handleRegenerate()} disabled={!!busy} className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/20 disabled:opacity-50">{pick(lang, "重新生成计划", "Regenerate Plan")}</button>
+          <button onClick={() => void handleWrite()} disabled={!!busy || !showWrite} title={showWrite ? "" : pick(lang, "Cổng chưa thông qua, tính năng viết bị chặn", "Gate blocked, write disabled")} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed">{pick(lang, "Viết chương tiếp theo", "Write Chapter")}</button>
+          <button onClick={() => void handleRegenerate()} disabled={!!busy} className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/20 disabled:opacity-50">{pick(lang, "Tạo lại kế hoạch", "Regenerate Plan")}</button>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">{pick(lang, "写作入口为 Task 19；错误直接透传 CONFLICT/AUTHOR_DECISION/UNCERTAIN/budget，无回退。", "Write entry is Task 19; errors surface CONFLICT/AUTHOR_DECISION/UNCERTAIN/budget directly, no fallback.")}</p>
+        <p className="mt-2 text-xs text-muted-foreground">{pick(lang, "Điểm vào viết là Task 19; lỗi được truyền thẳng CONFLICT/AUTHOR_DECISION/UNCERTAIN/budget, không có phương án dự phòng.", "Write entry is Task 19; errors surface CONFLICT/AUTHOR_DECISION/UNCERTAIN/budget directly, no fallback.")}</p>
       </section>
 
       <footer className="pb-6 text-center text-xs text-muted-foreground">
-        {pick(lang, "规划页 — 纯映射 Core 结果，不评估正史/范围/授权/节拍/门禁正确性", "Planning — maps Core result to UI, does not evaluate Canon/scope/Authorization/Beat/Gate correctness")}
+        {pick(lang, "Trang lập kế hoạch — chỉ ánh xạ kết quả Core, không đánh giá tính đúng của chính thống/phạm vi/ủy quyền/nhịp/cổng", "Planning — maps Core result to UI, does not evaluate Canon/scope/Authorization/Beat/Gate correctness")}
       </footer>
     </div>
   );

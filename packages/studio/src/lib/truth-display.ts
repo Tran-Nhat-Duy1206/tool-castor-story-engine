@@ -3,8 +3,8 @@
 // authors should never see YAML frontmatter, generator scaffolding, or
 // deprecated compat-pointer prose — these helpers translate the on-disk format
 // into friendly cards and clean prose. Display labels follow the app language
-// (getAppLanguage / tr); the default stays "zh" so existing behavior and tests
-// are unchanged.
+// (getAppLanguage / tr); the default stays "vi" so existing behavior and
+// tests are unchanged.
 
 import { getAppLanguage, tr } from "./app-language";
 
@@ -21,11 +21,11 @@ export interface DisplayCard {
   readonly values: ReadonlyArray<string>;
 }
 
-const FANFIC_LABELS: Record<string, { readonly zh: string; readonly en: string }> = {
-  canon: { zh: "原著向", en: "Canon-compliant" },
-  au: { zh: "架空改编", en: "Alternate Universe" },
-  ooc: { zh: "OOC", en: "OOC" },
-  cp: { zh: "CP 向", en: "Pairing (CP)" },
+const FANFIC_LABELS: Record<string, { readonly vi: string; readonly en: string }> = {
+  canon: { vi: "Bám theo nguyên tác", en: "Canon-compliant" },
+  au: { vi: "Thế giới song song (AU)", en: "Alternate Universe" },
+  ooc: { vi: "Nhân vật lệch chuẩn (OOC)", en: "OOC" },
+  cp: { vi: "Theo cặp đôi (CP)", en: "Pairing (CP)" },
 };
 
 // Turn the structured frontmatter of story_frame.md into a few reader-friendly
@@ -36,23 +36,23 @@ export function frontmatterToCards(fm: TruthFrontmatter | null | undefined): Rea
   if (!fm) return [];
   const cards: DisplayCard[] = [];
   const name = fm.protagonist?.name?.trim();
-  if (name) cards.push({ label: tr("主角", "Protagonist"), values: [name] });
+  if (name) cards.push({ label: tr("Nhân vật chính", "Protagonist"), values: [name] });
   const genre = fm.genreLock?.primary?.trim();
-  if (genre) cards.push({ label: tr("题材", "Genre"), values: [genre] });
+  if (genre) cards.push({ label: tr("Thể loại", "Genre"), values: [genre] });
   const era = fm.eraConstraints;
   if (era?.enabled) {
     const eraValues = [era.period, era.region]
       .map((v) => v?.trim())
       .filter((v): v is string => Boolean(v));
-    if (eraValues.length > 0) cards.push({ label: tr("时代背景", "Era"), values: eraValues });
+    if (eraValues.length > 0) cards.push({ label: tr("Bối cảnh thời đại", "Era"), values: eraValues });
   }
   const prohibitions = (fm.prohibitions ?? []).map((p) => p.trim()).filter(Boolean);
-  if (prohibitions.length > 0) cards.push({ label: tr("红线", "Hard Lines"), values: prohibitions });
+  if (prohibitions.length > 0) cards.push({ label: tr("Giới hạn cứng", "Hard Lines"), values: prohibitions });
   if (fm.fanficMode) {
     const fanficLabel = FANFIC_LABELS[fm.fanficMode];
     cards.push({
-      label: tr("同人模式", "Fanfic Mode"),
-      values: [fanficLabel ? tr(fanficLabel.zh, fanficLabel.en) : fm.fanficMode],
+      label: tr("Chế độ fanfic", "Fanfic Mode"),
+      values: [fanficLabel ? tr(fanficLabel.vi, fanficLabel.en) : fm.fanficMode],
     });
   }
   return cards;
@@ -124,20 +124,20 @@ export function roleFromPath(path: string): RoleRef | null {
 // Phase 5 outline/* layout and the pre-Phase-5 flat layout. Character files
 // (roles/*, character_matrix.md) are intentionally absent — they belong to the
 // character roster, not the foundation list. Files absent from this map are not
-// shown in the foundation list. This zh map is the registry of which files
+// shown in the foundation list. This vi map is the registry of which files
 // qualify; use foundationFileLabel() for the language-aware display label.
 export const FOUNDATION_FILE_LABELS: Record<string, string> = {
-  "outline/story_frame.md": "故事基石",
-  "outline/volume_map.md": "卷纲规划",
-  "current_state.md": "当前状态",
-  "pending_hooks.md": "伏笔池",
-  "emotional_arcs.md": "情感弧线",
-  "subplot_board.md": "支线进度",
+  "outline/story_frame.md": "Nền tảng truyện",
+  "outline/volume_map.md": "Kế hoạch tập",
+  "current_state.md": "Trạng thái hiện tại",
+  "pending_hooks.md": "Kho tiền để",
+  "emotional_arcs.md": "Cung cảm xúc",
+  "subplot_board.md": "Tiến độ nhánh phụ",
   // Pre-Phase-5 flat layout — only reached for old books; new books tag these
   // (story_bible.md / book_rules.md) as legacy and they are filtered out.
-  "story_bible.md": "世界观设定",
-  "volume_outline.md": "卷纲规划",
-  "book_rules.md": "叙事规则",
+  "story_bible.md": "Cài đặt thế giới quan",
+  "volume_outline.md": "Kế hoạch tập",
+  "book_rules.md": "Quy tắc tự sự",
 };
 
 const FOUNDATION_FILE_LABELS_EN: Record<string, string> = {
@@ -156,9 +156,9 @@ const FOUNDATION_FILE_LABELS_EN: Record<string, string> = {
 // for files that are not part of the foundation list (same qualification as
 // FOUNDATION_FILE_LABELS).
 export function foundationFileLabel(name: string): string | undefined {
-  const zh = FOUNDATION_FILE_LABELS[name];
-  if (zh === undefined) return undefined;
-  return getAppLanguage() === "en" ? FOUNDATION_FILE_LABELS_EN[name] ?? zh : zh;
+  const vi = FOUNDATION_FILE_LABELS[name];
+  if (vi === undefined) return undefined;
+  return getAppLanguage() === "en" ? FOUNDATION_FILE_LABELS_EN[name] ?? vi : vi;
 }
 
 // --- current_state.md ---------------------------------------------------

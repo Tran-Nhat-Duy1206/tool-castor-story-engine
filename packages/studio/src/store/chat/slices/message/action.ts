@@ -69,7 +69,7 @@ function formatAttachmentSize(size: number): string {
 
 function formatUserMessageForDisplay(text: string, attachments: ReadonlyArray<ChatAttachmentPayload>): string {
   if (attachments.length === 0) return text;
-  const heading = tr("附件：", "Attachments:");
+  const heading = tr("Tệp đính kèm: ", "Attachments:");
   const lines = text ? [text, "", heading] : [heading];
   for (const attachment of attachments) {
     lines.push(`- ${attachment.filename} (${attachment.mediaType || "application/octet-stream"}, ${formatAttachmentSize(attachment.size)})`);
@@ -163,10 +163,10 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
             || execution.status === "processing"
             || execution.status === "error",
         );
-        // 只把本轮（streamTs 消息）里的运行中工具标记为失败：并行运行的后台
-        // 任务卡挂在更早的消息上，聊天轮出错不代表任务失败，不能连带标记。
-        // isStreaming / stream 的收尾统一交给 sendMessage 的 finally 判断
-        //（那里会检查是否还有任务在跑）。
+        // Mark only running tools in this turn's (streamTs) message as failed:
+        // background task cards running in parallel attach to earlier messages, and a
+        // chat-turn error does not mean the task failed. isStreaming / stream
+        // finalization is left to sendMessage's finally, which checks for running tasks.
         const messages = hasActiveOrFailedTool
           ? session.messages.map((message) => (
               message.timestamp === streamTs && message.role === "assistant"
@@ -274,10 +274,11 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
 
   createDraftSession: (bookId, sessionKind, playMode) => {
     abortPreviousChatRound(null);
-    // 前端生成 sessionId（与后端 createBookSession 同格式），暂不持久化到磁盘，
-    // 也暂不写入 sessionIdsByBook——侧边栏看不到这条 draft。
-    // 发送第一条消息时 sendMessage 会调 POST /sessions { sessionId, bookId } 落盘
-    // 并把 id 追加进 sessionIdsByBook，那一刻侧边栏才出现该会话（带着 title）。
+    // The client generates the sessionId (same format as createBookSession); it is
+    // not persisted to disk yet and not added to sessionIdsByBook, so the sidebar
+    // cannot see this draft. When the first message is sent, sendMessage calls
+    // POST /sessions { sessionId, bookId } to persist it and appends the id to
+    // sessionIdsByBook - only then does the session (with its title) appear.
     const sessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     set((state) => {
       const runtime = createSessionRuntime({
@@ -321,7 +322,7 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
   deleteSession: async (sessionId) => {
     const session = get().sessions[sessionId];
     session?.stream?.close();
-    // 草稿会话还没写到磁盘，跳过 DELETE 请求避免后端返回 404
+    // Draft session not yet on disk: skip the DELETE request to avoid a 404 from the backend
     if (session && !session.isDraft) {
       try {
         await fetchJson(`/sessions/${sessionId}`, { method: "DELETE" });
@@ -356,7 +357,7 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
   abortSession: async (sessionId, scope = "all") => {
     const session = get().sessions[sessionId];
     const stoppedAt = Date.now();
-    const stoppedMessage = tr("已由用户停止", "Stopped by user");
+    const stoppedMessage = tr("Người dùng đã dừng", "Stopped by user");
     const chatOnly = scope === "chat";
     const messages = markRunningToolsFailed(
       session?.messages ?? [],
@@ -385,7 +386,7 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
   },
 
   loadSessionDetail: async (sessionId) => {
-    // 草稿会话：磁盘上还没有文件，直接跳过远端拉取。
+    // Draft session: no file on disk yet, skip the remote fetch.
     const existing = get().sessions[sessionId];
     if (existing?.isDraft) return;
     if (existing?.isStreaming && existing.stream) return;
@@ -465,21 +466,25 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
     const trimmed = text.trim();
     const attachments = options?.attachments ?? [];
     const session = get().sessions[sessionId];
-    // 只挡"聊天轮流式中"：后台生产任务运行期间（isStreaming=true 但
-    // isChatStreaming=false）允许继续发消息，聊天与任务并行。
+    // Only block while a chat turn is streaming: during background production
+    // tasks (isStreaming=true but isChatStreaming=false) sending messages stays
+    // allowed, so chat and task run in parallel.
     if ((!trimmed && attachments.length === 0) || !session || session.isChatStreaming) return;
-    const userInstruction = trimmed || tr("请阅读我上传的文件。", "Please read the files I uploaded.");
+    const userInstruction = trimmed || tr("Vui lòng đọc các tệp tôi đã tải lên.", "Please read the files I uploaded.");
     const activeBookId = options?.activeBookId ?? session.bookId ?? undefined;
     const sessionKind: ChatSessionKind = options?.sessionKind
       ?? session.sessionKind
       ?? (activeBookId ? "book" : "chat");
     const actionSource = options?.actionSource ?? "free-text";
     const playMode = options?.playMode ?? session.playMode;
-    // 确认式生产任务的发送轮不是"聊天轮"：请求会挂起到任务结束，
-    // 期间用户仍可继续聊天，所以不置 isChatStreaming。
+    // The send turn of a confirmed production task is not a "chat turn": the
+    // request stays pending until the task ends while the user can keep chatting,
+    // so isChatStreaming is not set.
     const isProductionTaskSend = isConfirmedProductionSend(actionSource, options?.requestedIntent);
-    // 聊天轮失败时记录原样发送参数（text + options），供"重试"按钮一键重发。
-    // 生产任务轮不记录：任务失败由任务卡自己展示，重试按钮只管聊天轮。
+    // On chat-turn failure, record the original send parameters (text + options)
+    // so the "Retry" button can resend them in one click. Production task turns are
+    // not recorded: task failures are shown by the task card itself; retry only
+    // covers chat turns.
     const rememberFailedSend = () => {
       if (isProductionTaskSend) return;
       set((state) => ({
@@ -491,14 +496,15 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
 
     if (!get().selectedModel) {
       get().addUserMessage(sessionId, formatUserMessageForDisplay(userInstruction, attachments));
-      get().addErrorMessage(sessionId, tr("请先选择一个模型", "Select a model first"));
+      get().addErrorMessage(sessionId, tr("Vui lòng chọn một mô hình trước", "Select a model first"));
       rememberFailedSend();
       return;
     }
 
-    // 草稿会话：第一条消息发送时才真正把 session 文件写到磁盘。
-    // 后端 POST /sessions 支持接受客户端传入的 sessionId，所以 id 保持一致，
-    // 前端 store 里的 runtime 不用 remount，只需要把 isDraft 翻成 false。
+    // Draft session: the session file is written to disk only when the first
+    // message is sent. The backend POST /sessions accepts a client-provided
+    // sessionId, so the id stays consistent and the runtime in the store needs no
+    // remount - just flip isDraft to false.
     if (session.isDraft) {
       try {
         await fetchJson<SessionResponse>("/sessions", {
@@ -506,8 +512,8 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId, bookId: session.bookId, sessionKind, playMode }),
         });
-        // 落盘成功：把 isDraft 翻成 false，同时把 sessionId 追加进 sessionIdsByBook
-        // 让侧边栏现在才看到这条会话。
+        // Persisted: flip isDraft to false and append the sessionId to
+        // sessionIdsByBook so the sidebar sees the session only now.
         set((state) => ({
           sessions: updateSession(state.sessions, sessionId, () => ({ isDraft: false, sessionKind, playMode })),
           sessionIdsByBook: {
@@ -539,16 +545,18 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
         isStreaming: true,
         isChatStreaming: !isProductionTaskSend,
         lastError: null,
-        // 新一轮发送开始即清除上一条失败记录：本轮失败会重新记录，
-        // 本轮成功则说明对话已继续，旧的重试入口不再保留。
+        // Clear the previous failure record as soon as a new send starts: if this
+        // turn fails it will be recorded again; if it succeeds the conversation moved
+        // on and the old retry entry is dropped.
         lastFailedSend: undefined,
       })),
     }));
 
     get().addUserMessage(sessionId, formatUserMessageForDisplay(userInstruction, attachments));
-    // 单连接原则：任务恢复流等旧连接先关掉，换成本轮的新连接。
-    // 运行中的任务卡不受影响——新连接建立时服务端会重放 running 快照，
-    // 任务日志（log）与收尾（tool:end）都按 execution id 匹配，与 streamTs 无关。
+    // Single-connection principle: close old connections (e.g. a task recovery
+    // stream) and switch to this turn's new connection. Running task cards are
+    // unaffected - on connect the server replays running snapshots, and task logs
+    // and finalization match by execution id, independent of streamTs.
     session.stream?.close();
     const streamEs = new EventSource(`/api/v1/events?sessionId=${encodeURIComponent(sessionId)}`);
     set((state) => ({
@@ -627,8 +635,8 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
         } else {
           get().addErrorMessage(sessionId, errorMessage);
         }
-        // 用户中途主动停止（abortSession）会先把 isChatStreaming 置回 false：
-        // 那不算失败，不记录重试。
+        // A user-initiated mid-turn stop (abortSession) flips isChatStreaming to
+        // false first: that is not a failure, so no retry record.
         if (get().sessions[sessionId]?.isChatStreaming) rememberFailedSend();
       } else if (finalContent) {
         if (hasStream) {
@@ -667,18 +675,20 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
           get().finalizeStream(sessionId, streamTs, "", toolCall);
         } else {
           const emptyMessage = tr(
-            "模型未返回文本内容。请检查协议类型（chat/responses）、流式开关或上游服务兼容性。",
+            "Mô hình không trả về nội dung văn bản. Vui lòng kiểm tra loại giao thức (chat/responses), công tắc stream hoặc tính tương thích của dịch vụ thượng nguồn.",
             "The model returned no text. Check the protocol type (chat/responses), the streaming toggle, or upstream service compatibility.",
           );
           get().addErrorMessage(sessionId, emptyMessage);
-          // 空响应同样算这轮失败；用户主动停止的轮 isChatStreaming 已是 false，不记录。
+          // An empty response also fails this turn; user-stopped turns already have
+          // isChatStreaming=false and are not recorded.
           if (get().sessions[sessionId]?.isChatStreaming) rememberFailedSend();
         }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      // 用户主动停止会先把 isChatStreaming 置回 false，被中止的请求随后 reject 到
-      // 这里：那不算失败，不记录重试；真正的请求失败此刻 isChatStreaming 仍为 true。
+      // A user stop flips isChatStreaming to false before the aborted request
+      // rejects here: not a failure, no retry record; a genuine request failure has
+      // isChatStreaming still true at this point.
       if (get().sessions[sessionId]?.isChatStreaming) rememberFailedSend();
       const failureAlreadyShown = get().sessions[sessionId]?.messages.some((message) => {
         const executions = [
@@ -702,13 +712,15 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
         get().addErrorMessage(sessionId, errorMessage);
       }
     } finally {
-      // 本轮请求已结束（成功/出错都走这里）。只有当会话的连接仍归本轮所有时
-      // 才收尾：如果发新消息时旧连接已被替换（stream 指向更新一轮的连接），
-      // 由新一轮负责后续状态。
+      // This turn's request ended (success or error both land here). Finalize only
+      // when the session's connection still belongs to this turn: if a new message
+      // replaced the old connection (stream points at a newer turn), that turn owns
+      // the subsequent state.
       const runtime = get().sessions[sessionId];
       if (runtime && (runtime.stream === streamEs || runtime.stream === null)) {
-        // 还有生产任务在跑：保持连接与 isStreaming，等任务自己的终态事件
-        //（tool:end → agent:complete）到来时由 stream-events 收尾。
+        // A production task is still running: keep the connection and isStreaming;
+        // stream-events finalizes when the task's own final events arrive
+        // (tool:end -> agent:complete).
         const taskInFlight = hasAnyInFlightExecution(runtime.messages);
         if (!taskInFlight) streamEs.close();
         set((state) => ({
@@ -726,7 +738,8 @@ export const createMessageSlice: StateCreator<ChatStore, [], [], MessageActions>
     const session = get().sessions[sessionId];
     const failed = session?.lastFailedSend;
     if (!session || !failed || session.isChatStreaming) return;
-    // 先清除记录再重发：重复点击时第二次进来已无记录，直接返回，避免双发。
+    // Clear the record before resending: on a double click the second invocation
+    // finds no record and returns early, avoiding a duplicate send.
     set((state) => ({
       sessions: updateSession(state.sessions, sessionId, () => ({ lastFailedSend: undefined })),
     }));

@@ -25,7 +25,7 @@ export function PendingHooksView({ content }: PendingHooksViewProps) {
   if (hooks.length === 0) {
     return (
       <p className="text-[14px] leading-6 text-muted-foreground/60 italic">
-        {tr("还没有埋下伏笔。", "No foreshadowing planted yet.")}
+        {tr("Chưa gieo tiền để nào.", "No foreshadowing planted yet.")}
       </p>
     );
   }
@@ -36,12 +36,12 @@ export function PendingHooksView({ content }: PendingHooksViewProps) {
           <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
             {hook.promoted === false && (
               <span className="text-[12px] px-1.5 py-0.5 rounded-full bg-zinc-500/10 text-muted-foreground">
-                {tr("种子", "Seed")}
+                {tr("Hạt giống", "Seed")}
               </span>
             )}
             {hook.promoted === true && (
               <span className="text-[12px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                {tr("活跃", "Active")}
+                {tr("Đang hoạt động", "Active")}
               </span>
             )}
             {hook.type && (
@@ -51,11 +51,11 @@ export function PendingHooksView({ content }: PendingHooksViewProps) {
             )}
             {hook.core && (
               <span className="text-[12px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
-                {tr("核心", "Core")}
+                {tr("Trọng tâm", "Core")}
               </span>
             )}
             {hook.payoff && (
-              <span className="text-[12px] text-muted-foreground/50 ml-auto">{tr("回收", "Payoff")} · {hook.payoff}</span>
+              <span className="text-[12px] text-muted-foreground/50 ml-auto">{tr("Thu hồi", "Payoff")} · {hook.payoff}</span>
             )}
           </div>
           <p className="text-[15px] text-foreground leading-7 font-['SimSun','Songti_SC','STSong',serif]">

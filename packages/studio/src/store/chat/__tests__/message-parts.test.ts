@@ -121,10 +121,10 @@ describe("buildPartsFromEvents", () => {
     expect(parts[0].type).toBe("tool");
     if (parts[0].type === "tool") {
       expect(parts[0].execution.tool).toBe("context_compression");
-      expect(parts[0].execution.label).toBe("整理会话记忆");
+      expect(parts[0].execution.label).toBe("Sắp xếp ký ức phiên");
       expect(parts[0].execution.status).toBe("completed");
       expect(parts[0].execution.stages?.[0]).toMatchObject({
-        label: "整理会话记忆",
+        label: "Sắp xếp ký ức phiên",
         status: "completed",
       });
     }
@@ -154,9 +154,9 @@ describe("buildPartsFromEvents", () => {
     expect(parts).toHaveLength(1);
     expect(parts[0].type).toBe("tool");
     if (parts[0].type === "tool") {
-      const compressionStage = parts[0].execution.stages?.find((stage) => stage.label === "压缩故事上下文");
+      const compressionStage = parts[0].execution.stages?.find((stage) => stage.label === "Nén ngữ cảnh truyện");
       expect(compressionStage).toMatchObject({
-        label: "压缩故事上下文",
+        label: "Nén ngữ cảnh truyện",
         status: "completed",
       });
     }
@@ -184,11 +184,11 @@ describe("buildPartsFromEvents", () => {
     expect(parts).toHaveLength(1);
     expect(parts[0].type).toBe("tool");
     if (parts[0].type === "tool") {
-      const compressionStage = parts[0].execution.stages?.find((stage) => stage.label === "压缩故事上下文");
-      expect(compressionStage?.progress?.status).toContain("保护 1200");
-      expect(compressionStage?.progress?.status).toContain("可压缩 9000");
-      expect(compressionStage?.progress?.status).toContain("预算 6000");
-      expect(compressionStage?.progress?.status).toContain("来源 4: story/chapter_summaries.md#recent_titles");
+      const compressionStage = parts[0].execution.stages?.find((stage) => stage.label === "Nén ngữ cảnh truyện");
+      expect(compressionStage?.progress?.status).toContain("Được bảo vệ 1200");
+      expect(compressionStage?.progress?.status).toContain("Có thể nén 9000");
+      expect(compressionStage?.progress?.status).toContain("Ngân sách 6000");
+      expect(compressionStage?.progress?.status).toContain("Nguồn 4: story/chapter_summaries.md#recent_titles");
       expect(compressionStage?.progress?.status).toContain("+1");
     }
   });
@@ -257,10 +257,10 @@ describe("buildPartsFromEvents", () => {
     ]);
 
     expect(parts).toHaveLength(4);
-    expect(parts[0].type === "tool" ? parts[0].execution.label : "").toBe("启动互动世界");
-    expect(parts[1].type === "tool" ? parts[1].execution.label : "").toBe("推进互动世界");
-    expect(parts[2].type === "tool" ? parts[2].execution.label : "").toBe("编辑互动世界");
-    expect(parts[3].type === "tool" ? parts[3].execution.label : "").toBe("重做互动回合");
+    expect(parts[0].type === "tool" ? parts[0].execution.label : "").toBe("Khởi động thế giới tương tác");
+    expect(parts[1].type === "tool" ? parts[1].execution.label : "").toBe("Đẩy thế giới tương tác");
+    expect(parts[2].type === "tool" ? parts[2].execution.label : "").toBe("Sửa thế giới tương tác");
+    expect(parts[3].type === "tool" ? parts[3].execution.label : "").toBe("Làm lại lượt tương tác");
   });
 
   it("labels narrative forecast tools as first-class planning actions", () => {
@@ -273,9 +273,9 @@ describe("buildPartsFromEvents", () => {
       { type: "tool:end", id: "f3", result: "selected" },
     ]);
 
-    expect(parts[0].type === "tool" ? parts[0].execution.label : "").toBe("剧情多线推演");
-    expect(parts[1].type === "tool" ? parts[1].execution.label : "").toBe("核验剧情推演");
-    expect(parts[2].type === "tool" ? parts[2].execution.label : "").toBe("采用候选分支");
+    expect(parts[0].type === "tool" ? parts[0].execution.label : "").toBe("Dự báo truyện đa nhánh");
+    expect(parts[1].type === "tool" ? parts[1].execution.label : "").toBe("Kiểm tra lại dự báo truyện");
+    expect(parts[2].type === "tool" ? parts[2].execution.label : "").toBe("Chọn nhánh ứng viên");
   });
 
   it("does not render model narration after a completed play tool as authoritative text", () => {
@@ -329,7 +329,7 @@ describe("buildPartsFromEvents", () => {
     ]);
 
     expect(parts).toHaveLength(1);
-    expect(parts[0].type === "tool" ? parts[0].execution.label : "").toBe("确认动作");
+    expect(parts[0].type === "tool" ? parts[0].execution.label : "").toBe("Xác nhận hành động");
   });
 
   it("localizes known tool errors", () => {
@@ -346,7 +346,7 @@ describe("buildPartsFromEvents", () => {
     expect(parts[0].type).toBe("tool");
     if (parts[0].type === "tool") {
       expect(parts[0].execution.error).toBe(
-        "最新第 1 章处于状态降级（state-degraded）。继续写下一章前，请先修复状态，或重写这一章。",
+        "Chương mới nhất 1 đang ở trạng thái suy giảm (state-degraded). Trước khi viết chương tiếp theo, hãy sửa trạng thái hoặc viết lại chương này.",
       );
     }
   });
@@ -354,7 +354,7 @@ describe("buildPartsFromEvents", () => {
 
 describe("buildPartsFromEvents in English app language", () => {
   afterEach(() => {
-    setAppLanguage("zh");
+    setAppLanguage("vi");
   });
 
   it("resolves agent and tool labels in English", () => {

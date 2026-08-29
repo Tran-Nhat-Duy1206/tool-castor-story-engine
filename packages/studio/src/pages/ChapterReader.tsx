@@ -259,7 +259,7 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5" role="alert">
           <div className="flex items-center gap-2 text-sm font-medium text-destructive">
             <FileWarning size={15} />
-            状态复核重建失败 · State review rebuild failed
+            Dựng lại bản soát lại trạng thái thất bại · State review rebuild failed
           </div>
           {reviewArtifact.reason && (
             <p className="mt-1.5 break-words text-xs text-muted-foreground">{reviewArtifact.reason}</p>
@@ -275,14 +275,14 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
               ) : (
                 <RefreshCw size={13} />
               )}
-              重试审计 · Retry Audit
+              Thử kiểm tra lại · Retry Audit
             </button>
             {nav.toStateReview && (
               <button
                 onClick={() => nav.toStateReview?.(bookId, chapterNumber)}
                 className="inline-flex items-center gap-2 rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
               >
-                查看详情 · Details
+                Xem chi tiết · Details
               </button>
             )}
           </div>
@@ -294,7 +294,7 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/5 p-4">
           <div className="flex items-center gap-2 text-sm font-medium text-amber-600">
             <Brain size={16} />
-            需要人工状态复核 · State Review Required
+            Cần người soát lại trạng thái · State Review Required
           </div>
           {reviewArtifact?.status === "rebuild_required" || reviewArtifact?.status === "stale" ? (
             <button
@@ -303,7 +303,7 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm disabled:opacity-50"
             >
               <RefreshCw size={13} />
-              重建状态复核 · Rebuild State Review
+              Dựng lại bản soát lại · Rebuild State Review
             </button>
           ) : null}
           {nav.toStateReview && (
@@ -312,7 +312,7 @@ export function ChapterReader({ bookId, chapterNumber, nav, theme, t }: {
               data-testid="open-state-review"
               className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-600 hover:bg-amber-500 hover:text-white transition-all"
             >
-              审阅状态修改 · Review State Changes
+              Xem xét thay đổi trạng thái · Review State Changes
             </button>
           )}
         </div>

@@ -6,27 +6,27 @@ const KNOWN_RUNTIME_REPLACEMENTS: ReadonlyArray<{
 }> = [
   {
     pattern: /Latest chapter (\d+) is state-degraded\. Repair state or rewrite that chapter before continuing\./g,
-    replacement: "最新第 $1 章处于状态降级（state-degraded）。继续写下一章前，请先修复状态，或重写这一章。",
+    replacement: "Chương mới nhất $1 đang ở trạng thái suy giảm (state-degraded). Trước khi viết chương tiếp theo, hãy sửa trạng thái hoặc viết lại chương này.",
   },
   {
     pattern: /Chapter (\d+) is not state-degraded\./g,
-    replacement: "第 $1 章不是状态降级（state-degraded），无需按状态修复。",
+    replacement: "Chương $1 không ở trạng thái suy giảm (state-degraded), không cần sửa theo trạng thái.",
   },
   {
     pattern: /Only the latest state-degraded chapter can be repaired safely \(latest is (\d+)\)\./g,
-    replacement: "只能安全修复最新的状态降级（state-degraded）章节；当前最新章是第 $1 章。",
+    replacement: "Chỉ có thể sửa an toàn chương suy giảm trạng thái mới nhất; hiện chương mới nhất là chương $1.",
   },
   {
     pattern: /State repair still failed for chapter (\d+)\./g,
-    replacement: "第 $1 章状态修复仍然失败。",
+    replacement: "Sửa trạng thái cho chương $1 vẫn thất bại.",
   },
   {
     pattern: /Studio LLM API key not set\. Open Studio services and save an API key for the selected service\./g,
-    replacement: "Studio 模型 API Key 未设置。请打开“模型配置”，为当前服务保存 API Key。",
+    replacement: "Chưa đặt API Key mô hình Studio. Hãy mở \"Cấu hình mô hình\" và lưu API Key cho dịch vụ hiện tại.",
   },
   {
     pattern: /CASTOR_LLM_API_KEY not set\. Run 'castor config set-global' or add it to project \.env file\./g,
-    replacement: "CASTOR_LLM_API_KEY 未设置。请运行 `castor config set-global`，或在项目 .env 文件中添加它。",
+    replacement: "CASTOR_LLM_API_KEY chưa được đặt. Hãy chạy `castor config set-global` hoặc thêm nó vào tệp .env của dự án.",
   },
 ];
 

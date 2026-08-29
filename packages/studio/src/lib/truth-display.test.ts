@@ -22,10 +22,10 @@ describe("frontmatterToCards", () => {
       fanficMode: "au",
     });
     expect(cards).toEqual([
-      { label: "主角", values: ["陈烬"] },
-      { label: "题材", values: ["都市悬疑"] },
-      { label: "红线", values: ["不写穿越", "不洗白反派"] },
-      { label: "同人模式", values: ["架空改编"] },
+      { label: "Nhân vật chính", values: ["陈烬"] },
+      { label: "Thể loại", values: ["都市悬疑"] },
+      { label: "Giới hạn cứng", values: ["不写穿越", "不洗白反派"] },
+      { label: "Chế độ fanfic", values: ["Thế giới song song (AU)"] },
     ]);
   });
 
@@ -36,7 +36,7 @@ describe("frontmatterToCards", () => {
       // engineering fields that must NOT surface to a reader:
       ...({ version: "1.0", fatigueWordsOverride: ["突然"], enableFullCastTracking: true } as object),
     });
-    expect(cards).toContainEqual({ label: "时代背景", values: ["1985 年", "南方港城"] });
+    expect(cards).toContainEqual({ label: "Bối cảnh thời đại", values: ["1985 年", "南方港城"] });
     expect(cards.map((c) => c.label)).not.toContain("version");
     expect(cards.map((c) => c.label)).not.toContain("fatigueWordsOverride");
   });
@@ -237,8 +237,8 @@ describe("hasTableRows", () => {
 
 describe("FOUNDATION_FILE_LABELS", () => {
   it("labels the authoritative Phase 5 files and excludes character files", () => {
-    expect(FOUNDATION_FILE_LABELS["outline/story_frame.md"]).toBe("故事基石");
-    expect(FOUNDATION_FILE_LABELS["outline/volume_map.md"]).toBe("卷纲规划");
+    expect(FOUNDATION_FILE_LABELS["outline/story_frame.md"]).toBe("Nền tảng truyện");
+    expect(FOUNDATION_FILE_LABELS["outline/volume_map.md"]).toBe("Kế hoạch tập");
     // character files do not belong to the foundation list
     expect(FOUNDATION_FILE_LABELS["character_matrix.md"]).toBeUndefined();
   });
@@ -246,7 +246,7 @@ describe("FOUNDATION_FILE_LABELS", () => {
 
 describe("English UI (app language = en)", () => {
   afterEach(() => {
-    setAppLanguage("zh");
+    setAppLanguage("vi");
   });
 
   it("frontmatterToCards emits English labels and fanfic-mode names", () => {
@@ -272,7 +272,7 @@ describe("English UI (app language = en)", () => {
 
     expect(foundationFileLabel("outline/story_frame.md")).toBe("Story Foundation");
     expect(foundationFileLabel("character_matrix.md")).toBeUndefined();
-    setAppLanguage("zh");
-    expect(foundationFileLabel("outline/story_frame.md")).toBe("故事基石");
+    setAppLanguage("vi");
+    expect(foundationFileLabel("outline/story_frame.md")).toBe("Nền tảng truyện");
   });
 });

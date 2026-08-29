@@ -88,7 +88,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
 
   const resolvedCustomName = persistedCustomName || customName.trim() || "Custom";
   const effectiveServiceId = isCustom ? `custom:${resolvedCustomName}` : serviceId;
-  const label = isCustom ? (customName || persistedCustomName || tr("自定义服务", "Custom service")) : (svc?.label ?? serviceId);
+  const label = isCustom ? (customName || persistedCustomName || tr("Dịch vụ tùy chỉnh", "Custom service")) : (svc?.label ?? serviceId);
   const storeModels = useServiceStore((s) => s.modelsByService[effectiveServiceId]);
 
   useEffect(() => {
@@ -143,11 +143,11 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
   const handleTest = async () => {
     const trimmedKey = apiKey.trim();
     if (!trimmedKey && !isCustom && !apiKeyOptional) {
-      setStatus({ state: "error", message: tr("请先输入 API Key", "Enter an API key first") });
+      setStatus({ state: "error", message: tr("Vui lòng nhập API Key trước", "Enter an API key first") });
       return;
     }
     if (isCustom && !baseUrl.trim()) {
-      setStatus({ state: "error", message: tr("请先填写 Base URL", "Enter a base URL first") });
+      setStatus({ state: "error", message: tr("Vui lòng nhập Base URL trước", "Enter a base URL first") });
       return;
     }
     setApiKey(trimmedKey);
@@ -184,17 +184,17 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
         setStoreModels(effectiveServiceId, mergedModels); // Write to global store
       } else {
         setVerifiedProbe(null);
-        setStatus({ state: "error", message: result.error ?? tr("连接失败", "Connection failed") });
+        setStatus({ state: "error", message: result.error ?? tr("Kết nối thất bại", "Connection failed") });
         clearStoreModels(effectiveServiceId);
       }
     } catch (e) {
       setVerifiedProbe(null);
-      setStatus({ state: "error", message: e instanceof Error ? e.message : tr("连接失败", "Connection failed") });
+      setStatus({ state: "error", message: e instanceof Error ? e.message : tr("Kết nối thất bại", "Connection failed") });
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(tr(`删除“${label}”的配置和密钥？`, `Delete the config and key for “${label}”?`))) return;
+    if (!window.confirm(tr(`Xóa cấu hình và khóa của "${label}"?`, `Delete the config and key for "${label}"?`))) return;
     setStatus({ state: "saving" });
     try {
       await deleteServiceConfig(effectiveServiceId);
@@ -202,7 +202,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
       await refreshServices();
       nav.toServices();
     } catch (e) {
-      setStatus({ state: "error", message: e instanceof Error ? e.message : tr("删除失败", "Delete failed") });
+      setStatus({ state: "error", message: e instanceof Error ? e.message : tr("Xóa thất bại", "Delete failed") });
     }
   };
 
@@ -210,7 +210,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
     const trimmedKey = apiKey.trim();
     setApiKey(trimmedKey);
     if (isCustom && !baseUrl.trim()) {
-      setStatus({ state: "error", message: tr("请先填写 Base URL", "Enter a base URL first") });
+      setStatus({ state: "error", message: tr("Vui lòng nhập Base URL trước", "Enter a base URL first") });
       return;
     }
     setStatus({ state: "saving" });
@@ -245,7 +245,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
       await refreshServices();
       nav.toServices();
     } catch (e) {
-      setStatus({ state: "error", message: e instanceof Error ? e.message : tr("保存失败", "Save failed") });
+      setStatus({ state: "error", message: e instanceof Error ? e.message : tr("Lưu thất bại", "Save failed") });
     }
   };
 
@@ -273,7 +273,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
         className="inline-flex items-center gap-2 rounded-lg border border-border/50 bg-card/60 px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors"
       >
         <ArrowLeft size={14} />
-        {tr("返回服务商管理", "Back to providers")}
+        {tr("Quay lại quản lý nhà cung cấp", "Back to providers")}
       </button>
 
       {/* Title + status */}
@@ -281,7 +281,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
         <h1 className="font-serif text-2xl">{label}</h1>
         {isConnected && (
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-medium">
-            {tr("已连接", "Connected")}
+            {tr("Đã kết nối", "Connected")}
           </span>
         )}
       </div>
@@ -291,9 +291,9 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
         {/* Custom fields */}
         {isCustom && (
         <div className="grid grid-cols-2 gap-4">
-            <Field label={tr("服务名称", "Service name")}>
+            <Field label={tr("Tên dịch vụ", "Service name")}>
               <input type="text" value={customName} onChange={(e) => setCustomName(e.target.value)}
-                placeholder={tr("例如：本地 Ollama", "e.g. local Ollama")} className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm" />
+                placeholder={tr("Ví dụ: Ollama cục bộ", "e.g. local Ollama")} className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm" />
             </Field>
             <Field label="Base URL">
               <input type="text" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)}
@@ -303,11 +303,11 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
         )}
 
         {/* API Key */}
-        <Field label={apiKeyOptional ? tr("API Key（可选）", "API key (optional)") : "API Key"}>
+        <Field label={apiKeyOptional ? tr("API Key (tùy chọn)", "API key (optional)") : "API Key"}>
           <div className="relative">
             <input
               type={showKey ? "text" : "password"} value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)} placeholder={apiKeyOptional ? tr("本地服务可留空", "Optional for local service") : "sk-..."}
+              onChange={(e) => setApiKey(e.target.value)} placeholder={apiKeyOptional ? tr("Dịch vụ cục bộ có thể để trống", "Optional for local service") : "sk-..."}
               className="w-full rounded-lg border border-border/60 bg-background px-3 py-2 pr-10 text-sm font-mono"
             />
             <button type="button" onClick={() => setShowKey((v) => !v)}
@@ -322,27 +322,27 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
           <button onClick={handleTest} disabled={isBusy}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs rounded-lg border border-border/60 hover:bg-secondary/50 transition-colors disabled:opacity-50">
             {status.state === "testing" && <Loader2 size={12} className="animate-spin" />}
-            {tr("测试连接", "Test connection")}
+            {tr("Thử kết nối", "Test connection")}
           </button>
           <button onClick={handleSave} disabled={isBusy}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50">
             {status.state === "saving" && <Loader2 size={12} className="animate-spin" />}
-            {tr("保存", "Save")}
+            {tr("Lưu", "Save")}
           </button>
           {(isConnected || isCustom) && (
             <button onClick={handleDelete} disabled={isBusy}
               className="flex items-center gap-1.5 px-3.5 py-2 text-xs rounded-lg border border-destructive/30 text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50">
               <Trash2 size={12} />
-              {tr("删除配置", "Delete config")}
+              {tr("Xóa cấu hình", "Delete config")}
             </button>
           )}
           {/* Status feedback */}
           {status.state === "connected" && (
             <span className="text-xs text-emerald-500">
-              {tr(`连接成功，${models.length} 个模型`, `Connected, ${models.length} models`)}
+              {tr(`Kết nối thành công, ${models.length} mô hình`, `Connected, ${models.length} models`)}
               {detectedModel
                 ? tr(
-                    `，已自动匹配 ${detectedModel}${detectedConfig ? ` / ${detectedConfig.apiFormat === "responses" ? "Responses" : "Chat"} / ${detectedConfig.stream ? "流式" : "非流式"}` : ""}`,
+                    `, đã tự khớp ${detectedModel}${detectedConfig ? ` / ${detectedConfig.apiFormat === "responses" ? "Responses" : "Chat"} / ${detectedConfig.stream ? "stream" : "không stream"}` : ""}`,
                     `, auto-matched ${detectedModel}${detectedConfig ? ` / ${detectedConfig.apiFormat === "responses" ? "Responses" : "Chat"} / ${detectedConfig.stream ? "streaming" : "non-streaming"}` : ""}`,
                   )
                 : ""}
@@ -352,12 +352,12 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
             <span className="text-xs text-destructive">{status.message}</span>
           )}
           {status.state === "saved" && (
-            <span className="text-xs text-emerald-500">{tr("已保存", "Saved")}</span>
+            <span className="text-xs text-emerald-500">{tr("Đã lưu", "Saved")}</span>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Field label={tr("协议类型", "Protocol")}>
+          <Field label={tr("Loại giao thức", "Protocol")}>
             <select
               value={apiFormat}
               onChange={(e) => setApiFormat(e.target.value as "chat" | "responses")}
@@ -368,14 +368,14 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
             </select>
           </Field>
 
-          <Field label={tr("流式响应", "Streaming")}>
+          <Field label={tr("Phản hồi stream", "Streaming")}>
             <label className="flex h-10 items-center gap-2 rounded-lg border border-border/60 bg-background px-3 text-sm">
               <input
                 type="checkbox"
                 checked={stream}
                 onChange={(e) => setStream(e.target.checked)}
               />
-              <span>{stream ? tr("开启", "On") : tr("关闭", "Off")}</span>
+              <span>{stream ? tr("Bật", "On") : tr("Tắt", "Off")}</span>
             </label>
           </Field>
         </div>
@@ -383,7 +383,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
         {/* Models */}
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground/70 font-medium uppercase tracking-wider">
-            {tr(`模型目录（${models.length}）`, `Model catalog (${models.length})`)}
+            {tr(`Danh mục mô hình (${models.length})`, `Model catalog (${models.length})`)}
           </p>
           <div className="flex gap-2">
             <input
@@ -396,7 +396,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
                   handleAddModel();
                 }
               }}
-              placeholder={tr("输入模型 ID，例如 gemini-3.1-pro", "Enter a model ID, e.g. gemini-3.1-pro")}
+              placeholder={tr("Nhập ID mô hình, ví dụ gemini-3.1-pro", "Enter a model ID, e.g. gemini-3.1-pro")}
               className="min-w-0 flex-1 rounded-lg border border-border/60 bg-background px-3 py-2 text-sm font-mono"
             />
             <button
@@ -406,11 +406,11 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
               className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 px-3 py-2 text-xs hover:bg-secondary/50 disabled:opacity-40"
             >
               <Plus size={13} />
-              {tr("添加", "Add")}
+              {tr("Thêm", "Add")}
             </button>
           </div>
           <p className="text-xs text-muted-foreground/60">
-            {tr("测试连接发现的模型和手动添加的模型都会在保存后持久化；内置目录只作为兜底。", "Discovered and manually added models are persisted on save; the built-in catalog is only a fallback.")}
+            {tr("Các mô hình phát hiện qua thử kết nối và thêm thủ công sẽ được lưu khi lưu; danh mục tích hợp chỉ là phương án dự phòng.", "Discovered and manually added models are persisted on save; the built-in catalog is only a fallback.")}
           </p>
           {hasModelCatalog && (
           <div className="space-y-2">
@@ -422,7 +422,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
                     <button
                       type="button"
                       onClick={() => handleRemoveModel(m.id)}
-                      aria-label={tr(`移除模型 ${m.id}`, `Remove model ${m.id}`)}
+                      aria-label={tr(`Gỡ mô hình ${m.id}`, `Remove model ${m.id}`)}
                       className="rounded-sm opacity-60 hover:opacity-100"
                     >
                       <X size={11} />
@@ -431,7 +431,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground/60">{tr("点击“测试连接”查看可用模型", "Click “Test connection” to list available models")}</p>
+              <p className="text-xs text-muted-foreground/60">{tr("Nhấp \"Thử kết nối\" để xem các mô hình khả dụng", "Click \"Test connection\" to list available models")}</p>
             )}
           </div>
           )}
@@ -440,7 +440,7 @@ export function ServiceDetailPage({ serviceId, nav }: { serviceId: string; nav: 
         {/* Advanced params */}
         <details className="group pt-2 border-t border-border/20">
           <summary className="text-xs text-muted-foreground/60 cursor-pointer select-none hover:text-muted-foreground transition-colors py-2">
-            {tr("高级参数", "Advanced")}
+            {tr("Tham số nâng cao", "Advanced")}
           </summary>
           <div className="space-y-4 pt-2">
             <Field label="temperature">

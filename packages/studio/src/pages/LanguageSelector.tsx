@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-export function LanguageSelector({ onSelect }: { onSelect: (lang: "zh" | "en") => void }) {
-  const [hovering, setHovering] = useState<"zh" | "en" | null>(null);
-  const [selected, setSelected] = useState<"zh" | "en" | null>(null);
+export function LanguageSelector({ onSelect }: { onSelect: (lang: "vi" | "en") => void }) {
+  const [hovering, setHovering] = useState<"vi" | "en" | null>(null);
+  const [selected, setSelected] = useState<"vi" | "en" | null>(null);
 
-  const handleSelect = (lang: "zh" | "en") => {
+  const handleSelect = (lang: "vi" | "en") => {
     setSelected(lang);
     // Brief pause for the selection animation before transitioning
     setTimeout(() => onSelect(lang), 400);
@@ -24,23 +24,23 @@ export function LanguageSelector({ onSelect }: { onSelect: (lang: "zh" | "en") =
       {/* Language cards — generous, distinct, immersive */}
       <div className="flex gap-8 mb-16">
         <button
-          onClick={() => handleSelect("zh")}
-          onMouseEnter={() => setHovering("zh")}
+          onClick={() => handleSelect("vi")}
+          onMouseEnter={() => setHovering("vi")}
           onMouseLeave={() => setHovering(null)}
           className={`group w-80 border rounded-lg p-10 text-left transition-all duration-300 ${
-            selected === "zh"
+            selected === "vi"
               ? "border-primary bg-primary/10 scale-[1.02]"
-              : hovering === "zh"
+              : hovering === "vi"
                 ? "border-primary/50 bg-card"
                 : "border-border bg-card/50"
           }`}
         >
-          <div className="font-serif text-3xl mb-4 text-foreground">中文创作</div>
+          <div className="font-serif text-3xl mb-4 text-foreground">Sáng tác tiếng Việt</div>
           <div className="text-base text-foreground/70 leading-relaxed mb-6">
-            玄幻 · 仙侠 · 都市 · 恐怖 · 通用
+            Tiên hiệp · Đô thị · Kinh dị · Viễn tưởng · Đại chúng
           </div>
           <div className="text-sm text-muted-foreground">
-            番茄小说 · 起点中文网 · 飞卢
+            Wattpad · Webnovel · các nền tảng truyện innen dòng
           </div>
         </button>
 
@@ -67,7 +67,7 @@ export function LanguageSelector({ onSelect }: { onSelect: (lang: "zh" | "en") =
       </div>
 
       <div className="text-sm text-muted-foreground">
-        可在设置中更改 · Can be changed in Settings
+        Có thể thay đổi trong Cài đặt · Can be changed in Settings
       </div>
     </div>
   );

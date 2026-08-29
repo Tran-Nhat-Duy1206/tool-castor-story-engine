@@ -39,8 +39,8 @@ export const DEFAULT_DETECTION: DetectionDraft = {
 
 export const NOTIFY_TYPES: ReadonlyArray<{ value: NotifyType; label: string }> = [
   { value: "telegram", label: "Telegram" },
-  { value: "feishu", label: "飞书 Feishu" },
-  { value: "wechat-work", label: "企业微信" },
+  { value: "feishu", label: "Feishu" },
+  { value: "wechat-work", label: "WeCom (WeChat Doanh nghiệp)" },
   { value: "webhook", label: "Webhook" },
 ];
 

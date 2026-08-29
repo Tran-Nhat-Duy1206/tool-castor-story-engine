@@ -4,7 +4,7 @@ interface FrontmatterCardsProps {
   readonly cards: ReadonlyArray<DisplayCard>;
 }
 
-// Renders the structured frontmatter of a story file (主角 / 题材 / 红线 …) as
+// Renders the structured frontmatter of a story file (protagonist / genre / hard lines...) as
 // small reader-friendly cards, so authors never see raw YAML keys.
 export function FrontmatterCards({ cards }: FrontmatterCardsProps) {
   if (cards.length === 0) return null;

@@ -64,8 +64,8 @@ export const SLOT_GLYPH: Record<string, string> = {
   timer: "⏳", pressure: "🔥", resource: "🪙", relation: "❤", clue: "🔍", evidence: "📄", flag: "🚩",
 };
 
-export const KIND_LABEL_ZH: Record<string, string> = {
-  item: "物件", evidence: "证据", clue: "线索", claim: "主张", proof_chain: "证据链",
+export const KIND_LABEL_VI: Record<string, string> = {
+  item: "Vật phẩm", evidence: "Bằng chứng", clue: "Manh mối", claim: "Luận điểm", proof_chain: "Chuỗi bằng chứng",
 };
 export const KIND_LABEL_EN: Record<string, string> = {
   item: "Item", evidence: "Evidence", clue: "Clue", claim: "Claim", proof_chain: "Proof chain",
@@ -75,9 +75,9 @@ export const KIND_LABEL_EN: Record<string, string> = {
 export const EVIDENCE_LADDER = [
   "unknown", "hinted", "seen", "collected", "verified", "weaponized", "exposed", "exhausted",
 ] as const;
-export const LADDER_LABEL_ZH: Record<string, string> = {
-  unknown: "未知", hinted: "有线索", seen: "已看见", collected: "已收集",
-  verified: "已验证", weaponized: "武器化", exposed: "已揭露", exhausted: "已耗尽",
+export const LADDER_LABEL_VI: Record<string, string> = {
+  unknown: "Chưa biết", hinted: "Có manh mối", seen: "Đã thấy", collected: "Đã thu thập",
+  verified: "Đã xác minh", weaponized: "Đã vũ khí hóa", exposed: "Đã bị lộ", exhausted: "Đã cạn kiệt",
 };
 export const LADDER_LABEL_EN: Record<string, string> = {
   unknown: "Unknown", hinted: "Hinted", seen: "Seen", collected: "Collected",

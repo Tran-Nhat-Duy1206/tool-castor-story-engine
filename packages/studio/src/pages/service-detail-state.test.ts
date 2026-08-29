@@ -82,7 +82,7 @@ describe("saveServiceConfig", () => {
     })).resolves.toMatchObject({
       status: {
         state: "error",
-        message: "请先输入 API Key",
+        message: "Vui lòng nhập API Key trước",
       },
     });
   });

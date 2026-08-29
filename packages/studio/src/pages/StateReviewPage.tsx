@@ -79,30 +79,30 @@ interface UserDraft {
   fields: DraftFields;
 }
 
-const USER_DRAFT_KINDS: ReadonlyArray<{ value: UserDraft["kind"]; zh: string; en: string }> = [
-  { value: "current-state-fact", zh: "当前状态事实", en: "Current-state fact" },
-  { value: "hook-mention", zh: "伏笔提及", en: "Hook mention" },
-  { value: "hook-resolve", zh: "伏笔回收", en: "Hook resolve" },
-  { value: "hook-defer", zh: "伏笔推迟", en: "Hook defer" },
-  { value: "note", zh: "备注", en: "Note" },
+const USER_DRAFT_KINDS: ReadonlyArray<{ value: UserDraft["kind"]; vi: string; en: string }> = [
+  { value: "current-state-fact", vi: "Sự kiện trạng thái hiện tại", en: "Current-state fact" },
+  { value: "hook-mention", vi: "Nhắc đến tiền để", en: "Hook mention" },
+  { value: "hook-resolve", vi: "Thu hồi tiền để", en: "Hook resolve" },
+  { value: "hook-defer", vi: "Hoãn tiền để", en: "Hook defer" },
+  { value: "note", vi: "Ghi chú", en: "Note" },
 ];
 
 /** Client-side pre-validation for the user-add form (Core re-validates). */
 function validateUserDraft(draft: UserDraft): string[] {
   const issues: string[] = [];
-  const need = (field: string, labelZh: string, labelEn: string) => {
+  const need = (field: string, labelVi: string, labelEn: string) => {
     if (!(draft.fields[field] ?? "").trim()) {
-      issues.push(`${labelZh}不能为空 · ${labelEn} is required`);
+      issues.push(`${labelVi} không được để trống · ${labelEn} is required`);
     }
   };
   if (draft.kind === "current-state-fact") {
-    need("subject", "主体", "Subject");
-    need("predicate", "谓词", "Predicate");
-    need("object", "值", "Value");
+    need("subject", "Chủ thể", "Subject");
+    need("predicate", "Vị từ", "Predicate");
+    need("object", "Giá trị", "Value");
   } else if (draft.kind === "note") {
-    need("text", "备注内容", "Note text");
+    need("text", "Nội dung ghi chú", "Note text");
   } else {
-    need("hookId", "伏笔 ID", "Hook ID");
+    need("hookId", "ID tiền để", "Hook ID");
   }
   return issues;
 }
@@ -136,8 +136,8 @@ function buildUserChange(draft: UserDraft): unknown {
  * an automatic decision.
  */
 export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageProps) {
-  const [lang, setLang] = useState<UiLanguage>("zh");
-  const zh = lang === "zh";
+  const [lang, setLang] = useState<UiLanguage>("vi");
+  const vi = lang === "vi";
   const [review, setReview] = useState<StateReviewArtifact | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -328,7 +328,7 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
       const outcome = await postStateReviewUserItem(bookId, chapterNumber, {
         kind: userDraft.kind,
         change: buildUserChange(userDraft),
-        title: userTitleFor(userDraft, zh),
+        title: userTitleFor(userDraft, vi),
         expectedReviewRevision: active.reviewRevision,
       });
       applyMutationOutcome(outcome);
@@ -400,21 +400,21 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
           </div>
           <div>
             <h1 className="text-xl font-semibold text-foreground">
-              {zh ? "状态复核" : "State Review"}
+              {vi ? "Soát lại trạng thái" : "State Review"}
               <span className="ml-3 rounded-full border border-border/60 bg-secondary/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                 #{chapterNumber}
               </span>
             </h1>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {zh
-                ? "你是最终裁决者：逐项审阅 AI 提议的状态修改，或添加你自己的修改。"
+              {vi
+                ? "Bạn là người phán quyết cuối cùng: soát từng thay đổi trạng thái do AI đề xuất, hoặc thêm thay đổi của riêng bạn."
                 : "You are the final authority: review each proposed state change, or add your own."}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5 rounded-lg bg-muted/50 p-0.5">
-            {(["zh", "en"] as const).map((value) => (
+            {(["vi", "en"] as const).map((value) => (
               <button
                 key={value}
                 onClick={() => setLang(value)}
@@ -422,7 +422,7 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
                   lang === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"
                 }`}
               >
-                {value === "zh" ? "中" : "EN"}
+                {value === "vi" ? "VI" : "EN"}
               </button>
             ))}
           </div>
@@ -432,21 +432,21 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
             className="inline-flex items-center gap-1.5 rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
           >
             <RefreshCw size={13} className={loading ? "animate-spin" : undefined} />
-            {zh ? "刷新" : "Refresh"}
+            {vi ? "Làm mới" : "Refresh"}
           </button>
           <button
             onClick={() => nav.toChapter(bookId, chapterNumber)}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft size={13} />
-            {zh ? "返回章节" : "Back to chapter"}
+            {vi ? "Quay lại chương" : "Back to chapter"}
           </button>
         </div>
       </header>
 
       {loading && !review && (
         <div className="py-16 text-center text-sm text-muted-foreground">
-          {zh ? "加载状态复核…" : "Loading state review…"}
+          {vi ? "Đang tải soát lại trạng thái…" : "Loading state review…"}
         </div>
       )}
       {loadError && (
@@ -456,12 +456,12 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
         </div>
       )}
 
-      {mutationView && <OutcomeBanner view={mutationView} zh={zh} onRefetch={() => void refetchReview()} />}
+      {mutationView && <OutcomeBanner view={mutationView} vi={vi} onRefetch={() => void refetchReview()} />}
 
       {confirmView && (
         <ConfirmOutcomeBanner
           view={confirmView}
-          zh={zh}
+          vi={vi}
           onReload={() => { setConfirmView(null); void refetchReview(); }}
           onRetryAudit={() => { setConfirmView(null); void handleRebuild(); }}
         />
@@ -470,8 +470,8 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
       {/* Lifecycle: none */}
       {!loading && !review && !loadError && (
         <div className="rounded-2xl border border-border/50 bg-card/50 p-8 text-center text-sm text-muted-foreground">
-          {zh
-            ? "本章没有待处理的状态复核。"
+          {vi
+            ? "Chương này không có việc soát lại trạng thái nào đang chờ."
             : "There is no pending state review for this chapter."}
         </div>
       )}
@@ -481,12 +481,12 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
         <ShellPanel
           tone="amber"
           icon={<History size={18} />}
-          title={zh ? "需要重建状态复核" : "Rebuild required"}
+          title={vi ? "Cần dựng lại bản soát lại" : "Rebuild required"}
           body={
             <>
               <p className="text-sm text-muted-foreground">
-                {zh
-                  ? "章节正文在发布后发生了变化，原有的状态提议已失效，需要根据最新正文重建。"
+                {vi
+                  ? "Phần thân chương đã thay đổi sau khi xuất bản, các đề xuất trạng thái cũ đã hết hiệu lực và cần được dựng lại từ phần thân mới nhất."
                   : "The chapter prose changed after publication, so the previous proposal is outdated and must be rebuilt from the latest text."}
               </p>
               {"reason" in (review as { reason?: string }) && (review as { reason?: string }).reason ? (
@@ -506,8 +506,8 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
               <RefreshCw size={14} />
             )}
             {pendingAction === "rebuild"
-              ? (zh ? "正在重建…" : "Rebuilding…")
-              : (zh ? "重建状态复核" : "Rebuild State Review")}
+              ? (vi ? "Đang dựng lại…" : "Rebuilding…")
+              : (vi ? "Dựng lại bản soát lại" : "Rebuild State Review")}
           </button>
         </ShellPanel>
       )}
@@ -516,7 +516,7 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6" role="alert">
           <div className="flex items-center gap-2 text-sm font-medium text-destructive">
             <FileWarning size={16} />
-            {zh ? "重建失败" : "Rebuild failed"}
+            {vi ? "Dựng lại thất bại" : "Rebuild failed"}
           </div>
           <p className="mt-2 break-words text-xs text-muted-foreground">{rebuildFailedBannerView(review).reason}</p>
           <div className="mt-4 flex gap-2">
@@ -530,14 +530,14 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
               ) : (
                 <RefreshCw size={14} />
               )}
-              {zh ? "重试审计（Retry Audit）" : "Retry Audit"}
+              {vi ? "Thử kiểm tra lại (Retry Audit)" : "Retry Audit"}
             </button>
             <button
               onClick={() => nav.toChapter(bookId, chapterNumber)}
               className="inline-flex items-center gap-2 rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
             >
               <Pencil size={14} />
-              {zh ? "编辑章节" : "Edit Chapter"}
+              {vi ? "Chỉnh sửa chương" : "Edit Chapter"}
             </button>
           </div>
         </div>
@@ -549,11 +549,11 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
           <div className="rounded-2xl border border-amber-500/40 bg-amber-500/5 p-6" role="alert">
             <div className="flex items-center gap-2 text-sm font-medium text-amber-600">
               <ShieldAlert size={16} />
-              {zh ? "此提议已过期（stale），不可确认" : "This proposal is stale and cannot be confirmed"}
+              {vi ? "Đề xuất này đã lỗi thời (stale), không thể xác nhận" : "This proposal is stale and cannot be confirmed"}
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              {zh
-                ? "章节输入在此提议生成后发生了变化。请重建以生成新的提议；旧的决定不会被保留。"
+              {vi
+                ? "Đầu vào của chương đã thay đổi sau khi đề xuất này được tạo. Hãy dựng lại để tạo đề xuất mới; các quyết định cũ sẽ không được giữ lại."
                 : "Chapter inputs changed after this proposal was generated. Rebuild to create a fresh proposal; old decisions are not carried over."}
             </p>
             <button
@@ -562,10 +562,10 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
               className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm disabled:opacity-50"
             >
               <RefreshCw size={14} />
-              {zh ? "重建状态复核" : "Rebuild State Review"}
+              {vi ? "Dựng lại bản soát lại" : "Rebuild State Review"}
             </button>
           </div>
-          <ReadOnlyReview review={active} zh={zh} />
+          <ReadOnlyReview review={active} vi={vi} />
         </div>
       )}
 
@@ -573,7 +573,7 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
       {lifecycle === "active" && active && (
         <ActiveReviewSurface
           review={active}
-          zh={zh}
+          vi={vi}
           lang={lang}
           busy={busy}
           pendingAction={pendingAction}
@@ -606,7 +606,7 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
       {receipts.length > 0 && (
         <section className="rounded-2xl border border-border/50 bg-card/50 p-4">
           <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            {zh ? "确认回执历史" : "Confirmation receipts"}
+            {vi ? "Lịch sử biên nhận xác nhận" : "Confirmation receipts"}
           </h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {receiptChips(receipts).map((chip) => (
@@ -621,10 +621,10 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
               >
                 {chip.resolution === "superseded" ? <X size={11} /> : <CheckCircle2 size={11} />}
                 {chip.resolution === "superseded"
-                  ? (zh ? "已被取代" : "superseded")
+                  ? (vi ? "đã bị thay thế" : "superseded")
                   : chip.resolution === "confirmed-no-changes"
-                    ? (zh ? "确认无修改" : "confirmed-no-changes")
-                    : (zh ? "已确认" : "resolved")}
+                    ? (vi ? "xác nhận không đổi" : "confirmed-no-changes")
+                    : (vi ? "đã xác nhận" : "resolved")}
                 <Clock size={10} className="opacity-60" />
                 {chip.resolvedAt.slice(0, 16).replace("T", " ")}
               </span>
@@ -646,12 +646,12 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
             <div className="flex items-center gap-2 text-destructive">
               <ShieldAlert size={18} />
               <h2 id="reject-warning-title" className="text-base font-semibold">
-                {zh ? "拒绝有原文直接依据的修改？" : "Reject a change directly supported by the text?"}
+                {vi ? "Từ chối thay đổi được phần văn bản trực tiếp chứng minh?" : "Reject a change directly supported by the text?"}
               </h2>
             </div>
             <p id="reject-warning-body" className="mt-3 text-sm text-muted-foreground">
-              {zh
-                ? "该修改看起来被章节文本直接支持。拒绝它可能导致规范状态与正文不一致。"
+              {vi
+                ? "Thay đổi này có vẻ được phần văn bản chương trực tiếp chứng minh. Từ chối có thể khiến trạng thái chính thống mâu thuẫn với phần thân."
                 : "This change appears to be directly supported by the chapter text. Rejecting it may cause Canon to disagree with the prose."}
             </p>
             <div className="mt-6 flex flex-wrap justify-end gap-2">
@@ -659,7 +659,7 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
                 onClick={() => setWarningItem(null)}
                 className="rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
               >
-                {zh ? "取消" : "Cancel"}
+                {vi ? "Hủy" : "Cancel"}
               </button>
               <button
                 onClick={() => {
@@ -669,13 +669,13 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
                 className="rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
               >
                 <Pencil size={12} className="mr-1 inline" />
-                {zh ? "编辑章节" : "Edit Chapter"}
+                {vi ? "Chỉnh sửa chương" : "Edit Chapter"}
               </button>
               <button
                 onClick={() => void handleRejectAnyway()}
                 className="rounded-xl bg-destructive px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-destructive/90"
               >
-                {zh ? "仍然拒绝" : "Reject Anyway"}
+                {vi ? "Vẫn từ chối" : "Reject Anyway"}
               </button>
             </div>
           </div>
@@ -695,12 +695,12 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
             <div className="flex items-center gap-2 text-destructive">
               <ShieldAlert size={18} />
               <h2 id="reject-all-warning-title" className="text-base font-semibold">
-                {zh ? "批量拒绝包含有原文直接依据的提议" : "Batch reject includes text-supported proposals"}
+                {vi ? "Từ chối hàng loạt gồm cả các đề xuất được văn bản chứng minh trực tiếp" : "Batch reject includes text-supported proposals"}
               </h2>
             </div>
             <p id="reject-all-warning-body" className="mt-3 text-sm text-muted-foreground">
-              {zh
-                ? "部分 AI 提议被章节文本直接支持。全部拒绝可能导致规范状态与正文不一致。确定要全部拒绝吗？"
+              {vi
+                ? "Một số đề xuất của AI được phần văn bản chương chứng minh trực tiếp. Từ chối tất cả có thể khiến trạng thái chính thống mâu thuẫn với phần thân. Bạn chắc chắn muốn từ chối tất cả?"
                 : "Some AI proposals appear directly supported by the chapter text. Rejecting all of them may cause Canon to disagree with the prose. Continue?"}
             </p>
             <div className="mt-6 flex flex-wrap justify-end gap-2">
@@ -708,13 +708,13 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
                 onClick={() => setRejectAllArmed(false)}
                 className="rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
               >
-                {zh ? "取消" : "Cancel"}
+                {vi ? "Hủy" : "Cancel"}
               </button>
               <button
                 onClick={() => void handleRejectAll(true)}
                 className="rounded-xl bg-destructive px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-destructive/90"
               >
-                {zh ? "仍然全部拒绝" : "Reject All Anyway"}
+                {vi ? "Vẫn từ chối tất cả" : "Reject All Anyway"}
               </button>
             </div>
           </div>
@@ -730,7 +730,7 @@ export function StateReviewPage({ bookId, chapterNumber, nav }: StateReviewPageP
 
 interface ActiveSurfaceProps {
   review: ActiveStateReviewArtifact;
-  zh: boolean;
+  vi: boolean;
   lang: UiLanguage;
   busy: boolean;
   pendingAction: string | null;
@@ -760,7 +760,7 @@ interface ActiveSurfaceProps {
 
 function ActiveReviewSurface(props: ActiveSurfaceProps) {
   const {
-    review, zh, lang, busy, pendingAction, progress, zeroChange, canConfirm,
+    review, vi, lang, busy, pendingAction, progress, zeroChange, canConfirm,
     editingItemId, editDraft, setEditDraft, userDraftOpen, setUserDraftOpen,
     userDraft, setUserDraft, draftIssues, rejectAllArmed,
     onAccept, onReject, onStartEdit, onCancelEdit, onSaveEdit,
@@ -773,18 +773,18 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
     <div className="space-y-4" data-testid="state-review-active">
       {/* Identity / anchors */}
       <section className="grid grid-cols-2 gap-3 rounded-2xl border border-border/50 bg-card/50 p-4 sm:grid-cols-4">
-        <Cell label={zh ? "来源章节" : "Source chapter"} value={`#${review.sourceChapter}`} />
-        <Cell label={zh ? "生效槽位" : "Effective slot"} value={`#${review.effectiveChapter}`} />
-        <Cell label={zh ? "复核版本" : "Review revision"} value={`r${review.reviewRevision}`} />
-        <Cell label={zh ? "生成 ID" : "Generation"} value={review.reviewId.slice(0, 8)} />
+        <Cell label={vi ? "Chương nguồn" : "Source chapter"} value={`#${review.sourceChapter}`} />
+        <Cell label={vi ? "Ô hiệu lực" : "Effective slot"} value={`#${review.effectiveChapter}`} />
+        <Cell label={vi ? "Phiên bản soát lại" : "Review revision"} value={`r${review.reviewRevision}`} />
+        <Cell label={vi ? "ID lượt tạo" : "Generation"} value={review.reviewId.slice(0, 8)} />
       </section>
 
       {historical && (
         <div className="flex items-start gap-2 rounded-2xl border border-sky-500/30 bg-sky-500/5 p-4 text-sm text-sky-700 dark:text-sky-400" role="note">
           <History size={15} className="mt-0.5 shrink-0" />
           <span>
-            {zh
-              ? `历史章节修正 — 此处确认的修改将从第 ${historical.effectiveChapter} 章起影响 Canon。第 ${historical.sourceChapter + 1}–${historical.effectiveChapter - 1} 章及其正文/历史不会被改写。`
+            {vi
+              ? `Sửa đổi chương quá khứ — các thay đổi xác nhận tại đây sẽ ảnh hưởng Canon từ chương ${historical.effectiveChapter}. Các chương ${historical.sourceChapter + 1}–${historical.effectiveChapter - 1} cùng phần thân/lịch sử của chúng sẽ không bị viết lại.`
               : `Historical chapter correction — Changes confirmed here will affect Canon from Chapter ${historical.effectiveChapter} onward. Existing Chapters ${historical.sourceChapter + 1}–${historical.effectiveChapter - 1} and their prose/history will not be rewritten.`}
           </span>
         </div>
@@ -794,9 +794,9 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
       <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/50 bg-card/50 p-4">
         <div className="text-sm">
           <span className="font-semibold text-foreground">
-            {zh ? `${progress.reviewedCount} / ${progress.total}` : `${progress.reviewedCount} / ${progress.total}`}
+            {vi ? `${progress.reviewedCount} / ${progress.total}` : `${progress.reviewedCount} / ${progress.total}`}
           </span>
-          <span className="ml-1.5 text-muted-foreground">{zh ? "项已复核" : "reviewed"}</span>
+          <span className="ml-1.5 text-muted-foreground">{vi ? "mục đã soát" : "reviewed"}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -804,7 +804,7 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
             className="inline-flex items-center gap-1.5 rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <Plus size={13} />
-            {zh ? "添加缺失的修改" : "Add Missing Change"}
+            {vi ? "Thêm thay đổi còn thiếu" : "Add Missing Change"}
           </button>
           {progress.total > 0 && (
             <button
@@ -813,7 +813,7 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
               className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10 disabled:opacity-50"
             >
               <X size={13} />
-              {zh ? "拒绝全部 AI 提议" : "Reject All AI"}
+              {vi ? "Từ chối tất cả đề xuất AI" : "Reject All AI"}
             </button>
           )}
           <button
@@ -828,18 +828,18 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
               <CheckCircle2 size={14} />
             )}
             {zeroChange
-              ? (zh ? "确认无修改" : "Confirm No Changes")
-              : (zh ? "最终确认" : "Final Confirm")}
+              ? (vi ? "Xác nhận không có thay đổi" : "Confirm No Changes")
+              : (vi ? "Xác nhận cuối cùng" : "Final Confirm")}
           </button>
         </div>
       </section>
 
       {/* User add form */}
       {userDraftOpen && (
-        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-4" aria-label={zh ? "添加状态修改" : "Add state change"}>
+        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-4" aria-label={vi ? "Thêm thay đổi trạng thái" : "Add state change"}>
           <div className="flex flex-wrap items-center gap-3">
             <label className="text-xs font-medium text-muted-foreground" htmlFor="user-draft-kind">
-              {zh ? "类型" : "Kind"}
+              {vi ? "Kiểu" : "Kind"}
             </label>
             <select
               id="user-draft-kind"
@@ -849,7 +849,7 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
             >
               {USER_DRAFT_KINDS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {zh ? option.zh : option.en}
+                  {vi ? option.vi : option.en}
                 </option>
               ))}
             </select>
@@ -857,16 +857,16 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
             {userDraft.kind === "current-state-fact" && (
               <>
-                <LabeledInput id="ud-subject" label={zh ? "主体" : "Subject"} value={userDraft.fields.subject ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, subject: v } })} />
-                <LabeledInput id="ud-predicate" label={zh ? "谓词" : "Predicate"} value={userDraft.fields.predicate ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, predicate: v } })} />
-                <LabeledInput id="ud-object" label={zh ? "值" : "Value"} value={userDraft.fields.object ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, object: v } })} />
+                <LabeledInput id="ud-subject" label={vi ? "Chủ thể" : "Subject"} value={userDraft.fields.subject ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, subject: v } })} />
+                <LabeledInput id="ud-predicate" label={vi ? "Vị từ" : "Predicate"} value={userDraft.fields.predicate ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, predicate: v } })} />
+                <LabeledInput id="ud-object" label={vi ? "Giá trị" : "Value"} value={userDraft.fields.object ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, object: v } })} />
               </>
             )}
             {(userDraft.kind === "hook-mention" || userDraft.kind === "hook-resolve" || userDraft.kind === "hook-defer") && (
-              <LabeledInput id="ud-hookid" label={zh ? "伏笔 ID" : "Hook ID"} value={userDraft.fields.hookId ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, hookId: v } })} />
+              <LabeledInput id="ud-hookid" label={vi ? "ID tiền để" : "Hook ID"} value={userDraft.fields.hookId ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, hookId: v } })} />
             )}
             {userDraft.kind === "note" && (
-              <LabeledInput id="ud-text" label={zh ? "备注内容" : "Note"} value={userDraft.fields.text ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, text: v } })} />
+              <LabeledInput id="ud-text" label={vi ? "Nội dung ghi chú" : "Note"} value={userDraft.fields.text ?? ""} onChange={(v) => setUserDraft({ ...userDraft, fields: { ...userDraft.fields, text: v } })} />
             )}
           </div>
           {draftIssues.length > 0 && (
@@ -885,13 +885,13 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
               ) : (
                 <Plus size={13} />
               )}
-              {zh ? "保存修改" : "Save Change"}
+              {vi ? "Lưu thay đổi" : "Save Change"}
             </button>
             <button
               onClick={() => setUserDraftOpen(false)}
               className="rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
             >
-              {zh ? "取消" : "Cancel"}
+              {vi ? "Hủy" : "Cancel"}
             </button>
           </div>
         </section>
@@ -900,7 +900,7 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
       {/* Zero-change layout switch (design §19) */}
       {zeroChange && (
         <div className="rounded-2xl border border-border/50 bg-card/50 p-6 text-sm text-muted-foreground" data-testid="zero-change-note">
-          {zh ? "没有提议的状态修改。" : "No proposed state changes."}
+          {vi ? "Không có thay đổi trạng thái nào được đề xuất." : "No proposed state changes."}
         </div>
       )}
 
@@ -908,17 +908,17 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
       {groups.map((group) => (
         <section key={group.key} className="space-y-2">
           <h2 className="px-1 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            {zh ? group.zh : group.en}
+            {vi ? group.vi : group.en}
             <span className="ml-2 font-normal normal-case tracking-normal">({group.items.length})</span>
           </h2>
           {group.items.length === 0 && (
-            <p className="px-1 text-xs text-muted-foreground/60">{zh ? "（无）" : "(none)"}</p>
+            <p className="px-1 text-xs text-muted-foreground/60">{vi ? "(không có)" : "(none)"}</p>
           )}
           {group.items.map((item) => (
             <ReviewItemCard
               key={item.id}
               item={item}
-              zh={zh}
+              vi={vi}
               lang={lang}
               busy={busy}
               pending={pendingAction === item.id}
@@ -944,11 +944,11 @@ function ActiveReviewSurface(props: ActiveSurfaceProps) {
 // ---------------------------------------------------------------------------
 
 function ReviewItemCard({
-  item, zh, lang, busy, pending, editing, editDraft, setEditDraft,
+  item, vi, lang, busy, pending, editing, editDraft, setEditDraft,
   onAccept, onReject, onStartEdit, onCancelEdit, onSaveEdit, onRemove,
 }: {
   item: ReviewItem;
-  zh: boolean;
+  vi: boolean;
   lang: UiLanguage;
   busy: boolean;
   pending: boolean;
@@ -985,23 +985,23 @@ function ReviewItemCard({
         {isUser && (
           <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/40 bg-sky-500/10 px-2 py-0.5 text-[10px] font-bold text-sky-600">
             <User size={10} />
-            {zh ? "手动添加" : "user"}
+            {vi ? "thêm thủ công" : "user"}
           </span>
         )}
         {item.evidence?.verifiedLevel === "explicit" && (
           <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600">
             <Quote size={10} />
-            {zh ? "已验证·原文直接支持" : "verified · explicit"}
+            {vi ? "đã xác minh · văn bản chứng minh trực tiếp" : "verified · explicit"}
           </span>
         )}
         {item.evidence?.verifiedLevel === "inferred" && (
           <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-secondary/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-            {zh ? "推断证据" : "inferred evidence"}
+            {vi ? "bằng chứng suy diễn" : "inferred evidence"}
           </span>
         )}
-        <DecisionBadge decision={item.decision} zh={zh} />
+        <DecisionBadge decision={item.decision} vi={vi} />
         {pending && (
-          <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary/20 border-t-primary" aria-label={zh ? "处理中" : "in progress"} />
+          <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary/20 border-t-primary" aria-label={vi ? "đang xử lý" : "in progress"} />
         )}
       </div>
 
@@ -1010,12 +1010,12 @@ function ReviewItemCard({
       {/* Proposed vs effective meaning */}
       <div className="mt-2 space-y-1 text-sm">
         <p className="text-muted-foreground">
-          <span className="mr-1.5 rounded bg-secondary/60 px-1.5 py-0.5 text-[10px] font-bold uppercase">{zh ? "提议" : "proposal"}</span>
+          <span className="mr-1.5 rounded bg-secondary/60 px-1.5 py-0.5 text-[10px] font-bold uppercase">{vi ? "đề xuất" : "proposal"}</span>
           {describeProposalChange(item.proposal, lang)}
         </p>
         {item.decision === "edited" && item.editedChange && (
           <p className="text-foreground">
-            <span className="mr-1.5 rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold uppercase text-primary">{zh ? "编辑后生效" : "effective (edited)"}</span>
+            <span className="mr-1.5 rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold uppercase text-primary">{vi ? "hiệu lực sau chỉnh sửa" : "effective (edited)"}</span>
             {describeProposalChange(item.editedChange, lang)}
           </p>
         )}
@@ -1030,17 +1030,17 @@ function ReviewItemCard({
         <div className="mt-3 flex flex-wrap gap-2">
           {!isUser && (
             <>
-              <ActionButton onClick={onAccept} disabled={busy} tone="positive" label={zh ? "接受" : "Accept"} icon={<Check size={12} />} />
-              <ActionButton onClick={onStartEdit} disabled={busy} tone="neutral" label={zh ? "编辑" : "Edit"} icon={<Pencil size={12} />} />
-              <ActionButton onClick={onReject} disabled={busy} tone="negative" label={zh ? "拒绝" : "Reject"} icon={<X size={12} />} />
+              <ActionButton onClick={onAccept} disabled={busy} tone="positive" label={vi ? "Chấp nhận" : "Accept"} icon={<Check size={12} />} />
+              <ActionButton onClick={onStartEdit} disabled={busy} tone="neutral" label={vi ? "Chỉnh sửa" : "Edit"} icon={<Pencil size={12} />} />
+              <ActionButton onClick={onReject} disabled={busy} tone="negative" label={vi ? "Từ chối" : "Reject"} icon={<X size={12} />} />
             </>
           )}
           {isUser && (
-            <ActionButton onClick={onRemove} disabled={busy} tone="negative" label={zh ? "删除" : "Remove"} icon={<Trash2 size={12} />} />
+            <ActionButton onClick={onRemove} disabled={busy} tone="negative" label={vi ? "Xóa" : "Remove"} icon={<Trash2 size={12} />} />
           )}
           {decided && !isUser && (
             <span className="self-center text-[11px] text-muted-foreground">
-              {zh ? "已裁定 · 可再次修改决定" : "decided · you can change this decision"}
+              {vi ? "đã quyết định · có thể đổi quyết định" : "decided · you can change this decision"}
             </span>
           )}
         </div>
@@ -1050,7 +1050,7 @@ function ReviewItemCard({
       )}
       {isNote && (
         <p className="mt-2 text-[11px] text-muted-foreground/70">
-          {zh ? "备注仅供参考，不参与完成度，也无需裁决。" : "Notes are informational — they never block completion and need no decision."}
+          {vi ? "Ghi chú chỉ mang tính tham khảo — không ảnh hưởng độ hoàn thành và không cần quyết định." : "Notes are informational — they never block completion and need no decision."}
         </p>
       )}
 
@@ -1059,8 +1059,8 @@ function ReviewItemCard({
         <div className="mt-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
           {hookUpsert ? (
             <p className="text-xs text-muted-foreground">
-              {zh
-                ? "完整伏笔记录暂不支持字段级编辑：请选择接受或拒绝。"
+              {vi
+                ? "Bản ghi tiền để đầy đủ chưa hỗ trợ chỉnh sửa theo trường: hãy chọn chấp nhận hoặc từ chối."
                 : "Field-level editing is not available for full hook records yet — accept or reject instead."}
             </p>
           ) : (
@@ -1069,7 +1069,7 @@ function ReviewItemCard({
                 <LabeledInput
                   key={field.key}
                   id={`edit-${item.id}-${field.key}`}
-                  label={zh ? field.zh : field.en}
+                  label={vi ? field.vi : field.en}
                   value={editDraft[field.key] ?? ""}
                   onChange={(value) => setEditDraft({ ...editDraft, [field.key]: value })}
                 />
@@ -1083,13 +1083,13 @@ function ReviewItemCard({
                 disabled={busy}
                 className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm disabled:opacity-50"
               >
-                {zh ? "保存并裁定" : "Save & Decide"}
+                {vi ? "Lưu & quyết định" : "Save & Decide"}
               </button>
               <button
                 onClick={onCancelEdit}
                 className="rounded-xl border border-border/50 px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
               >
-                {zh ? "取消" : "Cancel"}
+                {vi ? "Hủy" : "Cancel"}
               </button>
             </div>
           )}
@@ -1099,19 +1099,19 @@ function ReviewItemCard({
   );
 }
 
-function DecisionBadge({ decision, zh }: { decision: ReviewItem["decision"]; zh: boolean }) {
+function DecisionBadge({ decision, vi }: { decision: ReviewItem["decision"]; vi: boolean }) {
   if (decision === "undecided") {
-    return <span className="rounded-full bg-secondary/60 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">{zh ? "待定" : "undecided"}</span>;
+    return <span className="rounded-full bg-secondary/60 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">{vi ? "chưa quyết" : "undecided"}</span>;
   }
-  const map: Record<string, { zh: string; en: string; cls: string }> = {
-    accepted: { zh: "已接受", en: "accepted", cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-600" },
-    edited: { zh: "已编辑", en: "edited", cls: "border-sky-500/40 bg-sky-500/10 text-sky-600" },
-    rejected: { zh: "已拒绝", en: "rejected", cls: "border-destructive/40 bg-destructive/10 text-destructive" },
+  const map: Record<string, { vi: string; en: string; cls: string }> = {
+    accepted: { vi: "đã chấp nhận", en: "accepted", cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-600" },
+    edited: { vi: "đã chỉnh sửa", en: "edited", cls: "border-sky-500/40 bg-sky-500/10 text-sky-600" },
+    rejected: { vi: "đã từ chối", en: "rejected", cls: "border-destructive/40 bg-destructive/10 text-destructive" },
   };
   const view = map[decision];
   return (
     <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${view.cls}`}>
-      {zh ? view.zh : view.en}
+      {vi ? view.vi : view.en}
     </span>
   );
 }
@@ -1173,9 +1173,9 @@ function Cell({ label, value }: { label: string; value: string }) {
  * already_resolved and resolved-with-warnings are ALL successes — warnings
  * render visibly but never masquerade as failure and never auto-retry.
  */
-function ConfirmOutcomeBanner({ view, zh, onReload, onRetryAudit }: {
+function ConfirmOutcomeBanner({ view, vi, onReload, onRetryAudit }: {
   view: ConfirmOutcomeView;
-  zh: boolean;
+  vi: boolean;
   onReload: () => void;
   onRetryAudit: () => void;
 }) {
@@ -1194,23 +1194,23 @@ function ConfirmOutcomeBanner({ view, zh, onReload, onRetryAudit }: {
         {(view.tone === "conflict-reload" || view.tone === "locked") && <Lock size={15} className="opacity-70" />}
         {view.tone === "error" && <AlertTriangle size={15} />}
         {view.tone === "success" && (
-          zh ? "已确认 — 章节进入就绪（READY）" : "Confirmed — the chapter is READY"
+          vi ? "Đã xác nhận — chương ở trạng thái SẴN SÀNG (READY)" : "Confirmed — the chapter is READY"
         )}
         {view.tone === "warning-success" && (
-          zh ? "已确认（附警告）— 章节进入就绪（READY）" : "Confirmed (with warnings) — the chapter is READY"
+          vi ? "Đã xác nhận (kèm cảnh báo) — chương ở trạng thái SẴN SÀNG (READY)" : "Confirmed (with warnings) — the chapter is READY"
         )}
         {view.tone === "conflict-reload" && (
-          zh ? "确认被拒绝：此提议已不是当前生成" : "Confirm rejected: this proposal is no longer the current generation"
+          vi ? "Xác nhận bị từ chối: đề xuất này không còn là lượt tạo hiện tại" : "Confirm rejected: this proposal is no longer the current generation"
         )}
         {view.tone === "locked" && (
-          zh ? "书籍正被写入任务锁定，可稍后重试" : "The book is locked by a write task; retry shortly"
+          vi ? "Sách đang bị khóa bởi tác vụ ghi; thử lại sau" : "The book is locked by a write task; retry shortly"
         )}
-        {view.tone === "error" && (zh ? "确认失败" : "Confirm failed")}
+        {view.tone === "error" && (vi ? "Xác nhận thất bại" : "Confirm failed")}
       </div>
       {(view.tone === "success" || view.tone === "warning-success") && (
         <p className="mt-1.5 text-xs opacity-80">
-          {zh
-            ? "权威确认事务已完成；回执已保存。"
+          {vi
+            ? "Giao dịch xác nhận chính thức đã hoàn tất; biên nhận đã được lưu."
             : "The authoritative confirmation transaction has committed; the receipt is saved."}
           {view.resultingCanonRevision ? ` · ${view.resultingCanonRevision}` : ""}
         </p>
@@ -1227,11 +1227,11 @@ function ConfirmOutcomeBanner({ view, zh, onReload, onRetryAudit }: {
       {view.tone === "conflict-reload" && (
         <div className="mt-3 flex flex-wrap gap-2">
           <button onClick={onReload} className="rounded-lg border border-current/30 px-3 py-1.5 text-xs font-bold">
-            {zh ? "加载最新复核" : "Reload latest review"}
+            {vi ? "Tải bản soát lại mới nhất" : "Reload latest review"}
           </button>
           {view.offerRebuildChoice && (
             <button onClick={onRetryAudit} className="rounded-lg border border-current/30 px-3 py-1.5 text-xs font-bold">
-              {zh ? "重建状态复核" : "Rebuild State Review"}
+              {vi ? "Dựng lại bản soát lại" : "Rebuild State Review"}
             </button>
           )}
         </div>
@@ -1240,7 +1240,7 @@ function ConfirmOutcomeBanner({ view, zh, onReload, onRetryAudit }: {
   );
 }
 
-function OutcomeBanner({ view, zh, onRefetch }: { view: MutationOutcomeView; zh: boolean; onRefetch: () => void }) {
+function OutcomeBanner({ view, vi, onRefetch }: { view: MutationOutcomeView; vi: boolean; onRefetch: () => void }) {
   const styles: Record<string, string> = {
     conflict: "border-amber-500/40 bg-amber-500/5 text-amber-600",
     locked: "border-border/60 bg-secondary/30 text-foreground",
@@ -1253,14 +1253,14 @@ function OutcomeBanner({ view, zh, onRefetch }: { view: MutationOutcomeView; zh:
         <div className="min-w-0">
           {view.tone === "conflict" && (
             <p className="font-medium">
-              {zh
-                ? "操作被拒绝：状态复核已被其他操作更新。已加载最新版本，请基于最新内容重新评估后再试。"
+              {vi
+                ? "Thao tác bị từ chối: bản soát lại đã được thao tác khác cập nhật. Đã tải phiên bản mới nhất; hãy đánh giá lại trên nội dung mới rồi thử lại."
                 : "Rejected: the state review changed elsewhere. The latest version has been loaded — reassess before retrying. Nothing was overwritten."}
             </p>
           )}
           {view.tone === "locked" && (
             <p className="font-medium">
-              {zh ? "书籍正被写入任务锁定，可稍后重试；这不是数据丢失。" : "The book is locked by a write task. You can retry shortly — this is not data loss."}
+              {vi ? "Sách đang bị khóa bởi tác vụ ghi, có thể thử lại sau; đây không phải mất dữ liệu." : "The book is locked by a write task. You can retry shortly — this is not data loss."}
             </p>
           )}
           {view.tone === "error" && <p className="break-words">{view.message}</p>}
@@ -1270,7 +1270,7 @@ function OutcomeBanner({ view, zh, onRefetch }: { view: MutationOutcomeView; zh:
           {view.refetchLatest && (
             <button onClick={onRefetch} className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-current/30 px-3 py-1.5 text-xs font-bold">
               <RefreshCw size={12} />
-              {zh ? "已刷新最新复核" : "Reloaded latest review"}
+              {vi ? "Đã tải bản soát lại mới nhất" : "Reloaded latest review"}
             </button>
           )}
         </div>
@@ -1298,24 +1298,24 @@ function ShellPanel({ tone, icon, title, body, children }: {
   );
 }
 
-function ReadOnlyReview({ review, zh }: { review: ActiveStateReviewArtifact; zh: boolean }) {
+function ReadOnlyReview({ review, vi }: { review: ActiveStateReviewArtifact; vi: boolean }) {
   const groups = groupReviewItems(review.items);
   return (
     <section className="rounded-2xl border border-border/50 bg-card/40 p-4 opacity-75">
       <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-        {zh ? "过期提议（只读）" : "Stale proposal (read-only)"}
+        {vi ? "Đề xuất lỗi thời (chỉ đọc)" : "Stale proposal (read-only)"}
       </h2>
       <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
         {groups.flatMap((group) =>
           group.items.map((item) => (
             <li key={item.id}>
               <ChevronUp size={10} className="mr-1 inline" />
-              <span className="mr-1.5 rounded bg-secondary/60 px-1.5 py-0.5 text-[10px] font-bold uppercase">{reviewKindLabel(item.kind, zh ? "zh" : "en")}</span>
-              {describeProposalChange(item.proposal, zh ? "zh" : "en")}
+              <span className="mr-1.5 rounded bg-secondary/60 px-1.5 py-0.5 text-[10px] font-bold uppercase">{reviewKindLabel(item.kind, vi ? "vi" : "en")}</span>
+              {describeProposalChange(item.proposal, vi ? "vi" : "en")}
             </li>
           )),
         )}
-        {review.items.length === 0 && <li>{zh ? "（空提议）" : "(empty proposal)"}</li>}
+        {review.items.length === 0 && <li>{vi ? "(đề xuất trống)" : "(empty proposal)"}</li>}
       </ul>
     </section>
   );
@@ -1352,33 +1352,33 @@ function fillDraftFields(fields: DraftFields, change: ProposalChangeLike): void 
   }
 }
 
-function editFieldsFor(kind: ReviewItem["kind"]): ReadonlyArray<{ key: string; zh: string; en: string }> {
+function editFieldsFor(kind: ReviewItem["kind"]): ReadonlyArray<{ key: string; vi: string; en: string }> {
   switch (kind) {
     case "current-state-fact":
       return [
-        { key: "subject", zh: "主体", en: "Subject" },
-        { key: "predicate", zh: "谓词", en: "Predicate" },
-        { key: "object", zh: "值", en: "Value" },
+        { key: "subject", vi: "Chủ thể", en: "Subject" },
+        { key: "predicate", vi: "Vị từ", en: "Predicate" },
+        { key: "object", vi: "Giá trị", en: "Value" },
       ];
     case "hook-mention":
     case "hook-resolve":
     case "hook-defer":
       // The op is pinned by the item kind (frozen KIND_CHANGE_COMPAT); only
       // the target hook id is editable here.
-      return [{ key: "hookId", zh: "伏笔 ID", en: "Hook ID" }];
+      return [{ key: "hookId", vi: "ID tiền để", en: "Hook ID" }];
     case "new-hook-candidate":
       return [
-        { key: "type", zh: "类型", en: "Type" },
-        { key: "expectedPayoff", zh: "预期回报", en: "Expected payoff" },
-        { key: "notes", zh: "备注", en: "Notes" },
+        { key: "type", vi: "Kiểu", en: "Type" },
+        { key: "expectedPayoff", vi: "Thu hồi dự kiến", en: "Expected payoff" },
+        { key: "notes", vi: "Ghi chú", en: "Notes" },
       ];
     case "chapter-summary":
       return [
-        { key: "title", zh: "标题", en: "Title" },
-        { key: "characters", zh: "人物", en: "Characters" },
-        { key: "events", zh: "事件", en: "Events" },
-        { key: "stateChanges", zh: "状态变化", en: "State changes" },
-        { key: "mood", zh: "氛围", en: "Mood" },
+        { key: "title", vi: "Tiêu đề", en: "Title" },
+        { key: "characters", vi: "Nhân vật", en: "Characters" },
+        { key: "events", vi: "Sự kiện", en: "Events" },
+        { key: "stateChanges", vi: "Thay đổi trạng thái", en: "State changes" },
+        { key: "mood", vi: "Bầu không khí", en: "Mood" },
       ];
     default:
       // hook-upsert records and notes have no field-level editor in V1.
@@ -1429,16 +1429,16 @@ function buildEditedChange(kind: ReviewItem["kind"], draft: DraftFields): unknow
   }
 }
 
-function userTitleFor(draft: UserDraft, zh: boolean): string {
+function userTitleFor(draft: UserDraft, vi: boolean): string {
   switch (draft.kind) {
     case "current-state-fact":
-      return zh ? "手动添加的状态事实" : "User-added state fact";
+      return vi ? "Sự kiện trạng thái thêm thủ công" : "User-added state fact";
     case "note":
       // The note text IS the title (its change payload is frozen to none).
-      return draft.fields.text?.trim() || (zh ? "手动添加的备注" : "User-added note");
+      return draft.fields.text?.trim() || (vi ? "Ghi chú thêm thủ công" : "User-added note");
     default:
-      return zh
-        ? `手动添加的伏笔操作（${draft.kind.replace("hook-", "")}）`
+      return vi
+        ? `Thao tác tiền để thêm thủ công (${draft.kind.replace("hook-", "")})`
         : `User-added hook ${draft.kind.replace("hook-", "")}`;
   }
 }

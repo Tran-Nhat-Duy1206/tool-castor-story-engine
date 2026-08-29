@@ -305,22 +305,22 @@ export function readyVsPublishedDiverged(
   return isReady(readiness) !== isPublishedVersion(currentVersion);
 }
 
-export function getUnitStatusLabel(status: string, lang: "zh" | "en" = "zh"): string {
-  const map: Record<string, { zh: string; en: string }> = {
-    approved: { zh: "已批准", en: "Approved" },
-    published: { zh: "已发布", en: "Published" },
-    draft: { zh: "草稿", en: "Draft" },
-    needs_review: { zh: "待复核", en: "Needs Review" },
-    needs_revision: { zh: "需修订", en: "Needs Revision" },
-    stale: { zh: "已过期", en: "Stale" },
-    missing: { zh: "缺失", en: "Missing" },
-    legacy_established: { zh: "历史已确立", en: "Legacy Established" },
+export function getUnitStatusLabel(status: string, lang: "vi" | "en" = "vi"): string {
+  const map: Record<string, { vi: string; en: string }> = {
+    approved: { vi: "Đã phê duyệt", en: "Approved" },
+    published: { vi: "Đã xuất bản", en: "Published" },
+    draft: { vi: "Bản nháp", en: "Draft" },
+    needs_review: { vi: "Chờ soát lại", en: "Needs Review" },
+    needs_revision: { vi: "Cần chỉnh sửa", en: "Needs Revision" },
+    stale: { vi: "Đã lỗi thời", en: "Stale" },
+    missing: { vi: "Thiếu", en: "Missing" },
+    legacy_established: { vi: "Đã thiết lập từ trước", en: "Legacy Established" },
   };
-  return (map[status] ?? { zh: status, en: status })[lang];
+  return (map[status] ?? { vi: status, en: status })[lang];
 }
 
-export function getImportanceLabel(importance: string, lang: "zh" | "en" = "zh"): string {
-  return importance === "required" ? (lang === "zh" ? "必填" : "Required") : (lang === "zh" ? "可选" : "Optional");
+export function getImportanceLabel(importance: string, lang: "vi" | "en" = "vi"): string {
+  return importance === "required" ? (lang === "vi" ? "Bắt buộc" : "Required") : (lang === "vi" ? "Tùy chọn" : "Optional");
 }
 
 export function dependencyLabels(

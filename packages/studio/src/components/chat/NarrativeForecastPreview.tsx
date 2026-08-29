@@ -76,38 +76,38 @@ export function getNarrativeForecastPreviewDetails(exec: ToolExecution): Narrati
 export function buildNarrativeForecastSelectionInstruction(
   forecastId: string,
   branchId: string,
-  language: "zh" | "en",
+  language: "vi" | "en",
 ): string {
-  return language === "zh"
-    ? `请调用 select_narrative_branch，选择推演 ${forecastId} 的 ${branchId}。只保存候选计划，不修改正文、大纲或正史状态。`
+  return language === "vi"
+    ? `Hãy gọi select_narrative_branch để chọn nhánh ${branchId} của dự báo ${forecastId}. Chỉ lưu kế hoạch ứng viên; không sửa phần thân, dàn ý hay trạng thái chính thống.`
     : `Call select_narrative_branch for ${branchId} in forecast ${forecastId}. Save only the candidate plan; do not modify prose, outlines, or canonical state.`;
 }
 
 export function buildNarrativeForecastRecheckInstruction(
   forecastId: string,
-  language: "zh" | "en",
+  language: "vi" | "en",
 ): string {
-  return language === "zh"
-    ? `请调用 get_narrative_forecast，重新核验推演 ${forecastId} 是否已经过期。`
+  return language === "vi"
+    ? `Hãy gọi get_narrative_forecast để kiểm tra lại xem dự báo ${forecastId} đã lỗi thời chưa.`
     : `Call get_narrative_forecast for forecast ${forecastId} and report whether it is stale.`;
 }
 
 const RISK_LABELS: Record<ForecastRisk["kind"], readonly [string, string]> = {
-  continuity: ["连续性", "Continuity"],
-  causality: ["因果", "Causality"],
-  character: ["人物", "Character"],
+  continuity: ["Tính liên tục", "Continuity"],
+  causality: ["Nhân quả", "Causality"],
+  character: ["Nhân vật", "Character"],
 };
 
-function label(zh: boolean, values: readonly [string, string]): string {
-  return zh ? values[0] : values[1];
+function label(vi: boolean, values: readonly [string, string]): string {
+  return vi ? values[0] : values[1];
 }
 
-function RiskPills({ risks, zh }: { risks: readonly ForecastRisk[]; zh: boolean }) {
+function RiskPills({ risks, vi }: { risks: readonly ForecastRisk[]; vi: boolean }) {
   if (risks.length === 0) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-2 py-0.5 text-[11px] text-emerald-700 dark:text-emerald-300">
         <ShieldCheck size={11} />
-        {zh ? "未发现硬风险" : "No hard risks"}
+        {vi ? "Không phát hiện rủi ro nghiêm trọng" : "No hard risks"}
       </span>
     );
   }
@@ -119,7 +119,7 @@ function RiskPills({ risks, zh }: { risks: readonly ForecastRisk[]; zh: boolean 
           title={risk.description}
           className="inline-flex items-center rounded-full border border-amber-500/25 bg-amber-500/8 px-2 py-0.5 text-[11px] text-amber-800 dark:text-amber-200"
         >
-          {label(zh, RISK_LABELS[risk.kind])}
+          {label(vi, RISK_LABELS[risk.kind])}
         </span>
       ))}
     </div>
@@ -142,14 +142,14 @@ function BranchCard({
   branch,
   forecastId,
   stale,
-  zh,
+  vi,
   pending,
   onSelect,
 }: {
   readonly branch: ForecastBranch;
   readonly forecastId: string;
   readonly stale: boolean;
-  readonly zh: boolean;
+  readonly vi: boolean;
   readonly pending: boolean;
   readonly onSelect?: (branchId: string) => void;
 }) {
@@ -165,7 +165,7 @@ function BranchCard({
         </div>
         <div className="shrink-0 rounded-lg border border-primary/20 bg-primary/5 px-2 py-1 text-right">
           <div className="text-[15px] font-semibold leading-none text-primary">{branch.intentAlignment.score}</div>
-          <div className="mt-1 text-[9px] uppercase tracking-wide text-muted-foreground">{zh ? "意图" : "intent"}</div>
+          <div className="mt-1 text-[9px] uppercase tracking-wide text-muted-foreground">{vi ? "Ý định" : "intent"}</div>
         </div>
       </div>
 
@@ -175,29 +175,29 @@ function BranchCard({
         {branch.beats.map((beat) => (
           <li key={`${branch.branchId}-${beat.chapter}`} className="relative text-xs leading-5 text-foreground/90">
             <span className="absolute -left-[15px] top-[7px] h-1.5 w-1.5 rounded-full bg-primary/65" />
-            <span className="font-medium text-primary">{zh ? `第 ${beat.chapter} 章` : `Ch. ${beat.chapter}`}</span>
+            <span className="font-medium text-primary">{vi ? `Chương ${beat.chapter}` : `Ch. ${beat.chapter}`}</span>
             <span className="ml-1.5">{beat.summary}</span>
           </li>
         ))}
       </ol>
 
-      <div className="mt-3"><RiskPills risks={branch.risks} zh={zh} /></div>
+      <div className="mt-3"><RiskPills risks={branch.risks} vi={vi} /></div>
 
       <details className="group mt-3 border-t border-border/40 pt-2.5">
         <summary className="flex cursor-pointer list-none items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
           <ChevronRight size={13} className="transition-transform group-open:rotate-90" />
-          {zh ? "人物决定、变化与不确定性" : "Decisions, changes, uncertainties"}
+          {vi ? "Quyết định, thay đổi của nhân vật và các điểm bất định" : "Decisions, changes, uncertainties"}
         </summary>
         <div className="mt-3 space-y-3">
           <ChangeList
-            title={zh ? "人物决定" : "Character decisions"}
+            title={vi ? "Quyết định của nhân vật" : "Character decisions"}
             items={branch.characterDecisions.map((item) => `${item.character}：${item.decision}`)}
           />
-          <ChangeList title={zh ? "人物变化" : "Character changes"} items={branch.projectedChanges.characters} />
-          <ChangeList title={zh ? "关系变化" : "Relationship changes"} items={branch.projectedChanges.relationships} />
-          <ChangeList title={zh ? "世界变化" : "World changes"} items={branch.projectedChanges.world} />
-          <ChangeList title={zh ? "伏笔变化" : "Hook changes"} items={branch.projectedChanges.hooks} />
-          <ChangeList title={zh ? "不确定性" : "Uncertainties"} items={branch.uncertainties} />
+          <ChangeList title={vi ? "Thay đổi nhân vật" : "Character changes"} items={branch.projectedChanges.characters} />
+          <ChangeList title={vi ? "Thay đổi quan hệ" : "Relationship changes"} items={branch.projectedChanges.relationships} />
+          <ChangeList title={vi ? "Thay đổi thế giới" : "World changes"} items={branch.projectedChanges.world} />
+          <ChangeList title={vi ? "Thay đổi tiền để" : "Hook changes"} items={branch.projectedChanges.hooks} />
+          <ChangeList title={vi ? "Điểm bất định" : "Uncertainties"} items={branch.uncertainties} />
           <p className="rounded-lg bg-muted/45 px-2.5 py-2 text-xs leading-5 text-muted-foreground">
             {branch.intentAlignment.rationale}
           </p>
@@ -214,8 +214,8 @@ function BranchCard({
       >
         {pending ? <RefreshCw size={13} className="animate-spin" /> : <Check size={13} />}
         {stale
-          ? (zh ? "过期推演不可采用" : "Stale forecast")
-          : (zh ? "采用此分支" : "Use this branch")}
+          ? (vi ? "Dự báo lỗi thời, không thể chọn" : "Stale forecast")
+          : (vi ? "Dùng nhánh này" : "Use this branch")}
       </button>
     </article>
   );
@@ -232,17 +232,17 @@ export function NarrativeForecastPreview({ exec, onSelectBranch, onRecheck }: Na
       <div className="mx-3 mb-3 mt-1 rounded-xl border border-primary/25 bg-primary/5 px-3.5 py-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-primary">
           <Check size={15} />
-          {tr("候选分支已保存", "Candidate branch saved")}
+          {tr("Đã lưu nhánh ứng viên", "Candidate branch saved")}
         </div>
         <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
           {tr(
-            `${details.branchId} 已写入候选计划；正文、大纲和正史状态没有修改。`,
+            `${details.branchId} đã được ghi vào kế hoạch ứng viên; phần thân, dàn ý và trạng thái chính thống không bị thay đổi.`,
             `${details.branchId} was written to the candidate plan; prose, outline, and canon were not modified.`,
           )}
         </p>
         {details.stale && (
           <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
-            {tr("该推演基于旧正史，请核验后再继续写作。", "This forecast is stale; verify it before writing.")}
+            {tr("Dự báo này dựa trên bản chính thống cũ; hãy xác minh trước khi viết tiếp.", "This forecast is stale; verify it before writing.")}
           </p>
         )}
       </div>
@@ -250,7 +250,8 @@ export function NarrativeForecastPreview({ exec, onSelectBranch, onRecheck }: Na
   }
 
   const { forecast, stale } = details;
-  const zh = forecast.language === "zh";
+  // Legacy "zh" forecasts fall back to the Vietnamese default UI locale.
+  const vi = forecast.language !== "en";
   const selectBranch = async (branchId: string) => {
     if (!onSelectBranch || stale) return;
     setPendingBranch(branchId);
@@ -278,23 +279,23 @@ export function NarrativeForecastPreview({ exec, onSelectBranch, onRecheck }: Na
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-foreground">
                 <GitFork size={16} className="text-primary" />
-                {zh ? "剧情多线推演" : "Narrative forecast"}
+                {vi ? "Dự báo truyện đa nhánh" : "Narrative forecast"}
               </span>
               <span className="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-medium tracking-wide text-primary">
-                {zh ? "非正史规划" : "NON-CANONICAL"}
+                {vi ? "KHÔNG CHÍNH THỐNG" : "NON-CANONICAL"}
               </span>
               {stale && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:text-amber-200">
                   <AlertTriangle size={11} />
-                  {zh ? "正史已变化" : "Canon changed"}
+                  {vi ? "Chính thống đã thay đổi" : "Canon changed"}
                 </span>
               )}
             </div>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground/85">{forecast.divergence}</p>
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-              <span>{zh ? `基于第 ${forecast.baseChapter} 章` : `After chapter ${forecast.baseChapter}`}</span>
-              <span>{zh ? `${forecast.branches.length} 条候选分支` : `${forecast.branches.length} branches`}</span>
-              <span>{zh ? `推演未来约 ${forecast.horizon} 章` : `~${forecast.horizon} chapters ahead`}</span>
+              <span>{vi ? `Dựa trên sau chương ${forecast.baseChapter}` : `After chapter ${forecast.baseChapter}`}</span>
+              <span>{vi ? `${forecast.branches.length} nhánh ứng viên` : `${forecast.branches.length} branches`}</span>
+              <span>{vi ? `Dự báo trước khoảng ${forecast.horizon} chương` : `~${forecast.horizon} chapters ahead`}</span>
             </div>
           </div>
           {onRecheck && (
@@ -305,14 +306,14 @@ export function NarrativeForecastPreview({ exec, onSelectBranch, onRecheck }: Na
               className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border/60 bg-background/60 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground disabled:opacity-50"
             >
               <RefreshCw size={12} className={rechecking ? "animate-spin" : ""} />
-              {zh ? "重新核验" : "Recheck"}
+              {vi ? "Kiểm tra lại" : "Recheck"}
             </button>
           )}
         </div>
         {stale && (
           <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/8 px-3 py-2 text-xs leading-5 text-amber-900 dark:text-amber-100">
             <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-            <span>{zh ? "正史输入已在生成后变化。请重新推演，不要继续采用旧分支。" : "Canonical inputs changed after generation. Regenerate before selecting a branch."}</span>
+            <span>{vi ? "Đầu vào chính thống đã thay đổi sau khi tạo. Hãy chạy dự báo lại trước khi chọn nhánh." : "Canonical inputs changed after generation. Regenerate before selecting a branch."}</span>
           </div>
         )}
       </header>
@@ -329,7 +330,7 @@ export function NarrativeForecastPreview({ exec, onSelectBranch, onRecheck }: Na
               branch={branch}
               forecastId={forecast.forecastId}
               stale={stale}
-              zh={zh}
+              vi={vi}
               pending={pendingBranch === branch.branchId}
               onSelect={onSelectBranch ? (branchId) => { void selectBranch(branchId); } : undefined}
             />

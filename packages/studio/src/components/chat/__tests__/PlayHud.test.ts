@@ -148,10 +148,10 @@ describe("PlayHud buildView", () => {
       },
     });
 
-    expect(view?.time?.label).toBe("世界时间");
+    expect(view?.time?.label).toBe("Thời gian thế giới");
     expect(view?.time?.value).toBe("仍在雨夜门外的同一个片刻");
     expect(view?.time?.note).toContain("屏息观察");
-    expect(view?.time?.details[0]).toEqual({ label: "经过", text: "几息" });
+    expect(view?.time?.details[0]).toEqual({ label: "Trôi qua", text: "几息" });
     expect(view?.time?.details[1]?.text).toContain("数玩家的呼吸");
   });
 

@@ -82,23 +82,23 @@ function formatFileSize(bytes: number): string {
 }
 
 const LANGUAGE_PRESETS_ZH = [
-  "自动识别",
-  "中文（简体）",
-  "中文（繁体）",
-  "英语",
-  "日语",
-  "韩语",
-  "法语",
-  "德语",
-  "西班牙语",
-  "葡萄牙语",
-  "俄语",
-  "阿拉伯语",
-  "印尼语",
-  "越南语",
-  "泰语",
-  "意大利语",
-  "土耳其语",
+  "Tự nhận diện",
+  "Tiếng Trung (giản thể)",
+  "Tiếng Trung (phồn thể)",
+  "Tiếng Anh",
+  "Tiếng Nhật",
+  "Tiếng Hàn",
+  "Tiếng Pháp",
+  "Tiếng Đức",
+  "Tiếng Tây Ban Nha",
+  "Tiếng Bồ Đào Nha",
+  "Tiếng Nga",
+  "Tiếng Ả Rập",
+  "Tiếng Indonesia",
+  "Tiếng Việt",
+  "Tiếng Thái",
+  "Tiếng Ý",
+  "Tiếng Thổ Nhĩ Kỳ",
 ] as const;
 
 const LANGUAGE_PRESETS_EN = [
@@ -123,8 +123,8 @@ const LANGUAGE_PRESETS_EN = [
 
 export function TranslationManager({ nav, theme, t }: { nav: Nav; theme: Theme; t: TFunction }) {
   const c = useColors(theme);
-  const isZh = t("nav.connected") === "已连接";
-  const languagePresets = isZh ? LANGUAGE_PRESETS_ZH : LANGUAGE_PRESETS_EN;
+  const isVi = t("nav.connected") === "Đã kết nối";
+  const languagePresets = isVi ? LANGUAGE_PRESETS_ZH : LANGUAGE_PRESETS_EN;
   const { data, loading, error, refetch } = useApi<TranslationListResponse>("/translations");
   const [selectedId, setSelectedId] = useState("");
   const [detail, setDetail] = useState<TranslationDetailResponse | null>(null);
@@ -134,8 +134,8 @@ export function TranslationManager({ nav, theme, t }: { nav: Nav; theme: Theme; 
   const [file, setFile] = useState<File | null>(null);
   const [uploaded, setUploaded] = useState<TranslationUploadResponse | null>(null);
   const [title, setTitle] = useState("");
-  const [sourceLanguage, setSourceLanguage] = useState(isZh ? "自动识别" : "Auto detect");
-  const [targetLanguage, setTargetLanguage] = useState(isZh ? "中文（简体）" : "English");
+  const [sourceLanguage, setSourceLanguage] = useState(isVi ? "Tự nhận diện" : "Auto detect");
+  const [targetLanguage, setTargetLanguage] = useState(isVi ? "Tiếng Anh" : "English");
   const [segmentMaxChars, setSegmentMaxChars] = useState(1200);
   const [previewChapterNumber, setPreviewChapterNumber] = useState<number | null>(null);
 
@@ -179,7 +179,7 @@ export function TranslationManager({ nav, theme, t }: { nav: Nav; theme: Theme; 
       });
       setUploaded(res);
       if (!title.trim()) setTitle(file.name.replace(/\.[^.]+$/u, ""));
-      setStatus(isZh ? `已上传：${res.storedPath}` : `Uploaded: ${res.storedPath}`);
+      setStatus(isVi ? `Đã tải lên: ${res.storedPath}` : `Uploaded: ${res.storedPath}`);
     } catch (err) {
       setStatus(`Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -204,7 +204,7 @@ export function TranslationManager({ nav, theme, t }: { nav: Nav; theme: Theme; 
         }),
       });
       setSelectedId(res.projectId);
-      setStatus(isZh ? `已创建翻译项目：${res.title}` : `Created translation project: ${res.title}`);
+      setStatus(isVi ? `Đã tạo dự án dịch: ${res.title}` : `Created translation project: ${res.title}`);
       await refetch();
     } catch (err) {
       setStatus(`Error: ${err instanceof Error ? err.message : String(err)}`);
@@ -223,8 +223,8 @@ export function TranslationManager({ nav, theme, t }: { nav: Nav; theme: Theme; 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ batchSize: 8 }),
       });
-      setStatus(isZh
-        ? `翻译 ${res.translatedSegments} 段，审校 ${res.reviewedChapters} 章。${res.skillIds?.length ? `Skill：${res.skillIds.join(" · ")}。` : ""}报告：${res.reportPath}`
+      setStatus(isVi
+        ? `Đã dịch ${res.translatedSegments} đoạn, soát ${res.reviewedChapters} chương.${res.skillIds?.length ? ` Skill: ${res.skillIds.join(" · ")}.` : ""} Báo cáo: ${res.reportPath}`
         : `Translated ${res.translatedSegments} segments, reviewed ${res.reviewedChapters} chapters. ${res.skillIds?.length ? `Skills: ${res.skillIds.join(" · ")}. ` : ""}Report: ${res.reportPath}`);
       await refetch();
       const updated = await fetchJson<TranslationDetailResponse>(`/translations/${encodeURIComponent(selected.projectId)}`);
@@ -247,7 +247,7 @@ export function TranslationManager({ nav, theme, t }: { nav: Nav; theme: Theme; 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ format }),
       });
-      setStatus(isZh ? `已导出 ${format}: ${res.outputPath}` : `Exported ${format}: ${res.outputPath}`);
+      setStatus(isVi ? `Đã xuất ${format}: ${res.outputPath}` : `Exported ${format}: ${res.outputPath}`);
     } catch (err) {
       setStatus(`Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -333,7 +333,7 @@ export function TranslationManager({ nav, theme, t }: { nav: Nav; theme: Theme; 
               {languagePresets.map((language) => <option key={`source-${language}`} value={language} />)}
             </datalist>
             <datalist id="translation-target-language-options">
-              {languagePresets.filter((language) => language !== (isZh ? "自动识别" : "Auto detect")).map((language) => (
+              {languagePresets.filter((language) => language !== (isVi ? "Tự nhận diện" : "Auto detect")).map((language) => (
                 <option key={`target-${language}`} value={language} />
               ))}
             </datalist>

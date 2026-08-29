@@ -5,14 +5,14 @@ import { getServiceQuickLinks } from "../components/ServiceQuickLinks";
 
 // 每条用例结束后恢复默认语言，避免污染其他测试。
 afterEach(() => {
-  setAppLanguage("zh");
+  setAppLanguage("vi");
 });
 
 describe("service-groups i18n", () => {
-  it("默认（zh）返回中文标签", () => {
-    expect(getGroupLabel("overseas")).toBe("海外原厂");
-    expect(getGroupShortLabel("aggregator")).toBe("聚合");
-    expect(getGroupDescription("aggregator")).toContain("聚合国内外主流模型");
+  it("默认（vi）返回越南语标签", () => {
+    expect(getGroupLabel("overseas")).toBe("Nhà cung cấp quốc tế");
+    expect(getGroupShortLabel("aggregator")).toBe("Tổng hợp");
+    expect(getGroupDescription("aggregator")).toContain("một API Key");
     expect(getGroupDescription("overseas")).toBeNull();
   });
 
@@ -25,13 +25,13 @@ describe("service-groups i18n", () => {
 });
 
 describe("service quick links i18n", () => {
-  it("默认（zh）返回中文标签，en 分支返回英文标签，href 不变", () => {
-    const zhLinks = getServiceQuickLinks("kkaiapi");
-    expect(zhLinks.map((l) => l.label)).toEqual(["官网", "API 文档", "模型/价格"]);
+  it("默认（vi）返回越南语标签，en 分支返回英文标签，href 不变", () => {
+    const viLinks = getServiceQuickLinks("kkaiapi");
+    expect(viLinks.map((l) => l.label)).toEqual(["Trang chủ", "Tài liệu API", "Mô hình & giá"]);
 
     setAppLanguage("en");
     const enLinks = getServiceQuickLinks("kkaiapi");
     expect(enLinks.map((l) => l.label)).toEqual(["Website", "API docs", "Models & pricing"]);
-    expect(enLinks.map((l) => l.href)).toEqual(zhLinks.map((l) => l.href));
+    expect(enLinks.map((l) => l.href)).toEqual(viLinks.map((l) => l.href));
   });
 });

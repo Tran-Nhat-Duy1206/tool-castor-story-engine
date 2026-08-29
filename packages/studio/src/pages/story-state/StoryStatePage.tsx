@@ -33,7 +33,7 @@ type TabKey = "current-state" | "hooks" | "summaries";
  * second Confirm step. Hooks and chapter summaries stay read-only here.
  */
 export function StoryStatePage({ bookId }: StoryStatePageProps) {
-  const [lang, setLang] = useState<UiLanguage>("zh");
+  const [lang, setLang] = useState<UiLanguage>("vi");
   const [tab, setTab] = useState<TabKey>("current-state");
   // Hooks must run unconditionally: URL resolution never throws here, and
   // useApi("") is an inert no-op, so hook order stays stable even for
@@ -54,20 +54,20 @@ export function StoryStatePage({ bookId }: StoryStatePageProps) {
           </div>
           <div>
             <h1 className="text-xl font-semibold text-foreground">
-              故事状态 · Story State
+              Trạng thái truyện · Story State
               <span className="ml-3 inline-flex items-center gap-1 rounded-full border border-border/60 bg-secondary/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                 <BookLock size={11} />
-                手动编辑 · Manual editing
+                Chỉnh sửa thủ công · Manual editing
               </span>
             </h1>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Castor 对故事的当前权威认知（canonical structured state）· What Castor currently believes about your story
+              Nhận thức chính thức hiện tại của Castor về câu chuyện (canonical structured state) · What Castor currently believes about your story
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex gap-0.5 rounded-lg bg-muted/50 p-0.5">
-            {(["zh", "en"] as const).map((value) => (
+            {(["vi", "en"] as const).map((value) => (
               <button
                 key={value}
                 onClick={() => setLang(value)}
@@ -75,7 +75,7 @@ export function StoryStatePage({ bookId }: StoryStatePageProps) {
                   lang === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"
                 }`}
               >
-                {value === "zh" ? "中" : "EN"}
+                {value === "vi" ? "VI" : "EN"}
               </button>
             ))}
           </div>
@@ -84,13 +84,13 @@ export function StoryStatePage({ bookId }: StoryStatePageProps) {
             className="inline-flex items-center gap-1.5 rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <RefreshCw size={13} />
-            刷新 · Refresh
+            Làm mới · Refresh
           </button>
         </div>
       </header>
 
       {loading && !data && (
-        <div className="py-16 text-center text-sm text-muted-foreground">加载故事状态… · Loading story state…</div>
+        <div className="py-16 text-center text-sm text-muted-foreground">Đang tải trạng thái truyện… · Loading story state…</div>
       )}
       {error && <ErrorCard message={error} lang={lang} />}
       {data && <CanonBody data={data} tab={tab} setTab={setTab} lang={lang} bookId={bookId} refetch={() => void refetch()} />}
@@ -103,7 +103,7 @@ function ErrorCard({ message, lang }: { message: string; lang: UiLanguage }) {
     <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6">
       <div className="flex items-center gap-2 text-sm font-medium text-destructive">
         <AlertTriangle size={15} />
-        {lang === "zh" ? "无法读取规范状态" : "Failed to read canonical state"}
+        {lang === "vi" ? "Không thể đọc trạng thái chính thống" : "Failed to read canonical state"}
       </div>
       <p className="mt-2 break-all text-xs text-muted-foreground">{message}</p>
     </div>
@@ -126,23 +126,23 @@ function CanonBody({
   refetch: () => void;
 }) {
   const summary = manifestSummary(data);
-  const tabs: Array<{ key: TabKey; zh: string; en: string }> = [
-    { key: "current-state", zh: "当前状态", en: "Current State" },
-    { key: "hooks", zh: "伏笔池", en: "Hooks" },
-    { key: "summaries", zh: "章节摘要", en: "Chapter Summaries" },
+  const tabs: Array<{ key: TabKey; vi: string; en: string }> = [
+    { key: "current-state", vi: "Trạng thái hiện tại", en: "Current State" },
+    { key: "hooks", vi: "Kho tiền để", en: "Hooks" },
+    { key: "summaries", vi: "Tóm tắt chương", en: "Chapter Summaries" },
   ];
 
   return (
     <>
       <section className="grid grid-cols-2 gap-3 rounded-2xl border border-border/50 bg-card/50 p-4 sm:grid-cols-4">
-        <ManifestCell label={lang === "zh" ? "最新应用章节" : "Last applied chapter"} value={`#${summary.lastAppliedChapter}`} />
-        <ManifestCell label={lang === "zh" ? "模式语言" : "Manifest language"} value={summary.language} />
-        <ManifestCell label={lang === "zh" ? "投影版本" : "Projection version"} value={`v${summary.projectionVersion}`} />
-        <ManifestCell label={lang === "zh" ? "Schema 版本" : "Schema version"} value={`v${summary.schemaVersion}`} />
+        <ManifestCell label={lang === "vi" ? "Chương áp dụng gần nhất" : "Last applied chapter"} value={`#${summary.lastAppliedChapter}`} />
+        <ManifestCell label={lang === "vi" ? "Ngôn ngữ manifest" : "Manifest language"} value={summary.language} />
+        <ManifestCell label={lang === "vi" ? "Phiên bản chiếu" : "Projection version"} value={`v${summary.projectionVersion}`} />
+        <ManifestCell label={lang === "vi" ? "Phiên bản schema" : "Schema version"} value={`v${summary.schemaVersion}`} />
         {summary.warningCount > 0 && (
           <div className="col-span-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-2 text-xs text-amber-600 sm:col-span-4">
             <AlertTriangle size={12} className="mr-1 inline" />
-            迁移警告 · Migration warnings ({summary.warningCount}): {summary.warnings.join("；")}
+            Cảnh báo di chuyển · Migration warnings ({summary.warningCount}): {summary.warnings.join("; ")}
           </div>
         )}
       </section>
@@ -156,7 +156,7 @@ function CanonBody({
               tab === entry.key ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {lang === "zh" ? entry.zh : entry.en}
+            {lang === "vi" ? entry.vi : entry.en}
           </button>
         ))}
       </nav>
@@ -212,12 +212,12 @@ function OutcomeBanner({
               className="inline-flex items-center gap-1 rounded-lg border border-current/30 px-2.5 py-1 text-xs font-medium hover:bg-background/60"
             >
               <RefreshCw size={12} />
-              {lang === "zh" ? "刷新最新状态（需重新应用修改）" : "Refetch latest (re-apply your edit)"}
+              {lang === "vi" ? "Tải trạng thái mới nhất (cần áp dụng lại chỉnh sửa)" : "Refetch latest (re-apply your edit)"}
             </button>
           )}
           <button
             onClick={onDismiss}
-            aria-label={lang === "zh" ? "关闭提示" : "Dismiss"}
+            aria-label={lang === "vi" ? "Đóng thông báo" : "Dismiss"}
             className="rounded-lg px-1.5 py-1 text-xs hover:bg-background/60"
           >
             <X size={13} />
@@ -227,7 +227,7 @@ function OutcomeBanner({
       <p className="mt-1.5 break-all text-xs opacity-90">{outcome.detail}</p>
       {outcome.currentRevision && (
         <p className="mt-1 font-mono text-[11px] opacity-80">
-          {lang === "zh" ? "服务器当前版本：" : "Server revision: "}
+          {lang === "vi" ? "Phiên bản máy chủ hiện tại: " : "Server revision: "}
           {outcome.currentRevision}
         </p>
       )}
@@ -262,7 +262,7 @@ function CurrentStateTab({
 }) {
   const slots = slotRows(data.description.slots, lang);
   const additional = additionalFactRows(data.description.additionalFacts, lang);
-  const supersededLabel = lang === "zh" ? "历史区间" : "superseded";
+  const supersededLabel = lang === "vi" ? "khoảng lịch sử" : "superseded";
 
   const [buffer, setBuffer] = useState<EditBuffer | null>(null);
   const [draftIssues, setDraftIssues] = useState<string[]>([]);
@@ -336,8 +336,8 @@ function CurrentStateTab({
     <div className="space-y-6">
       {!editable && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-600">
-          {lang === "zh"
-            ? "当前视图缺少版本指纹，编辑已禁用。请刷新页面获取最新状态。"
+          {lang === "vi"
+            ? "Chế độ xem hiện tại thiếu dấu vân tay phiên bản nên đã tắt chỉnh sửa. Hãy tải lại trang để lấy trạng thái mới nhất."
             : "This view lacks a revision fingerprint; editing is disabled. Refresh to load the latest state."}
         </div>
       )}
@@ -358,14 +358,14 @@ function CurrentStateTab({
         <section className="rounded-xl border border-border/50 bg-card/60 p-4">
           <h3 className="mb-3 text-sm font-semibold text-foreground">
             {buffer.mode === "add-fact"
-              ? lang === "zh" ? "新增状态事实" : "Add fact"
-              : lang === "zh" ? `编辑事实：${buffer.subject} · ${buffer.predicate}` : `Edit fact: ${buffer.subject} · ${buffer.predicate}`}
+              ? lang === "vi" ? "Thêm sự kiện trạng thái" : "Add fact"
+              : lang === "vi" ? `Sửa sự kiện: ${buffer.subject} · ${buffer.predicate}` : `Edit fact: ${buffer.subject} · ${buffer.predicate}`}
           </h3>
           <div className="grid gap-3 sm:grid-cols-3">
             {buffer.mode === "add-fact" ? (
               <>
                 <label className="text-xs text-muted-foreground">
-                  {lang === "zh" ? "主体 · Subject" : "Subject"}
+                  {lang === "vi" ? "Chủ thể" : "Subject"}
                   <input
                     value={buffer.subject}
                     onChange={(e) => setBuffer({ ...buffer, subject: e.target.value })}
@@ -374,7 +374,7 @@ function CurrentStateTab({
                   />
                 </label>
                 <label className="text-xs text-muted-foreground">
-                  {lang === "zh" ? "谓词 · Predicate" : "Predicate"}
+                  {lang === "vi" ? "Vị từ" : "Predicate"}
                   <input
                     value={buffer.predicate}
                     onChange={(e) => setBuffer({ ...buffer, predicate: e.target.value })}
@@ -386,17 +386,17 @@ function CurrentStateTab({
             ) : (
               <>
                 <div className="text-xs text-muted-foreground">
-                  {lang === "zh" ? "主体 · Subject" : "Subject"}
+                  {lang === "vi" ? "Chủ thể" : "Subject"}
                   <div className="mt-1 rounded-lg bg-secondary/30 px-2 py-1.5 text-sm text-foreground">{buffer.subject}</div>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {lang === "zh" ? "谓词 · Predicate" : "Predicate"}
+                  {lang === "vi" ? "Vị từ" : "Predicate"}
                   <div className="mt-1 rounded-lg bg-secondary/30 px-2 py-1.5 text-sm text-foreground">{buffer.predicate}</div>
                 </div>
               </>
             )}
             <label className="text-xs text-muted-foreground">
-              {lang === "zh" ? "值 · Value" : "Value"}
+              {lang === "vi" ? "Giá trị" : "Value"}
               <input
                 value={buffer.object}
                 onChange={(e) => setBuffer({ ...buffer, object: e.target.value })}
@@ -421,18 +421,18 @@ function CurrentStateTab({
             >
               <Save size={12} />
               {saving
-                ? lang === "zh" ? "保存中…" : "Saving…"
-                : lang === "zh" ? "保存" : "Save"}
+                ? lang === "vi" ? "Đang lưu…" : "Saving…"
+                : lang === "vi" ? "Lưu" : "Save"}
             </button>
             <button
               onClick={cancelEdit}
               disabled={saving}
               className="rounded-lg border border-border/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
-              {lang === "zh" ? "取消" : "Cancel"}
+              {lang === "vi" ? "Hủy" : "Cancel"}
             </button>
             <span className="text-[11px] text-muted-foreground">
-              {lang === "zh" ? "点击「保存」即直接提交，无二次确认。" : "Save submits directly — no second confirmation."}
+              {lang === "vi" ? "Nhấn \"Lưu\" là gửi trực tiếp, không có xác nhận lần hai." : "Save submits directly — no second confirmation."}
             </span>
           </div>
         </section>
@@ -441,11 +441,11 @@ function CurrentStateTab({
       <table className="w-full border-collapse overflow-hidden rounded-xl text-sm">
         <thead>
           <tr className="bg-secondary/40 text-left text-xs text-muted-foreground">
-            <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "槽位" : "Slot"}</th>
-            <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "值" : "Value"}</th>
-            <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "主体" : "Subject"}</th>
-            <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "生效范围" : "Validity"}</th>
-            <th className="px-4 py-2.5 font-medium">{lang === "zh" ? "操作" : "Actions"}</th>
+            <th className="px-4 py-2.5 font-medium">{lang === "vi" ? "Ô" : "Slot"}</th>
+            <th className="px-4 py-2.5 font-medium">{lang === "vi" ? "Giá trị" : "Value"}</th>
+            <th className="px-4 py-2.5 font-medium">{lang === "vi" ? "Chủ thể" : "Subject"}</th>
+            <th className="px-4 py-2.5 font-medium">{lang === "vi" ? "Phạm vi hiệu lực" : "Validity"}</th>
+            <th className="px-4 py-2.5 font-medium">{lang === "vi" ? "Thao tác" : "Actions"}</th>
           </tr>
         </thead>
         <tbody>
@@ -460,7 +460,7 @@ function CurrentStateTab({
                 )}
               </td>
               <td className="max-w-[22rem] break-words px-4 py-2.5 text-foreground">
-                {slot.value ?? <span className="text-muted-foreground/60">{lang === "zh" ? "（未设定）" : "(not set)"}</span>}
+                {slot.value ?? <span className="text-muted-foreground/60">{lang === "vi" ? "(chưa đặt)" : "(not set)"}</span>}
               </td>
               <td className="px-4 py-2.5 text-muted-foreground">{slot.selectedSubject ?? "—"}</td>
               <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs text-muted-foreground">{slot.validity ?? "—"}</td>
@@ -472,7 +472,7 @@ function CurrentStateTab({
                     className={actionButtonClass}
                   >
                     <Pencil size={11} />
-                    {lang === "zh" ? "编辑" : "Edit"}
+                    {lang === "vi" ? "Chỉnh sửa" : "Edit"}
                   </button>
                 )}
               </td>
@@ -485,7 +485,7 @@ function CurrentStateTab({
         <div className="mb-2 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
             <FileText size={14} />
-            {lang === "zh" ? `其他状态事实（${additional.length}）` : `Additional facts (${additional.length})`}
+            {lang === "vi" ? `Sự kiện trạng thái khác (${additional.length})` : `Additional facts (${additional.length})`}
           </h3>
           <button
             onClick={startAddFact}
@@ -493,23 +493,23 @@ function CurrentStateTab({
             className={actionButtonClass}
           >
             <Plus size={11} />
-            {lang === "zh" ? "新增事实" : "Add fact"}
+            {lang === "vi" ? "Thêm sự kiện" : "Add fact"}
           </button>
         </div>
         {additional.length === 0 ? (
           <p className="rounded-xl bg-card/40 p-4 text-xs text-muted-foreground">
-            {lang === "zh" ? "暂无其他状态事实。" : "No additional facts recorded."}
+            {lang === "vi" ? "Chưa ghi nhận sự kiện trạng thái nào khác." : "No additional facts recorded."}
           </p>
         ) : (
           <table className="w-full border-collapse overflow-hidden rounded-xl text-sm">
             <thead>
               <tr className="bg-secondary/40 text-left text-xs text-muted-foreground">
-                <th className="px-4 py-2 font-medium">{lang === "zh" ? "主体" : "Subject"}</th>
-                <th className="px-4 py-2 font-medium">{lang === "zh" ? "谓词" : "Predicate"}</th>
-                <th className="px-4 py-2 font-medium">{lang === "zh" ? "值" : "Object"}</th>
-                <th className="px-4 py-2 font-medium">{lang === "zh" ? "生效" : "Valid"}</th>
-                <th className="px-4 py-2 font-medium">{lang === "zh" ? "来源章" : "Src ch."}</th>
-                <th className="px-4 py-2 font-medium">{lang === "zh" ? "操作" : "Actions"}</th>
+                <th className="px-4 py-2 font-medium">{lang === "vi" ? "Chủ thể" : "Subject"}</th>
+                <th className="px-4 py-2 font-medium">{lang === "vi" ? "Vị từ" : "Predicate"}</th>
+                <th className="px-4 py-2 font-medium">{lang === "vi" ? "Giá trị" : "Object"}</th>
+                <th className="px-4 py-2 font-medium">{lang === "vi" ? "Hiệu lực" : "Valid"}</th>
+                <th className="px-4 py-2 font-medium">{lang === "vi" ? "Chương nguồn" : "Src ch."}</th>
+                <th className="px-4 py-2 font-medium">{lang === "vi" ? "Thao tác" : "Actions"}</th>
               </tr>
             </thead>
             <tbody>
@@ -535,16 +535,16 @@ function CurrentStateTab({
                         className={actionButtonClass}
                       >
                         <Pencil size={11} />
-                        {lang === "zh" ? "编辑" : "Edit"}
+                        {lang === "vi" ? "Chỉnh sửa" : "Edit"}
                       </button>
                       <button
                         onClick={() => void removeFact(fact.subject, fact.predicate)}
                         disabled={!editable || saving}
-                        title={lang === "zh" ? "删除该事实（立即提交）" : "Remove fact (commits immediately)"}
+                        title={lang === "vi" ? "Xóa sự kiện này (gửi ngay)" : "Remove fact (commits immediately)"}
                         className={actionButtonClass}
                       >
                         <Trash2 size={11} />
-                        {lang === "zh" ? "删除" : "Remove"}
+                        {lang === "vi" ? "Xóa" : "Remove"}
                       </button>
                     </div>
                   </td>
@@ -572,25 +572,25 @@ function HooksTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLanguage })
   const rows = hookRows(data.hooks.hooks);
   const headers: Array<[string, string]> = [
     ["hook_id", "hook_id"],
-    [lang === "zh" ? "起始章" : "Start", "start"],
-    [lang === "zh" ? "类型" : "Type", "type"],
-    [lang === "zh" ? "状态" : "Status", "status"],
-    [lang === "zh" ? "最近推进" : "Advanced", "adv."],
-    [lang === "zh" ? "预期回收" : "Expected payoff", "payoff"],
-    [lang === "zh" ? "节奏" : "Timing", "timing"],
-    [lang === "zh" ? "上游依赖" : "Depends on", "deps"],
-    [lang === "zh" ? "回收卷" : "Arc", "arc"],
-    [lang === "zh" ? "核心" : "Core", "core"],
-    [lang === "zh" ? "半衰期" : "Half-life", "half-life"],
-    [lang === "zh" ? "推进次数" : "Advances", "count"],
-    [lang === "zh" ? "升级" : "Promoted", "prom."],
-    [lang === "zh" ? "备注" : "Notes", "notes"],
+    [lang === "vi" ? "Chương bắt đầu" : "Start", "start"],
+    [lang === "vi" ? "Kiểu" : "Type", "type"],
+    [lang === "vi" ? "Trạng thái" : "Status", "status"],
+    [lang === "vi" ? "Đẩy gần nhất" : "Advanced", "adv."],
+    [lang === "vi" ? "Thu hồi dự kiến" : "Expected payoff", "payoff"],
+    [lang === "vi" ? "Nhịp độ" : "Timing", "timing"],
+    [lang === "vi" ? "Phụ thuộc" : "Depends on", "deps"],
+    [lang === "vi" ? "Tập thu hồi" : "Arc", "arc"],
+    [lang === "vi" ? "Trọng tâm" : "Core", "core"],
+    [lang === "vi" ? "Chu kỳ bán rã" : "Half-life", "half-life"],
+    [lang === "vi" ? "Số lần đẩy" : "Advances", "count"],
+    [lang === "vi" ? "Đã nâng cấp" : "Promoted", "prom."],
+    [lang === "vi" ? "Ghi chú" : "Notes", "notes"],
   ];
 
   if (rows.length === 0) {
     return (
       <p className="rounded-xl bg-card/40 p-4 text-xs text-muted-foreground">
-        {lang === "zh" ? "伏笔池为空。" : "No hooks recorded."}
+        {lang === "vi" ? "Kho tiền để đang trống." : "No hooks recorded."}
       </p>
     );
   }
@@ -617,10 +617,10 @@ function HooksTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLanguage })
               <td className="px-3 py-2 text-muted-foreground">{row.payoffTiming || "—"}</td>
               <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{row.dependsOnText}</td>
               <td className="px-3 py-2 text-muted-foreground">{row.paysOffInArc || "—"}</td>
-              <td className="px-3 py-2">{row.coreHook ? <Badge tone="primary">{lang === "zh" ? "核心" : "core"}</Badge> : ""}</td>
+              <td className="px-3 py-2">{row.coreHook ? <Badge tone="primary">{lang === "vi" ? "trọng tâm" : "core"}</Badge> : ""}</td>
               <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{row.halfLifeChapters}</td>
               <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{row.advancedCount}</td>
-              <td className="px-3 py-2">{row.promoted ? <Badge tone="primary">{lang === "zh" ? "已升级" : "promoted"}</Badge> : ""}</td>
+              <td className="px-3 py-2">{row.promoted ? <Badge tone="primary">{lang === "vi" ? "đã nâng cấp" : "promoted"}</Badge> : ""}</td>
               <td className="max-w-[14rem] break-words px-3 py-2 text-xs text-muted-foreground">{row.notes || "—"}</td>
             </tr>
           ))}
@@ -635,7 +635,7 @@ function SummariesTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLanguag
   if (rows.length === 0) {
     return (
       <p className="rounded-xl bg-card/40 p-4 text-xs text-muted-foreground">
-        {lang === "zh" ? "暂无章节摘要。" : "No chapter summaries recorded."}
+        {lang === "vi" ? "Chưa có tóm tắt chương nào." : "No chapter summaries recorded."}
       </p>
     );
   }
@@ -645,13 +645,13 @@ function SummariesTab({ data, lang }: { data: StoryCanonViewDto; lang: UiLanguag
         <thead>
           <tr className="bg-secondary/40 text-left text-xs text-muted-foreground">
             <th className="px-3 py-2 font-medium">#</th>
-            <th className="px-3 py-2 font-medium">{lang === "zh" ? "标题" : "Title"}</th>
-            <th className="px-3 py-2 font-medium">{lang === "zh" ? "人物" : "Characters"}</th>
-            <th className="px-3 py-2 font-medium">{lang === "zh" ? "关键事件" : "Events"}</th>
-            <th className="px-3 py-2 font-medium">{lang === "zh" ? "状态变化" : "State changes"}</th>
-            <th className="px-3 py-2 font-medium">{lang === "zh" ? "伏笔动态" : "Hook activity"}</th>
-            <th className="px-3 py-2 font-medium">{lang === "zh" ? "情绪" : "Mood"}</th>
-            <th className="px-3 py-2 font-medium">{lang === "zh" ? "类型" : "Type"}</th>
+            <th className="px-3 py-2 font-medium">{lang === "vi" ? "Tiêu đề" : "Title"}</th>
+            <th className="px-3 py-2 font-medium">{lang === "vi" ? "Nhân vật" : "Characters"}</th>
+            <th className="px-3 py-2 font-medium">{lang === "vi" ? "Sự kiện chính" : "Events"}</th>
+            <th className="px-3 py-2 font-medium">{lang === "vi" ? "Thay đổi trạng thái" : "State changes"}</th>
+            <th className="px-3 py-2 font-medium">{lang === "vi" ? "Biến động tiền để" : "Hook activity"}</th>
+            <th className="px-3 py-2 font-medium">{lang === "vi" ? "Cảm xúc" : "Mood"}</th>
+            <th className="px-3 py-2 font-medium">{lang === "vi" ? "Kiểu" : "Type"}</th>
           </tr>
         </thead>
         <tbody>

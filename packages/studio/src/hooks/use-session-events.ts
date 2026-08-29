@@ -6,9 +6,9 @@ import { bookKey, mergeSessionIds, updateSession } from "../store/chat/slices/me
 import { clearBookCreateSessionId, getBookCreateSessionId } from "../pages/chat-page-state";
 
 /**
- * 监听全局 SSE 事件中与 session 有关的两类消息：
- * - session:title — AI 自动生成标题后推送，更新侧边栏显示
- * - book:created  — 新建书籍成功后推送，把 session 从 null 迁移到新书籍、清 localStorage、跳转
+ * Lắng nghe hai loại thông báo liên quan đến session trong sự kiện SSE toàn cục:
+ * - session:title — đẩy sau khi AI tự tạo tiêu đề, cập nhật hiển thị thanh bên
+ * - book:created  — đẩy sau khi tạo sách thành công, chuyển session từ null sang sách mới, xóa localStorage, điều hướng
  *
  * Cursor-based consumption matters because React may batch multiple SSE state
  * updates into one render; looking only at messages.at(-1) drops middle events.

@@ -105,15 +105,15 @@ describe("NarrativeForecastPreview", () => {
       onRecheck: vi.fn(),
     }));
 
-    expect(html).toContain("剧情多线推演");
-    expect(html).toContain("非正史规划");
-    expect(html).toContain("基于第 3 章");
+    expect(html).toContain("Dự báo truyện đa nhánh");
+    expect(html).toContain("KHÔNG CHÍNH THỐNG");
+    expect(html).toContain("Dựa trên sau chương 3");
     expect(html).toContain("主角是否立刻公开第三章发现的关键证据");
     expect(html).toContain("沉默的铁锈");
     expect(html).toContain("试探深水");
-    expect(html).toContain("第 4 章");
-    expect(html).toContain("连续性");
-    expect(html).toContain("采用此分支");
+    expect(html).toContain("Chương 4");
+    expect(html).toContain("Tính liên tục");
+    expect(html).toContain("Dùng nhánh này");
     expect(html).toContain(`data-forecast-id="${forecast.forecastId}"`);
     expect(html).toContain("data-branch-id=\"branch-1\"");
   });
@@ -125,17 +125,17 @@ describe("NarrativeForecastPreview", () => {
       onRecheck: vi.fn(),
     }));
 
-    expect(html).toContain("正史已变化");
+    expect(html).toContain("Chính thống đã thay đổi");
     expect(html).toMatch(/data-branch-id="branch-1"[^>]*disabled/);
-    expect(html).toContain("重新核验");
+    expect(html).toContain("Kiểm tra lại");
   });
 
   it("builds explicit existing-tool instructions from structured ids", () => {
-    expect(buildNarrativeForecastSelectionInstruction(forecast.forecastId, "branch-2", "zh"))
+    expect(buildNarrativeForecastSelectionInstruction(forecast.forecastId, "branch-2", "vi"))
       .toContain(`select_narrative_branch`);
-    expect(buildNarrativeForecastSelectionInstruction(forecast.forecastId, "branch-2", "zh"))
+    expect(buildNarrativeForecastSelectionInstruction(forecast.forecastId, "branch-2", "vi"))
       .toContain(`${forecast.forecastId}`);
-    expect(buildNarrativeForecastSelectionInstruction(forecast.forecastId, "branch-2", "zh"))
+    expect(buildNarrativeForecastSelectionInstruction(forecast.forecastId, "branch-2", "vi"))
       .toContain("branch-2");
     expect(buildNarrativeForecastRecheckInstruction(forecast.forecastId, "en"))
       .toBe(`Call get_narrative_forecast for forecast ${forecast.forecastId} and report whether it is stale.`);

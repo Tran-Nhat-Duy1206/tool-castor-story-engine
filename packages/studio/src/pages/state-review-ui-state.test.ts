@@ -166,7 +166,7 @@ describe("groupReviewItems (design §26 domain groups)", () => {
 describe("reviewKindLabel + describeProposalChange", () => {
   it("labels every V1 kind bilingually without inventing families", () => {
     expect(reviewKindLabel("current-state-fact", "en")).toMatch(/fact/i);
-    expect(reviewKindLabel("new-hook-candidate", "zh")).toBeTruthy();
+    expect(reviewKindLabel("new-hook-candidate", "vi")).toBeTruthy();
     expect(reviewKindLabel("note", "en")).toMatch(/note/i);
   });
 
@@ -174,7 +174,7 @@ describe("reviewKindLabel + describeProposalChange", () => {
     expect(describeProposalChange(factItem().proposal, "en")).toContain("当前位置");
     expect(describeProposalChange(factItem().proposal, "en")).toContain("北岸灯塔");
     expect(describeProposalChange(opItem().proposal, "en")).toContain("hook-ledger");
-    expect(describeProposalChange({ type: "none" }, "zh")).toBeTruthy();
+    expect(describeProposalChange({ type: "none" }, "vi")).toBeTruthy();
     // Unknown future shape must never crash the page.
     expect(describeProposalChange({ type: "time-travel" } as never, "en")).toContain("time-travel");
   });
@@ -276,7 +276,7 @@ describe("rejectAllUiPatch — §6 batch flow (review C1 regression)", () => {
     // C1 regression pin: previously the page's `finally` block reset the
     // armed flag after the arming branch returned, making the §6 dialog
     // unreachable whenever a verified-explicit item existed.
-    const patch = rejectAllUiPatch({ armed: false }, frictionOutcome, "zh");
+    const patch = rejectAllUiPatch({ armed: false }, frictionOutcome, "vi");
     expect(patch.armed).toBe(true);
     expect(patch.adoptArtifact).toBe(false);
     expect(patch.refetchLatest).toBe(false);
@@ -307,7 +307,7 @@ describe("mutationOutcomeToUi — CAS conflicts refresh, locks stay retryable", 
       ok: false,
       code: "state_review_edit_conflict",
       message: "revision moved",
-    }, "zh");
+    }, "vi");
     expect(view.tone).toBe("conflict");
     expect(view.refetchLatest).toBe(true);
     expect(view.autoRetry).toBe(false);
@@ -348,7 +348,7 @@ describe("confirmOutcomeToUi — resolved-with-warnings stays SUCCESS", () => {
   };
 
   it("resolved without warnings is plain success and leaves the active state", () => {
-    const view = confirmOutcomeToUi({ ok: true, status: "resolved", receipt, resultingCanonRevision: "x", warnings: [] }, "zh");
+    const view = confirmOutcomeToUi({ ok: true, status: "resolved", receipt, resultingCanonRevision: "x", warnings: [] }, "vi");
     expect(view.tone).toBe("success");
     expect(view.refreshChapter).toBe(true);
     expect(view.leaveActiveState).toBe(true);
@@ -366,7 +366,7 @@ describe("confirmOutcomeToUi — resolved-with-warnings stays SUCCESS", () => {
   });
 
   it("already_resolved is idempotent success, not failure", () => {
-    const view = confirmOutcomeToUi({ ok: true, status: "already_resolved", receipt, resultingCanonRevision: "x", warnings: [] }, "zh");
+    const view = confirmOutcomeToUi({ ok: true, status: "already_resolved", receipt, resultingCanonRevision: "x", warnings: [] }, "vi");
     expect(view.tone).toBe("success");
     expect(view.success).toBe(true);
     expect(view.leaveActiveState).toBe(true);
@@ -380,7 +380,7 @@ describe("confirmOutcomeToUi — resolved-with-warnings stays SUCCESS", () => {
   });
 
   it("lock conflicts during confirm remain retryable", () => {
-    expect(confirmOutcomeToUi({ ok: false, code: "book_write_locked", message: "busy" }, "zh").tone).toBe("locked");
+    expect(confirmOutcomeToUi({ ok: false, code: "book_write_locked", message: "busy" }, "vi").tone).toBe("locked");
   });
 });
 

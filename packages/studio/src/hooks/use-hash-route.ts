@@ -117,11 +117,11 @@ export function useHashRoute() {
   }, []);
 
   const setRoute = useCallback((newRoute: HashRoute) => {
-    // 先同步 React state：无论目标页面是否写 URL，保证页面立刻切换。
-    // 之前只在非 hash 页面才 setRouteState，hash 页面完全靠 hashchange 事件回调触发。
-    // 但当 URL 没有实际变化时（比如从 services → logs → services，中间的 logs
-    // 不写 URL，URL 一直停在 #/services），再次赋值同一个 hash 不会触发 hashchange，
-    // React state 就永远停留在 logs，表现为"点不动"。
+    // Đồng bộ React state trước: bất kể trang đích có ghi URL hay nào, đảm bảo chuyển trang ngay lập tức.
+    // Trước đây chỉ gọi setRouteState ở trang không phải hash; các trang hash hoàn toàn dựa vào callback sự kiện hashchange.
+    // Nhưng khi URL không thay đổi thực sự (ví dụ services → logs → services, logs ở giữa
+    // không ghi URL nên URL cứ dừng ở #/services), việc gán lại cùng một hash sẽ không kích hoạt hashchange,
+    // khiến React state kẹt mãi ở logs — biểu hiện là "bấm không ăn".
     setRouteState(newRoute);
     if (HASH_PAGES.has(newRoute.page)) {
       const hash = routeToHash(newRoute);

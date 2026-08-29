@@ -60,7 +60,7 @@ describe("fetchJson", () => {
     );
 
     await expect(fetchJson("/books/demo/write-next", { method: "POST" }, { fetchImpl })).rejects.toThrow(
-      "最新第 1 章处于状态降级（state-degraded）。继续写下一章前，请先修复状态，或重写这一章。",
+      "Chương mới nhất 1 đang ở trạng thái suy giảm (state-degraded). Trước khi viết chương tiếp theo, hãy sửa trạng thái hoặc viết lại chương này.",
     );
   });
 });

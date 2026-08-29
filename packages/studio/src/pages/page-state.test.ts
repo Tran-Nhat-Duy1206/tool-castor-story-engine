@@ -29,7 +29,7 @@ describe("pickValidValue", () => {
 
 describe("defaultChapterWordsForLanguage", () => {
   it("uses 3000 for chinese projects and 2000 for english projects", () => {
-    expect(defaultChapterWordsForLanguage("zh")).toBe("3000");
+    expect(defaultChapterWordsForLanguage("vi")).toBe("3000");
     expect(defaultChapterWordsForLanguage("en")).toBe("2000");
   });
 });
@@ -44,7 +44,7 @@ describe("platformOptionsForLanguage", () => {
 
 describe("book create form", () => {
   it("starts with sensible defaults for chinese projects", () => {
-    expect(defaultBookCreateForm("zh")).toEqual({
+    expect(defaultBookCreateForm("vi")).toEqual({
       title: "",
       genre: "",
       platform: "tomato",
@@ -56,7 +56,7 @@ describe("book create form", () => {
 
   it("requires title, genre, brief, and positive numeric targets before creating", () => {
     const ready = {
-      ...defaultBookCreateForm("zh"),
+      ...defaultBookCreateForm("vi"),
       title: "夜港账本",
       genre: "都市悬疑",
       brief: "近未来港口城，主角查账洗白。",
@@ -271,7 +271,7 @@ describe("buildCreationDraftSummary", () => {
       volumeOutline: "卷一先查账，再暴露港口旧案。",
       missingFields: ["supportingCast"],
       readyToCreate: false,
-    }, "zh");
+    }, "vi");
 
     expect(stages.map((stage) => ({
       key: stage.key,
@@ -282,35 +282,35 @@ describe("buildCreationDraftSummary", () => {
     }))).toEqual([
       {
         key: "basic",
-        label: "基础信息",
+        label: "Thông tin cơ bản",
         status: "complete",
         rows: ["title", "genre", "platform", "targetChapters", "chapterWordCount"],
         missing: [],
       },
       {
         key: "world",
-        label: "世界观与规则",
+        label: "Thế giới quan & quy tắc",
         status: "complete",
         rows: ["worldPremise", "settingNotes"],
         missing: [],
       },
       {
         key: "characters",
-        label: "主角与角色",
+        label: "Nhân vật chính & dàn nhân vật",
         status: "partial",
         rows: ["protagonist"],
-        missing: ["配角"],
+        missing: ["Nhân vật phụ"],
       },
       {
         key: "conflict",
-        label: "冲突与回报",
+        label: "Xung đột & phần thưởng",
         status: "complete",
         rows: ["conflictCore"],
         missing: [],
       },
       {
         key: "structure",
-        label: "结构与写作约束",
+        label: "Cấu trúc & ràng buộc viết",
         status: "complete",
         rows: ["volumeOutline"],
         missing: [],
@@ -330,14 +330,14 @@ describe("buildCreationDraftSummary", () => {
       nextQuestion: "卷一先查账还是先砸场？",
       missingFields: ["targetChapters"],
       readyToCreate: false,
-    }, "zh")).toEqual([
-      { key: "title", label: "书名", value: "夜港账本" },
-      { key: "worldPremise", label: "世界观", value: "近未来港口城，账本牵出多方势力。" },
-      { key: "protagonist", label: "主角", value: "林砚，水货账房出身，擅长记账和看人。" },
-      { key: "conflictCore", label: "核心冲突", value: "洗白与旧债回潮的对撞。" },
-      { key: "volumeOutline", label: "卷纲方向", value: "卷一先查账，再暴露港口旧案。" },
-      { key: "blurb", label: "简介", value: "一个做灰产生意的人，准备在夜港洗白，却先被旧账拖回去。" },
-      { key: "nextQuestion", label: "下一步", value: "卷一先查账还是先砸场？" },
+    }, "vi")).toEqual([
+      { key: "title", label: "Tên sách", value: "夜港账本" },
+      { key: "worldPremise", label: "Thế giới quan", value: "近未来港口城，账本牵出多方势力。" },
+      { key: "protagonist", label: "Nhân vật chính", value: "林砚，水货账房出身，擅长记账和看人。" },
+      { key: "conflictCore", label: "Xung đột cốt lõi", value: "洗白与旧债回潮的对撞。" },
+      { key: "volumeOutline", label: "Hướng dàn ý tập", value: "卷一先查账，再暴露港口旧案。" },
+      { key: "blurb", label: "Tóm tắt", value: "一个做灰产生意的人，准备在夜港洗白，却先被旧账拖回去。" },
+      { key: "nextQuestion", label: "Bước tiếp theo", value: "卷一先查账还是先砸场？" },
     ]);
   });
 });

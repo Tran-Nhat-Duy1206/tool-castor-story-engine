@@ -1,15 +1,15 @@
 import { ChevronRight } from "lucide-react";
 import type { HoldingRow } from "./types";
-import { KIND_LABEL_ZH, KIND_LABEL_EN } from "./types";
+import { KIND_LABEL_VI, KIND_LABEL_EN } from "./types";
 
 export function HoldingSlot(props: {
   readonly row: HoldingRow;
-  readonly isZh: boolean;
+  readonly isVi: boolean;
   readonly generating?: boolean;
   readonly onOpen: () => void;
 }) {
-  const { row, isZh, generating, onOpen } = props;
-  const kind = (isZh ? KIND_LABEL_ZH : KIND_LABEL_EN)[row.kind] ?? row.kind;
+  const { row, isVi, generating, onOpen } = props;
+  const kind = (isVi ? KIND_LABEL_VI : KIND_LABEL_EN)[row.kind] ?? row.kind;
   return (
     <button
       type="button"
@@ -28,7 +28,7 @@ export function HoldingSlot(props: {
           <span className="truncate text-[15px] leading-6 font-semibold text-foreground">{row.label}</span>
           {row.isFresh ? (
             <span className="shrink-0 rounded-full bg-emerald-500/20 px-1.5 text-[12px] leading-5 font-medium text-emerald-300">
-              {isZh ? "新" : "NEW"}
+              {isVi ? "MỚI" : "NEW"}
             </span>
           ) : null}
         </span>

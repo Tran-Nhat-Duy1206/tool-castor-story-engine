@@ -86,21 +86,21 @@ export function StoryGraphTree({
             className={`ml-auto px-3 py-1 rounded ${c.btnPrimary}`}
             data-testid="film-play"
           >
-            {tr("试玩", "Play")} →
+            {tr("Chơi thử", "Play")} →
           </button>
           <button
             onClick={() => nav.toFlow(projectId)}
             className={`px-3 py-1 rounded ${c.btnSecondary}`}
             data-testid="open-flow"
           >
-            {tr("流程图", "Flow")} →
+            {tr("Sơ đồ luồng", "Flow")} →
           </button>
           <button
             onClick={() => nav.toFilmAuthor(projectId)}
             className={`px-3 py-1 rounded ${c.btnSecondary}`}
             data-testid="open-authoring"
           >
-            {tr("AI 对话创作", "AI chat authoring")} →
+            {tr("Sáng tác qua chat với AI", "AI chat authoring")} →
           </button>
           {exportUrl && (
             <a
@@ -109,7 +109,7 @@ export function StoryGraphTree({
               className={`px-3 py-1 rounded ${c.btnSecondary}`}
               data-testid="film-export-package"
             >
-              {tr("导出整包", "Export package")}
+              {tr("Xuất toàn bộ gói", "Export package")}
             </a>
           )}
         </div>
@@ -119,15 +119,15 @@ export function StoryGraphTree({
 
       {saveError && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" data-testid="film-save-error">
-          {tr("保存失败：", "Save failed: ")}{saveError}
+          {tr("Lưu thất bại: ", "Save failed: ")}{saveError}
         </div>
       )}
 
       {graph.worldAnchor && (
         <div className="border rounded p-3 text-sm" data-testid="film-world">
-          <div className={c.muted}>{tr("世界锚点", "World anchor")}</div>
-          <div>{tr("核心：", "Core: ")}{graph.worldAnchor.storyCore}</div>
-          <div>{tr("主题：", "Theme: ")}{graph.worldAnchor.theme} · {tr("题材：", "Genre: ")}{graph.worldAnchor.genre}</div>
+          <div className={c.muted}>{tr("Mỏ neo thế giới", "World anchor")}</div>
+          <div>{tr("Cốt lõi: ", "Core: ")}{graph.worldAnchor.storyCore}</div>
+          <div>{tr("Chủ đề: ", "Theme: ")}{graph.worldAnchor.theme} · {tr("Thể loại: ", "Genre: ")}{graph.worldAnchor.genre}</div>
         </div>
       )}
 
@@ -204,7 +204,7 @@ function NodeEditor({
           onClick={() => onSave({ ...node, sceneDesc: scene })}
           className={`px-3 py-1 text-xs rounded ${colors.btnPrimary} disabled:opacity-40`}
         >
-          {saving ? tr("保存中…", "Saving…") : tr("保存", "Save")}
+          {saving ? tr("Đang lưu…", "Saving…") : tr("Lưu", "Save")}
         </button>
         <button
           data-testid={`gen-image-${node.id}`}
@@ -212,7 +212,7 @@ function NodeEditor({
           onClick={() => onGenerateImage(node.id)}
           className={`px-3 py-1 text-xs rounded ${colors.btnSecondary} disabled:opacity-40`}
         >
-          {generating ? tr("生成中…", "Generating…") : tr("生成配图", "Generate image")}
+          {generating ? tr("Đang tạo…", "Generating…") : tr("Tạo ảnh minh họa", "Generate image")}
         </button>
       </div>
     </div>

@@ -48,13 +48,13 @@ export type ToolHeaderProps = {
 // [zh, en] tuples resolved through tr() at render time so the badge follows
 // the current app language instead of the language active at module load.
 const statusLabels: Record<ToolPart["state"], readonly [string, string]> = {
-  "approval-requested": ["等待确认", "Awaiting approval"],
-  "approval-responded": ["已响应", "Responded"],
-  "input-available": ["执行中", "Running"],
-  "input-streaming": ["处理中", "Processing"],
-  "output-available": ["已完成", "Completed"],
-  "output-denied": ["已拒绝", "Denied"],
-  "output-error": ["出错", "Error"],
+  "approval-requested": ["Chờ xác nhận", "Awaiting approval"],
+  "approval-responded": ["Đã phản hồi", "Responded"],
+  "input-available": ["Đang chạy", "Running"],
+  "input-streaming": ["Đang xử lý", "Processing"],
+  "output-available": ["Đã hoàn thành", "Completed"],
+  "output-denied": ["Bị từ chối", "Denied"],
+  "output-error": ["Lỗi", "Error"],
 };
 
 const statusIcons: Record<ToolPart["state"], ReactNode> = {

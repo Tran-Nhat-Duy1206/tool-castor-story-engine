@@ -10,7 +10,7 @@ import type {
 } from "../../lib/canon-api";
 import { buildCanonUrl } from "../../lib/canon-api";
 
-export type UiLanguage = "zh" | "en";
+export type UiLanguage = "vi" | "en";
 
 /**
  * Resolves the canon fetch URL without throwing, so the page can keep a
@@ -33,11 +33,11 @@ export function resolveCanonRequestUrl(bookId: string): { url?: string; error?: 
 export function formatValidityInterval(fact: CurrentStateFactDto, lang: UiLanguage): string {
   const closed = fact.validUntilChapter !== null && fact.validUntilChapter !== undefined;
   if (closed) {
-    return lang === "zh"
-      ? `第${fact.validFromChapter}–${fact.validUntilChapter}章`
+    return lang === "vi"
+      ? `Chương ${fact.validFromChapter}–${fact.validUntilChapter}`
       : `ch.${fact.validFromChapter}–${fact.validUntilChapter}`;
   }
-  return lang === "zh" ? `第${fact.validFromChapter}章 起` : `from ch.${fact.validFromChapter}`;
+  return lang === "vi" ? `từ chương ${fact.validFromChapter}` : `from ch.${fact.validFromChapter}`;
 }
 
 export interface SlotRowDto {
@@ -172,9 +172,9 @@ export function validateFactDraft(input: {
   readonly object?: string;
 }): string[] {
   const issues: string[] = [];
-  if (!trim(input.subject)) issues.push("主体不能为空 · Subject is required");
-  if (!trim(input.predicate)) issues.push("谓词不能为空 · Predicate is required");
-  if (!trim(input.object)) issues.push("值不能为空 · Value is required");
+  if (!trim(input.subject)) issues.push("Chủ thể không được để trống · Subject is required");
+  if (!trim(input.predicate)) issues.push("Vị từ không được để trống · Predicate is required");
+  if (!trim(input.object)) issues.push("Giá trị không được để trống · Value is required");
   return issues;
 }
 
@@ -205,7 +205,7 @@ function issueTexts(issues: ReadonlyArray<{ scope?: string; code?: string; messa
  * silent retry.
  */
 export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): SaveOutcomeView {
-  const zh = lang === "zh";
+  const vi = lang === "vi";
   switch (outcome.status) {
     case "success": {
       const hasWarnings = outcome.warnings.length > 0;
@@ -213,11 +213,11 @@ export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): 
         tone: hasWarnings ? "warning" : "success",
         saved: true,
         title: hasWarnings
-          ? zh ? "已保存（附警告）" : "Saved (with warnings)"
-          : zh ? "已保存" : "Saved",
+          ? vi ? "Đã lưu (kèm cảnh báo)" : "Saved (with warnings)"
+          : vi ? "Đã lưu" : "Saved",
         detail: hasWarnings
-          ? zh ? "规范状态已更新，但派生数据需要关注。" : "Canonical state updated, but derived data needs attention."
-          : zh ? "规范状态已更新。" : "Canonical state updated.",
+          ? vi ? "Đã cập nhật trạng thái chính thống, nhưng dữ liệu phái sinh cần được lưu ý." : "Canonical state updated, but derived data needs attention."
+          : vi ? "Đã cập nhật trạng thái chính thống." : "Canonical state updated.",
         issues: [],
         warnings: [...outcome.warnings],
         showRefetch: false,
@@ -228,10 +228,10 @@ export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): 
       return {
         tone: "conflict",
         saved: false,
-        title: zh ? "保存被拒绝：状态已过期" : "Save rejected: state is stale",
+        title: vi ? "Lưu bị từ chối: trạng thái đã lỗi thời" : "Save rejected: state is stale",
         detail:
-          zh
-            ? "故事状态已被其他操作更新。请刷新最新状态后重新应用你的修改。"
+          vi
+            ? "Trạng thái truyện đã được thao tác khác cập nhật. Hãy tải trạng thái mới nhất rồi áp dụng lại thay đổi của bạn."
             : "The story state changed elsewhere. Refetch the latest state and re-apply your edit.",
         issues: [],
         warnings: [],
@@ -243,7 +243,7 @@ export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): 
       return {
         tone: "locked",
         saved: false,
-        title: zh ? "书籍正被写入任务锁定" : "Book is locked by a write task",
+        title: vi ? "Sách đang bị khóa bởi tác vụ ghi" : "Book is locked by a write task",
         detail: outcome.message,
         issues: [],
         warnings: [],
@@ -254,7 +254,7 @@ export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): 
       return {
         tone: "error",
         saved: false,
-        title: zh ? "规范状态不可用" : "Canonical state unavailable",
+        title: vi ? "Trạng thái chính thống không khả dụng" : "Canonical state unavailable",
         detail: outcome.message,
         issues: issueTexts(outcome.issues),
         warnings: [],
@@ -265,7 +265,7 @@ export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): 
       return {
         tone: "error",
         saved: false,
-        title: zh ? "编辑未通过校验" : "Edit failed validation",
+        title: vi ? "Chỉnh sửa không đạt xác thực" : "Edit failed validation",
         detail: outcome.message,
         issues: issueTexts(outcome.issues),
         warnings: [],
@@ -276,7 +276,7 @@ export function saveOutcomeToUi(outcome: CanonCommitOutcome, lang: UiLanguage): 
       return {
         tone: "error",
         saved: false,
-        title: zh ? "保存失败" : "Save failed",
+        title: vi ? "Lưu thất bại" : "Save failed",
         detail: outcome.message,
         issues: [],
         warnings: [],

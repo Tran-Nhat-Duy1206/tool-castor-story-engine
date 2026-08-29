@@ -68,11 +68,13 @@ export function App() {
 
   const isDark = theme === "dark";
 
-  // 全局语言同步：app-language 是模块级单例，供用不了 hook 的代码（lib 纯函数、
-  // store slice）读取。这里在渲染期同步赋值，让子组件在同一次渲染里调用 tr() 时
-  // 就读到正确语言（只用 effect 的话，effect 要等本次渲染提交后才执行，本次渲染
-  // 里的 tr() 会读到旧语言）。赋值是幂等的模块变量写入，StrictMode 重复渲染无影
-  // 响；下面的 effect 在语言加载完成和切换时再设置一次，保证提交后的值也正确。
+  // Global language sync: app-language is a module-level singleton read by code
+  // that cannot use hooks (pure lib functions, store slices). Assign during render
+  // so children calling tr() in the same render pass already see the correct
+  // language (with an effect alone, it would only run after this render commits,
+  // and tr() during this render would read the stale language). The assignment is
+  // an idempotent module-variable write, so StrictMode double renders are fine;
+  // the effect below sets it again once the language loads or changes.
   setAppLanguage(currentLang);
   useEffect(() => {
     setAppLanguage(currentLang);
@@ -141,12 +143,12 @@ export function App() {
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="max-w-md w-full rounded-2xl border border-destructive/30 bg-destructive/5 p-6 space-y-4">
           <div>
-            <h1 className="text-lg font-semibold text-destructive">无法加载项目配置 / Failed to load project config</h1>
+            <h1 className="text-lg font-semibold text-destructive">Không thể tải cấu hình dự án / Failed to load project config</h1>
             <p className="mt-2 text-sm text-muted-foreground break-all">{projectError}</p>
           </div>
-          {/* 项目配置没加载出来，语言未知，所以这屏中英双语并排展示。 */}
+          {/* Project config not loaded yet, language unknown, so this screen shows both languages side by side. */}
           <p className="text-sm text-muted-foreground">
-            请检查项目根目录下的 castor.json 是否存在且为合法 JSON，然后重试。
+            Hãy kiểm tra castor.json ở thư mục gốc dự án có tồn tại và là JSON hợp lệ hay không, rồi thử lại.
             <br />
             Check that castor.json in the project root exists and is valid JSON, then retry.
           </p>
@@ -155,7 +157,7 @@ export function App() {
             onClick={() => refetchProject()}
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           >
-            重试 / Retry
+            Thử lại / Retry
           </button>
         </div>
       </div>
@@ -207,12 +209,12 @@ export function App() {
             <div className="flex gap-0.5 bg-muted/50 rounded-lg p-0.5">
               <button
                 onClick={async () => {
-                  await putApi("/project", { language: "zh" });
+                  await putApi("/project", { language: "vi" });
                   refetchProject();
                 }}
-                className={`px-2.5 py-1 text-[16px] font-medium rounded-md ${currentLang === "zh" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+                className={`px-2.5 py-1 text-[16px] font-medium rounded-md ${currentLang === "vi" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
               >
-                中
+                VI
               </button>
               <button
                 onClick={async () => {
@@ -397,12 +399,12 @@ export function App() {
             </div>
           )}
           {route.page === "film-studio" && (
-            <Suspense fallback={<div className="p-6 text-sm">{tr("加载创作向导…", "Loading creation wizard…")}</div>}>
+            <Suspense fallback={<div className="p-6 text-sm">{tr("Đang tải trình hướng dẫn sáng tác…", "Loading creation wizard…")}</div>}>
               <FilmWizard projectId={route.projectId} nav={nav} theme={theme} t={t} sse={sse} />
             </Suspense>
           )}
           {route.page === "flow" && (
-            <Suspense fallback={<div className="p-6 text-sm">{tr("加载流程图…", "Loading flow view…")}</div>}>
+            <Suspense fallback={<div className="p-6 text-sm">{tr("Đang tải sơ đồ luồng…", "Loading flow view…")}</div>}>
               <FlowView projectId={route.projectId} nav={nav} theme={theme} t={t} />
             </Suspense>
           )}

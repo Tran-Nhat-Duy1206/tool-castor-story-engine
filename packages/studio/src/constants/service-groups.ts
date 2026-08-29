@@ -9,42 +9,43 @@ export const GROUP_ORDER: ReadonlyArray<EndpointGroup> = [
   "codingPlan",
 ] as const;
 
-// 标签在渲染时通过 tr() 取值，不能在模块加载时固化成单一语言字符串，
-// 所以这里存 zh/en 对，由下方 getGroupLabel 等函数在调用时解析。
-const GROUP_LABELS: Record<EndpointGroup, { zh: string; en: string }> = {
-  overseas: { zh: "海外原厂", en: "International providers" },
-  china: { zh: "国产原厂", en: "China providers" },
-  aggregator: { zh: "聚合 API", en: "Aggregator APIs" },
-  local: { zh: "本地 / 订阅", en: "Local / Subscription" },
-  codingPlan: { zh: "CodingPlan", en: "CodingPlan" },
+// Nhãn được resolve qua tr() khi render, không thể đóng băng thành chuỗi
+// đơn ngữ khi nạp module, nên ở đây lưu cặp vi/en, các hàm getGroupLabel...
+// bên dưới sẽ resolve khi được gọi.
+const GROUP_LABELS: Record<EndpointGroup, { vi: string; en: string }> = {
+  overseas: { vi: "Nhà cung cấp quốc tế", en: "International providers" },
+  china: { vi: "Nhà cung cấp Trung Quốc", en: "China providers" },
+  aggregator: { vi: "API tổng hợp", en: "Aggregator APIs" },
+  local: { vi: "Cục bộ / Gói đăng ký", en: "Local / Subscription" },
+  codingPlan: { vi: "CodingPlan", en: "CodingPlan" },
 };
 
-const GROUP_DESCRIPTIONS: Partial<Record<EndpointGroup, { zh: string; en: string }>> = {
+const GROUP_DESCRIPTIONS: Partial<Record<EndpointGroup, { vi: string; en: string }>> = {
   aggregator: {
-    zh: "聚合国内外主流模型，适合用一个 API Key 接入多模型的场景。",
+    vi: "Tổng hợp các mô hình chủ lực trong và ngoài nước, phù hợp khi muốn truy cập nhiều mô hình bằng một API Key.",
     en: "Aggregates mainstream models from multiple vendors — access many models with one API key.",
   },
 };
 
-const GROUP_SHORT_LABELS: Record<EndpointGroup, { zh: string; en: string }> = {
-  overseas: { zh: "海外", en: "Intl" },
-  china: { zh: "国产", en: "China" },
-  aggregator: { zh: "聚合", en: "Aggregator" },
-  local: { zh: "本地", en: "Local" },
-  codingPlan: { zh: "CodingPlan", en: "CodingPlan" },
+const GROUP_SHORT_LABELS: Record<EndpointGroup, { vi: string; en: string }> = {
+  overseas: { vi: "Quốc tế", en: "Intl" },
+  china: { vi: "Trung Quốc", en: "China" },
+  aggregator: { vi: "Tổng hợp", en: "Aggregator" },
+  local: { vi: "Cục bộ", en: "Local" },
+  codingPlan: { vi: "CodingPlan", en: "CodingPlan" },
 };
 
 export function getGroupLabel(group: EndpointGroup): string {
   const label = GROUP_LABELS[group];
-  return tr(label.zh, label.en);
+  return tr(label.vi, label.en);
 }
 
 export function getGroupDescription(group: EndpointGroup): string | null {
   const desc = GROUP_DESCRIPTIONS[group];
-  return desc ? tr(desc.zh, desc.en) : null;
+  return desc ? tr(desc.vi, desc.en) : null;
 }
 
 export function getGroupShortLabel(group: EndpointGroup): string {
   const label = GROUP_SHORT_LABELS[group];
-  return tr(label.zh, label.en);
+  return tr(label.vi, label.en);
 }

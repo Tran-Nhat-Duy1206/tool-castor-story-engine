@@ -51,7 +51,7 @@ import {
 } from "lucide-react";
 import { CastorLogo } from "./CastorLogo";
 
-// 历史记录里的会话混装多种类型（chat / short / play / book-create），用图标区分。
+// Sessions in the history mix several kinds (chat / short / play / book-create), distinguished by icon.
 function SessionKindIcon({ kind, className }: { readonly kind?: string; readonly className?: string }) {
   const Icon =
     kind === "play" ? Gamepad2
@@ -156,8 +156,9 @@ export function Sidebar({ nav, activePage, sse, t }: {
     }
   }, [mutateBooks, refetchBooks, refetchDaemon, sse.messages]);
 
-  // bookDataVersion 变化（外部数据信号）时才重拉当前已展开书的 session 列表；
-  // 展开/折叠本身不触发请求（展开由 toggleBook 驱动，已带"首次加载"判断）。
+  // Only refetch the expanded book's session list when bookDataVersion changes
+  // (external data signal); expanding/collapsing itself does not trigger requests
+  // (expansion is driven by toggleBook, which already has a "first load" check).
   useEffect(() => {
     for (const bookId of expandedBooks) {
       void loadSessionList(bookId);
@@ -187,7 +188,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
         return next;
       }
       next.add(bookId);
-      // 首次展开才拉：已有 sessionIdsByBook 数据就直接用缓存
+      // Fetch only on first expand: reuse the cache when sessionIdsByBook already has data
       if (sessionIdsByBook[bookId] === undefined) {
         void loadSessionList(bookId);
       }
@@ -229,8 +230,9 @@ export function Sidebar({ nav, activePage, sse, t }: {
   };
 
   const handleCreateSession = (bookId: string) => {
-    // 前端创建草稿会话：对话区立即变空，但 session 文件不落盘；
-    // 发第一条消息时 sendMessage 会调 POST /sessions 真正创建。
+    // Create a draft session on the client: the chat area empties immediately, but
+    // the session file is not persisted; sendMessage calls POST /sessions on the
+    // first message to actually create it.
     setExpandedBooks((prev) => new Set(prev).add(bookId));
     setInput("");
     createDraftSession(bookId, "book");
@@ -260,7 +262,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
 
   const launchProjectMode = (kind: "short" | "play" | "script" | "storyboard" | "interactive-film", playMode?: "guided" | "open") => {
     setProjectChatExpanded(true);
-    // Play mode (分支互动 = guided / 自由互动 = open) is now decided here at the
+    // Play mode (branching = guided / free-form = open) is now decided here at the
     // launcher, not via an in-chat button.
     const sessionId = createDraftSession(null, kind, playMode);
     setProjectChatSessionId(sessionId);
@@ -335,11 +337,11 @@ export function Sidebar({ nav, activePage, sse, t }: {
               const isExpanded = expandedBooks.has(book.id);
               return (
                 <div key={book.id}>
-                  {/* 书名行：箭头展开；标题进入该书，避免聊天区停留在上一本文稿。 */}
+                  {/* Book name row: arrow expands; the title navigates into the book, so the chat area does not linger on the previous manuscript. */}
                   <div className="group/book flex items-center">
                     <button
                       type="button"
-                      aria-label={isExpanded ? tr(`折叠 ${book.title}`, `Collapse ${book.title}`) : tr(`展开 ${book.title}`, `Expand ${book.title}`)}
+                      aria-label={isExpanded ? tr(`Thu gọn ${book.title}`, `Collapse ${book.title}`) : tr(`Mở rộng ${book.title}`, `Expand ${book.title}`)}
                       onClick={() => toggleBook(book.id)}
                       className="flex h-8 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground/60 hover:bg-secondary/30 hover:text-foreground transition-colors"
                     >
@@ -360,7 +362,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                     </button>
                   </div>
 
-                  {/* 展开后才显示 session 列表 + 新建按钮 */}
+                  {/* Session list + new button shown only after expanding */}
                   <Collapse open={isExpanded}>
                     <div className="mt-0.5">
                       {bookSessions.map((session) => {
@@ -400,7 +402,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                                   }}
                                 >
                                   <Pencil size={14} />
-                                  <span>{tr("改名", "Rename")}</span>
+                                  <span>{tr("Đổi tên", "Rename")}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -408,7 +410,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                                   onClick={() => setDeleteTarget({ sessionId: session.sessionId, title: label })}
                                 >
                                   <Trash2 size={14} />
-                                  <span>{tr("删除", "Delete")}</span>
+                                  <span>{tr("Xóa", "Delete")}</span>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -421,7 +423,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                         className="w-full flex items-center gap-2 pl-9 pr-2 py-1.5 text-[13px] text-muted-foreground/50 hover:text-foreground transition-colors"
                       >
                         <Plus size={12} />
-                        <span>{tr("新建会话", "New session")}</span>
+                        <span>{tr("Phiên mới", "New session")}</span>
                       </button>
                     </div>
                   </Collapse>
@@ -438,7 +440,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
           </Collapse>
         </div>
 
-        {/* 互动影游 Section */}
+        {/* Interactive film section */}
         <div data-testid="film-projects-section">
           <SectionHeader label={t("nav.createInteractiveFilm")} expanded={filmsExpanded} onToggle={() => setFilmsExpanded((v) => !v)} />
           <Collapse open={filmsExpanded}>
@@ -457,7 +459,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
               ))}
               {films.length === 0 && (
                 <div className="px-3 py-6 text-xs text-muted-foreground/50 italic text-center">
-                  {tr("还没有互动影游项目", "No interactive film projects yet")}
+                  {tr("Chưa có dự án phim tương tác", "No interactive film projects yet")}
                 </div>
               )}
             </div>
@@ -525,7 +527,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                               }}
                             >
                               <Pencil size={14} />
-                              <span>{tr("改名", "Rename")}</span>
+                              <span>{tr("Đổi tên", "Rename")}</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -533,7 +535,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                               onClick={() => setDeleteTarget({ sessionId: session.sessionId, title: label })}
                             >
                               <Trash2 size={14} />
-                              <span>{tr("删除", "Delete")}</span>
+                              <span>{tr("Xóa", "Delete")}</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -546,7 +548,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                     className="w-full flex items-center gap-2 pl-2 pr-2 py-1.5 text-[13px] text-muted-foreground/50 hover:text-foreground transition-colors"
                   >
                     <Plus size={12} />
-                    <span>{tr("新建会话", "New session")}</span>
+                    <span>{tr("Phiên mới", "New session")}</span>
                   </button>
                 </div>
               </Collapse>
@@ -665,7 +667,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
           className="sm:max-w-[360px] p-4 gap-3"
         >
           <DialogHeader className="space-y-0 gap-0">
-            <DialogTitle className="font-sans text-sm font-medium">{tr("重命名会话", "Rename Session")}</DialogTitle>
+            <DialogTitle className="font-sans text-sm font-medium">{tr("Đổi tên phiên", "Rename Session")}</DialogTitle>
           </DialogHeader>
           <input
             id="session-rename-input"
@@ -678,7 +680,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                 void handleRenameConfirm();
               }
             }}
-            placeholder={tr("输入新标题", "Enter a new title")}
+            placeholder={tr("Nhập tiêu đề mới", "Enter a new title")}
             className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-sm outline-none focus:border-border"
           />
           <DialogFooter className="gap-1 sm:gap-1">
@@ -690,7 +692,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
               }}
               className="px-3 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              {tr("取消", "Cancel")}
+              {tr("Hủy", "Cancel")}
             </button>
             <button
               type="button"
@@ -698,7 +700,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
               disabled={!renameValue.trim()}
               className="px-3 py-1 text-xs font-medium rounded-md bg-foreground text-background hover:opacity-90 transition-opacity disabled:opacity-30"
             >
-              {tr("保存", "Save")}
+              {tr("Lưu", "Save")}
             </button>
           </DialogFooter>
         </DialogContent>
@@ -706,13 +708,13 @@ export function Sidebar({ nav, activePage, sse, t }: {
 
       <ConfirmDialog
         open={deleteTarget !== null}
-        title={tr("删除会话", "Delete Session")}
+        title={tr("Xóa phiên", "Delete Session")}
         message={tr(
-          `确认删除“${deleteTarget?.title ?? ""}”吗？该操作只删除这条会话，不影响书籍内容。`,
+          `Xóa "${deleteTarget?.title ?? ""}"? Thao tác này chỉ xóa phiên này, không ảnh hưởng nội dung sách.`,
           `Delete "${deleteTarget?.title ?? ""}"? This only removes the session; the book content is not affected.`,
         )}
-        confirmLabel={tr("删除", "Delete")}
-        cancelLabel={tr("取消", "Cancel")}
+        confirmLabel={tr("Xóa", "Delete")}
+        cancelLabel={tr("Hủy", "Cancel")}
         variant="danger"
         onConfirm={() => void handleDeleteConfirm()}
         onCancel={() => setDeleteTarget(null)}
@@ -723,14 +725,15 @@ export function Sidebar({ nav, activePage, sse, t }: {
 
 function getSessionLabel(session: { sessionId: string; title: string | null; messages: ReadonlyArray<{ role: string; content: string }> }): string {
   if (session.title) return session.title;
-  // 后端会在第一条用户消息发送时立即把消息内容持久化为占位标题。
-  // 这里处理的是"已有消息但标题还没同步回来"的短暂中间态（乐观显示）。
+  // The backend persists the first user message as a placeholder title immediately.
+  // This handles the brief intermediate state where messages exist but the title
+  // has not synced back yet (optimistic display).
   const firstUserMsg = session.messages.find((m) => m.role === "user")?.content?.trim();
   if (firstUserMsg) {
     const oneLine = firstUserMsg.replace(/\s+/g, " ");
     return oneLine.length > 20 ? `${oneLine.slice(0, 20)}…` : oneLine;
   }
-  return tr("新会话", "New session");
+  return tr("Phiên mới", "New session");
 }
 
 function formatRelativeTime(sessionId: string): string {
@@ -738,14 +741,14 @@ function formatRelativeTime(sessionId: string): string {
   if (!Number.isFinite(rawTs)) return "";
   const diff = Date.now() - rawTs;
   const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return tr("刚刚", "just now");
-  if (minutes < 60) return tr(`${minutes} 分钟`, `${minutes}m`);
+  if (minutes < 1) return tr("vừa xong", "just now");
+  if (minutes < 60) return tr(`${minutes} phút`, `${minutes}m`);
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return tr(`${hours} 小时`, `${hours}h`);
+  if (hours < 24) return tr(`${hours} giờ`, `${hours}h`);
   const days = Math.floor(hours / 24);
-  if (days < 30) return tr(`${days} 天`, `${days}d`);
+  if (days < 30) return tr(`${days} ngày`, `${days}d`);
   const months = Math.floor(days / 30);
-  return tr(`${months} 个月`, `${months}mo`);
+  return tr(`${months} tháng`, `${months}mo`);
 }
 
 // Smooth collapse via grid-template-rows 0fr→1fr (content-height-agnostic, no JS measuring).

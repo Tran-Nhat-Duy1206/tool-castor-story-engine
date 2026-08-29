@@ -3,7 +3,7 @@ import type { HudRow } from "./types";
 // Renders a world-level state slot as a game-style gauge, picking the form from
 // the data: numeric current/max → progress bar; a pressure slot → caution pill;
 // everything else → glyph + value. The "why it changed" cause (if any) shows as
-// a subtle line below, keeping numbers explainable (数值随戏剧但可解释).
+// a subtle line below, keeping numbers explainable (metrics move with drama but stay explainable).
 export function StateGauge({ row }: { readonly row: HudRow }) {
   const cause = row.details[0]?.text;
   const isPressurePill = row.kind === "pressure" && row.ratio == null;

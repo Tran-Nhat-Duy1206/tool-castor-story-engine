@@ -8,14 +8,14 @@ import {
 export interface QuickActionsProps {
   readonly onAction: (command: string, requestedIntent?: "write_next") => void;
   readonly disabled: boolean;
-  readonly isZh: boolean;
+  readonly isVi: boolean;
 }
 
 interface ChipDef {
   readonly icon: React.ReactNode;
-  readonly labelZh: string;
+  readonly labelVi: string;
   readonly labelEn: string;
-  readonly commandZh: string;
+  readonly commandVi: string;
   readonly commandEn: string;
   readonly requestedIntent?: "write_next";
 }
@@ -23,41 +23,41 @@ interface ChipDef {
 const CHIPS: ReadonlyArray<ChipDef> = [
   {
     icon: <Zap size={12} />,
-    labelZh: "写下一章",
+    labelVi: "Viết chương tiếp theo",
     labelEn: "Write next",
-    commandZh: "写下一章",
+    commandVi: "Viết chương tiếp theo",
     commandEn: "write next",
     requestedIntent: "write_next",
   },
   {
     icon: <Search size={12} />,
-    labelZh: "审计",
+    labelVi: "Kiểm tra",
     labelEn: "Audit",
-    commandZh: "审计",
+    commandVi: "Kiểm tra",
     commandEn: "audit",
   },
   {
     icon: <FileOutput size={12} />,
-    labelZh: "导出",
+    labelVi: "Xuất",
     labelEn: "Export",
-    commandZh: "导出全书",
+    commandVi: "Xuất toàn bộ sách",
     commandEn: "export book",
   },
   {
     icon: <TrendingUp size={12} />,
-    labelZh: "市场雷达",
+    labelVi: "Radar thị trường",
     labelEn: "Market radar",
-    commandZh: "扫描市场趋势",
+    commandVi: "Quét xu hướng thị trường",
     commandEn: "scan market trends",
   },
 ];
 
-export function QuickActions({ onAction, disabled, isZh }: QuickActionsProps) {
+export function QuickActions({ onAction, disabled, isVi }: QuickActionsProps) {
   return (
     <div className="flex gap-2 overflow-x-auto px-1 py-1">
       {CHIPS.map((chip) => {
-        const label = isZh ? chip.labelZh : chip.labelEn;
-        const command = isZh ? chip.commandZh : chip.commandEn;
+        const label = isVi ? chip.labelVi : chip.labelEn;
+        const command = isVi ? chip.commandVi : chip.commandEn;
         return (
           <button
             key={label}

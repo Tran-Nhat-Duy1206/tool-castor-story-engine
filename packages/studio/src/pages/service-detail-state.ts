@@ -147,14 +147,14 @@ export async function saveServiceConfig(args: {
 
   if (!trimmedKey && !args.isCustom && !args.apiKeyOptional) {
     return {
-      status: { state: "error", message: "请先输入 API Key" },
+      status: { state: "error", message: "Vui lòng nhập API Key trước" },
       detectedModel: "",
       detectedConfig: null,
     };
   }
   if (args.isCustom && !trimmedBaseUrl) {
     return {
-      status: { state: "error", message: "请先填写 Base URL" },
+      status: { state: "error", message: "Vui lòng nhập Base URL trước" },
       detectedModel: "",
       detectedConfig: null,
     };
@@ -188,7 +188,7 @@ export async function saveServiceConfig(args: {
       }, { fetchJsonImpl });
     } catch (error) {
       return {
-        status: { state: "error", message: error instanceof Error ? error.message : "连接失败" },
+        status: { state: "error", message: error instanceof Error ? error.message : "Kết nối thất bại" },
         detectedModel: "",
         detectedConfig: null,
       };
@@ -197,7 +197,7 @@ export async function saveServiceConfig(args: {
 
   if (!probe.ok) {
     return {
-      status: { state: "error", message: probe.error ?? "连接失败" },
+      status: { state: "error", message: probe.error ?? "Kết nối thất bại" },
       detectedModel: "",
       detectedConfig: null,
     };
