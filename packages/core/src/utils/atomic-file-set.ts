@@ -59,7 +59,7 @@ export async function commitAtomicFileSet(input: AtomicFileSet): Promise<void> {
   }
 
   await mkdir(input.rootDir, { recursive: true });
-  const transactionDir = await mkdtemp(join(input.rootDir, ".inkos-file-txn-"));
+  const transactionDir = await mkdtemp(join(input.rootDir, ".castor-file-txn-"));
   const stagedDir = join(transactionDir, "staged");
   const backupDir = join(transactionDir, "backup");
   const touchedPaths = [...writePaths, ...deletes];

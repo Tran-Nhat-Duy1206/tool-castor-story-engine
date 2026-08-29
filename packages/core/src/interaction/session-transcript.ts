@@ -5,7 +5,8 @@ import type { AgentMessage } from "@mariozechner/pi-agent-core";
 import { TranscriptEventSchema, type TranscriptEvent } from "./session-transcript-schema.js";
 import type { SessionKind, TranscriptRole } from "./session-transcript-schema.js";
 
-const SESSIONS_DIR = ".inkos/sessions";
+const SESSIONS_DIR = ".castor/sessions";
+const LEGACY_SESSIONS_DIR = ".inkos/sessions";
 const appendQueues = new Map<string, Promise<void>>();
 
 export function sessionsDir(projectRoot: string): string {
@@ -26,7 +27,10 @@ export async function readTranscriptEvents(
 ): Promise<TranscriptEvent[]> {
   let raw: string;
   try {
-    raw = await readFile(transcriptPath(projectRoot, sessionId), "utf-8");
+    // Read-through: canonical transcript, falling back to a legacy transcript
+    // so historical sessions remain visible before any migration happens.
+    const { resolveRuntimePath } = await import("../config/runtime-dir.js");
+    raw = await readFile(await resolveRuntimePath(projectRoot, "sessions", `${sessionId}.jsonl`), "utf-8");
   } catch {
     return [];
   }

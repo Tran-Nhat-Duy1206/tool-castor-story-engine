@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { findProjectRoot, log, logError, GLOBAL_CONFIG_DIR, GLOBAL_ENV_PATH } from "../utils.js";
+import { findProjectRoot, log, logError, GLOBAL_ENV_PATH, resolveGlobalEnvPath } from "../utils.js";
 import { listModelsForService, loadProjectConfigFile, saveProjectConfigFile } from "@actalk/castor-core";
 import { formatListModelsEmpty, formatListModelsHeader, resolveCliLanguage } from "../localization.js";
 
@@ -100,7 +100,7 @@ configCommand
 
 configCommand
   .command("set-global")
-  .description("Set global LLM config (~/.inkos/.env), shared by all projects")
+  .description("Set global LLM config (~/.castor/.env), shared by all projects")
   .requiredOption("--provider <provider>", "LLM provider (openai / anthropic)")
   .requiredOption("--base-url <url>", "API base URL")
   .requiredOption("--api-key <key>", "API key")
@@ -112,7 +112,7 @@ configCommand
   .option("--lang <language>", "Default writing language: zh (Chinese) or en (English)")
   .action(async (opts) => {
     try {
-      await mkdir(GLOBAL_CONFIG_DIR, { recursive: true });
+      await mkdir(join(await resolveGlobalEnvPath(), ".."), { recursive: true });
 
       const lines = [
         "# Castor Global LLM Configuration",
@@ -126,8 +126,10 @@ configCommand
       if (opts.apiFormat) lines.push(`INKOS_LLM_API_FORMAT=${opts.apiFormat}`);
       if (opts.lang) lines.push(`INKOS_DEFAULT_LANGUAGE=${opts.lang}`);
 
-      await writeFile(GLOBAL_ENV_PATH, lines.join("\n") + "\n", "utf-8");
-      log(`Global config saved to ${GLOBAL_ENV_PATH}`);
+      const globalEnvPath = await resolveGlobalEnvPath();
+      await mkdir(join(globalEnvPath, ".."), { recursive: true });
+      await writeFile(globalEnvPath, lines.join("\n") + "\n", "utf-8");
+      log(`Global config saved to ${globalEnvPath}`);
       log("All projects will use this config unless overridden by project .env");
     } catch (e) {
       logError(`Failed to set global config: ${e}`);
@@ -137,10 +139,10 @@ configCommand
 
 configCommand
   .command("show-global")
-  .description("Show global LLM config (~/.inkos/.env)")
+  .description("Show global LLM config (~/.castor/.env)")
   .action(async () => {
     try {
-      const content = await readFile(GLOBAL_ENV_PATH, "utf-8");
+      const content = await readFile(await resolveGlobalEnvPath(), "utf-8");
       const masked = content.replace(
         /(INKOS_LLM_API_KEY=)(.{8})(.*)(.{4})/,
         "$1$2...$4",

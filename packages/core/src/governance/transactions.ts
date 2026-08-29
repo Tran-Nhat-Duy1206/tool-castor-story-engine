@@ -187,8 +187,8 @@ export async function runTransaction(input: TransactionInput): Promise<Transacti
 
     // Stage 3: stage
     const txId = randomUUID();
-    const stagingDir = join(bookDir, `.inkos-tx-staging-${txId}`);
-    const backupDir = join(bookDir, `.inkos-tx-backup-${txId}`);
+    const stagingDir = join(bookDir, `.castor-tx-staging-${txId}`);
+    const backupDir = join(bookDir, `.castor-tx-backup-${txId}`);
 
     await mkdir(stagingDir, { recursive: true });
     await mkdir(backupDir, { recursive: true });

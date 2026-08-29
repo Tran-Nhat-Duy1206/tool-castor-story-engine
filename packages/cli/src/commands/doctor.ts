@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { findProjectRoot, log, logError, GLOBAL_ENV_PATH } from "../utils.js";
+import { findProjectRoot, log, logError, resolveGlobalEnvPath } from "../utils.js";
 import { fetchWithProxy } from "@actalk/castor-core";
 import {
   ensureNodeRuntimePinFiles,
@@ -151,14 +151,21 @@ export const doctorCommand = new Command("doctor")
     {
       let hasGlobal = false;
       try {
-        const globalContent = await readFile(GLOBAL_ENV_PATH, "utf-8");
+        const globalPath = await resolveGlobalEnvPath();
+        const globalContent = await readFile(globalPath, "utf-8");
         hasGlobal = globalContent.includes("INKOS_LLM_API_KEY=") && !globalContent.includes("your-api-key-here");
-      } catch { /* no global config */ }
-      checks.push({
-        name: "Global Config",
-        ok: hasGlobal,
-        detail: hasGlobal ? `Found (${GLOBAL_ENV_PATH})` : "Not set. Run 'castor config set-global'",
-      });
+        checks.push({
+          name: "Global Config",
+          ok: hasGlobal,
+          detail: hasGlobal ? `Found (${globalPath})` : "Not set. Run 'castor config set-global'",
+        });
+      } catch { /* no global config */
+        checks.push({
+          name: "Global Config",
+          ok: false,
+          detail: "Not set. Run 'castor config set-global'",
+        });
+      }
     }
 
     // 5. Check effective LLM config (Studio project base + env/CLI overlay, or legacy env)
@@ -251,7 +258,7 @@ export const doctorCommand = new Command("doctor")
       } catch {
         // No project config — try building from global env
         const { config: loadDotenv } = await import("dotenv");
-        loadDotenv({ path: GLOBAL_ENV_PATH });
+        loadDotenv({ path: await resolveGlobalEnvPath() });
         const env = process.env;
         const apiKeyOptional = isApiKeyOptionalForEndpoint({
           provider: env.INKOS_LLM_PROVIDER,

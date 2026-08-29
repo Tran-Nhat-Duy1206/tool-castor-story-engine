@@ -32,7 +32,7 @@ export interface StudioTaskSnapshot {
   readonly updatedAt: number;
 }
 
-const TASKS_DIR = ".inkos/tasks";
+const TASKS_DIR = ".castor/tasks";
 const writeQueues = new Map<string, Promise<void>>();
 
 function taskFileName(sessionId: string): string {

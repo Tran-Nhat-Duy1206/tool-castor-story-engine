@@ -1,6 +1,6 @@
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, join } from "node:path";
-import { GLOBAL_ENV_PATH } from "./utils.js";
+import { GLOBAL_ENV_PATH, resolveGlobalEnvPath } from "./utils.js";
 
 export interface ProjectBootstrapOptions {
   readonly language?: "zh" | "en";
@@ -9,7 +9,7 @@ export interface ProjectBootstrapOptions {
 
 async function hasGlobalConfig(): Promise<boolean> {
   try {
-    const content = await readFile(GLOBAL_ENV_PATH, "utf-8");
+    const content = await readFile(await resolveGlobalEnvPath(), "utf-8");
     return content.includes("INKOS_LLM_API_KEY=") && !content.includes("your-api-key-here");
   } catch {
     return false;
@@ -88,7 +88,7 @@ function buildProjectEnvTemplate(globalConfigured: boolean): string {
   if (globalConfigured) {
     return [
       "# Project-level LLM overrides (optional)",
-      "# Global config at ~/.inkos/.env will be used by default.",
+      "# Global config at ~/.castor/.env will be used by default.",
       "# Switch Studio to 'Use Studio config' (使用 Studio 配置) if you want per-project service settings.",
       "# Uncomment below to override for this project only:",
       "# INKOS_LLM_PROVIDER=openai",

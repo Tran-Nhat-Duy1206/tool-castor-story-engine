@@ -618,7 +618,7 @@ function withSingleAttachmentFallback(
   const [path] = paths;
   const useHostAttachment = (candidate: string | undefined): boolean => {
     const value = candidate?.trim();
-    return !value || (value.startsWith(".inkos/uploads/") && value !== path);
+    return !value || ((value.startsWith(".castor/uploads/") || value.startsWith(".inkos/uploads/")) && value !== path);
   };
 
   if (params.action === "translation_create" && payload.translationCreate && useHostAttachment(payload.translationCreate.filePath)) {
@@ -1284,7 +1284,7 @@ export function createResearchWebTool(projectRoot: string): AgentTool<typeof Res
     name: "research_web",
     description:
       "Collect traceable web research for worldbuilding, era, profession, market, or fact-check questions. " +
-      "Saves a Markdown report under .inkos/research/. It is reference material only; it must not modify books, chapters, or truth files.",
+      "Saves a Markdown report under .castor/research/. It is reference material only; it must not modify books, chapters, or truth files.",
     label: "Research Web",
     parameters: ResearchWebParams,
     async execute(
@@ -1309,7 +1309,7 @@ export function createResearchWebTool(projectRoot: string): AgentTool<typeof Res
       }, {
         search: (query, maxResults) => searchWeb(query, maxResults, searchOptions),
       });
-      const reportDir = join(projectRoot, ".inkos", "research");
+      const reportDir = join(projectRoot, ".castor", "research");
       await mkdir(reportDir, { recursive: true });
       const fileName = `${new Date().toISOString().replace(/[:.]/g, "-")}-${slugResearchTopic(params.topic)}.md`;
       const reportPath = join(reportDir, fileName);
@@ -1351,7 +1351,7 @@ const IngestMaterialParams = Type.Object({
     description: "HTTP/HTTPS URL to fetch and extract. Supports HTML/text/JSON/PDF.",
   })),
   filePath: Type.Optional(Type.String({
-    description: "Project-relative stored_path from the Uploaded Files block, e.g. .inkos/uploads/session/file.pdf.",
+    description: "Project-relative stored_path from the Uploaded Files block, e.g. .castor/uploads/session/file.pdf.",
   })),
   filename: Type.Optional(Type.String({
     description: "Original filename when known.",

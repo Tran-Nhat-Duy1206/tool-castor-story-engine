@@ -1,10 +1,43 @@
-import { readFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { parse } from "dotenv";
+import { access } from "node:fs/promises";
 
-export const GLOBAL_CONFIG_DIR = join(homedir(), ".inkos");
+/**
+ * Canonical global Castor config directory. The legacy ~/.inkos directory is
+ * only read for one-way migration of the global .env (Checkpoint 4/5); it is
+ * never written again.
+ */
+export const GLOBAL_CONFIG_DIR = join(homedir(), ".castor");
+export const LEGACY_GLOBAL_CONFIG_DIR = join(homedir(), ".inkos");
 export const GLOBAL_ENV_PATH = join(GLOBAL_CONFIG_DIR, ".env");
+export const LEGACY_GLOBAL_ENV_PATH = join(LEGACY_GLOBAL_CONFIG_DIR, ".env");
+
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve the global .env path with one-way legacy migration: if the
+ * canonical ~/.castor/.env is missing but the legacy ~/.inkos/.env exists,
+ * the legacy file is copied once. Secrets are copied as opaque file content
+ * and never echoed. The legacy file is never modified.
+ */
+export async function resolveGlobalEnvPath(): Promise<string> {
+  if (await fileExists(GLOBAL_ENV_PATH)) return GLOBAL_ENV_PATH;
+  if (await fileExists(LEGACY_GLOBAL_ENV_PATH)) {
+    await mkdir(GLOBAL_CONFIG_DIR, { recursive: true });
+    // force:false keeps an existing canonical file authoritative under races.
+    await copyFile(LEGACY_GLOBAL_ENV_PATH, GLOBAL_ENV_PATH).catch(() => undefined);
+  }
+  return GLOBAL_ENV_PATH;
+}
 
 export type LLMEnvMap = Record<string, string | undefined>;
 
@@ -18,7 +51,7 @@ export async function loadLLMEnvLayers(
   root: string,
   processEnv: NodeJS.ProcessEnv = process.env,
 ): Promise<LLMEnvLayers> {
-  const global = await parseEnvFile(GLOBAL_ENV_PATH);
+  const global = await parseEnvFile(await resolveGlobalEnvPath());
   const project = await parseEnvFile(join(root, ".env"));
   // Compatibility: modelOverrides.apiKeyEnv and detector config still read process.env directly.
   hydrateProcessEnvFromEnvFiles(processEnv, global, project);

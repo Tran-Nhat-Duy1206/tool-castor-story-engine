@@ -265,7 +265,7 @@ bookCommand
 
 bookCommand
   .command("backup")
-  .description("Snapshot the whole book directory into .inkos/backups/<book-id>/ (or list backups with --list)")
+  .description("Snapshot the whole book directory into .castor/backups/<book-id>/ (or list backups with --list)")
   .argument("<book-id>", "Book ID")
   .option("--list", "List existing backups instead of creating one")
   .option("--json", "Output JSON")

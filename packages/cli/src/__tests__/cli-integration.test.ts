@@ -95,8 +95,8 @@ describe("CLI integration", () => {
       expect(output).toContain("Project initialized");
     });
 
-    it("creates inkos.json with correct structure", async () => {
-      const raw = await readFile(join(projectDir, "inkos.json"), "utf-8");
+    it("creates castor.json with correct structure", async () => {
+      const raw = await readFile(join(projectDir, "castor.json"), "utf-8");
       const config = JSON.parse(raw);
       expect(config.llm).toBeDefined();
       expect(config.llm.provider).toBeDefined();
@@ -135,7 +135,7 @@ describe("CLI integration", () => {
     });
 
     it("creates inkos.json in subdirectory", async () => {
-      const raw = await readFile(join(projectDir, "subproject", "inkos.json"), "utf-8");
+      const raw = await readFile(join(projectDir, "subproject", "castor.json"), "utf-8");
       const config = JSON.parse(raw);
       expect(config.name).toBe("subproject");
     });
@@ -147,7 +147,7 @@ describe("CLI integration", () => {
         const output = run(["init", absoluteDir]);
         expect(output).toContain(`Project initialized at ${absoluteDir}`);
 
-        const raw = await readFile(join(absoluteDir, "inkos.json"), "utf-8");
+        const raw = await readFile(join(absoluteDir, "castor.json"), "utf-8");
         const config = JSON.parse(raw);
         expect(config.name).toBe(basename(absoluteDir));
       } finally {
@@ -177,7 +177,7 @@ describe("CLI integration", () => {
 
     it("sets a nested config value", async () => {
       run(["config", "set", "llm.model", "gpt-5"]);
-      const raw = await readFile(join(projectDir, "inkos.json"), "utf-8");
+      const raw = await readFile(join(projectDir, "castor.json"), "utf-8");
       const config = JSON.parse(raw);
       expect(config.llm.model).toBe("gpt-5");
     });
@@ -192,7 +192,7 @@ describe("CLI integration", () => {
       const output = run(["config", "set", "writing.reviewRetries", "3"]);
       expect(output).toContain("Set writing.reviewRetries = 3");
 
-      const raw = await readFile(join(projectDir, "inkos.json"), "utf-8");
+      const raw = await readFile(join(projectDir, "castor.json"), "utf-8");
       const config = JSON.parse(raw);
       expect(config.writing.reviewRetries).toBe(3);
     });
@@ -208,7 +208,7 @@ describe("CLI integration", () => {
 
   describe("castor interact", () => {
     it("returns the agent-session JSON contract for natural-language interactions", async () => {
-      const initialized = await stat(join(projectDir, "inkos.json")).then(() => true).catch(() => false);
+      const initialized = await stat(join(projectDir, "castor.json")).then(() => true).catch(() => false);
       if (!initialized) run(["init"]);
       const envPath = join(projectDir, ".env");
       const originalEnv = await readFile(envPath, "utf-8");
@@ -232,7 +232,7 @@ describe("CLI integration", () => {
     }, CLI_PROCESS_TIMEOUT_MS);
 
     it("binds the requested book when interact is called with --book", async () => {
-      const initialized = await stat(join(projectDir, "inkos.json")).then(() => true).catch(() => false);
+      const initialized = await stat(join(projectDir, "castor.json")).then(() => true).catch(() => false);
       if (!initialized) run(["init"]);
       const envPath = join(projectDir, ".env");
       const originalEnv = await readFile(envPath, "utf-8");
@@ -285,7 +285,7 @@ describe("CLI integration", () => {
       expect(exitCode).not.toBe(0);
       expect(stderr).toContain("--api-key-env expects an environment variable name");
 
-      const raw = await readFile(join(projectDir, "inkos.json"), "utf-8");
+      const raw = await readFile(join(projectDir, "castor.json"), "utf-8");
       const config = JSON.parse(raw);
       expect(config.modelOverrides).toBeUndefined();
     });
@@ -307,7 +307,7 @@ describe("CLI integration", () => {
   describe("castor book create", () => {
     it("removes stale incomplete book directories before retrying create", async () => {
       try {
-        await stat(join(projectDir, "inkos.json"));
+        await stat(join(projectDir, "castor.json"));
       } catch {
         run(["init"]);
       }
@@ -544,11 +544,11 @@ describe("CLI integration", () => {
       const { stdout } = runStderr(["doctor"]);
       expect(stdout).toContain("Castor Doctor");
       expect(stdout).toContain("Node.js >= 22");
-      expect(stdout).toContain("inkos.json");
+      expect(stdout).toContain("castor.json");
     });
 
     it("repairs missing node runtime pin files for old projects", async () => {
-      await stat(join(projectDir, "inkos.json")).catch(() => {
+      await stat(join(projectDir, "castor.json")).catch(() => {
         run(["init"]);
       });
 
@@ -570,10 +570,10 @@ describe("CLI integration", () => {
     }, DOUBLE_CLI_INVOCATION_TEST_TIMEOUT_MS);
 
     it("treats localhost OpenAI-compatible endpoints as API-key optional", async () => {
-      await stat(join(projectDir, "inkos.json")).catch(() => {
+      await stat(join(projectDir, "castor.json")).catch(() => {
         run(["init"]);
       });
-      const configPath = join(projectDir, "inkos.json");
+      const configPath = join(projectDir, "castor.json");
       const envPath = join(projectDir, ".env");
       const originalConfig = await readFile(configPath, "utf-8");
       const originalEnv = await readFile(envPath, "utf-8");
@@ -782,7 +782,7 @@ describe("CLI integration", () => {
 
   describe("castor review", () => {
     it("preserves the original chapter snapshot when approving review", async () => {
-      const configPath = join(projectDir, "inkos.json");
+      const configPath = join(projectDir, "castor.json");
       const initialized = await stat(configPath).then(() => true).catch(() => false);
       if (!initialized) run(["init"]);
 
@@ -851,7 +851,7 @@ describe("CLI integration", () => {
 
   describe("inkos plan/compose", () => {
     beforeAll(async () => {
-      const configPath = join(projectDir, "inkos.json");
+      const configPath = join(projectDir, "castor.json");
       const initialized = await stat(configPath).then(() => true).catch(() => false);
       if (!initialized) run(["init"]);
 
@@ -966,7 +966,7 @@ describe("CLI integration", () => {
 
   describe("inkos export", () => {
     beforeAll(async () => {
-      const configPath = join(projectDir, "inkos.json");
+      const configPath = join(projectDir, "castor.json");
       const initialized = await stat(configPath).then(() => true).catch(() => false);
       if (!initialized) run(["init"]);
 

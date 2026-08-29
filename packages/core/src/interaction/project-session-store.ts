@@ -2,7 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { InteractionSessionSchema, type InteractionSession, GlobalSessionSchema, type GlobalSession } from "./session.js";
 
-const SESSION_DIR = ".inkos";
+const SESSION_DIR = ".castor";
 const SESSION_FILE = "session.json";
 
 export function resolveProjectSessionPath(projectRoot: string): string {
@@ -20,7 +20,8 @@ export function createProjectSession(projectRoot: string): InteractionSession {
 
 export async function loadProjectSession(projectRoot: string): Promise<InteractionSession> {
   try {
-    const raw = await readFile(resolveProjectSessionPath(projectRoot), "utf-8");
+    const { resolveRuntimePath } = await import("../config/runtime-dir.js");
+    const raw = await readFile(await resolveRuntimePath(projectRoot, SESSION_FILE), "utf-8");
     return InteractionSessionSchema.parse(JSON.parse(raw));
   } catch {
     return createProjectSession(projectRoot);
@@ -38,7 +39,8 @@ export async function persistProjectSession(
 
 export async function loadGlobalSession(projectRoot: string): Promise<GlobalSession> {
   try {
-    const raw = await readFile(join(projectRoot, SESSION_DIR, SESSION_FILE), "utf-8");
+    const { resolveRuntimePath } = await import("../config/runtime-dir.js");
+    const raw = await readFile(await resolveRuntimePath(projectRoot, SESSION_FILE), "utf-8");
     const data = JSON.parse(raw);
     return GlobalSessionSchema.parse({
       activeBookId: data.activeBookId,

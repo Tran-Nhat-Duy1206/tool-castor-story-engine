@@ -50,7 +50,8 @@ export async function ingestMaterial(
   const source = await readMaterialSource(projectRoot, input, deps);
   const title = (input.title?.trim() || source.title || titleFromSource(input) || "material").slice(0, 120);
   const id = `${now.toISOString().replace(/[:.]/g, "-")}-${slug(title)}`;
-  const materialsDir = join(projectRoot, ".inkos", "materials");
+  const { resolveRuntimePath } = await import("../config/runtime-dir.js");
+  const materialsDir = await resolveRuntimePath(projectRoot, "materials");
   await mkdir(materialsDir, { recursive: true });
 
   const markdown = renderMaterialMarkdown({

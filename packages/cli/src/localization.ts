@@ -512,8 +512,8 @@ export function formatChapterDeleteDone(
 
 export function formatBookBackupCreated(language: CliLanguage, bookId: string, backupId: string): string {
   return localize(language, {
-    zh: `已备份 ${bookId} → .inkos/backups/${bookId}/${backupId}/`,
-    en: `Backed up ${bookId} → .inkos/backups/${bookId}/${backupId}/`,
+    zh: `已备份 ${bookId} → .castor/backups/${bookId}/${backupId}/`,
+    en: `Backed up ${bookId} → .castor/backups/${bookId}/${backupId}/`,
   });
 }
 

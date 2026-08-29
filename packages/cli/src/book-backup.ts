@@ -31,11 +31,11 @@ export interface RestoreBookBackupResult {
 }
 
 /**
- * Whole-book backups live OUTSIDE books/ (at .inkos/backups/<bookId>/<backupId>/),
+ * Whole-book backups live OUTSIDE books/ (at .castor/backups/<bookId>/<backupId>/),
  * so a backup never recursively contains other backups.
  */
 export function bookBackupsDir(root: string, bookId: string): string {
-  return join(root, ".inkos", "backups", bookId);
+  return join(root, ".castor", "backups", bookId);
 }
 
 export async function createBookBackup(
@@ -68,22 +68,28 @@ export async function listBookBackups(
   root: string,
   bookId: string,
 ): Promise<ReadonlyArray<BookBackupInfo>> {
-  const backupsDir = bookBackupsDir(root, bookId);
-  const entries = await readdir(backupsDir, { withFileTypes: true }).catch((error) => {
-    if ((error as { code?: unknown }).code === "ENOENT") {
-      return [];
-    }
-    throw error;
-  });
+  async function listDir(dir: string): Promise<BookBackupInfo[]> {
+    const entries = await readdir(dir, { withFileTypes: true }).catch((error) => {
+      if ((error as { code?: unknown }).code === "ENOENT") {
+        return [];
+      }
+      throw error;
+    });
+    return Promise.all(
+      entries
+        .filter((entry) => entry.isDirectory())
+        .map(async (entry) => {
+          const info = await stat(join(dir, entry.name));
+          return { id: entry.name, createdAt: info.mtime.toISOString() };
+        }),
+    );
+  }
 
-  const backups = await Promise.all(
-    entries
-      .filter((entry) => entry.isDirectory())
-      .map(async (entry) => {
-        const info = await stat(join(backupsDir, entry.name));
-        return { id: entry.name, createdAt: info.mtime.toISOString() };
-      }),
-  );
+  // Canonical backups plus a read-only view of pre-rename legacy backups.
+  const backups = [
+    ...(await listDir(bookBackupsDir(root, bookId))),
+    ...(await listDir(join(root, ".inkos", "backups", bookId))),
+  ];
   // Backup ids start with a UTC timestamp, so a descending id sort is newest-first.
   return backups.sort((a, b) => b.id.localeCompare(a.id));
 }
@@ -102,11 +108,20 @@ export async function restoreBookBackup(
 
   const backupPath = join(bookBackupsDir(root, bookId), backupId);
   const backupInfo = await stat(backupPath).catch(() => null);
+  // Legacy backups created before the Castor rename remain restorable in place
+  // (read-only compatibility; they are never copied or rewritten).
+  let resolvedBackupPath = backupPath;
   if (!backupInfo?.isDirectory()) {
-    throw new Error(
-      `Backup "${backupId}" not found for book "${bookId}". `
-      + `List available backups with: castor book backup ${bookId} --list`,
-    );
+    const legacyBackupPath = join(root, ".inkos", "backups", bookId, backupId);
+    const legacyBackupInfo = await stat(legacyBackupPath).catch(() => null);
+    if (legacyBackupInfo?.isDirectory()) {
+      resolvedBackupPath = legacyBackupPath;
+    } else {
+      throw new Error(
+        `Backup "${backupId}" not found for book "${bookId}". `
+        + `List available backups with: castor book backup ${bookId} --list`,
+      );
+    }
   }
 
   const bookDir = join(root, "books", bookId);
@@ -118,7 +133,7 @@ export async function restoreBookBackup(
   }
 
   await rm(bookDir, { recursive: true, force: true });
-  await cp(backupPath, bookDir, { recursive: true });
+  await cp(resolvedBackupPath, bookDir, { recursive: true });
 
   return { bookId, restoredFrom: backupId, preRestoreBackupId };
 }

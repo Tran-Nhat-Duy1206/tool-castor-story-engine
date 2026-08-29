@@ -9,7 +9,7 @@ import {
   brightCyan, brightGreen, brightWhite,
 } from "./ansi.js";
 import { resolveTuiLocale, type TuiLocale } from "./i18n.js";
-import { GLOBAL_ENV_PATH, loadConfig } from "../utils.js";
+import { resolveGlobalEnvPath, loadConfig } from "../utils.js";
 import { ensureProjectGitignore } from "../project-bootstrap.js";
 
 const PROVIDERS = ["openai", "anthropic", "kkaiapi", "custom"] as const;
@@ -238,11 +238,12 @@ export async function interactiveLlmSetup(
     ].join("\n");
 
     if (useGlobal) {
-      const globalDir = join(GLOBAL_ENV_PATH, "..");
+      const globalEnvPath = await resolveGlobalEnvPath();
+      const globalDir = join(globalEnvPath, "..");
       await mkdir(globalDir, { recursive: true });
-      await writeFile(GLOBAL_ENV_PATH, envContent + "\n", "utf-8");
+      await writeFile(globalEnvPath, envContent + "\n", "utf-8");
       console.log();
-      console.log(`  ${c("✓", brightGreen, bold)} ${c(copy.savedTo, dim)} ${c(GLOBAL_ENV_PATH, gray)}`);
+      console.log(`  ${c("✓", brightGreen, bold)} ${c(copy.savedTo, dim)} ${c(globalEnvPath, gray)}`);
     } else {
       await writeFile(join(projectRoot, ".env"), envContent + "\n", "utf-8");
       console.log();
@@ -309,11 +310,11 @@ async function autoInit(cwd: string): Promise<void> {
 async function hasLlmConfig(projectRoot: string): Promise<boolean> {
   const projectEnv = join(projectRoot, ".env");
   if (await checkEnvForKey(projectEnv)) return true;
-  return checkEnvForKey(GLOBAL_ENV_PATH);
+  return checkEnvForKey(await resolveGlobalEnvPath());
 }
 
 async function hasGlobalConfig(): Promise<boolean> {
-  return checkEnvForKey(GLOBAL_ENV_PATH);
+  return checkEnvForKey(await resolveGlobalEnvPath());
 }
 
 async function checkEnvForKey(envPath: string): Promise<boolean> {
@@ -347,7 +348,7 @@ export async function detectModelInfo(projectRoot: string): Promise<ModelInfo | 
     // Fall back to legacy env parsing below.
   }
 
-  const paths = [join(projectRoot, ".env"), GLOBAL_ENV_PATH];
+  const paths = [join(projectRoot, ".env"), await resolveGlobalEnvPath()];
   for (const p of paths) {
     const info = await parseEnvModel(p);
     if (info) return info;

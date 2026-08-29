@@ -47,6 +47,7 @@ import {
   DetectionConfigSchema,
   ResearchSearchConfigSchema,
   GLOBAL_ENV_PATH,
+  resolveGlobalEnvPath,
   COVER_PROVIDER_PRESETS,
   createPlayDB,
   PlayStore,
@@ -713,7 +714,7 @@ async function normalizeAgentAttachments(
     throw new ApiError(413, "TOO_MANY_ATTACHMENTS", `At most ${MAX_AGENT_ATTACHMENTS} files can be attached to one message`);
   }
 
-  const uploadDir = join(root, ".inkos", "uploads", safeUploadFileName(sessionId));
+  const uploadDir = join(root, ".castor", "uploads", safeUploadFileName(sessionId));
   const out: AgentSessionAttachment[] = [];
   for (const [index, raw] of value.entries()) {
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
@@ -807,7 +808,7 @@ async function storeProjectUpload(
   if (parsed.buffer.byteLength > options.maxBytes) {
     throw new ApiError(413, `${options.errorCode}_TOO_LARGE`, `${filename} exceeds ${options.maxBytes} bytes`);
   }
-  const uploadDir = join(root, ".inkos", "uploads", safeUploadFileName(options.scope));
+  const uploadDir = join(root, ".castor", "uploads", safeUploadFileName(options.scope));
   await mkdir(uploadDir, { recursive: true });
   const storedName = `${Date.now()}-${filename}`;
   const storedPath = join(uploadDir, storedName);
@@ -2077,7 +2078,7 @@ async function readEnvConfigValues(path: string): Promise<EnvConfigValues> {
 
 async function readEnvConfigStatus(root: string): Promise<EnvConfigStatus> {
   const project = await readEnvConfigValues(join(root, ".env"));
-  const global = await readEnvConfigValues(GLOBAL_ENV_PATH);
+  const global = await readEnvConfigValues(await resolveGlobalEnvPath());
   return {
     project: toEnvConfigSummary(project),
     global: toEnvConfigSummary(global),
@@ -2089,7 +2090,7 @@ async function readEnvConfigStatus(root: string): Promise<EnvConfigStatus> {
 async function readEffectiveEnvConfigValues(root: string): Promise<{ source: "project" | "global"; values: EnvConfigValues } | null> {
   const project = await readEnvConfigValues(join(root, ".env"));
   if (project.detected) return { source: "project", values: project };
-  const global = await readEnvConfigValues(GLOBAL_ENV_PATH);
+  const global = await readEnvConfigValues(await resolveGlobalEnvPath());
   if (global.detected) return { source: "global", values: global };
   return null;
 }
@@ -8284,12 +8285,13 @@ export function createStudioServer(
 
   app.get("/api/v1/doctor", async (c) => {
     const { existsSync } = await import("node:fs");
-    const { GLOBAL_ENV_PATH } = await import("@actalk/castor-core");
+    const { resolveGlobalEnvPath } = await import("@actalk/castor-core");
+    const globalEnvPath = await resolveGlobalEnvPath();
 
     const checks = {
       projectConfigFile: existsSync(join(root, "castor.json")) || existsSync(join(root, "inkos.json")),
       projectEnv: existsSync(join(root, ".env")),
-      globalEnv: existsSync(GLOBAL_ENV_PATH),
+      globalEnv: existsSync(globalEnvPath),
       booksDir: existsSync(join(root, "books")),
       llmConnected: false,
       bookCount: 0,

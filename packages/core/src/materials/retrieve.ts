@@ -69,7 +69,8 @@ export async function retrieveMaterials(
     });
   }
 
-  const searchIndex = new LocalSearchIndex(join(projectRoot, ".inkos", "retrieval.db"));
+  const { resolveRuntimePath } = await import("../config/runtime-dir.js");
+  const searchIndex = new LocalSearchIndex(await resolveRuntimePath(projectRoot, "retrieval.db"));
   try {
     searchIndex.replaceScope(MATERIAL_SCOPE, documents);
     const limit = normalizeLimit(input.limit);
@@ -90,7 +91,8 @@ export async function retrieveMaterials(
 }
 
 async function listMaterialAssets(projectRoot: string): Promise<MaterialAsset[]> {
-  const materialsDir = join(projectRoot, ".inkos", "materials");
+  const { resolveRuntimePath } = await import("../config/runtime-dir.js");
+  const materialsDir = await resolveRuntimePath(projectRoot, "materials");
   let entries: string[] = [];
   try {
     entries = await readdir(materialsDir);

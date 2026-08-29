@@ -33,19 +33,19 @@ describe("secrets", () => {
   });
 
   describe("saveSecrets", () => {
-    it("creates .inkos dir and writes secrets file", async () => {
+    it("creates the canonical .castor dir and writes secrets file", async () => {
       await saveSecrets(root, {
         services: { deepseek: { apiKey: "sk-deep" } },
       });
-      const raw = await readFile(join(root, ".inkos", "secrets.json"), "utf-8");
+      const raw = await readFile(join(root, ".castor", "secrets.json"), "utf-8");
       const parsed = JSON.parse(raw);
       expect(parsed.services.deepseek.apiKey).toBe("sk-deep");
     });
 
-    it("overwrites existing secrets file", async () => {
-      await mkdir(join(root, ".inkos"), { recursive: true });
+    it("canonical file wins over legacy file on overwrite", async () => {
+      await mkdir(join(root, ".castor"), { recursive: true });
       await writeFile(
-        join(root, ".inkos", "secrets.json"),
+        join(root, ".castor", "secrets.json"),
         JSON.stringify({ services: { old: { apiKey: "old-key" } } }),
       );
       await saveSecrets(root, {

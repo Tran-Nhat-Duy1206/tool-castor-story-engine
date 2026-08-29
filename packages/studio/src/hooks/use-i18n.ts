@@ -249,7 +249,7 @@ const strings = {
   "doctor.recheck": { zh: "重新检查", en: "Re-check" },
   "doctor.inkosJson": { zh: "castor.json 配置", en: "castor.json configuration" },
   "doctor.projectEnv": { zh: "项目 .env 文件", en: "Project .env file" },
-  "doctor.globalEnv": { zh: "全局 ~/.inkos/.env", en: "Global ~/.inkos/.env" },
+  "doctor.globalEnv": { zh: "全局 ~/.castor/.env", en: "Global ~/.castor/.env" },
   "doctor.booksDir": { zh: "书籍目录", en: "Books directory" },
   "doctor.llmApi": { zh: "LLM API 连接", en: "LLM API connectivity" },
   "doctor.connected": { zh: "已连接", en: "Connected" },
