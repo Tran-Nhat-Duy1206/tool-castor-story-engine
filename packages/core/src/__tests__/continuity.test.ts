@@ -32,14 +32,14 @@ describe("ContinuityAuditor", () => {
       projectRoot: "/tmp/castor-auditor-bad-json-test",
     });
 
-    const result = (auditor as any).parseAuditResult("模型只返回了一段散文，没有 JSON。", "zh");
+    const result = (auditor as any).parseAuditResult("Mô hình chỉ trả về văn xuôi, không có JSON.", "vi");
 
     expect(result.passed).toBe(false);
-    expect(result.summary).toContain("审稿输出解析失败");
+    expect(result.summary).toContain("Audit output parsing failed");
     expect(result.issues).toEqual([
       expect.objectContaining({
         severity: "critical",
-        category: "系统错误",
+        category: "System Error",
       }),
     ]);
   });
@@ -439,18 +439,18 @@ describe("ContinuityAuditor", () => {
       const userPrompt = messages?.[1]?.content ?? "";
 
       // Prompt declares structure-only scope and sparse-memo legality.
-      expect(systemPrompt).toContain("审稿边界");
-      expect(systemPrompt).toContain("你不审文笔");
-      expect(systemPrompt).toContain("稀疏 memo 是合法状态");
-      expect(systemPrompt).toContain("章节备忘偏离");
-      expect(systemPrompt).not.toContain("大纲偏离检测");
+      expect(systemPrompt).toContain("Reviewer Scope");
+      expect(systemPrompt).toContain("You audit completion and structure only");
+      expect(systemPrompt).toContain("Sparse chapter_memo is legitimate");
+      expect(systemPrompt).toContain("Kiểm tra Lệch Ghi nhớ Chương");
+      expect(systemPrompt).not.toContain("volume-outline drift detection");
 
       // User prompt injects the memo for drift-checking.
-      expect(userPrompt).toContain("## 章节备忘（用于 memo 偏离检测）");
-      expect(userPrompt).toContain("goal：陆焚抢回残刃并离开");
+      expect(userPrompt).toContain("## Chapter Memo (for memo drift checks)");
+      expect(userPrompt).toContain("Goal: 陆焚抢回残刃并离开");
       expect(userPrompt).toContain("## 章尾必须发生的改变");
       // Legacy volume-outline block is gone.
-      expect(userPrompt).not.toContain("## 卷纲");
+      expect(userPrompt).not.toContain("## Volume Outline");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
