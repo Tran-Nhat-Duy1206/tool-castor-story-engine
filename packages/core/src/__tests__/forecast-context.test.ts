@@ -12,28 +12,28 @@ async function writeFixtureBook(bookDir: string): Promise<void> {
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
-  await mkdir(join(bookDir, "story", "roles", "主要角色"), { recursive: true });
+  await mkdir(join(bookDir, "story", "roles", "major"), { recursive: true });
 
-  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: "demo", title: "示例书", language: "vi" }), "utf-8");
-  await writeFile(join(bookDir, "chapters", "0001_开局.md"), "第一章正文", "utf-8");
-  await writeFile(join(bookDir, "chapters", "0002_升级.md"), "第二章正文", "utf-8");
-  await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["主角在东城"] }), "utf-8");
+  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: "demo", title: "Sach Thu Nghiem", language: "vi" }), "utf-8");
+  await writeFile(join(bookDir, "chapters", "0001_mo_dau.md"), "Chuong 1", "utf-8");
+  await writeFile(join(bookDir, "chapters", "0002_chuyen_bien.md"), "Chuong 2", "utf-8");
+  await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["Nhan vat chinh o Dong Thanh"] }), "utf-8");
   await writeFile(join(bookDir, "story", "state", "hooks.json"), JSON.stringify({ hooks: [] }), "utf-8");
-  await writeFile(join(bookDir, "story", "author_intent.md"), "# 作者意图\n复仇主线", "utf-8");
-  await writeFile(join(bookDir, "story", "current_focus.md"), "# 当前聚焦\n推进证据链", "utf-8");
-  await writeFile(join(bookDir, "story", "current_state.md"), "# 当前状态\n主角在东城", "utf-8");
-  await writeFile(join(bookDir, "story", "pending_hooks.md"), "| hook_id | 描述 |\n| --- | --- |\n| hook-03 | 遗嘱 |", "utf-8");
-  await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# 故事框架\n都市复仇", "utf-8");
-  await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "# 卷映射\n第一卷", "utf-8");
-  await writeFile(join(bookDir, "story", "roles", "主要角色", "林潜.md"), "# 林潜\n人设锁：绝不妥协", "utf-8");
-  await writeFile(join(bookDir, "story", "subplot_board.md"), "| 支线 | 状态 |\n| --- | --- |\n| 遗产争夺 | active |", "utf-8");
+  await writeFile(join(bookDir, "story", "author_intent.md"), "# Y do tac gia\nTuyen bao thu", "utf-8");
+  await writeFile(join(bookDir, "story", "current_focus.md"), "# Tieu diem hien tai\nDay manh bang chung", "utf-8");
+  await writeFile(join(bookDir, "story", "current_state.md"), "# Trang thai hien tai\nNhan vat chinh o Dong Thanh", "utf-8");
+  await writeFile(join(bookDir, "story", "pending_hooks.md"), "| hook_id | Mo ta |\n| --- | --- |\n| hook-03 | Di chuc |", "utf-8");
+  await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# Khung cau chuyen\nDo thi bao thu", "utf-8");
+  await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "# So do quyen\nChuong 1-10", "utf-8");
+  await writeFile(join(bookDir, "story", "roles", "major", "lu_xun.md"), "# Lu Xun\nVai chinh", "utf-8");
+  await writeFile(join(bookDir, "story", "subplot_board.md"), "| Tuyến | Trạng thái |\n| --- | --- |\n| sub-01 | active |", "utf-8");
   await writeFile(
     join(bookDir, "story", "chapter_summaries.md"),
     [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| Chuong | Tieu de | Nhan vat | Su kien | Bien doi | Hook | Cam xuc | Loai |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 1 | 开局 | 主角 | 遭背叛 | 低谷 | hook-01 埋下 | 压抑 | 铺垫 |",
-      "| 2 | 升级 | 主角 | 拿到证据 | 反击开始 | hook-03 埋下 | 上扬 | 推进 |",
+      "| 1 | Mo dau | Lu Xun | Bat dau | Khoi hanh | hook-01 | Cang thang | Khoi dau |",
+      "| 2 | Chuyen bien | Lu Xun | Bien co | Phat hien | hook-03 | Bat ngo | Xung dot |",
     ].join("\n"),
     "utf-8",
   );
@@ -46,21 +46,22 @@ describe("buildForecastContext", () => {
     bookDir = await mkdtemp(join(tmpdir(), "castor-forecast-ctx-"));
     await writeFixtureBook(bookDir);
   });
+
   afterEach(async () => {
     await rm(bookDir, { recursive: true, force: true });
   });
 
-  it("collects canonical sections, base chapter and language", async () => {
+  it("extracts canonical base chapter and fingerprint from on-disk state", async () => {
     const context = await buildForecastContext({ bookDir, bookId: "demo" });
 
     expect(context.baseChapter).toBe(2);
     expect(context.language).toBe("vi");
-    expect(context.bookTitle).toBe("示例书");
-    expect(context.sections.authorIntent).toContain("复仇主线");
-    expect(context.sections.currentFocus).toContain("推进证据链");
+    expect(context.bookTitle).toBe("Sach Thu Nghiem");
+    expect(context.sections.authorIntent).toContain("Tuyen bao thu");
+    expect(context.sections.currentFocus).toContain("Day manh bang chung");
     expect(context.sections.pendingHooks).toContain("hook-03");
-    expect(context.sections.storyFrame).toContain("都市复仇");
-    expect(context.sections.recentChapterSummaries).toContain("拿到证据");
+    expect(context.sections.storyFrame).toContain("Do thi bao thu");
+    expect(context.sections.recentChapterSummaries).toContain("hook-03");
     expect(context.contextFingerprint).toMatch(/^[0-9a-f]{64}$/);
   });
 
@@ -72,14 +73,14 @@ describe("buildForecastContext", () => {
 
   it("changes the fingerprint when a structured state file changes", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["主角离开东城"] }), "utf-8");
+    await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["Nhan vat chinh o Tay Thanh"] }), "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
   });
 
   it("changes the fingerprint when a new canonical chapter lands", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "chapters", "0003_反击.md"), "第三章正文", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0003_phan_cong.md"), "Chuong 3", "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
     expect(after.baseChapter).toBe(3);
@@ -87,35 +88,35 @@ describe("buildForecastContext", () => {
 
   it("changes the fingerprint when a control document changes", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "story", "current_focus.md"), "# 当前聚焦\n转向感情线", "utf-8");
+    await writeFile(join(bookDir, "story", "current_focus.md"), "# Tieu diem moi\nThu thap manh moi", "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
   });
 
   it("changes the fingerprint when the story frame changes", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# 故事框架\n都市复仇改为悬疑探案", "utf-8");
+    await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# Khung cau chuyen moi\nDo thi hien dai", "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
   });
 
   it("changes the fingerprint when the volume map changes", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "# 卷映射\n第一卷改写：提前决战", "utf-8");
+    await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "# So do quyen moi\nChuong 1-20", "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
   });
 
   it("changes the fingerprint when a character role card changes", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "story", "roles", "主要角色", "林潜.md"), "# 林潜\n人设锁改动：可以妥协", "utf-8");
+    await writeFile(join(bookDir, "story", "roles", "major", "lu_xun.md"), "# Lu Xun\nTrang thai moi da thay doi", "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
   });
 
   it("changes the fingerprint when the subplot board changes", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "story", "subplot_board.md"), "| 支线 | 状态 |\n| --- | --- |\n| 遗产争夺 | resolved |", "utf-8");
+    await writeFile(join(bookDir, "story", "subplot_board.md"), "| Tuyến | Trạng thái |\n| --- | --- |\n| sub-01 | resolved |", "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
   });
@@ -125,10 +126,10 @@ describe("buildForecastContext", () => {
     await writeFile(
       join(bookDir, "story", "chapter_summaries.md"),
       [
-        "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+        "| Chuong | Tieu de | Nhan vat | Su kien | Bien doi | Hook | Cam xuc | Loai |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
-        "| 1 | 开局 | 主角 | 遭背叛 | 低谷 | hook-01 埋下 | 压抑 | 铺垫 |",
-        "| 2 | 升级 | 主角 | 证据被毁 | 反击受挫 | hook-03 引爆 | 低沉 | 转折 |",
+        "| 1 | Mo dau | Lu Xun | Bat dau | Khoi hanh | hook-01 | Cang thang | Khoi dau |",
+        "| 2 | Chuyen bien | Lu Xun | Bien co | Phat hien | hook-99 | Bat ngo | Xung dot |",
       ].join("\n"),
       "utf-8",
     );
@@ -138,7 +139,7 @@ describe("buildForecastContext", () => {
 
   it("changes the fingerprint when a new input file appears", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
-    await writeFile(join(bookDir, "story", "roles", "主要角色", "沈疏影.md"), "# 沈疏影\n身份：盟友", "utf-8");
+    await writeFile(join(bookDir, "story", "roles", "major", "a_ning.md"), "# A Ning\nVai phu moi", "utf-8");
     const after = await buildForecastContext({ bookDir, bookId: "demo" });
     expect(after.contextFingerprint).not.toBe(before.contextFingerprint);
   });
@@ -154,7 +155,7 @@ describe("buildForecastContext", () => {
   it("ignores non-canonical runtime files, including forecast artifacts", async () => {
     const before = await buildForecastContext({ bookDir, bookId: "demo" });
     await mkdir(join(bookDir, "story", "runtime", "narrative-forecasts", "fc-001"), { recursive: true });
-    await writeFile(join(bookDir, "story", "runtime", "scratch.md"), "无关内容", "utf-8");
+    await writeFile(join(bookDir, "story", "runtime", "scratch.md"), "ghi chu", "utf-8");
     await writeFile(
       join(bookDir, "story", "runtime", "narrative-forecasts", "fc-001", "forecast.json"),
       JSON.stringify({ forecastId: "fc-001" }),
@@ -199,8 +200,8 @@ describe("renderForecastContextMarkdown", () => {
       const context = await buildForecastContext({ bookDir, bookId: "demo" });
       const markdown = renderForecastContextMarkdown(context);
 
-      expect(markdown).toContain("复仇主线");
-      expect(markdown).toContain("推进证据链");
+      expect(markdown).toContain("Tuyen bao thu");
+      expect(markdown).toContain("Day manh bang chung");
       expect(markdown).toContain("hook-03");
       expect(markdown).not.toContain("undefined");
     } finally {

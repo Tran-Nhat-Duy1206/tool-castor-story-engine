@@ -68,23 +68,23 @@ describe("StateValidatorAgent", () => {
     });
     vi.spyOn(agent as unknown as { chat: (...args: unknown[]) => Promise<unknown> }, "chat")
       .mockResolvedValue({
-        content: "REPAIR\n[missing_state_update] 角色已到码头，但状态卡仍在车站",
+        content: "REPAIR\n[missing_state_update] mock_text，mock_text",
         usage: ZERO_USAGE,
       });
 
     await expect(agent.validate(
-      "林舟抵达码头。",
+      "mock_text。",
       3,
-      "位置：家中",
-      "位置：车站",
-      "H1 未推进",
-      "H1 未推进",
+      "mock_text：mock_text",
+      "mock_text：mock_text",
+      "H1 mock_text",
+      "H1 mock_text",
     )).resolves.toEqual({
       passed: false,
       repairRequired: true,
       warnings: [{
         category: "missing_state_update",
-        description: "角色已到码头，但状态卡仍在车站",
+        description: "mock_text，mock_text",
       }],
     });
   });
@@ -141,17 +141,17 @@ describe("StateValidatorAgent", () => {
     ).mockResolvedValue({ content: "PASS", usage: ZERO_USAGE });
 
     await agent.validate(
-      "正文确认：第五条规则才是天黑后不准出宿舍。",
+      "mock_text：Chương mock_text。",
       2,
       "old state",
-      "new state: 第一条规则已被批注",
+      "new state: Chương mock_text",
       "old hooks",
       "new hooks",
       "vi",
       {
-        storyFrame: "简介里写过：规则一：天黑后不准出宿舍。",
-        bookRules: "硬规则：规则编号必须以前文正文确立版本为准。",
-        chapterSummaries: "第1章：发现第五条规则的漏洞。",
+        storyFrame: "mock_text：mock_text：mock_text。",
+        bookRules: "mock_text：mock_text。",
+        chapterSummaries: "Chương 1：mock_textChương mock_text。",
       },
     );
 
@@ -159,8 +159,8 @@ describe("StateValidatorAgent", () => {
     expect(messages[0]?.content).toContain("truth files");
     expect(messages[0]?.content).toContain("numbered");
     expect(messages[1]?.content).toContain("## Authority / Cross-Truth Context");
-    expect(messages[1]?.content).toContain("规则一：天黑后不准出宿舍");
-    expect(messages[1]?.content).toContain("第1章：发现第五条规则的漏洞");
+    expect(messages[1]?.content).toContain("mock_text：mock_text");
+    expect(messages[1]?.content).toContain("Chương 1：mock_textChương mock_text");
   });
 
   it("does not silently truncate chapter or authority context before validation", async () => {
@@ -186,7 +186,7 @@ describe("StateValidatorAgent", () => {
     ).mockResolvedValue({ content: "PASS", usage: ZERO_USAGE });
 
     await agent.validate(
-      `${"正文".repeat(7000)}\nCHAPTER_TAIL_MARKER`,
+      `${"mock_text".repeat(7000)}\nCHAPTER_TAIL_MARKER`,
       8,
       "old state",
       "new state",
@@ -194,9 +194,9 @@ describe("StateValidatorAgent", () => {
       "new hooks",
       "vi",
       {
-        storyFrame: `${"世界设定".repeat(4000)}\nSTORY_FRAME_TAIL_MARKER`,
-        bookRules: `${"规则".repeat(3000)}\nBOOK_RULES_TAIL_MARKER`,
-        chapterSummaries: `${"摘要".repeat(4000)}\nCHAPTER_SUMMARIES_TAIL_MARKER`,
+        storyFrame: `${"mock_text".repeat(4000)}\nSTORY_FRAME_TAIL_MARKER`,
+        bookRules: `${"mock_text".repeat(3000)}\nBOOK_RULES_TAIL_MARKER`,
+        chapterSummaries: `${"mock_text".repeat(4000)}\nCHAPTER_SUMMARIES_TAIL_MARKER`,
       },
     );
 

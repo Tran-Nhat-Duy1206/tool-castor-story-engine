@@ -325,7 +325,7 @@ function buildAttachmentUserBlock(attachments: ReadonlyArray<AgentSessionAttachm
   const lines = [
     isEn
       ? "\n\n## Uploaded Files (host-provided, user-authorized)"
-      : "\n\n## 用户上传文件（宿主已接收，用户授权本轮使用）",
+      : "\n\n## User uploaded files (received by host, authorized for use)",
   ];
   for (const attachment of attachments) {
     lines.push(`\n### ${attachment.filename}`);
@@ -334,16 +334,16 @@ function buildAttachmentUserBlock(attachments: ReadonlyArray<AgentSessionAttachm
     lines.push(`- size: ${attachment.size}`);
     if (attachment.storedPath) lines.push(`- stored_path: ${attachment.storedPath}`);
     if (attachment.text) {
-      lines.push(isEn ? "\nContent:" : "\n内容：");
+      lines.push(isEn ? "\nContent:" : "\nNội dung: ");
       lines.push("```");
       lines.push(attachment.text);
       lines.push("```");
     } else if (attachment.image) {
-      lines.push(isEn ? "- image: attached as multimodal input" : "- 图片：已作为多模态输入附加");
+      lines.push(isEn ? "- image: attached as multimodal input" : "- Hình ảnh: đã đính kèm dưới dạng đầu vào đa phương thức");
     } else {
       lines.push(isEn
         ? "- content: stored only; no extractor is available for this MIME type yet"
-        : "- 内容：已保存；当前 MIME 类型暂未配置文本抽取器");
+        : "- Nội dung: đã lưu; loại MIME hiện tại chưa cấu hình trình trích xuất văn bản");
     }
   }
   return lines.join("\n");
@@ -584,7 +584,7 @@ function convertAgentMessagesForModel(messages: AgentMessage[], model: Model<Api
   // Many openai-completions upstreams (Google, and kkaiapi/DeepSeek-Pro-style gateways) reject
   // it outright — which surfaces as an opaque "503 provider temporarily unavailable" — so fold
   // tool results into a plain user message for EVERY openai-completions endpoint, not just Google.
-  // Anthropic-format endpoints (MiniMax / 百炼) handle tool results natively and are left untouched.
+  // Anthropic-format endpoints (MiniMax / Bailian) handle tool results natively and are left untouched.
   const isOpenAICompletionsCompatible = candidate.api === "openai-completions";
   if (!isOpenAICompletionsCompatible) return llmMessages;
 
@@ -748,11 +748,7 @@ function agentMessagesToPlain(
 // Main entry point
 // ---------------------------------------------------------------------------
 
-/**
- * 会创建/修改书籍与产物的生产工具。suppressProductionTools 为 true（同会话
- * 有后台生产任务在运行）时从工具表剔除；read/grep/ls、research/material 与
- * propose_action 保留——propose_action 引发的确认任务在 host 侧另有单任务闸门。
- */
+// Production tools create/modify books and artifacts. Suppressed during background tasks.
 const PRODUCTION_MUTATION_TOOL_NAMES = new Set([
   "sub_agent",
   "generate_cover",

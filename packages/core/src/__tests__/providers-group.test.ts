@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import { getAllEndpoints } from "../llm/providers/index.js";
 
 describe("ProviderEndpoint.group", () => {
-  it("每个非 custom endpoint 都必须声明 group 字段", () => {
+  it("mock_text custom endpoint mock_text group  từmock_text", () => {
     const missing = getAllEndpoints().filter((ep) => ep.id !== "custom" && !ep.group);
     expect(missing, `missing group: ${missing.map((e) => e.id).join(", ")}`).toHaveLength(0);
   });
 
-  it("每个 group 的 endpoint 数量匹配分组清单", () => {
+  it("mock_text group mock_text endpoint mock_text", () => {
     const all = getAllEndpoints();
     const byGroup = (g: string) => all.filter((ep) => ep.group === g).map((e) => e.id).sort();
 
@@ -27,7 +27,7 @@ describe("ProviderEndpoint.group", () => {
     ].sort());
   });
 
-  it("custom endpoint 不参与分组计数", () => {
+  it("custom endpoint mock_text", () => {
     const custom = getAllEndpoints().find((ep) => ep.id === "custom");
     expect(custom).toBeDefined();
   });

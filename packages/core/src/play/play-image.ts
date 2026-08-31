@@ -1,12 +1,3 @@
-/**
- * Interactive-world (Play) illustration: turn world-graph entities and key
- * moments into images. Reuses the same image-provider plumbing as cover
- * generation (resolveCoverGenerationRequest + generateImageFromPrompt) so a
- * single cover-API configuration drives both.
- *
- * Images and their status live in a per-run sidecar (run/images/) decoupled
- * from the event log — generation is async and is not part of game state.
- */
 import { Buffer } from "node:buffer";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -17,14 +8,14 @@ import {
 
 /** Per-type task framing only; visual style must come from the world / visual contract. */
 const SHOT_BY_TYPE: Record<string, string> = {
-  actor: "为这个角色生成配图",
-  location: "为这个地点生成配图",
-  item: "为这件物品生成配图",
-  evidence: "为这件证物生成配图",
-  clue: "为这条线索生成配图",
-  claim: "为这个主张生成配图",
-  proof_chain: "为这条证据链生成配图",
-  organization: "为这个组织生成配图",
+  actor: "Generate an illustration for this character",
+  location: "Generate an illustration for this location",
+  item: "Generate an illustration for this item",
+  evidence: "Generate an illustration for this piece of evidence",
+  clue: "Generate an illustration for this clue",
+  claim: "Generate an illustration for this claim",
+  proof_chain: "Generate an illustration for this proof chain",
+  organization: "Generate an illustration for this organization",
 };
 
 function clamp(text: string, max: number): string {
@@ -44,15 +35,15 @@ function renderImageWorldContext(input: PlayImageWorldInput): string {
   if (!input) return "";
   if (typeof input === "string") {
     const premise = input.trim();
-    return premise ? `世界设定（决定时代、场景与整体美术风格，必须贴合）：${clamp(premise, 600)}` : "";
+    return premise ? `World setting (determines the era, scene, and overall art style; must strictly adhere): ${clamp(premise, 600)}` : "";
   }
   const premise = input.premise?.trim();
   const worldContract = input.worldContract?.trim();
   const visualContract = input.visualContract?.trim();
   return [
-    premise ? `世界设定（决定时代、场景与整体美术风格，必须贴合）：${clamp(premise, 600)}` : "",
-    worldContract ? `世界契约（只遵守用户定义的规则，不要自行发明 RPG/数值/等级系统）：${clamp(worldContract, 700)}` : "",
-    visualContract ? `视觉契约（图片必须按这条表达语义）：${clamp(visualContract, 700)}` : "",
+    premise ? `World setting (determines the era, scene, and overall art style; must strictly adhere): ${clamp(premise, 600)}` : "",
+    worldContract ? `World contract (follow only user-defined rules; do not invent RPG/numerical/level systems): ${clamp(worldContract, 700)}` : "",
+    visualContract ? `Visual contract (images must convey semantics according to this rule): ${clamp(visualContract, 700)}` : "",
   ].filter(Boolean).join("\n");
 }
 
@@ -66,13 +57,13 @@ export function buildPlayEntityImagePrompt(
   worldPremise?: PlayImageWorldInput,
 ): string {
   const worldContext = renderImageWorldContext(worldPremise);
-  const subject = SHOT_BY_TYPE[entity.type] ?? "为这个对象生成配图";
+  const subject = SHOT_BY_TYPE[entity.type] ?? "Generate an illustration for this entity";
   const summary = entity.summary?.trim();
   return [
     worldContext,
     subject,
-    `对象：${entity.label}`,
-    summary ? `细节：${clamp(summary, 400)}` : "",
+    `Subject: ${entity.label}`,
+    summary ? `Details: ${clamp(summary, 400)}` : "",
   ].filter(Boolean).join("\n");
 }
 
@@ -81,7 +72,7 @@ export function buildPlaySceneImagePrompt(sceneText: string, worldPremise?: Play
   const worldContext = renderImageWorldContext(worldPremise);
   return [
     worldContext,
-    "为下面这一刻生成配图，捕捉当下的动作、氛围与情绪：",
+    "Generate an illustration capturing the action, atmosphere, and emotion of this moment:",
     clamp(sceneText, 900),
   ].filter(Boolean).join("\n");
 }
@@ -184,8 +175,6 @@ export async function generatePlayImage(input: {
   readonly prompt: string;
   readonly size?: string;
 }): Promise<PlayImageEntry> {
-  // Resolution failure (no cover API configured) is a real misconfiguration —
-  // let it surface so the endpoint can return a clear "configure first".
   const request = await resolveCoverGenerationRequest({ root: input.root });
   try {
     const { buffer, extension } = await generateImageFromPrompt(

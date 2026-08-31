@@ -1,17 +1,9 @@
-/**
- * 智谱 GLM (Zhipu AI)
- *
- * - 官网：https://www.bigmodel.cn/
- * - 控制台：https://open.bigmodel.cn/
- * - API key：https://open.bigmodel.cn/usercenter/proj-mgmt/apikeys
- * - API 文档：https://docs.bigmodel.cn/cn/api/normal-model/glm-4
- * - 模型列表：https://open.bigmodel.cn/dev/howuse/model
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const ZHIPU: ProviderEndpoint = {
   id: "zhipu",
-  label: "智谱 GLM",
+  label: " GLM",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://open.bigmodel.cn/api/paas/v4",

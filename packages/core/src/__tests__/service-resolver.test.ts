@@ -188,11 +188,11 @@ describe("resolveServiceModel", () => {
     await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
       join(root, ".castor", "secrets.json"),
-      JSON.stringify({ services: { "custom:内网GPT": { apiKey: "sk-corp" } } }),
+      JSON.stringify({ services: { "custom:mock_textGPT": { apiKey: "sk-corp" } } }),
     );
 
     const result = await resolveServiceModel(
-      "custom:内网GPT",
+      "custom:mock_textGPT",
       "gpt-4o",
       root,
       "https://llm.internal.corp/v1",
@@ -206,11 +206,11 @@ describe("resolveServiceModel", () => {
     await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
       join(root, ".castor", "secrets.json"),
-      JSON.stringify({ services: { "custom:内网GPT": { apiKey: "sk-corp" } } }),
+      JSON.stringify({ services: { "custom:mock_textGPT": { apiKey: "sk-corp" } } }),
     );
 
     const result = await resolveServiceModel(
-      "custom:内网GPT",
+      "custom:mock_textGPT",
       "gpt-5.4",
       root,
       "https://llm.internal.corp/v1",

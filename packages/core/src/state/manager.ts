@@ -51,13 +51,13 @@ export class StateManager {
 
   private static defaultAuthorIntent(language: "vi" | "en"): string {
     return language === "vi"
-      ? "# 作者意图\n\n（在这里描述这本书的长期创作方向。）\n"
+      ? "# Ý định tác giả\n\n(Mô tả định hướng sáng tác lâu dài của cuốn sách này tại đây.)\n"
       : "# Author Intent\n\n(Describe the long-horizon vision for this book here.)\n";
   }
 
   private static defaultCurrentFocus(language: "vi" | "en"): string {
     return language === "vi"
-      ? "# 当前聚焦\n\n## 当前重点\n\n（描述接下来 1-3 章最需要优先推进的内容。）\n"
+      ? "# Tiêu điểm hiện tại\n\n## Trọng tâm hiện tại\n\n(Mô tả nội dung cần ưu tiên thúc đẩy trong 1-3 chương tới.)\n"
       : "# Current Focus\n\n## Active Focus\n\n(Describe what the next 1-3 chapters should prioritize.)\n";
   }
 
@@ -74,8 +74,8 @@ export class StateManager {
     const storyDir = join(bookDir, "story");
     const runtimeDir = join(storyDir, "runtime");
     const outlineDir = join(storyDir, "outline");
-    const rolesMajorDir = join(storyDir, "roles", "主要角色");
-    const rolesMinorDir = join(storyDir, "roles", "次要角色");
+    const rolesMajorDir = join(storyDir, "roles", "major");
+    const rolesMinorDir = join(storyDir, "roles", "minor");
 
     await mkdir(storyDir, { recursive: true });
     await mkdir(runtimeDir, { recursive: true });
@@ -99,7 +99,7 @@ export class StateManager {
     const styleGuidePath = join(storyDir, "style_guide.md");
     try {
       const existing = await readFile(styleGuidePath, "utf-8");
-      if (!existing.includes("写作方法论") && !existing.includes("Writing Methodology")) {
+      if (!existing.includes("Writing Methodology") && !existing.includes("Phương pháp luận viết")) {
         const { buildWritingMethodologySection } = await import("../utils/writing-methodology.js");
         await writeFile(styleGuidePath, `${existing}\n\n${buildWritingMethodologySection(language)}`, "utf-8");
       }
@@ -528,7 +528,7 @@ export class StateManager {
       const rawTitle = match[2]?.replace(/^_+/, "").replace(/_/g, " ").trim();
       return [{
         number,
-        title: rawTitle || `第${number}章`,
+        title: rawTitle || `Chương ${number}`,
         status: "ready-for-review" as const,
         wordCount: content.replace(/\s+/g, "").length,
         createdAt: timestamp,

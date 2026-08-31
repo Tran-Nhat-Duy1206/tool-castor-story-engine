@@ -3,25 +3,25 @@ import { createLeadingThinkTagStripper, stripLeadingThinkBlock } from "../llm/th
 
 describe("stripLeadingThinkBlock", () => {
   it("strips a complete leading <think> block and following whitespace", () => {
-    expect(stripLeadingThinkBlock("<think>推理</think>\n\n正文开始。")).toBe("正文开始。");
+    expect(stripLeadingThinkBlock("<think>mock_text</think>\n\nmock_text。")).toBe("mock_text。");
   });
 
   it("strips a leading block preceded by whitespace", () => {
-    expect(stripLeadingThinkBlock("\n  <think>推理</think>正文")).toBe("正文");
+    expect(stripLeadingThinkBlock("\n  <think>mock_text</think>mock_text")).toBe("mock_text");
   });
 
   it("leaves mid-text <think> occurrences untouched", () => {
-    const text = "正文里介绍 <think> 标签的用法。";
+    const text = "mock_text <think> mock_text。";
     expect(stripLeadingThinkBlock(text)).toBe(text);
   });
 
   it("leaves an unterminated leading block untouched (no data loss)", () => {
-    const text = "<think>推理到一半被截断";
+    const text = "<think>mock_text";
     expect(stripLeadingThinkBlock(text)).toBe(text);
   });
 
   it("returns plain text unchanged", () => {
-    expect(stripLeadingThinkBlock("普通正文。")).toBe("普通正文。");
+    expect(stripLeadingThinkBlock("mock_text。")).toBe("mock_text。");
   });
 });
 
@@ -33,27 +33,27 @@ describe("createLeadingThinkTagStripper", () => {
   }
 
   it("suppresses a leading block split across chunk boundaries", () => {
-    const { emitted, flushed } = pushAll(["<th", "ink>推理A", "推理B</th", "ink>\n正文", "继续"]);
-    expect(emitted.join("")).toBe("正文继续");
+    const { emitted, flushed } = pushAll(["<th", "ink>mock_textA", "mock_textB</th", "ink>\nmock_text", "mock_text"]);
+    expect(emitted.join("")).toBe("mock_text");
     expect(flushed).toBe("");
   });
 
   it("emits buffered text once the prefix diverges from <think>", () => {
-    const { emitted, flushed } = pushAll(["<th", "ree>不是 think 标签", "，正文"]);
-    expect(emitted.join("")).toBe("<three>不是 think 标签，正文");
+    const { emitted, flushed } = pushAll(["<th", "ree>mock_text think mock_text", "，mock_text"]);
+    expect(emitted.join("")).toBe("<three>mock_text think mock_text，mock_text");
     expect(flushed).toBe("");
   });
 
   it("passes plain text through immediately", () => {
     const stripper = createLeadingThinkTagStripper();
-    expect(stripper.push("正文第一段")).toBe("正文第一段");
-    expect(stripper.push("<think>正文中间的字样不受影响")).toBe("<think>正文中间的字样不受影响");
+    expect(stripper.push("mock_textChương mock_text")).toBe("mock_textChương mock_text");
+    expect(stripper.push("<think>mock_text từmock_text")).toBe("<think>mock_text từmock_text");
     expect(stripper.flush()).toBe("");
   });
 
   it("returns an unterminated leading block via flush", () => {
-    const { emitted, flushed } = pushAll(["<think>推理没有闭合"]);
+    const { emitted, flushed } = pushAll(["<think>mock_text"]);
     expect(emitted).toEqual([]);
-    expect(flushed).toBe("<think>推理没有闭合");
+    expect(flushed).toBe("<think>mock_text");
   });
 });

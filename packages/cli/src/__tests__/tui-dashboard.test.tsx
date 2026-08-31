@@ -189,15 +189,15 @@ describe("ink dashboard", () => {
       },
       pendingDecision: undefined,
       creationDraft: {
-        concept: "港风商战悬疑，主角从灰产洗白。",
-        title: "夜港账本",
-        nextQuestion: "你更想写长篇连载，还是十来章能收住？",
+        concept: "test_mockHuyen bi，test_mock。",
+        title: "test_mock",
+        nextQuestion: "test_mock，test_mock？",
         missingFields: ["targetChapters"],
         readyToCreate: false,
       },
       messages: [
-        { role: "user", content: "我想写个港风商战悬疑。", timestamp: 1 },
-        { role: "assistant", content: "先把这本书的大概方向收住。", timestamp: 2 },
+        { role: "user", content: "test_mockHuyen bi。", timestamp: 1 },
+        { role: "assistant", content: "test_mock。", timestamp: 2 },
       ],
       events: [],
     };
@@ -215,6 +215,6 @@ describe("ink dashboard", () => {
 
     const frame = lastFrame() ?? "";
     expect(frame).toContain("Bản nháp");
-    expect(frame).toContain("夜港账本");
+    expect(frame).toContain("test_mock");
   });
 });

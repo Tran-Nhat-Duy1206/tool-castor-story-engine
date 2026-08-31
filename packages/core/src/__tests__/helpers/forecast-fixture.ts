@@ -5,26 +5,26 @@ import type { ForecastBranch, ForecastModelBranch, NarrativeForecast } from "../
 export function makeForecastBranch(overrides: Partial<ForecastBranch> = {}): ForecastBranch {
   return {
     branchId: "branch-1",
-    title: "主角接受提议",
-    premise: "假设主角在第13章接受了对手的合作提议。",
+    title: "Nhan vat chinh chap nhan de nghi",
+    premise: "Gia dinh nhan vat chinh o Chuong 13 chap nhan loi de nghi hop tac cua doi thu.",
     beats: [
-      { chapter: 13, summary: "主角签下合作协议，盟友震怒离场。" },
-      { chapter: 14, summary: "合作暴露主角软肋，对手开始渗透。" },
+      { chapter: 13, summary: "Nhan vat chinh ky hop dong hop tac, dong minh tuc gian roi di." },
+      { chapter: 14, summary: "Hop tac lam lo diem yeu cua nhan vat chinh, doi thu bat dau tham nhap." },
     ],
     characterDecisions: [
-      { character: "主角", decision: "接受提议换取短期资源" },
+      { character: "Nhan vat chinh", decision: "Chap nhan de nghi de doi lay tai nguyen ngan han" },
     ],
     projectedChanges: {
-      characters: ["主角信誉受损"],
-      relationships: ["主角与盟友决裂"],
-      world: ["东城势力平衡向对手倾斜"],
-      hooks: ["hook-03 提前引爆"],
+      characters: ["Uy tin cua nhan vat chinh bi ton hai"],
+      relationships: ["Nhan vat chinh va dong minh ran nut"],
+      world: ["Can bang the luc Dong Thanh nghieng ve doi thu"],
+      hooks: ["hook-03 duoc kich hoat som"],
     },
     risks: [
-      { kind: "character", description: "主角人设锁强调不妥协，接受提议需要强动机铺垫。" },
+      { kind: "character", description: "Thiet lap tinh cach nhan vat khong thoa hiep, can dong co manh me hon de giai thich." },
     ],
-    uncertainties: ["盟友是否会立即反目尚不确定"],
-    intentAlignment: { score: 62, rationale: "偏离作者意图中的复仇主线，但制造了新张力。" },
+    uncertainties: ["Chua chac dong minh co lap tuc quay lung hay khong"],
+    intentAlignment: { score: 62, rationale: "Lech khoi tuyen bao thu chinh cua tac gia nhung tao duoc kich tinh moi." },
     ...overrides,
   };
 }
@@ -40,22 +40,18 @@ export async function writeForecastFixtureBook(bookDir: string): Promise<void> {
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
 
-  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: "demo-book", title: "示例书", language: "vi" }), "utf-8");
-  await writeFile(join(bookDir, "chapters", "0001_开局.md"), "第一章正文", "utf-8");
-  await writeFile(join(bookDir, "chapters", "0002_升级.md"), "第二章正文", "utf-8");
-  await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["主角在东城"] }), "utf-8");
+  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: "demo-book", title: "Sach mau", language: "vi" }), "utf-8");
+  await writeFile(join(bookDir, "chapters", "0001_mo_dau.md"), "Chuong 1 noi dung chinh van", "utf-8");
+  await writeFile(join(bookDir, "chapters", "0002_nang_cap.md"), "Chuong 2 noi dung chinh van", "utf-8");
+  await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["Nhan vat chinh o Dong Thanh"] }), "utf-8");
   await writeFile(join(bookDir, "story", "state", "hooks.json"), JSON.stringify({ hooks: [] }), "utf-8");
-  await writeFile(join(bookDir, "story", "author_intent.md"), "# 作者意图\n复仇主线", "utf-8");
-  await writeFile(join(bookDir, "story", "current_focus.md"), "# 当前聚焦\n推进证据链", "utf-8");
-  await writeFile(join(bookDir, "story", "current_state.md"), "# 当前状态\n主角在东城", "utf-8");
-  await writeFile(join(bookDir, "story", "pending_hooks.md"), "| hook_id | 描述 |\n| --- | --- |\n| hook-03 | 遗嘱 |", "utf-8");
-  await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# 故事框架\n都市复仇", "utf-8");
+  await writeFile(join(bookDir, "story", "author_intent.md"), "# Y do tac gia\nTuyen bao thu chinh", "utf-8");
+  await writeFile(join(bookDir, "story", "current_focus.md"), "# Tieu diem hien tai\nDay manh chuoi bang chung", "utf-8");
+  await writeFile(join(bookDir, "story", "current_state.md"), "# Trang thai hien tai\nNhan vat chinh o Dong Thanh", "utf-8");
+  await writeFile(join(bookDir, "story", "pending_hooks.md"), "| hook_id | Mo ta |\n| --- | --- |\n| hook-03 | Di chuc |", "utf-8");
+  await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# Khung cau chuyen\nDo thi bao thu", "utf-8");
 }
 
-/**
- * Snapshot every canonical file under bookDir (excluding the forecast output
- * directory) so tests can assert that forecast operations never touch canon.
- */
 export async function snapshotCanonicalFiles(bookDir: string): Promise<ReadonlyMap<string, string>> {
   const snapshot = new Map<string, string>();
   await walk(bookDir, bookDir, snapshot);
@@ -83,7 +79,7 @@ export function makeForecast(overrides: Partial<NarrativeForecast> = {}): Narrat
     bookId: "demo-book",
     createdAt: "2026-01-01T00:00:00.000Z",
     language: "vi",
-    divergence: "主角是否接受对手的合作提议",
+    divergence: "Nhan vat chinh co chap nhan loi de nghi hop tac",
     horizon: 5,
     baseChapter: 12,
     contextFingerprint: "abc123",
@@ -92,9 +88,9 @@ export function makeForecast(overrides: Partial<NarrativeForecast> = {}): Narrat
       makeForecastBranch(),
       makeForecastBranch({
         branchId: "branch-2",
-        title: "主角拒绝提议",
-        premise: "假设主角当场拒绝并公开对手把柄。",
-        intentAlignment: { score: 88, rationale: "延续复仇主线，符合当前聚焦。" },
+        title: "Nhan vat chinh tu choi de nghi",
+        premise: "Gia dinh nhan vat chinh tu choi ngay tai cho va cong khai diem yeu cua doi thu.",
+        intentAlignment: { score: 88, rationale: "Tiep noi tuyen bao thu, phu hop voi tieu diem hien tai." },
       }),
     ],
     ...overrides,

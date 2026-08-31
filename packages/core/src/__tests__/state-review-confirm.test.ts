@@ -85,7 +85,7 @@ import { confirmStateReview } from "../state/state-review-finalize.js";
 
 const CREATED_AT = "2026-08-24T00:00:00.000Z";
 const REVIEW_ID = "3f2504e0-4f89-41d3-9a0c-0305e82c3302";
-const PROSE_16 = "# 第16章 反转\n\n林秋在北岸灯塔烧毁了账本。";
+const PROSE_16 = "# Chương 16 mock_text\n\nmock_text。";
 
 /** Module-scope mirror so the Task 12 describe can assert typed errors too. */
 function expectStateReviewError(error: unknown, code: string, itemId?: string): void {
@@ -99,7 +99,7 @@ function expectStateReviewError(error: unknown, code: string, itemId?: string): 
 function factProposal(predicate: string, object: string) {
   return {
     type: "fact" as const,
-    change: { action: "set" as const, subject: "主角", predicate, object },
+    change: { action: "set" as const, subject: "mock_text", predicate, object },
   };
 }
 
@@ -110,7 +110,7 @@ function factItem(id: string, predicate: string, object: string, overrides?: Par
     origin: "ai",
     title: `Current-state update: ${predicate}`,
     proposal: factProposal(predicate, object),
-    evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "北岸灯塔" },
+    evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" },
     decision: "accepted",
     ...overrides,
   };
@@ -125,19 +125,19 @@ async function seedProseAndIndex(
   const prefix = String(chapter).padStart(4, "0");
   const chaptersDir = join(fixture.bookDir, "chapters");
   // Replace any colliding durable prose for this chapter (fixture seeds
-  // `0016_第16章.md`; the reviewed generation owns exactly ONE file).
+  // `0016_Chương 16.md`; the reviewed generation owns exactly ONE file).
   for (const name of await readdir(chaptersDir)) {
     if (name.startsWith(`${prefix}_`) && name.endsWith(".md")) {
       await rm(join(chaptersDir, name));
     }
   }
-  await writeFile(join(chaptersDir, `${prefix}_反转.md`), prose, "utf-8");
+  await writeFile(join(chaptersDir, `${prefix}_mock_text.md`), prose, "utf-8");
   const numbers = [...Object.keys(statuses).map(Number)].sort((a, b) => a - b);
   await writeFile(
     join(fixture.bookDir, "chapters", "index.json"),
     JSON.stringify(numbers.map((number) => ({
       number,
-      title: `第${number}章`,
+      title: `Chương ${number}mock_text`,
       status: statuses[number],
       wordCount: 10,
       createdAt: CREATED_AT,
@@ -225,23 +225,23 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       items: [
-        factItem("item-fact", "当前位置", "北岸灯塔"),
+        factItem("item-fact", "mock_text", "mock_text"),
         {
           id: "item-summary",
           kind: "chapter-summary",
           origin: "ai",
-          title: "Chapter summary: ch 16 反转",
+          title: "Chapter summary: ch 16 mock_text",
           proposal: {
             type: "chapter-summary",
             row: {
               chapter: 16,
-              title: "反转",
-              characters: "主角；林秋",
-              events: "林秋在北岸灯塔烧毁了账本",
-              stateChanges: "当前位置→北岸灯塔",
+              title: "mock_text",
+              characters: "mock_text；mock_text",
+              events: "mock_text",
+              stateChanges: "mock_text→mock_text",
               hookActivity: "",
-              mood: "紧张",
-              chapterType: "调查",
+              mood: "mock_text",
+              chapterType: "mock_text",
             },
           },
           decision: "accepted",
@@ -277,11 +277,11 @@ describe("state-review-confirm PREPARE (pure)", () => {
     expect(manifest.lastAppliedChapter).toBe(26);
     const currentState = CurrentStateStateSchema.parse(JSON.parse(byPath.get("story/state/current_state.json")!));
     expect(currentState.chapter).toBe(26);
-    const lighthouse = currentState.facts.find((fact) => fact.object === "北岸灯塔");
+    const lighthouse = currentState.facts.find((fact) => fact.object === "mock_text");
     expect(lighthouse?.validFromChapter).toBe(26);
     expect(lighthouse?.sourceChapter).toBe(26);
     const summaries = ChapterSummariesStateSchema.parse(JSON.parse(byPath.get("story/state/chapter_summaries.json")!));
-    expect(summaries.rows.some((row) => row.chapter === 26 && row.title === "反转")).toBe(true);
+    expect(summaries.rows.some((row) => row.chapter === 26 && row.title === "mock_text")).toBe(true);
     HooksStateSchema.parse(JSON.parse(byPath.get("story/state/hooks.json")!));
 
     // Projections correspond to the SAME candidate state.
@@ -291,7 +291,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       "story/chapter_summaries.md",
     ]);
     const projectionByPath = new Map(prepared.projectionWrites.map((w) => [w.relativePath, w.content]));
-    expect(projectionByPath.get("story/current_state.md")).toContain("北岸灯塔");
+    expect(projectionByPath.get("story/current_state.md")).toContain("mock_text");
 
     // Snapshot writes are composed for story/snapshots/26 but NOT on disk.
     const snapshotPaths = prepared.snapshotWrites.map((w) => w.relativePath);
@@ -318,7 +318,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
     expect(receipt.decisions.map((d) => d.decision)).toEqual(["accepted", "accepted"]);
     expect(receipt.effectiveChanges).toHaveLength(2);
     expect(receipt.evidence).toEqual([
-      { itemId: "item-fact", evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "北岸灯塔" } },
+      { itemId: "item-fact", evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" } },
     ]);
     expect(prepared.resultingCanonRevision).toMatch(/^[0-9a-f]{16}$/);
     expect(prepared.resultingCanonRevision).not.toBe(receipt.baseCanonRevision);
@@ -332,13 +332,13 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       items: [
-        factItem("item-edited", "当前位置", "提案里的旧值", {
+        factItem("item-edited", "mock_text", "mock_text", {
           decision: "edited",
-          editedChange: factProposal("当前目标", "查明遗嘱真相"),
+          editedChange: factProposal("mock_text", "mock_textSu that"),
         }),
-        factItem("item-rejected", "主角状态", "被拒绝的值", {
+        factItem("item-rejected", "mock_text", "mock_text", {
           decision: "rejected",
-          editedChange: factProposal("当前目标", "拒绝项上残留的旧编辑"),
+          editedChange: factProposal("mock_text", "mock_text"),
         }),
       ],
     });
@@ -350,10 +350,10 @@ describe("state-review-confirm PREPARE (pure)", () => {
 
     const currentJson = prepared.canonWrites.find((w) => w.relativePath === "story/state/current_state.json")!;
     const candidate = CurrentStateStateSchema.parse(JSON.parse(currentJson.content));
-    expect(candidate.facts.some((fact) => fact.predicate === "当前目标" && fact.object === "查明遗嘱真相")).toBe(true);
-    expect(candidate.facts.some((fact) => fact.object === "提案里的旧值")).toBe(false);
-    expect(candidate.facts.some((fact) => fact.object === "被拒绝的值")).toBe(false);
-    expect(candidate.facts.some((fact) => fact.object === "拒绝项上残留的旧编辑")).toBe(false);
+    expect(candidate.facts.some((fact) => fact.predicate === "mock_text" && fact.object === "mock_textSu that")).toBe(true);
+    expect(candidate.facts.some((fact) => fact.object === "mock_text")).toBe(false);
+    expect(candidate.facts.some((fact) => fact.object === "mock_text")).toBe(false);
+    expect(candidate.facts.some((fact) => fact.object === "mock_text")).toBe(false);
     const receipt = ResolvedReviewReceiptSchema.parse(JSON.parse(prepared.receiptWrite.content));
     expect(receipt.reviewId).toBe(reviewId);
     // Rejected stays in audit history with its stale edit, but contributes none.
@@ -370,7 +370,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       items: [
-        factItem("item-user", "主角状态", "用户改写：轻伤痊愈", { origin: "user" }),
+        factItem("item-user", "mock_text", "mock_text：mock_text", { origin: "user" }),
       ],
     });
     const before = await captureBookMetadata(fixture.root);
@@ -382,9 +382,9 @@ describe("state-review-confirm PREPARE (pure)", () => {
     const candidate = CurrentStateStateSchema.parse(JSON.parse(
       prepared.canonWrites.find((w) => w.relativePath === "story/state/current_state.json")!.content,
     ));
-    expect(candidate.facts.some((fact) => fact.predicate === "主角状态" && fact.object === "用户改写：轻伤痊愈")).toBe(true);
+    expect(candidate.facts.some((fact) => fact.predicate === "mock_text" && fact.object === "mock_text：mock_text")).toBe(true);
     const receipt = ResolvedReviewReceiptSchema.parse(JSON.parse(prepared.receiptWrite.content));
-    expect(receipt.proposals[0]).toEqual(factProposal("主角状态", "用户改写：轻伤痊愈"));
+    expect(receipt.proposals[0]).toEqual(factProposal("mock_text", "mock_text：mock_text"));
     expect(receipt.decisions[0]?.decision).toBe("accepted");
     expect(await captureBookMetadata(fixture.root)).toEqual(before);
   });
@@ -394,8 +394,8 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       items: [
-        factItem("item-open", "当前位置", "北岸灯塔", { decision: "undecided" }),
-        { id: "item-note", kind: "note", origin: "ai", title: "备注", proposal: { type: "none" }, decision: "undecided" },
+        factItem("item-open", "mock_text", "mock_text", { decision: "undecided" }),
+        { id: "item-note", kind: "note", origin: "ai", title: "mock_text", proposal: { type: "none" }, decision: "undecided" },
       ],
     });
     await expect(expectZeroWrites(() => prepareStateReviewConfirm({
@@ -411,7 +411,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       items: [
-        { id: "item-note", kind: "note", origin: "ai", title: "备注", proposal: { type: "none" }, decision: "undecided" },
+        { id: "item-note", kind: "note", origin: "ai", title: "mock_text", proposal: { type: "none" }, decision: "undecided" },
       ],
     });
     const before = await captureBookMetadata(fixture.root);
@@ -436,7 +436,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       prepared.canonWrites.find((w) => w.relativePath === "story/state/current_state.json")!.content,
     ));
     expect(candidateState.chapter).toBe(26);
-    expect(candidateState.facts.some((fact) => fact.object === "北岸灯塔")).toBe(false);
+    expect(candidateState.facts.some((fact) => fact.object === "mock_text")).toBe(false);
     const currentStateProjection = prepared.projectionWrites.find((w) => w.relativePath === "story/current_state.md")!;
     expect(currentStateProjection.content).toContain("26");
     const snapshotManifest = StateManifestSchema.parse(JSON.parse(
@@ -452,7 +452,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(T8/T9/J) zero-item AND all-rejected reviews advance the applied head with no semantic mutation", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 26, effectiveChapter: 26,
-      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
+      proseText: "# Chương 26 mock_text\n\nmock_text。",
       items: [],
     });
     const empty = await prepareStateReviewConfirm({
@@ -476,7 +476,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       reviewId: "3f2504e0-4f89-41d3-9a0c-0305e82c3303",
-      items: [factItem("item-rej", "当前位置", "北岸灯塔", { decision: "rejected" })],
+      items: [factItem("item-rej", "mock_text", "mock_text", { decision: "rejected" })],
     });
     const before = await captureBookMetadata(fixture.root);
     const allRejected = await prepareStateReviewConfirm({
@@ -488,7 +488,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       allRejected.canonWrites.find((w) => w.relativePath === "story/state/current_state.json")!.content,
     ));
     // The rejected proposal NEVER enters semantics; only bookkeeping advances.
-    expect(candidate.facts.some((fact) => fact.object === "北岸灯塔")).toBe(false);
+    expect(candidate.facts.some((fact) => fact.object === "mock_text")).toBe(false);
     const rejectedManifest = StateManifestSchema.parse(JSON.parse(
       allRejected.canonWrites.find((w) => w.relativePath === "story/state/manifest.json")!.content,
     ));
@@ -527,7 +527,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(T11/AH) expectedReviewRevision mismatch fails edit_conflict with zero writes", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     await expect(expectZeroWrites(() => prepareStateReviewConfirm({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 4, durableHead: 25,
@@ -540,10 +540,10 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(T12/AG) prose drift fails stale with zero writes", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     // Tamper prose AFTER publication without Task 9 (simulates out-of-band edit).
-    await seedProseAndIndex(fixture, 16, `${PROSE_16}\n\n后续追加的一段。`, { 1: "approved", 16: "needs-state-review" });
+    await seedProseAndIndex(fixture, 16, `${PROSE_16}\n\nmock_text。`, { 1: "approved", 16: "needs-state-review" });
     await expect(expectZeroWrites(() => prepareStateReviewConfirm({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
     }))).rejects.toSatisfy((error: unknown) => {
@@ -555,7 +555,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(T13/AF) Canon drift WITHOUT head change fails conflict with zero writes", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     // Concurrent/manual correction of one fact value; manifest untouched.
     const statePath = join(fixture.bookDir, "story", "state", "current_state.json");
@@ -563,7 +563,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       facts: Array<{ predicate: string; object: string }>;
     };
     parsed.facts = parsed.facts.map((fact) =>
-      fact.predicate === "主角状态" ? { ...fact, object: "手动修正后的状态" } : fact);
+      fact.predicate === "mock_text" ? { ...fact, object: "mock_text" } : fact);
     await writeFile(statePath, JSON.stringify(parsed, null, 2), "utf-8");
 
     await expect(expectZeroWrites(() => prepareStateReviewConfirm({
@@ -577,7 +577,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(T14/AE) confirmed-head drift fails CLOSED instead of rebasing effectiveChapter", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     // Another valid confirmation advances the confirmed head to 26 AFTER the
     // proposal was generated. PREPARE must NOT shift effective 26 → 27.
@@ -597,7 +597,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(§9.A RED) caller-passed head ≥ effectiveChapter is an APPLY-ZERO error", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     await expect(expectZeroWrites(() => prepareStateReviewConfirm({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 27,
@@ -608,12 +608,12 @@ describe("state-review-confirm PREPARE (pure)", () => {
   });
 
   it("(T15/G) pending CURRENT chapter source26/effective26 over confirmed head25 PREPAREs literally at 26", async () => {
-    const prose26 = "# 第26章 终局\n\n林秋抵达北岸灯塔。";
+    const prose26 = "# Chương 26 mock_text\n\nmock_text。";
     const reviewId = await publishActiveReview(fixture, {
       sourceChapter: 26,
       effectiveChapter: 26,
       proseText: prose26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     const before = await captureBookMetadata(fixture.root);
 
@@ -636,9 +636,9 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       items: [
-        factItem("item-good", "当前位置", "北岸灯塔"),
+        factItem("item-good", "mock_text", "mock_text"),
         // Schema-VALID envelope, semantically invalid: edited without payload.
-        factItem("item-bad", "主角状态", "占位", {
+        factItem("item-bad", "mock_text", "mock_text", {
           decision: "edited",
           // editedChange deliberately absent
         }),
@@ -656,7 +656,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
     // Unknown predicate on an ACCEPTED item.
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-weird", "不存在的谓词", "任意值")],
+      items: [factItem("item-weird", "mock_text", "mock_text")],
     });
     await expect(expectZeroWrites(() => prepareStateReviewConfirm({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 1, durableHead: 25,
@@ -675,7 +675,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
         kind: "current-state-fact",
         origin: "ai",
         title: "remove?",
-        proposal: { type: "fact", change: { action: "remove", subject: "主角", predicate: "当前位置" } },
+        proposal: { type: "fact", change: { action: "remove", subject: "mock_text", predicate: "mock_text" } },
         decision: "accepted",
       }],
     });
@@ -700,13 +700,13 @@ describe("state-review-confirm PREPARE (pure)", () => {
           type: "chapter-summary",
           row: {
             chapter: 17,
-            title: "反转",
-            characters: "主角",
-            events: "事件",
+            title: "mock_text",
+            characters: "mock_text",
+            events: "mock_text",
             stateChanges: "",
             hookActivity: "",
             mood: "",
-            chapterType: "调查",
+            chapterType: "mock_text",
           },
         },
         decision: "accepted",
@@ -725,7 +725,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       sourceChapter: 16,
       effectiveChapter: 26,
       items: [
-        factItem("item-fact", "当前位置", "北岸灯塔"),
+        factItem("item-fact", "mock_text", "mock_text"),
         {
           id: "item-hook",
           kind: "hook-upsert",
@@ -739,9 +739,9 @@ describe("state-review-confirm PREPARE (pure)", () => {
               type: "subplot",
               status: "open",
               lastAdvancedChapter: 26,
-              expectedPayoff: "邻居目击证词",
+              expectedPayoff: "mock_text",
               payoffTiming: "near-term",
-              notes: "第26章推进",
+              notes: "Chương 26mock_text",
             },
           },
           decision: "accepted",
@@ -760,7 +760,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
       prepared.canonWrites.find((w) => w.relativePath === "story/state/hooks.json")!.content,
     ));
     const neighbor = hooks.hooks.find((hook) => hook.hookId === "hook-sub-neighbor");
-    expect(neighbor?.notes).toBe("第26章推进");
+    expect(neighbor?.notes).toBe("Chương 26mock_text");
     // Live disk hooks remain untouched (still the fixture notes: "").
     const liveSnapshot = await readLiveRuntimeStateSnapshot(fixture.bookDir);
     expect(liveSnapshot.hooks.hooks.find((hook) => hook.hookId === "hook-sub-neighbor")?.notes).toBe("");
@@ -770,10 +770,10 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(T20/W/X/Y) snapshotWrites mirror the CANDIDATE state and copy unchanged slots, purely composed", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     // An unrelated story slot that must be copied unchanged into the snapshot.
-    await writeFile(join(fixture.bookDir, "story", "particle_ledger.md"), "粒子账本内容", "utf-8");
+    await writeFile(join(fixture.bookDir, "story", "particle_ledger.md"), "mock_text", "utf-8");
     const before = await captureBookMetadata(fixture.root);
 
     const prepared = await prepareStateReviewConfirm({
@@ -781,8 +781,8 @@ describe("state-review-confirm PREPARE (pure)", () => {
     });
 
     const byPath = new Map(prepared.snapshotWrites.map((w) => [w.relativePath, w.content]));
-    expect(byPath.get("story/snapshots/26/particle_ledger.md")).toBe("粒子账本内容");
-    expect(byPath.get("story/snapshots/26/current_state.md")).toContain("北岸灯塔");
+    expect(byPath.get("story/snapshots/26/particle_ledger.md")).toBe("mock_text");
+    expect(byPath.get("story/snapshots/26/current_state.md")).toContain("mock_text");
     const snapState = CurrentStateStateSchema.parse(JSON.parse(
       byPath.get("story/snapshots/26/state/current_state.json")!,
     ));
@@ -793,14 +793,14 @@ describe("state-review-confirm PREPARE (pure)", () => {
   it("(Z) index candidate flips ONLY the reviewed chapter to approved and preserves unrelated entries exactly", async () => {
     await publishActiveReview(fixture, {
       sourceChapter: 16, effectiveChapter: 26,
-      items: [factItem("item-fact", "当前位置", "北岸灯塔")],
+      items: [factItem("item-fact", "mock_text", "mock_text")],
     });
     // Extra unrelated entry that must survive byte-for-byte in values.
     const indexPath = join(fixture.bookDir, "chapters", "index.json");
     const existing = JSON.parse(await readFile(indexPath, "utf-8")) as Array<Record<string, unknown>>;
     existing.push({
-      number: 2, title: "第二章", status: "approved", wordCount: 99,
-      createdAt: CREATED_AT, updatedAt: CREATED_AT, auditIssues: ["遗留问题"], lengthWarnings: [],
+      number: 2, title: "Chương mock_text", status: "approved", wordCount: 99,
+      createdAt: CREATED_AT, updatedAt: CREATED_AT, auditIssues: ["mock_text"], lengthWarnings: [],
     });
     await writeFile(indexPath, JSON.stringify(existing, null, 2), "utf-8");
 
@@ -812,7 +812,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
     expect(entries.find((entry) => entry.number === 16)?.status).toBe("approved");
     const untouched = entries.find((entry) => entry.number === 2);
     expect(untouched?.status).toBe("approved");
-    expect(untouched?.auditIssues).toEqual(["遗留问题"]);
+    expect(untouched?.auditIssues).toEqual(["mock_text"]);
     expect(untouched?.wordCount).toBe(99);
     expect(entries.filter((entry) => entry.status === "ready-for-review")).toEqual([]);
   });
@@ -825,18 +825,18 @@ describe("state-review-confirm PREPARE (pure)", () => {
         id: "item-summary",
         kind: "chapter-summary",
         origin: "ai",
-        title: "Chapter summary: ch 16 反转",
+        title: "Chapter summary: ch 16 mock_text",
         proposal: {
           type: "chapter-summary",
           row: {
             chapter: 16,
-            title: "反转",
-            characters: "主角；林秋",
-            events: "林秋在北岸灯塔烧毁了账本",
-            stateChanges: "当前位置→北岸灯塔",
+            title: "mock_text",
+            characters: "mock_text；mock_text",
+            events: "mock_text",
+            stateChanges: "mock_text→mock_text",
             hookActivity: "",
-            mood: "紧张",
-            chapterType: "调查",
+            mood: "mock_text",
+            chapterType: "mock_text",
           },
         },
         decision: "accepted",
@@ -854,9 +854,9 @@ describe("state-review-confirm PREPARE (pure)", () => {
     const summaries = ChapterSummariesStateSchema.parse(JSON.parse(
       prepared.canonWrites.find((w) => w.relativePath === "story/state/chapter_summaries.json")!.content,
     ));
-    const applied = summaries.rows.find((row) => row.title === "反转");
+    const applied = summaries.rows.find((row) => row.title === "mock_text");
     expect(applied?.chapter).toBe(26);
-    expect(applied?.events).toBe("林秋在北岸灯塔烧毁了账本");
+    expect(applied?.events).toBe("mock_text");
     const manifest = StateManifestSchema.parse(JSON.parse(
       prepared.canonWrites.find((w) => w.relativePath === "story/state/manifest.json")!.content,
     ));
@@ -881,7 +881,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
     await publishActiveReview(fixture, {
       sourceChapter: 26,
       effectiveChapter: 26,
-      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
+      proseText: "# Chương 26 mock_text\n\nmock_text。",
       items: [],
     });
     // Live manifest says 25; a stale caller reporting 24 must NOT slip the
@@ -922,24 +922,24 @@ describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
   let fixture: CanonBookFixture;
 
   const FACT_ITEM = (id = "item-fact") =>
-    factItem(id, "当前位置", "北岸灯塔");
+    factItem(id, "mock_text", "mock_text");
 
   const SUMMARY_ITEM = (id = "item-summary"): ReviewItem => ({
     id,
     kind: "chapter-summary",
     origin: "ai",
-    title: "Chapter summary: ch 16 反转",
+    title: "Chapter summary: ch 16 mock_text",
     proposal: {
       type: "chapter-summary",
       row: {
         chapter: 16,
-        title: "反转",
-        characters: "主角；林秋",
-        events: "林秋在北岸灯塔烧毁了账本",
-        stateChanges: "当前位置→北岸灯塔",
+        title: "mock_text",
+        characters: "mock_text；mock_text",
+        events: "mock_text",
+        stateChanges: "mock_text→mock_text",
         hookActivity: "",
-        mood: "紧张",
-        chapterType: "调查",
+        mood: "mock_text",
+        chapterType: "mock_text",
       },
     },
     decision: "accepted",
@@ -1067,8 +1067,8 @@ describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
     // Tamper prose + bump nothing: if PREPARE ran it would throw stale —
     // receipt-first lookup must return BEFORE any validation.
     await writeFile(
-      join(fixture.bookDir, "chapters/0016_第16章.md"),
-      "# 第16章 反转\n\n被篡改的内容。",
+      join(fixture.bookDir, "chapters/0016_Chương 16.md"),
+      "# Chương 16 mock_text\n\nmock_text。",
       "utf-8",
     );
     const tampered = await captureBookMetadata(fixture.root);
@@ -1137,8 +1137,8 @@ describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
 
     // Prose drift ⇒ state_review_stale (Task 11 anchor, not reinterpreted).
     await writeFile(
-      join(fixture.bookDir, "chapters/0016_第16章.md"),
-      "# 第16章 反转\n\n林秋在北岸灯塔烧毁了账本。额外段落。",
+      join(fixture.bookDir, "chapters/0016_Chương 16.md"),
+      "# Chương 16 mock_text\n\nmock_text。mock_text。",
       "utf-8",
     );
     const drifted = await captureBookMetadata(fixture.root);
@@ -1155,7 +1155,7 @@ describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
     await publishActiveReview(fixture, {
       sourceChapter: 26,
       effectiveChapter: 26,
-      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
+      proseText: "# Chương 26 mock_text\n\nmock_text。",
       items: [],
     });
     const result = await confirmTx(26, REVIEW_ID);
@@ -1171,7 +1171,7 @@ describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
     const currentState = CurrentStateStateSchema.parse(
       JSON.parse(await readFile(join(fixture.bookDir, "story/state/current_state.json"), "utf-8")),
     );
-    expect(currentState.facts.some((fact) => fact.object === "北岸灯塔")).toBe(false);
+    expect(currentState.facts.some((fact) => fact.object === "mock_text")).toBe(false);
     expect(StateManifestSchema.parse(JSON.parse(
       await readFile(join(fixture.bookDir, "story/snapshots/26/state/manifest.json"), "utf-8"),
     )).lastAppliedChapter).toBe(26);
@@ -1316,8 +1316,8 @@ describe("state-review-confirm CONFIRM transaction (Task 12)", () => {
       sourceChapter: 26,
       effectiveChapter: 26,
       reviewId: "3f2504e0-4f89-41d3-9a0c-0305e82c3303",
-      proseText: "# 第26章 终局\n\n林秋抵达北岸灯塔。",
-      items: [factItem("item-b", "当前位置", "北岸灯塔")],
+      proseText: "# Chương 26 mock_text\n\nmock_text。",
+      items: [factItem("item-b", "mock_text", "mock_text")],
       extraStatuses: { 16: "needs-state-review" }, // A and B active in parallel
     }); // B: artifact under chapter-26, same slot
 

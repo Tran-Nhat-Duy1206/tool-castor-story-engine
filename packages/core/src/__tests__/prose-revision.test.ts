@@ -7,7 +7,7 @@ import {
 
 describe("computeProseRevision", () => {
   it("is deterministic for the exact same string", () => {
-    const content = "# 第1章 夜航\n\n他推开了临街的木门。";
+    const content = "# Chương 1 mock_text\n\nmock_text。";
     expect(computeProseRevision(content)).toBe(computeProseRevision(content));
   });
 
@@ -26,8 +26,8 @@ describe("computeProseRevision", () => {
   });
 
   it("distinguishes two distinct Chinese strings", () => {
-    expect(computeProseRevision("他推开了门")).not.toBe(
-      computeProseRevision("她推开了窗"),
+    expect(computeProseRevision("mock_text")).not.toBe(
+      computeProseRevision("mock_text"),
     );
   });
 
@@ -62,8 +62,8 @@ describe("normalizeForEvidenceMatch", () => {
   });
 
   it("keeps punctuation significant", () => {
-    expect(normalizeForEvidenceMatch("他说，来吧。")).toBe("他说，来吧。");
-    expect(normalizeForEvidenceMatch("他说，来吧。")).not.toBe("他说来吧");
+    expect(normalizeForEvidenceMatch("mock_text，mock_text。")).toBe("mock_text，mock_text。");
+    expect(normalizeForEvidenceMatch("mock_text，mock_text。")).not.toBe("mock_text");
     expect(normalizeForEvidenceMatch("Stop!")).not.toBe("Stop");
   });
 
@@ -74,13 +74,13 @@ describe("normalizeForEvidenceMatch", () => {
 
 describe("evidenceQuoteVerified", () => {
   const PROSE = [
-    "前夜的风很大。",
-    "他推开了门，风灌了进来。",
+    "mock_text。",
+    "mock_text，mock_text。",
     "The old door groaned open in the wind.",
   ].join("\n");
 
   it("verifies an exact contained CJK sentence", () => {
-    expect(evidenceQuoteVerified("他推开了门，风灌了进来。", PROSE)).toBe(true);
+    expect(evidenceQuoteVerified("mock_text，mock_text。", PROSE)).toBe(true);
   });
 
   it("matches English despite case differences", () => {
@@ -88,20 +88,20 @@ describe("evidenceQuoteVerified", () => {
   });
 
   it("collapses newlines and runs of whitespace between quote and prose", () => {
-    expect(evidenceQuoteVerified("风很大。\n他推开了门", PROSE)).toBe(true);
+    expect(evidenceQuoteVerified("mock_text。\nmock_text", PROSE)).toBe(true);
     expect(evidenceQuoteVerified("door   groaned\topen", PROSE)).toBe(true);
   });
 
   it("does NOT invent away CJK-internal spaces", () => {
-    expect(evidenceQuoteVerified("他 推开了 门", "他推开了门，风灌了进来。")).toBe(false);
+    expect(evidenceQuoteVerified("mock_text mock_text mock_text", "mock_text，mock_text。")).toBe(false);
   });
 
   it("verifies a true contiguous CJK substring", () => {
-    expect(evidenceQuoteVerified("他推开了门", PROSE)).toBe(true);
+    expect(evidenceQuoteVerified("mock_text", PROSE)).toBe(true);
   });
 
   it("fails when punctuation differs materially", () => {
-    expect(evidenceQuoteVerified("他推开了门。", PROSE)).toBe(false);
+    expect(evidenceQuoteVerified("mock_text。", PROSE)).toBe(false);
     expect(evidenceQuoteVerified("The old door groaned open?", PROSE)).toBe(false);
   });
 
@@ -119,6 +119,6 @@ describe("evidenceQuoteVerified", () => {
   });
 
   it("returns false when the quote simply is not present", () => {
-    expect(evidenceQuoteVerified("她关上了窗", PROSE)).toBe(false);
+    expect(evidenceQuoteVerified("mock_text", PROSE)).toBe(false);
   });
 });

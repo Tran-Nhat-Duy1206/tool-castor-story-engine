@@ -56,11 +56,11 @@ export async function readBookRules(storyDir: string): Promise<string> {
     const proto = rules.protagonist;
     const personality = proto.personalityLock.join("、");
     const constraints = proto.behavioralConstraints.join("、");
-    lines.push(`- 主角 ${proto.name}${personality ? ` / 人设锁：${personality}` : ""}${constraints ? ` / 行为约束：${constraints}` : ""}`);
+    lines.push(`-  ${proto.name}${personality ? ` / ：${personality}` : ""}${constraints ? ` / ：${constraints}` : ""}`);
   }
 
   if (rules.prohibitions.length > 0) {
-    lines.push("- 本书禁忌：");
+    lines.push("- ：");
     for (const p of rules.prohibitions) {
       lines.push(`  - ${p}`);
     }
@@ -68,15 +68,15 @@ export async function readBookRules(storyDir: string): Promise<string> {
 
   if (rules.genreLock) {
     const forbidden = rules.genreLock.forbidden.join("、");
-    lines.push(`- 题材锁：${rules.genreLock.primary}${forbidden ? ` / 禁止混入：${forbidden}` : ""}`);
+    lines.push(`- ：${rules.genreLock.primary}${forbidden ? ` / ：${forbidden}` : ""}`);
   }
 
   if (rules.fanficMode) {
-    lines.push(`- 同人模式：${rules.fanficMode}`);
+    lines.push(`- ：${rules.fanficMode}`);
   }
 
   const trimmedBody = body.trim();
-  // The body holds narrative guidance prose (e.g. 叙事视角). Include it verbatim
+  // Planner context builder.
   // so the planner sees the same text as before the cleanup.
   if (trimmedBody) {
     lines.push("", trimmedBody);
@@ -102,10 +102,10 @@ export function formatRecentSummaries(
 
   const recent = rows.slice(-limit);
   if (recent.length === 0) {
-    return "（暂无前章摘要）";
+    return "（）";
   }
 
-  const header = "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |";
+  const header = "|  |  |  |  |  |  |  |  |";
   const divider = "| --- | --- | --- | --- | --- | --- | --- | --- |";
   const body = recent.map((row) => `| ${row.join(" | ")} |`).join("\n");
   return [header, divider, body].join("\n");
@@ -126,13 +126,13 @@ export function composeCurrentArcProse(
 
   const parts: string[] = [];
   if (activeSubplots.length > 0) {
-    parts.push("活跃支线：\n" + activeSubplots.map((line) => `- ${line}`).join("\n"));
+    parts.push("：\n" + activeSubplots.map((line) => `- ${line}`).join("\n"));
   }
   if (recentArcs.length > 0) {
-    parts.push("近期情感线：\n" + recentArcs.map((line) => `- ${line}`).join("\n"));
+    parts.push("：\n" + recentArcs.map((line) => `- ${line}`).join("\n"));
   }
   if (parts.length === 0) {
-    return "（暂无 arc 数据——可能是新书起始阶段）";
+    return "（ arc ——）";
   }
   return parts.join("\n\n");
 }
@@ -149,10 +149,10 @@ function extractActiveSubplotLines(raw: string): string[] {
       .slice(0, 6);
   }
   return rows
-    .filter((row) => !/^(id|subplot_id|subplot|status|状态)$/i.test(row[0] ?? ""))
+    .filter((row) => !/^(id|subplot_id|subplot|status|)$/i.test(row[0] ?? ""))
     .filter((row) => {
-      const status = (row.find((cell) => /进行|推进|高压|激活|activ|progress|partial/i.test(cell)) ?? "");
-      const dormant = row.find((cell) => /暂稳待续|暂挂|dormant|paused/i.test(cell));
+      const status = (row.find((cell) => /||||activ|progress|partial/i.test(cell)) ?? "");
+      const dormant = row.find((cell) => /||dormant|paused/i.test(cell));
       return Boolean(status) && !dormant;
     })
     .map((row) => row.filter(Boolean).join(" | "))
@@ -169,7 +169,7 @@ function extractRecentEmotionalArcLines(raw: string, chapterNumber: number, limi
       .slice(-limit)
       .map((line) => line.replace(/^-\s*/, ""));
   }
-  // emotional_arcs.md column layout: 角色 | 章节 | 情绪状态 | 触发事件 | 强度 | 弧线方向
+  // Planner context builder.
   // Chapter number lives in column index 1 (row[1]), not column 0.
   return rows
     .filter((row) => /^\d+$/.test(row[1] ?? ""))
@@ -178,23 +178,17 @@ function extractRecentEmotionalArcLines(raw: string, chapterNumber: number, limi
     .map((row) => row.filter(Boolean).join(" | "));
 }
 
-const CHARACTER_MATRIX_HEADER_CELLS = /^(角色|character|name|核心标签|与主角关系|relation)$/i;
+const CHARACTER_MATRIX_HEADER_CELLS = /^(|character|name|||relation)$/i;
 
 function isLikelyHeaderRow(row: ReadonlyArray<string>): boolean {
   return row.some((cell) => CHARACTER_MATRIX_HEADER_CELLS.test(cell.trim()));
 }
 
-/**
- * Extract the protagonist row from character_matrix.md. Protagonist is detected
- * by a cell in the 与主角关系 column matching "主角本人" / "主角" / "protagonist"
- * (case-insensitive). Falls back to the first non-header data row if no
- * explicit match is found — that row is almost always the protagonist by
- * convention.
- */
+// Planner context builder.
 export function extractProtagonistRow(characterMatrixRaw: string): string {
   const rows = parseMarkdownTableRows(characterMatrixRaw);
   const protagonist = rows.find((row) =>
-    row.some((cell) => /^(主角本人|主角|protagonist)$/i.test(cell.trim())),
+    row.some((cell) => /^(||protagonist)$/i.test(cell.trim())),
   );
   if (protagonist) {
     return `| ${protagonist.join(" | ")} |`;
@@ -203,18 +197,18 @@ export function extractProtagonistRow(characterMatrixRaw: string): string {
   if (firstDataRow) {
     return `| ${firstDataRow.join(" | ")} |`;
   }
-  return "（未找到主角行——请检查 character_matrix.md）";
+  return "（—— character_matrix.md）";
 }
 
-const OPPONENT_PATTERNS = /敌对|对手|阻力|opponent|antagonist|foe/i;
-const COLLABORATOR_PATTERNS = /协力|盟友|临时助力|ally|collaborator|mentor/i;
+const OPPONENT_PATTERNS = /|||opponent|antagonist|foe/i;
+const COLLABORATOR_PATTERNS = /|||ally|collaborator|mentor/i;
 
 export function extractOpponentRows(characterMatrixRaw: string, limit: number): string {
-  return extractRowsByRelation(characterMatrixRaw, OPPONENT_PATTERNS, limit, "（暂无明确对手登场）");
+  return extractRowsByRelation(characterMatrixRaw, OPPONENT_PATTERNS, limit, "（）");
 }
 
 export function extractCollaboratorRows(characterMatrixRaw: string, limit: number): string {
-  return extractRowsByRelation(characterMatrixRaw, COLLABORATOR_PATTERNS, limit, "（暂无明确协作者登场）");
+  return extractRowsByRelation(characterMatrixRaw, COLLABORATOR_PATTERNS, limit, "（）");
 }
 
 function extractRowsByRelation(
@@ -225,7 +219,7 @@ function extractRowsByRelation(
 ): string {
   const rows = parseMarkdownTableRows(characterMatrixRaw)
     .filter((row) => row.some((cell) => pattern.test(cell)))
-    .filter((row) => !row.some((cell) => /^(主角|protagonist)$/i.test(cell.trim())))
+    .filter((row) => !row.some((cell) => /^(|protagonist)$/i.test(cell.trim())))
     .slice(0, limit);
   if (rows.length === 0) {
     return emptyText;
@@ -248,14 +242,14 @@ export function formatRelevantThreads(
   const subplotRows = extractActiveSubplotLines(subplotBoardRaw).map((line) => `- ${line}`);
   const lines = [...hookRows, ...subplotRows];
   if (lines.length === 0) {
-    return language === "en" ? "(no relevant threads)" : "（暂无相关线索）";
+    return language === "en" ? "(no relevant threads)" : "（）";
   }
   return lines.join("\n");
 }
 
 /**
  * Phase 9-2: render stale hooks that the planner MUST dispose of in this
- * chapter's memo ("## 本章 hook 账"). These are already filtered by
+ * chapter's memo ("## Sổ hook chương này"). These are already filtered by
  * computeRecyclableHooks; here we just format them for the prompt.
  *
  * Language switch mirrors the rest of the planner prompt: zh by default,
@@ -269,7 +263,7 @@ export function formatRecyclableHooks(
   if (hooks.length === 0) {
     return language === "en"
       ? "(no stale hooks — the ledger is clean)"
-      : "（暂无陈旧 hook——账本干净）";
+      : "（ hook——）";
   }
 
   const topSlice = hooks.slice(0, 6);
@@ -277,14 +271,14 @@ export function formatRecyclableHooks(
     const lastTouch = Math.max(hook.startChapter, hook.lastAdvancedChapter);
     const silence = lastTouch <= 0 ? chapterNumber : Math.max(0, chapterNumber - lastTouch);
     const payoff = hook.expectedPayoff?.trim() || hook.notes?.trim() || "";
-    const core = hook.coreHook === true ? (language === "en" ? " [core]" : " [核心]") : "";
+    const core = hook.coreHook === true ? (language === "en" ? " [core]" : " []") : "";
     return language === "en"
       ? `- ${hook.hookId} "${payoff}" — status=${hook.status}, silent ${silence} ch${core}`
-      : `- ${hook.hookId} "${payoff}" — 状态=${hook.status}，已沉默 ${silence} 章${core}`;
+      : `- ${hook.hookId} "${payoff}" — =${hook.status}， ${silence} ${core}`;
   });
 
   const header = language === "en"
     ? "The planner MUST place each of these under advance / resolve / defer in the hook ledger (deferring requires an explicit reason):"
-    : "规划时必须把以下每个 hook 放入 advance / resolve / defer（若 defer，必须写出理由）：";
+    : " hook  advance / resolve / defer（ defer，）：";
   return [header, ...lines].join("\n");
 }

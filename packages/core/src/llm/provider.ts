@@ -283,10 +283,7 @@ export interface LLMClient {
   readonly _apiKey?: string;
   readonly defaults: {
     readonly temperature: number;
-    /**
-     * Per-call fallback: 当 agent 调 chat() 不传 options.maxTokens 时用这个值。
-     * 命中模型卡时来自 providers bank 的 modelCard.maxOutput；未知模型走写作兜底预算。
-     */
+    // LLM provider configuration and endpoints.
     readonly maxTokens: number;
     /**
      * Legacy mock compatibility only. v2 provider resolution no longer caps
@@ -302,7 +299,7 @@ export interface LLMClient {
 // === Factory ===
 
 export function createLLMClient(config: LLMConfig): LLMClient {
-  // C1 (v2.0.0)：config.maxTokens / maxTokensCap 已删除；defaults.maxTokens 完全从 modelCard 推导。
+  // LLM provider configuration and endpoints.
   const _earlyCard = lookupModel(config.service ?? "custom", config.model);
   const defaults = {
     temperature: config.temperature ?? 0.7,
@@ -328,8 +325,8 @@ export function createLLMClient(config: LLMConfig): LLMClient {
     : undefined;
 
   const provider = config.provider === "anthropic" ? "anthropic" : "openai";
-  // pi-ai provider 字段：大多数情况 pi-ai 会按 baseUrl 自动嗅探（openrouter.ai / api.z.ai /
-  // api.x.ai / deepseek.com / anthropic.com 等）。这里只列 pi-ai 嗅探不到、需要显式指定的少数情况。
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   let piProvider: string;
   if (endpointProvider?.id === "google") piProvider = "google";
   else if (endpointProvider?.id === "zhipu") piProvider = "zai";
@@ -345,10 +342,10 @@ export function createLLMClient(config: LLMConfig): LLMClient {
     api: piApi,
     provider: piProvider,
     baseUrl,
-    // 注意：piModel.reasoning 是"激活 reasoning 模式"标志（会让 pi-ai 把 system 改成 developer role 等），
-    // 不是"模型能力"标签。只有用户显式配了 thinkingBudget > 0 才启用 reasoning mode。
-    // 千万不要从 lobe abilities.reasoning 自动推导，否则 Moonshot 这类不支持 developer role 的服务
-    // 会把 content 吃掉，只返回 reasoning_content（见 R4 bug 1 诊断）。
+    // LLM provider configuration and endpoints.
+    // LLM provider configuration and endpoints.
+    // LLM provider configuration and endpoints.
+    // LLM provider configuration and endpoints.
     reasoning: (config.thinkingBudget ?? 0) > 0,
     input: ["text"] as ("text" | "image")[],
     cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
@@ -411,10 +408,10 @@ function parseEnvHeaders(): Record<string, string> | undefined {
   return undefined;
 }
 
-// === Partial Response（流式生成中途被掐断）===
-// 语义：内容不完整、不可信。由 withTransientLLMRetry 整体重新生成；
-// 重试耗尽后如实抛错。绝不把半截内容当成功返回（那会产出写到一半就
-// 结束的章节/设定文件）。partialContent 仅用于错误诊断。
+// LLM provider configuration and endpoints.
+// LLM provider configuration and endpoints.
+// LLM provider configuration and endpoints.
+// LLM provider configuration and endpoints.
 
 export class PartialResponseError extends Error {
   readonly partialContent: string;
@@ -469,15 +466,15 @@ function stripReservedKeys(extra: Record<string, unknown>): Record<string, unkno
 
 // === Fixed-Temperature Model Clamp ===
 //
-// 部分 thinking 模型（如 Moonshot kimi-k2.5/k2.6、kimi-k2-thinking）的 API
-// 硬要求 temperature === 1，其他值会被直接 400 拒绝（Moonshot 返回
+// LLM provider configuration and endpoints.
+// LLM provider configuration and endpoints.
 // `invalid temperature: only 1 is allowed for this model`）。
 //
-// castor 让 writer/validator/architect 各自带 per-call 温度（0.1~1.5），
-// 所以 provider 层统一夹制：如果 bank 里模型卡标了 temperature 字段，
-// 就把 per-call 温度 clamp 到那个值，并对每个模型名打一次 warning。
+// LLM provider configuration and endpoints.
+// LLM provider configuration and endpoints.
+// LLM provider configuration and endpoints.
 //
-// 这个字段只表达"服务端硬约束"，普通模型不要标，避免误伤 per-call 调参。
+// LLM provider configuration and endpoints.
 
 const warnedFixedTemperatureModels = new Set<string>();
 
@@ -493,13 +490,13 @@ function clampTemperatureForModel(
   if (!warnedFixedTemperatureModels.has(model)) {
     warnedFixedTemperatureModels.add(model);
     console.warn(
-      `[castor] 模型 "${model}" API 要求 temperature=${locked}，已 clamp（原值 ${requested}）`,
+      `[castor]  "${model}" API  temperature=${locked}， clamp（ ${requested}）`,
     );
   }
   return locked;
 }
 
-// 仅测试用：清空 warning 去重集合。
+// LLM provider configuration and endpoints.
 export function __resetFixedTemperatureWarnings(): void {
   warnedFixedTemperatureModels.clear();
 }
@@ -604,7 +601,7 @@ function wrapLLMError(error: unknown, context?: { readonly baseUrl?: string; rea
     : "";
 
   if (msg.includes("400")) {
-    // 抽上游 error body 的 message / reason / code（和下方 5xx 一致），让真实错因浮到用户面前
+    // LLM provider configuration and endpoints.
     let detail = "";
     if (error && typeof error === "object") {
       const err = error as { error?: unknown; body?: unknown; message?: string };
@@ -616,30 +613,30 @@ function wrapLLMError(error: unknown, context?: { readonly baseUrl?: string; rea
       }
     }
     return new Error(
-      `API 返回 400（请求参数错误）。${detail ? `上游详情：${detail}。\n` : ""}` +
-      `常见原因：\n` +
-      `  1. temperature / max_tokens 超出模型约束（如 Moonshot kimi-k2.X 强制 temperature=1）\n` +
-      `  2. 模型名称不正确或未上架\n` +
-      `  3. 消息格式不兼容（部分服务不支持 system role 或 developer role）${ctxLine}`,
+      `API  400（）。${detail ? `：${detail}。\n` : ""}` +
+      `：\n` +
+      `  1. temperature / max_tokens （ Moonshot kimi-k2.X  temperature=1）\n` +
+      `  2. \n` +
+      `  3. （ system role  developer role）${ctxLine}`,
     );
   }
   if (msg.includes("403")) {
     return new Error(
-      `API 返回 403 (请求被拒绝)。可能原因：\n` +
-      `  1. API Key 无效或过期\n` +
-      `  2. API 提供方的内容审查拦截了请求（公益/免费 API 常见）\n` +
-      `  3. 账户余额不足\n` +
-      `  建议：用 castor doctor 测试 API 连通性，或换一个不限制内容的 API 提供方${ctxLine}`,
+      `API  403 ()。：\n` +
+      `  1. API Key \n` +
+      `  2. API （/ API ）\n` +
+      `  3. \n` +
+      `  ： castor doctor  API ， API ${ctxLine}`,
     );
   }
   if (msg.includes("401")) {
     return new Error(
-      `API 返回 401 (未授权)。请检查 .env 中的 CASTOR_LLM_API_KEY 是否正确。${ctxLine}`,
+      `API  401 ()。 .env  CASTOR_LLM_API_KEY 。${ctxLine}`,
     );
   }
   if (msg.includes("429")) {
     return new Error(
-      `API 返回 429 (请求过多)。请稍后重试，或检查 API 配额。${ctxLine}`,
+      `API  429 ()。， API 。${ctxLine}`,
     );
   }
   if (
@@ -654,15 +651,15 @@ function wrapLLMError(error: unknown, context?: { readonly baseUrl?: string; rea
     || msg.includes("EPIPE")
   ) {
     return new Error(
-      `无法连接到 API 服务。可能原因：\n` +
-      `  1. baseUrl 地址不正确（当前：${context?.baseUrl ?? "未知"}）\n` +
-      `  2. 网络不通或被防火墙拦截\n` +
-      `  3. API 服务暂时不可用\n` +
-      `  建议：检查 CASTOR_LLM_BASE_URL 是否包含完整路径（如 /v1）`,
+      ` API 。：\n` +
+      `  1. baseUrl （：${context?.baseUrl ?? ""}）\n` +
+      `  2. \n` +
+      `  3. API \n` +
+      `  ： CASTOR_LLM_BASE_URL （ /v1）`,
     );
   }
-  // R4 Bug 2: 5xx "status code (no body)" — 尝试从 OpenAI SDK APIError 里抽 body 给用户看具体原因
-  // （如 PPIO 的 {"code":500,"reason":"MODEL_NOT_AVAILABLE","message":"model not available"}）
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   if (msg.includes("status code") && msg.includes("no body")) {
     let detail = "";
     if (error && typeof error === "object") {
@@ -675,11 +672,11 @@ function wrapLLMError(error: unknown, context?: { readonly baseUrl?: string; rea
       }
     }
     return new Error(
-      `API 返回 5xx（上游服务异常）。${detail ? `上游详情：${detail}。` : ""}\n` +
-      `可能原因：\n` +
-      `  1. 模型在 /models 列表但 inference 未上架（如 PPIO 返回 MODEL_NOT_AVAILABLE）\n` +
-      `  2. 服务端临时故障，稍后重试\n` +
-      `  3. 当前 apikey 无权限调用该模型${ctxLine}`,
+      `API  5xx（）。${detail ? `：${detail}。` : ""}\n` +
+      `：\n` +
+      `  1.  /models  inference （ PPIO  MODEL_NOT_AVAILABLE）\n` +
+      `  2. ，\n` +
+      `  3.  apikey ${ctxLine}`,
     );
   }
   return error instanceof Error ? error : new Error(msg);
@@ -753,8 +750,8 @@ function isIncompleteLLMResponseError(error: unknown): boolean {
 }
 
 function isRetryableLLMError(error: unknown): boolean {
-  // PartialResponseError = 流在生成中途被掐断（网关切长连接等）。重试会完整
-  // 重新生成一次，比把半截内容当成功交付（截断的章节/设定文件）要正确。
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   return error instanceof PartialResponseError
     || isIncompleteLLMResponseError(error)
     || isTransientLLMTransportError(error)
@@ -848,11 +845,11 @@ function buildCustomHeaders(client: LLMClient, traceHeaders: Record<string, stri
 
 function defaultOpenAIChatExtra(client: LLMClient, model: string): Record<string, unknown> {
   if (client.service !== "minimax") return {};
-  // MiniMax OpenAI 兼容端点（issue #329）：
-  // - reasoning_split: true 让 thinking 拆分到 reasoning_content / reasoning_details，
-  //   不再以 <think>...</think> 内联在 content 里。M2.x 系列的 thinking 无法关闭，
-  //   不拆分的话思考内容会混进章节/对话正文。
-  // - M3 系列额外默认关闭 thinking（M2.x 不支持 thinking 参数，不能发送）。
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   return {
     reasoning_split: true,
     ...(/^minimax-m3(?:$|[-_.])/i.test(model) ? { thinking: { type: "disabled" } } : {}),
@@ -930,8 +927,8 @@ function isSystemRoleUnsupportedErrorText(text: string): boolean {
     || normalized.includes("not support")
     || normalized.includes("does not support")
     || normalized.includes("invalid")
-    || normalized.includes("不支持")
-    || normalized.includes("不允许");
+    || normalized.includes("")
+    || normalized.includes("");
 }
 
 async function readErrorResponse(res: Response): Promise<string> {
@@ -1007,8 +1004,8 @@ function extractChatDeltaContent(json: any): string {
 
 function extractChatDeltaReasoningContent(json: any): string {
   const delta = json?.choices?.[0]?.delta;
-  // MiniMax reasoning_split 模式下流式 thinking 走 delta.reasoning_details
-  //（[{ text: "..." }] 数组）；其它服务走 delta.reasoning_content。
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   return extractOpenAITextPart(delta?.reasoning_content)
     || extractOpenAITextPart(delta?.reasoning_details);
 }
@@ -1139,7 +1136,7 @@ async function chatCompletionViaCustomAnthropicCompatible(
     throw wrapLLMError(new Error("LLM returned empty response from stream"), errorCtx);
   }
   if (!sawMessageStop) {
-    // Anthropic 协议的正常结束必须有 message_stop；没有就是流被中途掐断
+    // LLM provider configuration and endpoints.
     throw new PartialResponseError(content, new Error("stream closed without message_stop"));
   }
   if (!usage.totalTokens) {
@@ -1265,7 +1262,7 @@ async function chatCompletionViaCustomOpenAICompatible(
       throw wrapLLMError(new Error("LLM returned empty response from stream"), errorCtx);
     }
     if (!sawResponseTerminal) {
-      // Responses 协议的正常结束必须有 response.completed/incomplete 终止事件
+      // LLM provider configuration and endpoints.
       throw new PartialResponseError(content, new Error("stream closed without response.completed"));
     }
     if (sawResponseIncomplete) {
@@ -1319,8 +1316,8 @@ async function chatCompletionViaCustomOpenAICompatible(
 
   if (!client.stream) {
     const json = await response.json() as any;
-    // MiniMax M2.x 等模型可能把思考内容以 <think>...</think> 内联在 content 开头，
-    // 剥掉起始处的完整 think 块，防止思考内容混进章节/对话正文（issue #329）。
+    // LLM provider configuration and endpoints.
+    // LLM provider configuration and endpoints.
     const content = stripLeadingThinkBlock(extractChatContent(json));
     const finishReason = json?.choices?.[0]?.finish_reason;
     if (finishReason === "length" || finishReason === "max_tokens") {
@@ -1353,13 +1350,13 @@ async function chatCompletionViaCustomOpenAICompatible(
   let content = "";
   let reasoningContent = "";
   let usage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
-  // OpenAI 协议的正常结束必须出现 [DONE] 哨兵或带 finish_reason 的 chunk。
-  // 网关掐断长连接时流会"干净地"关闭但没有任何终止信号——那是截断，不是完成。
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   let sawTerminal = false;
   let terminalFinishReason: string | undefined;
   const monitor = createStreamMonitor(onStreamProgress);
-  // 内联 <think>...</think> 的模型（如 MiniMax M2.x）：剥掉响应起始处的完整
-  // think 块，思考内容既不并入正文也不通过 onTextDelta 发给 UI（issue #329）。
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   const thinkStripper = createLeadingThinkTagStripper();
 
   try {
@@ -1409,7 +1406,7 @@ async function chatCompletionViaCustomOpenAICompatible(
     monitor.stop();
   }
 
-  // 流结束仍缓冲在剥离器里的文本（未闭合的 think 块等）原样并回，避免数据丢失。
+  // LLM provider configuration and endpoints.
   content += thinkStripper.flush();
   if (terminalFinishReason === "length" || terminalFinishReason === "max_tokens") {
     throw new PartialResponseError(
@@ -1451,7 +1448,7 @@ export async function chatCompletion(
   },
 ): Promise<LLMResponse> {
   if (isLlmStubEnabled()) return Promise.resolve(stubChatCompletion(messages, model));
-  // C1 (v2.0.0)：删除 maxTokensCap 机制。per-call 显式传的 maxTokens 永远不被裁剪。
+  // LLM provider configuration and endpoints.
   const resolved = {
     temperature: clampTemperatureForModel(
       client.service,
@@ -1535,9 +1532,9 @@ export async function chatCompletion(
       { enabled: (options?.retry ?? true) && !onTextDelta, signal },
     );
   } catch (error) {
-    // 注意：中断的流（PartialResponseError）不再"打捞"半截内容当成功返回——
-    // 那会产出写到一半就结束的章节/设定文件。重试由 withTransientLLMRetry
-    // 负责（完整重新生成）；重试耗尽后如实抛错。
+    // LLM provider configuration and endpoints.
+    // LLM provider configuration and endpoints.
+    // LLM provider configuration and endpoints.
     throw wrapLLMError(error, errorCtx);
   }
 }
@@ -1620,7 +1617,7 @@ async function chatCompletionViaPiAi(
     }
     if (!content) {
       const diag = `usage=${response.usage.input}+${response.usage.output}`;
-      console.warn(`[castor] LLM 非流式响应无文本内容 (${diag})`);
+      console.warn(`[castor] LLM  (${diag})`);
       throw new Error(`LLM returned empty response (${diag})`);
     }
     return {
@@ -1677,7 +1674,7 @@ async function chatCompletionViaPiAi(
     if (streamError instanceof PartialResponseError) throw streamError;
     const partial = chunks.join("");
     if (partial) {
-      // 带着已收到的部分内容抛 PartialResponseError，让瞬时重试整体重新生成
+      // LLM provider configuration and endpoints.
       throw new PartialResponseError(partial, streamError);
     }
     throw streamError;
@@ -1695,11 +1692,11 @@ async function chatCompletionViaPiAi(
   }
   if (!content) {
     const diag = `usage=${inputTokens}+${outputTokens}`;
-    console.warn(`[castor] LLM 流式响应无文本内容 (${diag})`);
+    console.warn(`[castor] LLM  (${diag})`);
     throw new Error(`LLM returned empty response from stream (${diag})`);
   }
   if (!sawDone) {
-    // 事件流没有以 done 收尾就结束 = 上游把流掐断了，内容不可信
+    // LLM provider configuration and endpoints.
     throw new PartialResponseError(content, new Error("stream ended without done event"));
   }
 

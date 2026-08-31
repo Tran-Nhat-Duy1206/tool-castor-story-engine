@@ -67,7 +67,7 @@ describe("WriterAgent", () => {
     await mkdir(storyDir, { recursive: true });
     await writeFile(
       join(storyDir, "chapter_summaries.md"),
-      "# 章节摘要\n\n| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| 1 | 开端 | 林秋 | 找到账本 | 起疑 | H01 开启 | 紧张 | 调查 |\n",
+      "# mock_text\n\n| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| 1 | mock_text | mock_text | mock_text | mock_text | H01 mock_text | mock_text | mock_text |\n",
       "utf-8",
     );
     const agent = new WriterAgent({
@@ -84,28 +84,28 @@ describe("WriterAgent", () => {
     try {
       await agent.saveChapter(bookDir, {
         chapterNumber: 2,
-        title: "雨夜对账",
-        content: "林秋在雨夜重新核对账本。",
+        title: "mock_text",
+        content: "mock_text。",
         wordCount: 14,
         preWriteCheck: "",
         postSettlement: "",
-        updatedState: "# 当前状态\n\n- 林秋确认账目被篡改。\n",
-        updatedLedger: "# 粒子账本\n",
-        updatedHooks: "# 伏笔池\n",
-        chapterSummary: "| 2 | 雨夜对账 | 林秋 | 确认账目被篡改 | 获得实证 | H01 推进 | 压迫 | 调查 |",
-        updatedSubplots: "# 支线进度\n",
-        updatedEmotionalArcs: "# 情感弧线\n",
-        updatedCharacterMatrix: "# 角色矩阵\n",
+        updatedState: "# mock_text\n\n- mock_text。\n",
+        updatedLedger: "# mock_text\n",
+        updatedHooks: "# mock_text\n",
+        chapterSummary: "| 2 | mock_text | mock_text | mock_text | mock_text | H01 mock_text | mock_text | mock_text |",
+        updatedSubplots: "# mock_text\n",
+        updatedEmotionalArcs: "# mock_text\n",
+        updatedCharacterMatrix: "# mock_text\n",
         postWriteErrors: [],
         postWriteWarnings: [],
       }, false, "vi");
 
-      expect(await readFile(join(bookDir, "chapters", "0002_雨夜对账.md"), "utf-8"))
-        .toContain("林秋在雨夜重新核对账本");
+      expect(await readFile(join(bookDir, "chapters", "0002_mock_text.md"), "utf-8"))
+        .toContain("mock_text");
       expect(await readFile(join(storyDir, "chapter_summaries.md"), "utf-8"))
-        .toContain("| 2 | 雨夜对账 |");
+        .toContain("| 2 | mock_text |");
       expect(await readFile(join(storyDir, "current_state.md"), "utf-8"))
-        .toContain("账目被篡改");
+        .toContain("mock_text");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -122,9 +122,9 @@ describe("WriterAgent", () => {
     const stateDir = join(storyDir, "state");
     await mkdir(stateDir, { recursive: true });
     const stateCard = [
-      "# 当前状态",
+      "# mock_text",
       "",
-      "| 字段 | 值 |",
+      "|  từmock_text | mock_text |",
       "| --- | --- |",
       "| Current Chapter | 0 |",
       "| Current Location | Ashen ferry crossing |",
@@ -172,13 +172,13 @@ describe("WriterAgent", () => {
         wordCount: 3,
         preWriteCheck: "",
         postSettlement: "",
-        updatedState: "# 当前状态\n\n- 林秋确认账目被篡改。\n",
-        updatedLedger: "# 粒子账本\n",
-        updatedHooks: "# 伏笔池\n",
-        chapterSummary: "| 2 | Drifted Delta | 林秋 | 确认账目 | 获得实证 | | 平静 | 调查 |",
-        updatedSubplots: "# 支线进度\n",
-        updatedEmotionalArcs: "# 情感弧线\n",
-        updatedCharacterMatrix: "# 角色矩阵\n",
+        updatedState: "# mock_text\n\n- mock_text。\n",
+        updatedLedger: "# mock_text\n",
+        updatedHooks: "# mock_text\n",
+        chapterSummary: "| 2 | Drifted Delta | mock_text | mock_text | mock_text | | mock_text | mock_text |",
+        updatedSubplots: "# mock_text\n",
+        updatedEmotionalArcs: "# mock_text\n",
+        updatedCharacterMatrix: "# mock_text\n",
         postWriteErrors: [],
         postWriteWarnings: [],
         runtimeStateDelta: {
@@ -193,7 +193,7 @@ describe("WriterAgent", () => {
       expect(await readFile(join(storyDir, "state", "manifest.json"), "utf-8"))
         .toContain("\"lastAppliedChapter\": 2");
       expect(await readFile(join(storyDir, "current_state.md"), "utf-8"))
-        .toMatch(/\|\s*(Current Chapter|当前章节)\s*\|\s*2\s*\|/);
+        .toMatch(/\|\s*(Current Chapter|mock_text)\s*\|\s*2\s*\|/);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -241,9 +241,9 @@ describe("WriterAgent", () => {
       chapterNumber: 7,
       chapterMemo: {
         chapter: 7,
-        goal: "推进账本线",
+        goal: "mock_text",
         isGoldenOpening: false,
-        body: "## 当前任务\n围绕账本线推进。",
+        body: "## Nhiệm vụ hiện tại\nmock_text。",
         threadRefs: [],
       },
       contextPackage: { chapter: 7, selectedContext: [] },
@@ -255,12 +255,12 @@ describe("WriterAgent", () => {
       },
       lengthSpec: buildLengthSpec(1200, "vi"),
       language: "vi",
-      externalContext: "本章标题：雨夜账本\n必须围绕账本失窃后的当面对质展开。",
+      externalContext: "mock_text：mock_text\nmock_text。",
     });
 
-    expect(prompt).toContain("本章用户指令");
-    expect(prompt).toContain("本章标题：雨夜账本");
-    expect(prompt).toContain("当面对质");
+    expect(prompt).toContain("mock_text");
+    expect(prompt).toContain("mock_text：mock_text");
+    expect(prompt).toContain("mock_text");
   });
 
   it("uses compact summary context plus selected long-range evidence during governed settlement", async () => {
@@ -277,7 +277,7 @@ describe("WriterAgent", () => {
       writeFile(join(storyDir, "pending_hooks.md"), [
         "# Pending Hooks",
         "",
-        "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+        "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
         "| --- | --- | --- | --- | --- | --- | --- |",
         "| guild-route | 1 | mystery | open | 2 | 6 | Merchant guild trail |",
         "| old-seal | 3 | artifact | open | 12 | 40 | Old seal detour |",
@@ -293,26 +293,26 @@ describe("WriterAgent", () => {
         "| 99 | Locked Gate | Lin Yue | Lin Yue chooses the mentor line over the guild line | Mentor conflict takes priority | mentor-oath advanced | focused | decision |",
       ].join("\n"), "utf-8"),
       writeFile(join(storyDir, "subplot_board.md"), [
-        "# 支线进度板",
+        "# mock_text",
         "",
-        "| 支线ID | 支线名 | 相关角色 | 起始章 | 最近活跃章 | 距今章数 | 状态 | 进度概述 | 回收ETA |",
+        "| mock_textID | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_textETA |",
         "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-        "| SP-mentor | 师债线 | Lin Yue | 8 | 99 | 1 | active | 师债继续推进 | 101 |",
-        "| SP-seal | 旧印支线 | Guildmaster Ren | 3 | 12 | 88 | closed | 旧印已回收 | 12 |",
+        "| SP-mentor | mock_text | Lin Yue | 8 | 99 | 1 | active | mock_text | 101 |",
+        "| SP-seal | mock_text | Guildmaster Ren | 3 | 12 | 88 | closed | mock_text | 12 |",
       ].join("\n"), "utf-8"),
       writeFile(join(storyDir, "emotional_arcs.md"), [
-        "# 情感弧线",
+        "# mock_text",
         "",
-        "| 角色 | 章节 | 情绪状态 | 触发事件 | 强度(1-10) | 弧线方向 |",
+        "| mock_text | mock_text | mock_text | mock_text | mock_text(1-10) | mock_text |",
         "| --- | --- | --- | --- | --- | --- |",
-        "| Lin Yue | 40 | 麻木 | 旧印支线拖延 | 4 | 停滞 |",
-        "| Lin Yue | 99 | 紧绷 | 师债重新压上来 | 8 | 收紧 |",
+        "| Lin Yue | 40 | mock_text | mock_text | 4 | mock_text |",
+        "| Lin Yue | 99 | mock_text | mock_text | 8 | mock_text |",
       ].join("\n"), "utf-8"),
       writeFile(join(storyDir, "character_matrix.md"), [
-        "# 角色交互矩阵",
+        "# mock_text",
         "",
-        "### 角色档案",
-        "| 角色 | 核心标签 | 反差细节 | 说话风格 | 性格底色 | 与主角关系 | 核心动机 | 当前目标 |",
+        "### mock_text",
+        "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
         "| Lin Yue | oath | restraint | clipped | stubborn | self | repay debt | find mentor |",
         "| Guildmaster Ren | guild | swagger | loud | opportunistic | rival | stall Mara | seize seal |",
@@ -356,25 +356,25 @@ describe("WriterAgent", () => {
       .mockResolvedValueOnce({
         content: [
           "=== POST_SETTLEMENT ===",
-          "| 伏笔变动 | mentor-oath 推进 | 同步更新伏笔池 |",
+          "| mock_text | mentor-oath mock_text | mock_text |",
           "",
           "=== UPDATED_STATE ===",
-          "状态卡",
+          "mock_text",
           "",
           "=== UPDATED_HOOKS ===",
-          "伏笔池",
+          "mock_text",
           "",
           "=== CHAPTER_SUMMARY ===",
           "| 100 | A Decision | Lin Yue | Chooses the mentor debt | Focus narrowed | mentor-oath advanced | tense | decision |",
           "",
           "=== UPDATED_SUBPLOTS ===",
-          "支线板",
+          "mock_text",
           "",
           "=== UPDATED_EMOTIONAL_ARCS ===",
-          "情感弧线",
+          "mock_text",
           "",
           "=== UPDATED_CHARACTER_MATRIX ===",
-          "角色矩阵",
+          "mock_text",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
@@ -453,16 +453,16 @@ describe("WriterAgent", () => {
       });
 
       const settlePrompt = (chatSpy.mock.calls[2]?.[0] as ReadonlyArray<{ content: string }> | undefined)?.[1]?.content ?? "";
-      expect(settlePrompt).toContain("## 本章控制输入");
+      expect(settlePrompt).toContain("## mock_text");
       expect(settlePrompt).toContain("story/chapter_summaries.md#99");
       expect(settlePrompt).toContain("| 99 | Locked Gate |");
       expect(settlePrompt).toContain("## Hook Debt Briefs");
       expect(settlePrompt).toContain("mentor-oath | cadence: slow-burn");
-      expect(settlePrompt).toContain("| stale-ledger | 14 | mystery | open | 70 | 120 | 中程 | 无 |  | 否 |  |  | Old ledger debt is dormant but unresolved |");
+      expect(settlePrompt).toContain("| stale-ledger | 14 | mystery | open | 70 | 120 |");
       expect(settlePrompt).not.toContain("| 1 | Guild Trail |");
       expect(settlePrompt).not.toContain("old-seal");
       expect(settlePrompt).not.toContain("Guildmaster Ren");
-      expect(settlePrompt).not.toContain("| Lin Yue | 40 | 麻木 |");
+      expect(settlePrompt).not.toContain("| Lin Yue | 40 | mock_text |");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -1024,12 +1024,12 @@ describe("WriterAgent", () => {
       writeFile(join(storyDir, "story_bible.md"), "# Story Bible\n", "utf-8"),
       writeFile(join(storyDir, "volume_outline.md"), "# Volume Outline\n", "utf-8"),
       writeFile(join(storyDir, "style_guide.md"), "# Style Guide\n", "utf-8"),
-      writeFile(join(storyDir, "current_state.md"), "# 当前状态\n", "utf-8"),
-      writeFile(join(storyDir, "pending_hooks.md"), "# 伏笔池\n", "utf-8"),
-      writeFile(join(storyDir, "chapter_summaries.md"), "# 章节摘要\n", "utf-8"),
-      writeFile(join(storyDir, "subplot_board.md"), "# 支线进度板\n", "utf-8"),
-      writeFile(join(storyDir, "emotional_arcs.md"), "# 情感弧线\n", "utf-8"),
-      writeFile(join(storyDir, "character_matrix.md"), "# 角色交互矩阵\n", "utf-8"),
+      writeFile(join(storyDir, "current_state.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "pending_hooks.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "chapter_summaries.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "subplot_board.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "emotional_arcs.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "character_matrix.md"), "# mock_text\n", "utf-8"),
     ]);
 
     const agent = new WriterAgent({
@@ -1053,10 +1053,10 @@ describe("WriterAgent", () => {
       .mockResolvedValueOnce({
         content: [
           "=== CHAPTER_TITLE ===",
-          "试炼前夜",
+          "mock_text",
           "",
           "=== CHAPTER_CONTENT ===",
-          "林越在破庙外停住脚步，想起师门旧债。",
+          "mock_text，mock_text。",
           "",
           "=== PRE_WRITE_CHECK ===",
           "- ok",
@@ -1070,25 +1070,25 @@ describe("WriterAgent", () => {
       .mockResolvedValueOnce({
         content: [
           "=== POST_SETTLEMENT ===",
-          "| 伏笔变动 | mentor-oath 推进 | 同步更新伏笔池 |",
+          "| mock_text | mentor-oath mock_text | mock_text |",
           "",
           "=== UPDATED_STATE ===",
-          "状态卡",
+          "mock_text",
           "",
           "=== UPDATED_HOOKS ===",
-          "伏笔池",
+          "mock_text",
           "",
           "=== CHAPTER_SUMMARY ===",
-          "| 1 | 试炼前夜 | 林越 | 林越记起师门旧债 | 决心加深 | mentor-oath advanced | tense | setup |",
+          "| 1 | mock_text | mock_text | mock_text | mock_text | mentor-oath advanced | tense | setup |",
           "",
           "=== UPDATED_SUBPLOTS ===",
-          "支线板",
+          "mock_text",
           "",
           "=== UPDATED_EMOTIONAL_ARCS ===",
-          "情感弧线",
+          "mock_text",
           "",
           "=== UPDATED_CHARACTER_MATRIX ===",
-          "角色矩阵",
+          "mock_text",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
@@ -1114,10 +1114,10 @@ describe("WriterAgent", () => {
       });
 
       expect(infos).toEqual(expect.arrayContaining([
-        "阶段 1：创作正文（第1章）",
-        "阶段 2：状态结算（第1章，18字）",
-        "阶段 2a：提取第1章事实",
-        "阶段 2b：把观察结果回写到真相文件",
+        "Giai đoạn 1: Sáng tác nội dung (Chương 1）",
+        "Giai đoạn 2: Quyết toán trạng thái (Chương 1，18 từ）",
+        "Giai đoạn 2a: Trích xuất chương 1 sự thật",
+        "Giai đoạn 2b: Ghi kết quả quan sát vào tệp sự thật",
       ]));
       const messages = chatSpy.mock.calls[0]?.[0] as ReadonlyArray<{ content: string }> | undefined;
       expect(messages?.[0]?.content ?? "").toContain("PROJECT WRITER OVERRIDE");
@@ -1518,7 +1518,7 @@ describe("WriterAgent", () => {
           chapter: 4,
           goal: "Push Mara back toward the archive ledger.",
           isGoldenOpening: false,
-          body: "本章要做的是推进 ledger-fragment tension at the archive.",
+          body: "This chapter needs to advance ledger-fragment tension at the archive.",
           threadRefs: ["mentor-oath", "ledger-fragment"],
         },
         contextPackage: {
@@ -1559,7 +1559,8 @@ describe("WriterAgent", () => {
       // But slug references INSIDE free text (targetEffect) are sanitized
       expect(creativePrompt).not.toContain("stale-ledger");
       expect(creativePrompt).not.toContain("H001");
-      expect(creativePrompt).not.toContain("本章要做的");
+      expect(creativePrompt).not.toContain("this chapter needs to");
+      expect(creativePrompt).toContain("the current move is to");
       // The goal text should survive sanitization
       expect(creativePrompt).toContain("Push Mara back toward the archive ledger.");
     } finally {

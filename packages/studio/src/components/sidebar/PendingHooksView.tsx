@@ -7,10 +7,14 @@ interface PendingHooksViewProps {
 }
 
 const HOOK_TYPE_COLOR: Record<string, string> = {
-  "主线伏笔": "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-  "角色前置": "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  "情感线伏笔": "bg-pink-500/15 text-pink-600 dark:text-pink-400",
-  "次要伏笔": "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  "Phục bút chính": "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  "Tiền đề nhân vật": "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  "Phục bút tình cảm": "bg-pink-500/15 text-pink-600 dark:text-pink-400",
+  "Phục bút phụ": "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  "main": "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  "character": "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  "romance": "bg-pink-500/15 text-pink-600 dark:text-pink-400",
+  "minor": "bg-blue-500/15 text-blue-600 dark:text-blue-400",
 };
 
 function hookTypeColor(type: string): string {

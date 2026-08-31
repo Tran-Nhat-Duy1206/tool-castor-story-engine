@@ -135,9 +135,9 @@ describe("runtime-state-store memory helpers", () => {
         [
           "| hook_id | start_chapter | type | status | last_advanced | expected_payoff | notes |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| dormant-seed | 1 | evidence | 未激活 | 0 | 后续揭开封条日期 | 休眠种子，不应当成正在进行 |",
-          "| waiting-seed | 1 | evidence | 待启动 | 0 | 后续揭开压力曲线 | 未来种子，不应当成正在进行 |",
-          "| confirmed-hit | 1 | evidence | confirmed_hit | 1 | 已确认压力曲线异常 | 本章已命中，不应退回 open |",
+          "| dormant-seed | 1 | evidence | mock_text | 0 | mock_text | mock_text，mock_text |",
+          "| waiting-seed | 1 | evidence | mock_text | 0 | mock_text | mock_text，mock_text |",
+          "| confirmed-hit | 1 | evidence | confirmed_hit | 1 | mock_text | mock_text，mock_text open |",
           "",
         ].join("\n"),
         "utf-8",
@@ -147,7 +147,7 @@ describe("runtime-state-store memory helpers", () => {
         [
           "| chapter | title | characters | events | stateChanges | hookActivity | mood | chapterType |",
           "| --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| 1 | Ch1 | 夜班巡检员 | 发现工具箱。 | 种下压力异常。 | confirmed-hit advanced | tense | opening |",
+          "| 1 | Ch1 | mock_text | mock_text。 | mock_text。 | confirmed-hit advanced | tense | opening |",
           "",
         ].join("\n"),
         "utf-8",
@@ -249,7 +249,7 @@ describe("runtime-state-store memory helpers", () => {
         [
           "| hook_id | start_chapter | type | status | last_advanced | expected_payoff | notes |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| H012 | 0 | mystery | 暂缓 | 0 | Explain the clock drift. | Sun Yuzhen owns the clock. |",
+          "| H012 | 0 | mystery | tạm hoãn | 0 | Explain the clock drift. | Sun Yuzhen owns the clock. |",
           "",
         ].join("\n"),
         "utf-8",
@@ -307,23 +307,23 @@ describe("runtime-state-store memory helpers", () => {
         rows: [
           {
             chapter: 12,
-            title: "河埠对账",
-            characters: "林月",
-            events: "第一次写入。",
-            stateChanges: "第一次写入。",
-            hookActivity: "mentor-debt 推进",
-            mood: "紧绷",
-            chapterType: "主线推进",
+            title: "mock_text",
+            characters: "mock_text",
+            events: "Chương mock_text。",
+            stateChanges: "Chương mock_text。",
+            hookActivity: "mentor-debt mock_text",
+            mood: "mock_text",
+            chapterType: "mock_text",
           },
           {
             chapter: 12,
-            title: "重复河埠对账",
-            characters: "林月",
-            events: "第二次写入。",
-            stateChanges: "第二次写入。",
-            hookActivity: "mentor-debt 推进",
-            mood: "紧绷",
-            chapterType: "主线推进",
+            title: "mock_text",
+            characters: "mock_text",
+            events: "Chương mock_text。",
+            stateChanges: "Chương mock_text。",
+            hookActivity: "mentor-debt mock_text",
+            mood: "mock_text",
+            chapterType: "mock_text",
           },
         ],
       }, null, 2), "utf-8"),
@@ -332,7 +332,7 @@ describe("runtime-state-store memory helpers", () => {
     // Duplicates are auto-repaired (deduped, keeping last occurrence), not rejected
     const snapshot = await loadRuntimeStateSnapshot(bookDir);
     expect(snapshot.chapterSummaries.rows).toHaveLength(1);
-    expect(snapshot.chapterSummaries.rows[0]?.title).toBe("重复河埠对账");
+    expect(snapshot.chapterSummaries.rows[0]?.title).toBe("mock_text");
   });
 
   it("repairs persisted hooks with empty type instead of failing the library load", async () => {
@@ -355,7 +355,7 @@ describe("runtime-state-store memory helpers", () => {
         [
           "| hook_id | start_chapter | type | status | last_advanced | expected_payoff | payoff_timing | notes |",
           "| --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| h001--broken | 3 |  | open | 5 | 后续揭开账本来源。 | near-term | 模型生成了空 type。 |",
+          "| h001--broken | 3 |  | open | 5 | mock_text。 | near-term | mock_text type。 |",
           "",
         ].join("\n"),
         "utf-8",
@@ -379,8 +379,8 @@ describe("runtime-state-store memory helpers", () => {
             type: "",
             status: "open",
             lastAdvancedChapter: 5,
-            expectedPayoff: "后续揭开账本来源。",
-            notes: "模型生成了空 type，旧版本会导致 books 接口整体报错。",
+            expectedPayoff: "mock_text。",
+            notes: "mock_text type，mock_text books mock_text。",
           },
         ],
       }, null, 2), "utf-8"),

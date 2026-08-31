@@ -4,7 +4,7 @@ import { buildStudioBookConfig, normalizeStudioPlatform, waitForStudioBookReady 
 describe("normalizeStudioPlatform", () => {
   it("keeps supported chinese platform ids and folds unsupported values to other", () => {
     expect(normalizeStudioPlatform("tomato")).toBe("tomato");
-    expect(normalizeStudioPlatform("番茄小说")).toBe("tomato");
+    expect(normalizeStudioPlatform("mock_val")).toBe("tomato");
     expect(normalizeStudioPlatform("qidian")).toBe("qidian");
     expect(normalizeStudioPlatform("feilu")).toBe("feilu");
     expect(normalizeStudioPlatform("royal-road")).toBe("other");
@@ -16,7 +16,7 @@ describe("buildStudioBookConfig", () => {
   it("preserves supported platform selections from studio create requests", () => {
     const config = buildStudioBookConfig(
       {
-        title: "测试书",
+        title: "Testmock_val",
         genre: "xuanhuan",
         platform: "qidian",
         language: "zh",
@@ -27,7 +27,7 @@ describe("buildStudioBookConfig", () => {
     );
 
     expect(config).toMatchObject({
-      title: "测试书",
+      title: "Testmock_val",
       genre: "xuanhuan",
       platform: "qidian",
       language: "zh",

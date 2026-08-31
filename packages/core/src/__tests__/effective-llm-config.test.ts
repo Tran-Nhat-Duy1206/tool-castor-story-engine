@@ -28,7 +28,7 @@ describe("resolveEffectiveLLMConfig", () => {
     await writeFile(join(root, ".castor", "secrets.json"), JSON.stringify({ services }, null, 2), "utf-8");
   }
 
-  it("Studio consumer 使用 Studio/project 配置，并忽略旧顶层 model/baseUrl", async () => {
+  it("Studio consumer mock_text Studio/project mock_text，mock_text model/baseUrl", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -54,10 +54,10 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.model).toBe("gemini-2.5-flash");
     expect(result.llm.apiKey).toBe("sk-google");
     expect(result.diagnostics.apiKeySource).toBe("studio-secret");
-    expect(result.diagnostics.warnings.join("\n")).toContain("旧顶层");
+    expect(result.diagnostics.warnings.join("\n")).toContain("mock_text");
   });
 
-  it("CLI consumer 允许 CASTOR_LLM_SERVICE 切换服务，并从 provider bank 推导 baseUrl", async () => {
+  it("CLI consumer mock_text CASTOR_LLM_SERVICE mock_text，mock_text provider bank mock_text baseUrl", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -90,7 +90,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.diagnostics.modelSource).toBe("env");
   });
 
-  it("CLI consumer 兼容旧 env：没有 CASTOR_LLM_SERVICE 时从 baseUrl 反推 service", async () => {
+  it("CLI consumer mock_text env：mock_text CASTOR_LLM_SERVICE mock_text baseUrl mock_text service", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -121,7 +121,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.diagnostics.serviceSource).toBe("env");
   });
 
-  it("Studio consumer 不让任何 env 里的旧模型污染 Studio service", async () => {
+  it("Studio consumer mock_text env mock_text Studio service", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -156,10 +156,10 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.service).toBe("google");
     expect(result.llm.model).toBe("gemini-2.5-flash");
     expect(result.llm.apiKey).toBe("sk-google");
-    expect(result.diagnostics.warnings.join("\n")).toContain("Studio 运行时不会使用 env");
+    expect(result.diagnostics.warnings.join("\n")).toContain("Studio mock_text env");
   });
 
-  it("旧 configSource=env 保持 legacy-env 行为", async () => {
+  it("mock_text configSource=env mock_text legacy-env mock_text", async () => {
     await writeProject({
       configSource: "env",
       provider: "openai",
@@ -193,7 +193,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.apiKey).toBe("sk-env");
   });
 
-  it("legacy-env 模式下 CLI --service 覆盖会切换到目标 service 的 endpoint 默认值", async () => {
+  it("legacy-env mock_text CLI --service mock_text service mock_text endpoint mock_text", async () => {
     await writeProject({
       configSource: "env",
       provider: "custom",
@@ -232,7 +232,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.apiKey).toBe("sk-google");
   });
 
-  it("legacy-env 模式下 CLI transport 覆盖优先级高于 env", async () => {
+  it("legacy-env mock_text CLI transport mock_text env", async () => {
     await writeProject({
       configSource: "env",
       provider: "openai",
@@ -266,7 +266,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.stream).toBe(false);
   });
 
-  it("保留旧 CASTOR_LLM_EXTRA_* 和 CASTOR_DEFAULT_LANGUAGE 行为", async () => {
+  it("mock_text CASTOR_LLM_EXTRA_* mock_text CASTOR_DEFAULT_LANGUAGE mock_text", async () => {
     await writeProject({
       configSource: "env",
       provider: "openai",
@@ -292,7 +292,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.extra).toMatchObject({ top_p: 0.9 });
   });
 
-  it("CLI override 优先级高于 env", async () => {
+  it("CLI override mock_text env", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -319,7 +319,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.diagnostics.modelSource).toBe("cli");
   });
 
-  it("CLI 指定 service 时不会继承旧 env 的 baseUrl/model/apiKey", async () => {
+  it("CLI mock_text service mock_text env mock_text baseUrl/model/apiKey", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -354,7 +354,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.diagnostics.apiKeySource).toBe("studio-secret");
   });
 
-  it("拒绝不属于最终 service 的模型", async () => {
+  it("mock_text service mock_text", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -371,10 +371,10 @@ describe("resolveEffectiveLLMConfig", () => {
         project: { CASTOR_LLM_MODEL: "kimi-k2.5" },
         process: {},
       },
-    })).rejects.toThrow(/模型.*kimi-k2\.5.*不属于.*google/);
+    })).rejects.toThrow(/mock_text.*kimi-k2\.5.*mock_text.*google/);
   });
 
-  it("openrouter 配置了不在静态 bank 的模型时保留用户模型，不回退 checkModel（issue #300）", async () => {
+  it("openrouter mock_text bank mock_text，mock_text checkModel（issue #300）", async () => {
     await writeProject({
       configSource: "studio",
       service: "openrouter",
@@ -395,7 +395,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.model).toBe("moonshotai/kimi-k2-thinking");
   });
 
-  it("CLI env 显式指定 openrouter 未列出模型时也直接透传", async () => {
+  it("CLI env mock_text openrouter mock_text", async () => {
     await writeProject({
       configSource: "studio",
       service: "openrouter",
@@ -419,7 +419,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.diagnostics.modelSource).toBe("env");
   });
 
-  it("openrouter 完全没配模型时才回退到 checkModel", async () => {
+  it("openrouter mock_text checkModel", async () => {
     await writeProject({
       configSource: "studio",
       service: "openrouter",
@@ -438,7 +438,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.model).toBe("openrouter/auto");
   });
 
-  it("CLI env 指向 Ollama 时允许用户本地安装的动态模型", async () => {
+  it("CLI env mock_text Ollama mock_text", async () => {
     await writeProject({
       configSource: "studio",
       service: "google",
@@ -469,7 +469,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.apiKey).toBe("");
   });
 
-  it("CLI 使用 Studio Ollama 配置时保留不在内置 bank 的默认模型", async () => {
+  it("CLI mock_text Studio Ollama mock_text bank mock_text", async () => {
     await writeProject({
       configSource: "studio",
       service: "ollama",
@@ -489,7 +489,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.model).toBe("Qwen3.6-35B-A3B-APEX-I-Mini.gguf");
   });
 
-  it("CLI 建书路径使用 Studio Ollama 配置时不要求 API key", async () => {
+  it("CLI mock_text Studio Ollama mock_text API key", async () => {
     await writeProject({
       configSource: "studio",
       service: "ollama",
@@ -509,7 +509,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.apiKey).toBe("");
   });
 
-  it("Studio 建书路径使用 Studio Ollama 配置时不要求 API key", async () => {
+  it("Studio mock_text Studio Ollama mock_text API key", async () => {
     await writeProject({
       configSource: "studio",
       service: "ollama",
@@ -529,7 +529,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.apiKey).toBe("");
   });
 
-  it("Studio 使用 LM Studio 动态模型时不要求 API key", async () => {
+  it("Studio mock_text LM Studio mock_text API key", async () => {
     await writeProject({
       configSource: "studio",
       service: "lmstudio",
@@ -549,7 +549,7 @@ describe("resolveEffectiveLLMConfig", () => {
     expect(result.llm.apiKey).toBe("");
   });
 
-  it("从 provider bank 应用 service transport 默认值", async () => {
+  it("mock_text provider bank mock_text service transport mock_text", async () => {
     await writeProject({
       configSource: "studio",
       service: "minimaxCodingPlan",

@@ -27,42 +27,42 @@ describe("FanficCanonImporter", () => {
       "chat",
     )
       .mockResolvedValueOnce({
-        content: "片段1资料：主角甲第一次登场。",
+        content: "mock_text1mock_text：mock_textChương mock_text。",
         usage: ZERO_USAGE,
       })
       .mockResolvedValueOnce({
-        content: "片段2资料：TAIL_CANON_MARKER 是尾部关键正典。",
+        content: "mock_text2mock_text：TAIL_CANON_MARKER mock_text。",
         usage: ZERO_USAGE,
       })
       .mockResolvedValueOnce({
         content: [
           "=== SECTION: world_rules ===",
-          "尾部世界规则：TAIL_CANON_MARKER。",
+          "mock_text：TAIL_CANON_MARKER。",
           "=== SECTION: character_profiles ===",
-          "| 角色 | 身份 | 性格底色 | 语癖/口头禅 | 说话风格 | 行为模式 | 关键关系 | 信息边界 |",
+          "| mock_text | mock_text | mock_text | mock_text/mock_text | mock_text | mock_text | mock_text | mock_text |",
           "|------|------|----------|-------------|----------|----------|----------|----------|",
-          "| 甲 | 主角 | 克制 | （素材未提及） | 冷静 | 查证 | 无 | 只知道片段信息 |",
+          "| mock_text | mock_text | mock_text | （mock_text） | mock_text | mock_text | mock_text | mock_text |",
           "=== SECTION: key_events ===",
-          "| 序号 | 事件 | 涉及角色 | 对同人写作的约束 |",
+          "| mock_text | mock_text | mock_text | mock_text |",
           "|------|------|----------|------------------|",
-          "| 1 | 尾部事件 | 甲 | 必须保留 TAIL_CANON_MARKER |",
+          "| 1 | mock_text | mock_text | mock_text TAIL_CANON_MARKER |",
           "=== SECTION: power_system ===",
-          "（原作无明确力量体系）",
+          "（mock_text）",
           "=== SECTION: writing_style ===",
-          "句式克制。",
+          "mock_text。",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
-    const source = `${"前段".repeat(25_000)}\nTAIL_CANON_MARKER`;
-    const result = await agent.importFromText(source, "长原作", "canon");
+    const source = `${"mock_text".repeat(25_000)}\nTAIL_CANON_MARKER`;
+    const result = await agent.importFromText(source, "mock_text", "canon");
 
     expect(chatSpy).toHaveBeenCalledTimes(3);
     const secondChunkMessages = chatSpy.mock.calls[1]?.[0] as Array<{ role: string; content: string }>;
     expect(secondChunkMessages[1]?.content).toContain("TAIL_CANON_MARKER");
     const finalMessages = chatSpy.mock.calls[2]?.[0] as Array<{ role: string; content: string }>;
-    expect(finalMessages[1]?.content).toContain("片段2资料：TAIL_CANON_MARKER");
-    expect(finalMessages[0]?.content).not.toContain("已截断");
+    expect(finalMessages[1]?.content).toContain("mock_text2mock_text：TAIL_CANON_MARKER");
+    expect(finalMessages[0]?.content).not.toContain("mock_text");
     expect(result.worldRules).toContain("TAIL_CANON_MARKER");
   });
 });

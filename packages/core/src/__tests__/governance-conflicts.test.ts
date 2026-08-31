@@ -28,37 +28,37 @@ let root = "";
 let bookDir = "";
 
 const PUBLISHED_FRAME = [
-  "## 主题与基调",
-  "主题段落：命运与选择。",
+  "## mock_text",
+  "mock_text：mock_text。",
   "",
-  "## 核心冲突",
-  "冲突段落：家族债务与个人自由。",
+  "## mock_text",
+  "mock_text：mock_text。",
   "",
-  "## 世界观底色",
-  "世界段落：河港城，商会与帮派。",
+  "## mock_text",
+  "mock_text：mock_text，mock_text。",
   "",
-  "## 终局方向",
-  "结局段落：主角在平衡中收束。",
+  "## mock_text",
+  "mock_text：mock_text。",
   "",
 ].join("\n");
 
 const CHANGED_FRAME = PUBLISHED_FRAME.replace(
-  "冲突段落：家族债务与个人自由。",
-  "冲突段落：家族债务与个人自由的彻底决裂。",
+  "mock_text：mock_text。",
+  "mock_text：mock_text。",
 );
 
 const PUBLISHED_RULES = [
-  "## 主角",
-  "- 名字：林辞",
+  "## mock_text",
+  "- mock_text từ：mock_text",
   "",
-  "## 禁止事项",
-  "- 不得破坏核心世界观",
+  "## mock_text",
+  "- mock_text",
   "",
 ].join("\n");
 
 const RULES_WITHOUT_MAIN_RULE = [
-  "## 禁止事项",
-  "- 不得破坏核心世界观",
+  "## mock_text",
+  "- mock_text",
   "",
 ].join("\n");
 
@@ -67,9 +67,9 @@ const CORE_CONFLICT_UNIT = "sf-core-conflict";
 async function mainRuleUnitId(): Promise<string> {
   const { units } = await bootstrapFoundation(bookDir);
   const rule = units.find(
-    (unit) => unit.kind === "book_rule" && unit.locator.contentKind === "rule" && unit.locator.ruleId === "主角",
+    (unit) => unit.kind === "book_rule" && unit.locator.contentKind === "rule" && unit.locator.ruleId === "mock_text",
   );
-  if (!rule) throw new Error("fixture: published 主角 rule not bootstrapped");
+  if (!rule) throw new Error("fixture: published mock_text rule not bootstrapped");
   return rule.unitId;
 }
 
@@ -92,7 +92,7 @@ async function setupBook(): Promise<void> {
     "utf-8",
   );
   await writeFile(join(bookDir, "story", "outline", "story_frame.md"), PUBLISHED_FRAME, "utf-8");
-  await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "## 卷一\n第一卷追出站台背后的旧案。\n", "utf-8");
+  await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "## mock_text\nChương mock_text。\n", "utf-8");
   await writeFile(join(bookDir, "story", "book_rules.md"), PUBLISHED_RULES, "utf-8");
   await writeFile(
     join(bookDir, "story", "state", "manifest.json"),
@@ -219,11 +219,11 @@ describe("classifyCanonConflictDeterministic", () => {
     // Draft frame with only THREE level-2 sections breaks the story-frame
     // positional contract that extractGovernedContent enforces.
     await seedDraft(revisionId, CORE_CONFLICT_UNIT, [
-      "## 主题与基调",
-      "主题段落：命运与选择。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
-      "## 核心冲突",
-      "冲突段落：家族债务与个人自由的彻底决裂。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
     ].join("\n"));
     const result = await classifyCanonConflictDeterministic(bookDir, revisionId, CORE_CONFLICT_UNIT);
@@ -235,7 +235,7 @@ describe("classifyCanonConflictDeterministic", () => {
 
   it("returns a hard canon_conflict when the draft would remove a published governed rule", async () => {
     await setupBook();
-    // Published rules include the "主角" rule; a draft rules file without that
+    // Published rules include the "mock_text" rule; a draft rules file without that
     // heading would silently delete the published governed content.
     const ruleUnitId = await mainRuleUnitId();
     await seedDraftRevision("rev-rule", ruleUnitId, RULES_WITHOUT_MAIN_RULE, 2);
@@ -262,7 +262,7 @@ describe("classifyCanonConflictDeterministic", () => {
 
   it("fails closed when the unit has no published Foundation baseline", async () => {
     await setupBook();
-    await seedDraftRevision("rev-a", "ghost-unit", "## 幽灵\n内容。\n", 1);
+    await seedDraftRevision("rev-a", "ghost-unit", "## mock_text\nmock_text。\n", 1);
     await expect(classifyCanonConflictDeterministic(bookDir, "rev-a", "ghost-unit")).rejects.toThrow();
   });
 });
@@ -295,11 +295,11 @@ describe("classifyCanonConflictSemantic", () => {
     const { revisionId } = await standardRevision();
     // Deterministic layer sees a contract violation here (hard canon_conflict).
     await seedDraft(revisionId, CORE_CONFLICT_UNIT, [
-      "## 主题与基调",
-      "主题段落：命运与选择。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
-      "## 核心冲突",
-      "冲突段落：家族债务与个人自由的彻底决裂。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
     ].join("\n"));
     const deterministic = await classifyCanonConflictDeterministic(bookDir, revisionId, CORE_CONFLICT_UNIT);
@@ -705,8 +705,8 @@ describe("authority immutability", () => {
       humanActor: "humantest",
     });
     const serialized = JSON.stringify(record);
-    expect(serialized).not.toContain("主题段落");
-    expect(serialized).not.toContain("冲突段落");
-    expect(serialized).not.toContain("命运与选择");
+    expect(serialized).not.toContain("mock_text");
+    expect(serialized).not.toContain("mock_text");
+    expect(serialized).not.toContain("mock_text");
   });
 });

@@ -19,7 +19,7 @@ export const agentCommand = new Command("agent")
       const context = await resolveContext(opts);
 
       const fullInstruction = context
-        ? `${instruction}\n\n补充信息：${context}`
+        ? `${instruction}\n\nAdditional Context:\n${context}`
         : instruction;
 
       const bookId = opts.book ? await resolveBookId(opts.book, root) : null;
@@ -48,7 +48,7 @@ export const agentCommand = new Command("agent")
           sessionKind,
           actionSource,
           requestedIntent,
-          language: config.language ?? "zh",
+          language: config.language ?? "vi",
           pipeline,
           projectRoot: root,
           model: client._piModel

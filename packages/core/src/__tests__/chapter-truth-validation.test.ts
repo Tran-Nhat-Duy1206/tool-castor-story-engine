@@ -70,12 +70,12 @@ describe("validateChapterTruthPersistence", () => {
         .mockResolvedValueOnce(createValidationResult({
           passed: false,
           repairRequired: true,
-          warnings: [{ category: "missing_state_update", description: "位置尚未更新。" }],
+          warnings: [{ category: "missing_state_update", description: "mock_text。" }],
         }))
         .mockResolvedValueOnce(createValidationResult()),
     };
     const writer = {
-      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "码头" })),
+      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "mock_text" })),
     };
 
     const result = await validateChapterTruthPersistence({
@@ -84,18 +84,18 @@ describe("validateChapterTruthPersistence", () => {
       book: BOOK,
       bookDir: "/tmp/book",
       chapterNumber: 2,
-      title: "抵达码头",
-      content: "林舟抵达码头。",
-      persistenceOutput: createWriterOutput({ updatedState: "车站" }),
+      title: "mock_text",
+      content: "mock_text。",
+      persistenceOutput: createWriterOutput({ updatedState: "mock_text" }),
       auditResult: createAuditResult(),
-      previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
+      previousTruth: { oldState: "mock_text", oldHooks: "hooks", oldLedger: "ledger" },
       language: "vi",
       logWarn: vi.fn(),
     });
 
     expect(writer.settleChapterState).toHaveBeenCalledTimes(1);
     expect(result.chapterStatus).toBeNull();
-    expect(result.persistenceOutput.updatedState).toBe("码头");
+    expect(result.persistenceOutput.updatedState).toBe("mock_text");
   });
 
   it("uses recovered settlement output when retry succeeds", async () => {
@@ -105,7 +105,7 @@ describe("validateChapterTruthPersistence", () => {
           passed: false,
           warnings: [{
             category: "unsupported_change",
-            description: "正文写铜牌在怀里，但 state 说未携带。",
+            description: "mock_text，mock_text state mock_text。",
           }],
         }))
         .mockResolvedValueOnce(createValidationResult()),
@@ -150,13 +150,13 @@ describe("validateChapterTruthPersistence", () => {
     expect(writer.settleChapterState).toHaveBeenCalledWith(expect.objectContaining({
       chapterNumber: 3,
       title: "Test Chapter",
-      validationFeedback: expect.stringContaining("铜牌在怀里"),
+      validationFeedback: expect.stringContaining("mock_text"),
     }));
     expect(result.chapterStatus).toBeNull();
     expect(result.persistenceOutput.updatedState).toBe("fixed state");
     expect(result.persistenceOutput.updatedHooks).toBe("fixed hooks");
     expect(result.auditResult.issues).toEqual([]);
-    expect(logger.warn).toHaveBeenCalledWith("  [unsupported_change] 正文写铜牌在怀里，但 state 说未携带。");
+    expect(logger.warn).toHaveBeenCalledWith("  [unsupported_change] mock_text，mock_text state mock_text。");
   });
 
   it("degrades gracefully when validator throws (e.g. LLM returned empty response)", async () => {
@@ -214,14 +214,14 @@ describe("validateChapterTruthPersistence", () => {
           passed: false,
           warnings: [{
             category: "unsupported_change",
-            description: "第一次校验失败。",
+            description: "Chương mock_text。",
           }],
         }))
         .mockResolvedValueOnce(createValidationResult({
           passed: false,
           warnings: [{
             category: "unsupported_change",
-            description: "重试后仍然失败。",
+            description: "mock_text。",
           }],
         })),
     };
@@ -270,7 +270,7 @@ describe("validateChapterTruthPersistence", () => {
       expect.objectContaining({
         severity: "warning",
         category: "state-validation",
-        description: "重试后仍然失败。",
+        description: "mock_text。",
       }),
     ]);
     expect(result.persistenceOutput.updatedState).toBe("stable state");
@@ -280,7 +280,7 @@ describe("validateChapterTruthPersistence", () => {
       baseIssue,
       expect.objectContaining({
         category: "state-validation",
-        description: "重试后仍然失败。",
+        description: "mock_text。",
       }),
     ]);
   });
@@ -293,12 +293,12 @@ describe("validateChapterTruthPersistence", () => {
         .mockResolvedValueOnce(createValidationResult({
           passed: false,
           repairRequired: true,
-          warnings: [{ category: "missing_state_update", description: "位置尚未更新。" }],
+          warnings: [{ category: "missing_state_update", description: "mock_text。" }],
         }))
         .mockResolvedValueOnce(createValidationResult()),
     };
     const writer = {
-      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "码头" })),
+      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "mock_text" })),
     };
 
     await validateChapterTruthPersistence({
@@ -307,11 +307,11 @@ describe("validateChapterTruthPersistence", () => {
       book: BOOK,
       bookDir: "/tmp/book",
       chapterNumber: 5,
-      title: "抵达码头",
-      content: "林舟抵达码头。",
-      persistenceOutput: createWriterOutput({ updatedState: "车站" }),
+      title: "mock_text",
+      content: "mock_text。",
+      persistenceOutput: createWriterOutput({ updatedState: "mock_text" }),
       auditResult: createAuditResult(),
-      previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
+      previousTruth: { oldState: "mock_text", oldHooks: "hooks", oldLedger: "ledger" },
       language: "vi",
       logWarn: vi.fn(),
       deferStateApplication: true,
@@ -328,12 +328,12 @@ describe("validateChapterTruthPersistence", () => {
         .mockResolvedValueOnce(createValidationResult({
           passed: false,
           repairRequired: true,
-          warnings: [{ category: "missing_state_update", description: "位置尚未更新。" }],
+          warnings: [{ category: "missing_state_update", description: "mock_text。" }],
         }))
         .mockResolvedValueOnce(createValidationResult()),
     };
     const writer = {
-      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "码头" })),
+      settleChapterState: vi.fn().mockResolvedValue(createWriterOutput({ updatedState: "mock_text" })),
     };
 
     await validateChapterTruthPersistence({
@@ -342,11 +342,11 @@ describe("validateChapterTruthPersistence", () => {
       book: BOOK,
       bookDir: "/tmp/book",
       chapterNumber: 6,
-      title: "抵达码头",
-      content: "林舟抵达码头。",
-      persistenceOutput: createWriterOutput({ updatedState: "车站" }),
+      title: "mock_text",
+      content: "mock_text。",
+      persistenceOutput: createWriterOutput({ updatedState: "mock_text" }),
       auditResult: createAuditResult(),
-      previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
+      previousTruth: { oldState: "mock_text", oldHooks: "hooks", oldLedger: "ledger" },
       language: "vi",
       logWarn: vi.fn(),
     });

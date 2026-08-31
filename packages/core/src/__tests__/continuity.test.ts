@@ -66,16 +66,16 @@ describe("ContinuityAuditor", () => {
       issues: [{
         severity: "critical",
         repair_scope: "structural",
-        category: "模型审稿判断",
-        description: "核心场面缺失",
-        suggestion: "重写场面",
+        category: "mock_text",
+        description: "mock_text",
+        suggestion: "mock_text",
       }],
       summary: "needs rewrite",
     }), "vi");
 
     expect(result.issues[0]).toMatchObject({
       repairScope: "structural",
-      category: "模型审稿判断",
+      category: "mock_text",
     });
   });
 
@@ -230,15 +230,15 @@ describe("ContinuityAuditor", () => {
       expect(systemPrompt).not.toContain("more than 5 chapters");
       expect(systemPrompt).not.toContain("3 straight chapters");
       expect(systemPrompt).not.toContain("3+ consecutive chapters");
-      expect(systemPrompt).not.toContain("伏笔检查");
-      expect(systemPrompt).not.toContain("大纲偏离检测");
+      expect(systemPrompt).not.toContain("mock_text");
+      expect(systemPrompt).not.toContain("mock_text");
 
       expect(userPrompt).toContain("Review chapter 1.");
       expect(userPrompt).toContain("## Current State Card");
       expect(userPrompt).toContain("## Pending Hooks");
-      expect(userPrompt).not.toContain("请审查第1章");
-      expect(userPrompt).not.toContain("## 当前状态卡");
-      expect(userPrompt).not.toContain("## 伏笔池");
+      expect(userPrompt).not.toContain("mock_textChương 1");
+      expect(userPrompt).not.toContain("## mock_text");
+      expect(userPrompt).not.toContain("## mock_text");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -257,7 +257,7 @@ describe("ContinuityAuditor", () => {
         [
           "# Pending Hooks",
           "",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
           "| guild-route | 1 | mystery | open | 2 | 6 | Merchant guild trail |",
           "| mentor-oath | 8 | relationship | open | 99 | 101 | Mentor oath debt with Lin Yue |",
@@ -276,9 +276,9 @@ describe("ContinuityAuditor", () => {
         ].join("\n"),
         "utf-8",
       ),
-      writeFile(join(storyDir, "subplot_board.md"), "# 支线进度板\n", "utf-8"),
-      writeFile(join(storyDir, "emotional_arcs.md"), "# 情感弧线\n", "utf-8"),
-      writeFile(join(storyDir, "character_matrix.md"), "# 角色交互矩阵\n", "utf-8"),
+      writeFile(join(storyDir, "subplot_board.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "emotional_arcs.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "character_matrix.md"), "# mock_text\n", "utf-8"),
       writeFile(join(storyDir, "volume_outline.md"), "# Volume Outline\n\n## Chapter 100\nTrack the merchant guild trail.\n", "utf-8"),
       writeFile(join(storyDir, "style_guide.md"), "# Style Guide\n\n- Keep the prose restrained.\n", "utf-8"),
     ]);
@@ -368,9 +368,9 @@ describe("ContinuityAuditor", () => {
       writeFile(join(storyDir, "current_state.md"), "# Current State\n", "utf-8"),
       writeFile(join(storyDir, "pending_hooks.md"), "# Pending Hooks\n", "utf-8"),
       writeFile(join(storyDir, "chapter_summaries.md"), "# Chapter Summaries\n", "utf-8"),
-      writeFile(join(storyDir, "subplot_board.md"), "# 支线\n", "utf-8"),
-      writeFile(join(storyDir, "emotional_arcs.md"), "# 情感\n", "utf-8"),
-      writeFile(join(storyDir, "character_matrix.md"), "# 矩阵\n", "utf-8"),
+      writeFile(join(storyDir, "subplot_board.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "emotional_arcs.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "character_matrix.md"), "# mock_text\n", "utf-8"),
       writeFile(join(storyDir, "style_guide.md"), "# Style\n", "utf-8"),
     ]);
 
@@ -396,36 +396,36 @@ describe("ContinuityAuditor", () => {
     });
 
     const memoBody = [
-      "## 当前任务",
-      "陆焚在小巷抢回残刃并离开。",
+      "## Nhiệm vụ hiện tại",
+      "mock_text。",
       "",
-      "## 读者此刻在等什么",
-      "读者想看他怎么脱身。",
+      "## Độc giả đang chờ đợi điều gì lúc này",
+      "mock_text。",
       "",
-      "## 该兑现的 / 暂不掀的",
-      "兑现：残刃归手；暂不掀：身世。",
+      "## Cần thực hiện / tạm giữ lại",
+      "mock_text：mock_text；mock_text：mock_text。",
       "",
-      "## 日常/过渡承担什么任务",
-      "开篇小巷场景 → 情绪代入 + 信息植入。",
+      "## Nhịp chậm / chuyển cảnh đảm nhận điều gì",
+      "mock_text → mock_text + mock_text。",
       "",
-      "## 关键抉择过三连问",
-      "陆焚选择独自动手的理由是什么？",
+      "## Kiểm tra ba câu hỏi cho lựa chọn then chốt",
+      "mock_text？",
       "",
-      "## 章尾必须发生的改变",
-      "陆焚拿回残刃，被人目击。",
+      "## Thay đổi bắt buộc cuối chương",
+      "mock_text，mock_text。",
       "",
-      "## 本章 hook 账",
-      "resolve: H11 残刃下落 → 本章找回。defer: H04 幕后主使 → 留到第 50 章。",
+      "## Sổ hook chương này",
+      "resolve: H11 mock_text → mock_text。defer: H04 mock_text → mock_textChương 50。",
       "",
-      "## 不要做",
-      "不要写成大段打斗。",
+      "## Không làm",
+      "mock_text。",
     ].join("\n");
 
     try {
       await auditor.auditChapter(bookDir, "Chapter body.", 42, "xuanhuan", {
         chapterMemo: {
           chapter: 42,
-          goal: "陆焚抢回残刃并离开",
+          goal: "mock_text",
           isGoldenOpening: false,
           body: memoBody,
           threadRefs: [],
@@ -447,8 +447,8 @@ describe("ContinuityAuditor", () => {
 
       // User prompt injects the memo for drift-checking.
       expect(userPrompt).toContain("## Chapter Memo (for memo drift checks)");
-      expect(userPrompt).toContain("Goal: 陆焚抢回残刃并离开");
-      expect(userPrompt).toContain("## 章尾必须发生的改变");
+      expect(userPrompt).toContain("Goal: mock_text");
+      expect(userPrompt).toContain("## Thay đổi bắt buộc cuối chương");
       // Legacy volume-outline block is gone.
       expect(userPrompt).not.toContain("## Volume Outline");
     } finally {

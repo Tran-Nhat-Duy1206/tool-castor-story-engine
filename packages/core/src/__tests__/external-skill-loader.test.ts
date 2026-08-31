@@ -264,8 +264,8 @@ describe("external skill loader", () => {
   });
 
   it("rejects relative external directories", async () => {
-    // 不能用 relative(process.cwd(), root)：Windows CI 上 cwd 和临时目录在不同盘符，
-    // path.relative 跨盘符会返回绝对路径，测试意图（传相对路径必须被拒绝）就失效了。
+    // mock_text relative(process.cwd(), root)：Windows CI mock_text cwd mock_text，
+    // path.relative mock_text，Testmock_text（mock_text）mock_text。
     await expect(loadExternalAgentSkills({ externalDirs: [join("relative", "external-skills")] }))
       .rejects.toThrow(/absolute/);
   });

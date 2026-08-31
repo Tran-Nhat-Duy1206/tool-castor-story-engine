@@ -15,23 +15,23 @@ export const FANFIC_DIMENSIONS: ReadonlyArray<{
 }> = [
   {
     id: 34,
-    name: "角色还原度",
-    baseNote: "检查角色的语癖、说话风格、行为模式是否与 fanfic_canon.md 角色档案一致。偏离必须有情境驱动。",
+    name: "Character fidelity",
+    baseNote: "Check if character catchphrases, speaking style, and behavioral patterns match fanfic_canon.md character profiles. Deviations must be situationally motivated.",
   },
   {
     id: 35,
-    name: "世界规则遵守",
-    baseNote: "检查章节内容是否违反 fanfic_canon.md 中的世界规则（地理、力量体系、阵营关系）。",
+    name: "World rules compliance",
+    baseNote: "Check if chapter content violates world rules in fanfic_canon.md (geography, power systems, faction relations).",
   },
   {
     id: 36,
-    name: "关系动态",
-    baseNote: "检查角色之间的关系互动是否合理，是否与 fanfic_canon.md 中标注的关键关系一致或有合理发展。",
+    name: "Relationship dynamics",
+    baseNote: "Check if character interactions are plausible and align with key relationships in fanfic_canon.md.",
   },
   {
     id: 37,
-    name: "正典事件一致性",
-    baseNote: "检查章节是否与 fanfic_canon.md 关键事件时间线矛盾。",
+    name: "Canon event consistency",
+    baseNote: "Check if chapter contradicts key event timeline in fanfic_canon.md.",
   },
 ];
 
@@ -61,21 +61,21 @@ export function getFanficDimensionConfig(
     severityOverrides.set(dim.id, severityMap[dim.id]!);
 
     const severity = severityMap[dim.id]!;
-    const severityLabel = severity === "critical" ? "（严格检查）"
-      : severity === "info" ? "（仅记录，不判定失败）"
-      : "（警告级别）";
+    const severityLabel = severity === "critical" ? "(Strict check)"
+      : severity === "info" ? "(Record only, non-blocking)"
+      : "(Warning level)";
     notes.set(dim.id, `${dim.baseNote} ${severityLabel}`);
   }
 
   // OOC mode relaxes the built-in OOC check
   if (mode === "ooc") {
     severityOverrides.set(OOC_DIM, "info");
-    notes.set(OOC_DIM, "OOC模式下角色可偏离性格底色，此维度仅记录不判定失败。参照 fanfic_canon.md 角色档案评估偏离程度。");
+    notes.set(OOC_DIM, "Under OOC mode characters may deviate from core personality; this dimension records without failing. Evaluate deviation against fanfic_canon.md.");
   }
 
   // Canon mode strengthens the built-in OOC check
   if (mode === "canon") {
-    notes.set(OOC_DIM, "原作向同人：角色必须严格遵守性格底色。参照 fanfic_canon.md 角色档案中的性格底色和行为模式。");
+    notes.set(OOC_DIM, "Canon fanfiction: characters must strictly adhere to core persona and behaviors in fanfic_canon.md.");
   }
 
   return {

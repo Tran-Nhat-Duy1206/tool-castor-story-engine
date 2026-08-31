@@ -45,17 +45,14 @@ import { ASTRON_CODING_PLAN } from "./endpoints/astronCodingPlan.js";
 
 export type { ProviderEndpoint, ProviderModel, ApiProtocol, EndpointGroup } from "./types.js";
 
-/**
- * 所有已注册 provider 的扁平列表。顺序定义了 lookup Layer 2 的遍历顺序，
- * 但 Layer 2 还会按 PROVIDER_PRIORITY 显式排序，所以此处顺序不影响结果。
- */
+// LLM provider configuration and endpoints.
 const ALL_PROVIDERS: readonly ProviderEndpoint[] = [
   ANTHROPIC, OPENAI, GOOGLE, DEEPSEEK, MINIMAX,
   MOONSHOT, ZHIPU, SILICONCLOUD, BAILIAN, VOLCENGINE, HUNYUAN, BAICHUAN, STEPFUN, WENXIN,
   SPARK, SENSENOVA, TENCENTCLOUD, XIAOMI_MIMO, LONGCAT, INTERNLM,
   ZEROONE, AI360,
   OLLAMA, LMSTUDIO, OPENROUTER, CUSTOM, MISTRAL, XAI, NEWAPI, GITHUB_COPILOT, KKAIAPI,
-  // B6 CodingPlan（8 个）
+  // LLM provider configuration and endpoints.
   KIMI_CODING_PLAN, KIMI_CODE, MINIMAX_CODING_PLAN, BAILIAN_CODING_PLAN, GLM_CODING_PLAN, VOLCENGINE_CODING_PLAN, OPENCODE_CODING_PLAN, ASTRON_CODING_PLAN,
 ];
 

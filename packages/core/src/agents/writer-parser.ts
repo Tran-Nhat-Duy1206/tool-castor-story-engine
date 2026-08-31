@@ -50,30 +50,16 @@ export function parseCreativeOutput(
  * stripping metadata and returning the longest prose block.
  */
 function fallbackExtractContent(raw: string, countingMode: LengthCountingMode): string {
-  // Try markdown heading: # 第N章 ... followed by content
-  const headingMatch = raw.match(/^#\s*第\d+章[^\n]*\n+([\s\S]+)/m);
+  // Accept canonical Vietnamese or English markdown chapter headings.
+  const headingMatch = raw.match(/^#\s*(?:Chương|Chapter)\s+\d+(?::|\s+)?[^\n]*\n+([\s\S]+)/im);
   if (headingMatch) {
     return headingMatch[1]!.trim();
   }
 
-  if (countingMode === "en_words") {
-    const englishHeadingMatch = raw.match(/^#\s*Chapter\s+\d+(?::|\s+)([^\n]*)\n+([\s\S]+)/im);
-    if (englishHeadingMatch) {
-      return englishHeadingMatch[2]!.trim();
-    }
-  }
-
-  // Try "正文" or "内容" labeled section
-  const labelMatch = raw.match(/(?:正文|内容|章节内容)[：:]\s*\n+([\s\S]+)/);
+  // Accept canonical English machine labels without delimiter markers.
+  const labelMatch = raw.match(/(?:content|chapter content):\s*\n+([\s\S]+)/i);
   if (labelMatch) {
     return labelMatch[1]!.trim();
-  }
-
-  if (countingMode === "en_words") {
-    const englishLabelMatch = raw.match(/(?:content|chapter content)[：:]\s*\n+([\s\S]+)/i);
-    if (englishLabelMatch) {
-      return englishLabelMatch[1]!.trim();
-    }
   }
 
   // Last resort: strip lines that look like metadata/tags, keep the rest
@@ -82,7 +68,7 @@ function fallbackExtractContent(raw: string, countingMode: LengthCountingMode): 
     const trimmed = line.trim();
     // Skip tag-like lines, empty lines at boundaries, and short key-value lines
     if (/^===\s*[A-Z_]+\s*===/.test(trimmed)) return false;
-    if (/^(PRE_WRITE_CHECK|CHAPTER_TITLE|章节标题|写作自检)[：:]/.test(trimmed)) return false;
+    if (/^(PRE_WRITE_CHECK|CHAPTER_TITLE):/.test(trimmed)) return false;
     return true;
   });
   const result = proseLines.join("\n").trim();
@@ -98,19 +84,13 @@ function fallbackExtractTitle(
   chapterNumber: number,
   countingMode: LengthCountingMode,
 ): string {
-  // Try: # 第N章 Title
-  const headingMatch = raw.match(/^#\s*第\d+章\s*(.+)/m);
+  // Accept canonical Vietnamese or English markdown chapter headings.
+  const headingMatch = raw.match(/^#\s*(?:Chương|Chapter)\s+\d+(?::|\s+)\s*(.+)/im);
   if (headingMatch) {
     return headingMatch[1]!.trim();
   }
-  if (countingMode === "en_words") {
-    const englishHeadingMatch = raw.match(/^#\s*Chapter\s+\d+(?::|\s+)\s*(.+)/im);
-    if (englishHeadingMatch) {
-      return englishHeadingMatch[1]!.trim();
-    }
-  }
-  // Try: 章节标题：Title or CHAPTER_TITLE: Title (without === delimiters)
-  const labelMatch = raw.match(/(?:章节标题|CHAPTER_TITLE)[：:]\s*(.+)/);
+  // Accept CHAPTER_TITLE: Title without === delimiters.
+  const labelMatch = raw.match(/CHAPTER_TITLE:\s*(.+)/);
   if (labelMatch) {
     return labelMatch[1]!.trim();
   }
@@ -162,17 +142,17 @@ function defaultChapterTitle(
   chapterNumber: number,
   countingMode: LengthCountingMode,
 ): string {
-  return countingMode === "en_words" ? `Chapter ${chapterNumber}` : `第${chapterNumber}章`;
+  return countingMode === "en_words" ? `Chapter ${chapterNumber}` : `Chương ${chapterNumber}`;
 }
 
 function defaultStatePlaceholder(countingMode: LengthCountingMode): string {
-  return countingMode === "en_words" ? "(state card not updated)" : "(状态卡未更新)";
+  return countingMode === "en_words" ? "(state card not updated)" : "(thẻ trạng thái chưa được cập nhật)";
 }
 
 function defaultLedgerPlaceholder(countingMode: LengthCountingMode): string {
-  return countingMode === "en_words" ? "(ledger not updated)" : "(账本未更新)";
+  return countingMode === "en_words" ? "(ledger not updated)" : "(sổ theo dõi chưa được cập nhật)";
 }
 
 function defaultHooksPlaceholder(countingMode: LengthCountingMode): string {
-  return countingMode === "en_words" ? "(hooks pool not updated)" : "(伏笔池未更新)";
+  return countingMode === "en_words" ? "(hooks pool not updated)" : "(danh sách gợi mở chưa được cập nhật)";
 }

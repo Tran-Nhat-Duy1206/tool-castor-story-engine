@@ -55,14 +55,14 @@ export interface ParsedBookRules {
  * frontmatter instead of treating the pointer as legitimate empty rules.
  *
  * Markers (must match buildBookRulesShim() in architect.ts):
- *   - 本书规则（兼容指针——已废弃） / Book Rules (compat pointer — deprecated)
- *   - 本文件仅为外部读取保留 / This file is kept for external readers only
+ *   - rules（rules——rules） / Book Rules (compat pointer — deprecated)
+ *   - rules / This file is kept for external readers only
  */
 export function isBookRulesShim(raw: string): boolean {
   return (
-    /本书规则（兼容指针——已废弃）/.test(raw)
+    /(?:Quy tắc sách|Book Rules) \(compat pointer\)/i.test(raw)
     || /Book Rules \(compat pointer — deprecated\)/.test(raw)
-    || /本文件仅为外部读取保留/.test(raw)
+    || /This file is kept for external readers only/i.test(raw)
     || /This file is kept for external readers only/.test(raw)
   );
 }
@@ -129,72 +129,72 @@ export function tryParseBookRulesFrontmatter(
 }
 
 function parseMarkdownBookRules(raw: string): BookRules {
-  const protagonistSection = extractMarkdownSection(raw, ["主角", "Protagonist"]);
+  const protagonistSection = extractMarkdownSection(raw, ["Nhân vật chính", "Protagonist", "Main Character"]);
   const protagonistName =
-    readLabeledValue(protagonistSection, ["名字", "姓名", "name", "protagonist"])
-    ?? readLabeledValue(raw, ["主角", "protagonist"]);
+    readLabeledValue(protagonistSection, ["Tên", "name", "protagonist"])
+    ?? readLabeledValue(raw, ["Nhân vật chính", "protagonist"]);
   const personalityLock = readLabeledList(protagonistSection, [
-    "性格锁",
-    "性格关键词",
+    "",
+    "",
     "personalityLock",
     "personality lock",
     "core tags",
   ]);
   const behavioralConstraints = readLabeledList(protagonistSection, [
-    "行为约束",
+    "",
     "behavioralConstraints",
     "behavioral constraints",
   ]);
 
-  const genreSection = extractMarkdownSection(raw, ["题材锁", "Genre Lock", "Genre"]);
-  const primary = readLabeledValue(genreSection, ["主类型", "题材", "primary", "genre"]);
+  const genreSection = extractMarkdownSection(raw, ["Khóa thể loại", "Genre Lock", "Genre"]);
+  const primary = readLabeledValue(genreSection, ["Thể loại chính", "primary", "genre"]);
   const forbidden = [
-    ...readLabeledList(genreSection, ["禁止混入", "禁混", "forbidden"]),
-    ...readMarkdownList(extractMarkdownSection(raw, ["禁止混入", "Forbidden Style Intrusions", "Forbidden"])),
+    ...readLabeledList(genreSection, ["Cấm đưa vào", "forbidden", "forbidden style"]),
+    ...readMarkdownList(extractMarkdownSection(raw, ["Cấm đưa vào", "Forbidden Style Intrusions", "Forbidden"])),
   ];
 
   const prohibitions = readMarkdownList(extractMarkdownSection(raw, [
-    "禁止事项",
-    "禁忌",
-    "本书禁忌",
+    "",
+    "",
+    "",
     "Prohibitions",
     "Do Not",
   ]));
-  const fanficSection = extractMarkdownSection(raw, ["同人模式", "Fanfic Mode", "Fanfic"]);
+  const fanficSection = extractMarkdownSection(raw, ["Chế độ đồng nhân", "Chế độ fanfic", "Fanfic Mode", "Fanfic"]);
   const fanficMode = normalizeFanficMode(readLabeledValue(fanficSection, [
-    "模式",
-    "同人模式",
+    "",
+    "",
     "fanficMode",
     "fanfic mode",
     "mode",
   ]));
   const allowedDeviations = readLabeledList(fanficSection, [
-    "允许偏离",
-    "允许的偏离",
+    "",
+    "",
     "allowedDeviations",
     "allowed deviations",
   ]);
 
   const numericalSection = extractMarkdownSection(raw, [
-    "数值/资源规则",
-    "数值规则",
-    "资源规则",
+    "/",
+    "",
+    "",
     "Numerical / Resource Rules",
     "Numerical Rules",
     "Resource Rules",
   ]);
   const resourceTypes = readLabeledList(numericalSection, [
-    "核心资源",
-    "资源类型",
+    "",
+    "",
     "resourceTypes",
     "core resources",
     "resources",
   ]);
-  const hardCap = readLabeledValue(numericalSection, ["硬上限", "hardCap", "hard cap"]);
+  const hardCap = readLabeledValue(numericalSection, ["Giới hạn cứng", "hardCap", "hard cap"]);
 
-  const eraSection = extractMarkdownSection(raw, ["年代限制", "时代限制", "Era Constraints"]);
-  const period = readLabeledValue(eraSection, ["时期", "年代", "period", "era"]);
-  const region = readLabeledValue(eraSection, ["地域", "地区", "region"]);
+  const eraSection = extractMarkdownSection(raw, ["Ràng buộc thời đại", "Era Constraints"]);
+  const period = readLabeledValue(eraSection, ["Thời kỳ", "period", "era"]);
+  const region = readLabeledValue(eraSection, ["Khu vực", "region"]);
 
   return BookRulesSchema.parse({
     protagonist: protagonistName
@@ -281,18 +281,18 @@ function splitList(value: string): string[] {
 }
 
 function detectNarrativePerson(raw: string): "first" | "third" | undefined {
-  if (/第一人称|first[-\s]?person|\bfirst\b/i.test(raw)) return "first";
-  if (/第三人称|third[-\s]?person|\bthird\b/i.test(raw)) return "third";
+  if (/ngôi thứ nhất|first[-\s]?person|\bfirst\b/i.test(raw)) return "first";
+  if (/ngôi thứ ba|third[-\s]?person|\bthird\b/i.test(raw)) return "third";
   return undefined;
 }
 
 function normalizeFanficMode(value: string | undefined): "canon" | "au" | "ooc" | "cp" | undefined {
   if (!value) return undefined;
   const normalized = value.trim().toLowerCase();
-  if (normalized === "canon" || /正典|原作空白|原作视角/.test(value)) return "canon";
-  if (normalized === "au" || /平行|分歧|if线/i.test(value)) return "au";
-  if (normalized === "ooc" || /性格偏离/i.test(value)) return "ooc";
-  if (normalized === "cp" || /配对|感情线/i.test(value)) return "cp";
+  if (normalized === "canon" || /chính điển|canon/i.test(value)) return "canon";
+  if (normalized === "au" || /song song|au/i.test(value)) return "au";
+  if (normalized === "ooc" || /lệch tính cách|ooc/i.test(value)) return "ooc";
+  if (normalized === "cp" || /ghép đôi|cp/i.test(value)) return "cp";
   return undefined;
 }
 
@@ -301,7 +301,7 @@ function cleanScalar(value: string): string {
     .trim()
     .replace(/^["'`“”‘’]+|["'`“”‘’]+$/g, "")
     .trim();
-  return /^(?:无|none|n\/a|na|\(none\)|（无）|-|—)$/i.test(trimmed) ? "" : trimmed;
+  return /^(?:|none|n\/a|na|\(none\)|（）|-|—)$/i.test(trimmed) ? "" : trimmed;
 }
 
 function normalizeHeading(value: string): string {

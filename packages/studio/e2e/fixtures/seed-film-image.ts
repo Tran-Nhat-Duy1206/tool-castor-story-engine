@@ -11,12 +11,12 @@ const PNG = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,0x00,0x00,0x00,
 export async function seedFilmImageGraph(): Promise<void> {
   const assetRef = `interactive-films/${E2E_IMG_ID}/assets/nodes/s.png`;
   await saveStoryGraph(E2E_ROOT, E2E_IMG_ID, StoryGraphSchema.parse({
-    schemaVersion: 1, projectId: E2E_IMG_ID, title: "E2E 配图样例", variables: [], characters: [],
+    schemaVersion: 1, projectId: E2E_IMG_ID, title: "E2E mock_val", variables: [], characters: [],
     nodes: [
-      { id: "s", type: "start", title: "开场", sceneDesc: "宫门前", imageSlot: { prompt: "宫门", assetRef }, choices: [{ id: "c", text: "go", targetNodeId: "e" }] },
-      { id: "e", type: "ending", title: "结局", choices: [] },
+      { id: "s", type: "start", title: "Mo dau", sceneDesc: "Cong dien", imageSlot: { prompt: "mock_val", assetRef }, choices: [{ id: "c", text: "go", targetNodeId: "e" }] },
+      { id: "e", type: "ending", title: "mock_val", choices: [] },
     ],
-    endings: [{ id: "g", nodeId: "e", title: "好结局", type: "good", description: "" }],
+    endings: [{ id: "g", nodeId: "e", title: "mock_val", type: "good", description: "" }],
   }));
   const abs = resolve(E2E_ROOT, assetRef);
   await mkdir(resolve(abs, ".."), { recursive: true });

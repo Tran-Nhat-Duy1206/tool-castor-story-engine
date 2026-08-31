@@ -50,7 +50,7 @@ export type SafeRelPath = z.infer<typeof SafeRelPathSchema>;
 // Source-key schema for legacy/source locator selectors (e.g. book_rules H2
 // heading text). DIFFERENT from SafeGovernanceId: it selects EXISTING Markdown
 // identities and may contain ordinary punctuation REQUIRED by real headings
-// (including "/", e.g. "数值/资源规则"). It is bounded and control-free but is
+// Core narrative engine processing.
 // NEVER interpreted as a path — it is never passed into path.join/safeChildPath
 // as a path component. The manifest unitId remains SafeGovernanceId (path-safe).
 // ---------------------------------------------------------------------------

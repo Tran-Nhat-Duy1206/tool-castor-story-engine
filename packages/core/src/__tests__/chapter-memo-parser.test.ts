@@ -2,49 +2,49 @@ import { describe, it, expect } from "vitest";
 import { parseMemo, PlannerParseError } from "../utils/chapter-memo-parser.js";
 
 const SECTIONS = `
-## 场景与篇幅预算
-- 现场勘查（约 900 字）：主角复核锁芯和监控时间线，找到能排除自然磨损的证据。
-- 证据交锋（约 700 字）：阿泽试图把异常解释成维护疏漏，主角用时间戳逼出破绽。
+## Cảnh và ngân sách độ dài
+- mock_text（mock_text 900  từ）：mock_text，mock_text。
+- mock_text（mock_text 700  từ）：mock_text，mock_text。
 
-## 当前任务
-主角进入七号门现场，比对锁芯刮痕与监控时间线，把"被动过手脚"从猜测钉成实证。
+## Nhiệm vụ hiện tại
+mock_text，mock_text，mock_text"mock_text"mock_text。
 
-## 读者此刻在等什么
-1) 读者在等七号门异常是否实锤
-2) 本章完全兑现——钉成现场实证
+## Độc giả đang chờ đợi điều gì lúc này
+1) mock_text
+2) mock_text——mock_text
 
-## 该兑现的 / 暂不掀的
-- 该兑现：七号门异常 → 钉成现场实证
-- 暂不掀：幕后主使 → 压到第 20 章
+## Cần thực hiện / tạm giữ lại
+- mock_text：mock_text → mock_text
+- mock_text：mock_text → mock_textChương 20
 
-## 日常/过渡承担什么任务
-不适用 - 本章为高压实证章，无日常过渡段。
+## Nhịp chậm / chuyển cảnh đảm nhận điều gì
+mock_text - mock_text，mock_text。
 
-## 关键抉择过三连问
-- 主角本章最关键的一次选择：
-  - 为什么这么做？因为线索只剩这一条
-  - 符合当前利益吗？符合
-  - 符合他的人设吗？符合
-- 对手/配角本章最关键的一次选择：
-  - 为什么这么做？为了掩盖踪迹
-  - 符合当前利益吗？符合
-  - 符合他的人设吗？符合
+## Kiểm tra ba câu hỏi cho lựa chọn then chốt
+- mock_text：
+  - mock_text？mock_text
+  - mock_text？mock_text
+  - mock_text？mock_text
+- mock_text/mock_text：
+  - mock_text？mock_text
+  - mock_text？mock_text
+  - mock_text？mock_text
 
-## 章尾必须发生的改变
-- 信息改变：主角掌握实证
-- 关系改变：主角对阿泽产生戒心
+## Thay đổi bắt buộc cuối chương
+- mock_text：mock_text
+- mock_text：mock_text
 
-## 本章 hook 账
+## Sổ hook chương này
 advance:
-- H03 "七号门异常" → 从 pressured → near_payoff（主角拿到实证）
+- H03 "mock_text" → mock_text pressured → near_payoff（mock_text）
 resolve:
-- S004 "锁芯刮痕" → 本章核验完毕
+- S004 "mock_text" → mock_text
 defer:
-- H07 "幕后主使" → 压到第 20 章，时机未到
+- H07 "mock_text" → mock_textChương 20，mock_text
 
-## 不要做
-- 不要让对手突然降智
-- 不要直接点破幕后主使
+## Không làm
+- mock_text
+- mock_text
 `.trim();
 
 function makeRaw(
@@ -60,13 +60,13 @@ function makeRaw(
     ? opts.threadRefs.map((id) => `- ${id}`).join("\n")
     : "";
   const raw = [
-    `# 第 12 章 memo`,
+    `# Chương 12 memo`,
     "",
-    "## 本章目标",
-    opts.goal ?? "把七号门被动手脚钉成实证",
+    "## Mục tiêu chương",
+    opts.goal ?? "mock_text",
     "",
-    "## 关联线索",
-    refs || "无",
+    "## mock_text",
+    refs || "mock_text",
     "",
     opts.body ?? SECTIONS,
   ].join("\n");
@@ -78,16 +78,16 @@ describe("parseMemo", () => {
   it("parses a valid markdown memo without YAML frontmatter", () => {
     const memo = parseMemo(makeRaw({ threadRefs: ["H03", "S004"] }), 12, false);
     expect(memo.chapter).toBe(12);
-    expect(memo.goal).toBe("把七号门被动手脚钉成实证");
+    expect(memo.goal).toBe("mock_text");
     expect(memo.isGoldenOpening).toBe(false);
     expect(memo.threadRefs).toEqual(["H03", "S004"]);
-    expect(memo.body).toContain("## 当前任务");
-    expect(memo.body).toContain("## 不要做");
+    expect(memo.body).toContain("## Nhiệm vụ hiện tại");
+    expect(memo.body).toContain("## Không làm");
   });
 
   it("accepts markdown wrapped in a code fence with leading prose", () => {
     const memo = parseMemo(makeRaw({
-      prefix: "好的，下面是本章 memo：\n\n",
+      prefix: "mock_text，mock_text memo：\n\n",
       fenced: true,
       threadRefs: ["H03"],
     }), 12, true);
@@ -97,23 +97,23 @@ describe("parseMemo", () => {
   });
 
   it("keeps long goal semantics in the memo body while deriving a short display goal", () => {
-    const longGoal = "把异常钉成实证".repeat(10);
+    const longGoal = "mock_text".repeat(10);
     const memo = parseMemo(makeRaw({ goal: longGoal }), 12, false);
     expect(memo.goal.length).toBeLessThanOrEqual(50);
     expect(memo.body).toContain(longGoal);
   });
 
   it.each([
-    "## 本章目标",
-    "## 场景与篇幅预算",
-    "## 当前任务",
-    "## 读者此刻在等什么",
-    "## 该兑现的 / 暂不掀的",
-    "## 日常/过渡承担什么任务",
-    "## 关键抉择过三连问",
-    "## 章尾必须发生的改变",
-    "## 本章 hook 账",
-    "## 不要做",
+    "## mock_text",
+    "## Cảnh và ngân sách độ dài",
+    "## Nhiệm vụ hiện tại",
+    "## Độc giả đang chờ đợi điều gì lúc này",
+    "## Cần thực hiện / tạm giữ lại",
+    "## Nhịp chậm / chuyển cảnh đảm nhận điều gì",
+    "## Kiểm tra ba câu hỏi cho lựa chọn then chốt",
+    "## Thay đổi bắt buộc cuối chương",
+    "## Sổ hook chương này",
+    "## Không làm",
   ])("throws when body is missing section %s", (heading) => {
     const raw = makeRaw().replace(heading, "## SECTION-REMOVED");
     expect(() => parseMemo(raw, 12, false)).toThrow(/missing sections|goal/);
@@ -135,23 +135,23 @@ describe("parseMemo", () => {
   describe("empty section detection", () => {
     it("rejects a memo where every heading is present but payloads are blank", () => {
       const blankBody = [
-        "## 场景与篇幅预算",
+        "## Cảnh và ngân sách độ dài",
         "",
-        "## 当前任务",
+        "## Nhiệm vụ hiện tại",
         "",
-        "## 读者此刻在等什么",
+        "## Độc giả đang chờ đợi điều gì lúc này",
         "",
-        "## 该兑现的 / 暂不掀的",
+        "## Cần thực hiện / tạm giữ lại",
         "",
-        "## 日常/过渡承担什么任务",
+        "## Nhịp chậm / chuyển cảnh đảm nhận điều gì",
         "",
-        "## 关键抉择过三连问",
+        "## Kiểm tra ba câu hỏi cho lựa chọn then chốt",
         "",
-        "## 章尾必须发生的改变",
+        "## Thay đổi bắt buộc cuối chương",
         "",
-        "## 本章 hook 账",
+        "## Sổ hook chương này",
         "",
-        "## 不要做",
+        "## Không làm",
         "",
       ].join("\n");
       expect(() => parseMemo(makeRaw({ body: blankBody }), 12, false))
@@ -160,77 +160,77 @@ describe("parseMemo", () => {
 
     it("rejects a memo where one section has only whitespace / placeholder", () => {
       const body = SECTIONS.replace(
-        /## 当前任务\n[\s\S]*?\n\n## 读者此刻在等什么/,
-        "## 当前任务\n   \n\n## 读者此刻在等什么",
+        /## Nhiệm vụ hiện tại\n[\s\S]*?\n\n## Độc giả đang chờ đợi điều gì lúc này/,
+        "## Nhiệm vụ hiện tại\n   \n\n## Độc giả đang chờ đợi điều gì lúc này",
       );
       expect(() => parseMemo(makeRaw({ body }), 12, false))
-        .toThrow(/empty sections.*当前任务/);
+        .toThrow(/empty sections.*Nhiệm vụ hiện tại/);
     });
 
     it("rejects a memo where one section has 'TODO' (under 20 chars)", () => {
       const body = SECTIONS.replace(
-        /## 章尾必须发生的改变\n[\s\S]*?\n\n## 本章 hook 账/,
-        "## 章尾必须发生的改变\nTODO\n\n## 本章 hook 账",
+        /## Thay đổi bắt buộc cuối chương\n[\s\S]*?\n\n## Sổ hook chương này/,
+        "## Thay đổi bắt buộc cuối chương\nTODO\n\n## Sổ hook chương này",
       );
       expect(() => parseMemo(makeRaw({ body }), 12, false))
-        .toThrow(/empty sections.*章尾必须发生的改变/);
+        .toThrow(/empty sections.*Thay đổi bắt buộc cuối chương/);
     });
 
     it("accepts a sparse-but-non-empty memo (Phase 6 sparse-memo principle)", () => {
       // Each section just barely meets the threshold — this is the
       // breath/transition chapter case the principle wants to keep legal.
       const sparseBody = [
-        "## 场景与篇幅预算",
-        "码头会合约八百字，交换情报并让协作者的犹豫显形；离场约四百字，埋下下一步行动压力。",
+        "## Cảnh và ngân sách độ dài",
+        "mock_text từ，mock_text；mock_text từ，mock_text。",
         "",
-        "## 当前任务",
-        "主角与协作者在码头会合，交换上一案的情报与下一步行动安排。",
+        "## Nhiệm vụ hiện tại",
+        "mock_text，mock_text。",
         "",
-        "## 读者此刻在等什么",
-        "读者在等线索是否真被坐实。本章只给出半成品的暗示。",
+        "## Độc giả đang chờ đợi điều gì lúc này",
+        "mock_text。mock_text。",
         "",
-        "## 该兑现的 / 暂不掀的",
-        "该兑现：暗示线索成形；暂不掀：幕后是谁，留到第 20 章。",
+        "## Cần thực hiện / tạm giữ lại",
+        "mock_text：mock_text；mock_text：mock_text，mock_textChương 20。",
         "",
-        "## 日常/过渡承担什么任务",
-        "码头闲笔铺人物关系，让协作者的犹豫成为下一章的钩。",
+        "## Nhịp chậm / chuyển cảnh đảm nhận điều gì",
+        "mock_text，mock_text。",
         "",
-        "## 关键抉择过三连问",
-        "主角选信协作者，因为情报缺口只能从这里补；符合利益与人设。",
+        "## Kiểm tra ba câu hỏi cho lựa chọn then chốt",
+        "mock_text，mock_text；mock_text。",
         "",
-        "## 章尾必须发生的改变",
-        "关系改变：主角和协作者从交易关系微微转向共担风险的同伴。",
+        "## Thay đổi bắt buộc cuối chương",
+        "mock_text：mock_text。",
         "",
-        "## 本章 hook 账",
-        "advance: H03 线索 → 从 planted 推到 pressured（本章让协作者第一次点头）。",
+        "## Sổ hook chương này",
+        "advance: H03 mock_text → mock_text planted mock_text pressured（mock_textChương mock_text）。",
         "",
-        "## 不要做",
-        "无",
+        "## Không làm",
+        "mock_text",
       ].join("\n");
 
       const memo = parseMemo(makeRaw({ body: sparseBody }), 12, false);
-      expect(memo.body).toContain("## 当前任务");
-      expect(memo.body).toContain("## 不要做");
+      expect(memo.body).toContain("## Nhiệm vụ hiện tại");
+      expect(memo.body).toContain("## Không làm");
     });
 
-    it('accepts "## 不要做" with very short content like "无" / "N/A" (relaxed threshold)', () => {
+    it('accepts "## Không làm" with very short content like "mock_text" / "N/A" (relaxed threshold)', () => {
       // The "do not" section uses a 5-char minimum so books with no extra
       // chapter-level prohibitions can say so without inventing filler.
       const body = SECTIONS.replace(
-        /## 不要做\n[\s\S]*$/,
-        "## 不要做\n无。",
+        /## Không làm\n[\s\S]*$/,
+        "## Không làm\nmock_text。",
       );
       const memo = parseMemo(makeRaw({ body }), 12, false);
-      expect(memo.body).toContain("无。");
+      expect(memo.body).toContain("mock_text。");
     });
 
-    it("rejects empty '## 不要做' even with the relaxed threshold", () => {
+    it("rejects empty '## Không làm' even with the relaxed threshold", () => {
       const body = SECTIONS.replace(
-        /## 不要做\n[\s\S]*$/,
-        "## 不要做\n",
+        /## Không làm\n[\s\S]*$/,
+        "## Không làm\n",
       );
       expect(() => parseMemo(makeRaw({ body }), 12, false))
-        .toThrow(/empty sections.*不要做/);
+        .toThrow(/empty sections.*Không làm/);
     });
   });
 });

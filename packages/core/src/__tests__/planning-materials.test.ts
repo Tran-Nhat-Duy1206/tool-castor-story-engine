@@ -49,10 +49,10 @@ describe("gatherPlanningMaterials", () => {
       writeFile(
         join(bookDir, "chapters", "0003_Canal Shadow.md"),
         [
-          "# 第3章 Canal Shadow",
+          "# Chương 3 Canal Shadow",
           "",
-          "林月把那张转运单塞进袖口，没再回头。",
-          "雨水顺着码头铁皮往下淌，阿盛在后面只说了一句：仓库今晚会出事。",
+          "mock_text，mock_text。",
+          "mock_text，mock_text：mock_text。",
         ].join("\n"),
         "utf-8",
       ),
@@ -75,7 +75,7 @@ describe("gatherPlanningMaterials", () => {
     expect(result.currentFocus).toContain("harbor ledger");
     expect(result.recentSummaries).toHaveLength(2);
     expect(result.previousEndingHook).toContain("warehouse");
-    expect(result.previousEndingExcerpt).toContain("仓库今晚会出事");
+    expect(result.previousEndingExcerpt).toContain("mock_text");
     expect(result.activeHooks).toEqual([
       expect.objectContaining({
         hookId: "H019",

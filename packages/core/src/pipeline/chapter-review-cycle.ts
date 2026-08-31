@@ -97,8 +97,8 @@ export async function runChapterReviewCycle(params: {
   /** Re-run deterministic post-write checks (chapter-ref, paragraph shape, etc.) on any content. */
   readonly runPostWriteChecks?: (content: string) => ReadonlyArray<AuditIssue>;
   readonly maxReviewIterations?: number;
-  readonly logWarn: (message: { zh: string; en: string }) => void;
-  readonly logStage: (message: { zh: string; en: string }) => void;
+  readonly logWarn: (message: { vi: string; en: string }) => void;
+  readonly logStage: (message: { vi: string; en: string }) => void;
 }): Promise<ChapterReviewCycleResult> {
   let totalUsage = params.initialUsage;
   let finalContent = params.normalizePostWriteSurface?.(params.initialOutput.content)
@@ -181,7 +181,7 @@ export async function runChapterReviewCycle(params: {
   // projects can raise it when they accept slower but more persistent repair.
   // ---------------------------------------------------------------------------
   const maxReviewIterations = Math.max(0, Math.floor(params.maxReviewIterations ?? DEFAULT_MAX_REVIEW_ITERATIONS));
-  params.logStage({ zh: "审计草稿", en: "auditing draft" });
+  params.logStage({ vi: "Đánh giá bản nháp", en: "auditing draft" });
   const initial = await assess(finalContent);
 
   const snapshots: ReviewSnapshot[] = [{
@@ -197,7 +197,7 @@ export async function runChapterReviewCycle(params: {
 
   if (initial.auditResult.parseFailed) {
     params.logWarn({
-      zh: "审稿输出解析失败，跳过自动修稿以避免误改正文",
+      vi: "Phân tích đầu ra đánh giá thất bại, bỏ qua tự động sửa để tránh sửa sai văn bản",
       en: "Audit output parsing failed; skipping automatic repair to avoid rewriting valid prose from an unreliable audit.",
     });
     return {
@@ -215,7 +215,7 @@ export async function runChapterReviewCycle(params: {
   if (!isPassed(initial)) {
     for (let iteration = 0; iteration < maxReviewIterations; iteration++) {
       params.logStage({
-        zh: `修复轮次 ${iteration + 1}/${maxReviewIterations}（当前 ${currentAudit.score} 分）`,
+        vi: ` ${iteration + 1}/${maxReviewIterations}（ ${currentAudit.score} ）`,
         en: `repair iteration ${iteration + 1}/${maxReviewIterations} (current score: ${currentAudit.score})`,
       });
 
@@ -233,7 +233,7 @@ export async function runChapterReviewCycle(params: {
 
       if (reviseOutput.revisedContent.length === 0 || reviseOutput.revisedContent === finalContent) {
         params.logWarn({
-          zh: `修复轮次 ${iteration + 1} 未产出新内容，退出循环`,
+          vi: ` ${iteration + 1} ，`,
           en: `repair iteration ${iteration + 1} produced no new content, exiting loop`,
         });
         break;
@@ -259,7 +259,7 @@ export async function runChapterReviewCycle(params: {
       // Check if passed
       if (isPassed(nextAssessment)) {
         params.logStage({
-          zh: `修复后达到通过线（${nextAssessment.score} 分），退出循环`,
+          vi: `（${nextAssessment.score} ），`,
           en: `repair reached pass threshold (${nextAssessment.score}), exiting loop`,
         });
         finalContent = revisedContent;
@@ -278,7 +278,7 @@ export async function runChapterReviewCycle(params: {
         // Continue to next iteration
       } else {
         params.logWarn({
-          zh: `修复轮次 ${iteration + 1} 未净提升（${currentAudit.score} → ${nextAssessment.score}），退出循环`,
+          vi: ` ${iteration + 1} （${currentAudit.score} → ${nextAssessment.score}），`,
           en: `repair iteration ${iteration + 1} no net improvement (${currentAudit.score} → ${nextAssessment.score}), exiting loop`,
         });
         break;
@@ -304,7 +304,7 @@ export async function runChapterReviewCycle(params: {
   );
   if (shouldRestoreBestSnapshot) {
     params.logWarn({
-      zh: `回退到最高分版本（${bestSnapshot.score} 分 vs 当前 ${currentAudit.score} 分）`,
+      vi: `（${bestSnapshot.score}  vs  ${currentAudit.score} ）`,
       en: `rolling back to highest-scoring version (${bestSnapshot.score} vs current ${currentAudit.score})`,
     });
     finalContent = bestSnapshot.content;

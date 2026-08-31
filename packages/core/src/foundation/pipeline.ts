@@ -100,16 +100,16 @@ const FRESH_UNIT_IDS = {
 } as const;
 
 const MUST_KNOW = [
-  { key: "protagonist", label: "protagonist", aliases: ["protagonist", "main character", "主角"] },
-  { key: "premise", label: "core premise", aliases: ["premise", "core premise", "story premise", "核心前提", "故事前提"] },
-  { key: "conflict", label: "central conflict", aliases: ["conflict", "central conflict", "dramatic engine", "核心冲突", "戏剧引擎"] },
+  { key: "protagonist", label: "protagonist", aliases: ["protagonist", "main character", "nhân vật chính"] },
+  { key: "premise", label: "core premise", aliases: ["premise", "core premise", "story premise", "tiền đề", "tiền đề cốt lõi"] },
+  { key: "conflict", label: "central conflict", aliases: ["conflict", "central conflict", "dramatic engine", "xung đột", "xung đột trung tâm"] },
 ] as const;
 
 const HELPFUL = [
-  { label: "ending preference", aliases: ["ending", "ending preference", "结局"] },
-  { label: "antagonist", aliases: ["antagonist", "反派"] },
-  { label: "tone", aliases: ["tone", "基调", "风格"] },
-  { label: "supporting cast", aliases: ["supporting cast", "配角"] },
+  { label: "ending preference", aliases: ["ending", "ending preference", "kết thúc", "kết truyện"] },
+  { label: "antagonist", aliases: ["antagonist", "phản diện"] },
+  { label: "tone", aliases: ["tone", "style", "giọng điệu", "phong cách"] },
+  { label: "supporting cast", aliases: ["supporting cast", "supporting characters", "nhân vật phụ"] },
 ] as const;
 
 function nonEmpty(value: unknown): boolean {
@@ -157,9 +157,9 @@ export async function adaptiveIntake(
 
   // BookConfig already establishes genre, target scale, and writing language.
   const structuralGaps: string[] = [];
-  if (!book?.genre && !hasAlias(values, ["genre", "story mode", "题材", "类型"])) structuralGaps.push("story mode / genre");
-  if (!book?.targetChapters && !hasAlias(values, ["scale", "target scale", "target chapters", "篇幅"])) structuralGaps.push("target scale");
-  if (!book?.language && !hasAlias(values, ["language", "writing language", "语言"])) structuralGaps.push("writing language");
+  if (!book?.genre && !hasAlias(values, ["genre", "story mode", "thể loại"])) structuralGaps.push("story mode / genre");
+  if (!book?.targetChapters && !hasAlias(values, ["scale", "target scale", "target chapters", "quy mô", "số chương"])) structuralGaps.push("target scale");
+  if (!book?.language && !hasAlias(values, ["language", "writing language", "ngôn ngữ", "ngôn ngữ viết"])) structuralGaps.push("writing language");
 
   const creativeGaps = MUST_KNOW
     .filter((field) => !hasAlias(values, field.aliases) && !briefContainsKnown(brief, field.aliases))

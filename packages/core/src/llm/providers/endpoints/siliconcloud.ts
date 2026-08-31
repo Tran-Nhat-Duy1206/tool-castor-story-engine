@@ -1,19 +1,9 @@
-/**
- * 硅基流动 (SiliconCloud / SiliconFlow)
- *
- * - 官网：https://www.siliconflow.com/
- * - 控制台 / API key：https://cloud.siliconflow.cn/account/ak
- * - 模型广场：https://cloud.siliconflow.cn/models
- * - API 文档：https://docs.siliconflow.cn/
- *
- * 聚合平台，代理 Qwen / DeepSeek / GLM / Kimi / 百川 / 昆仑万维等多家开源 + 托管模型，
- * 新模型上架频繁，bank 只维护文本 chat 主流，元数据以 live /models probe 为准。
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const SILICONCLOUD: ProviderEndpoint = {
   id: "siliconcloud",
-  label: "硅基流动",
+  label: "SiliconFlow",
   group: "aggregator",
   api: "openai-completions",
   baseUrl: "https://api.siliconflow.cn/v1",
@@ -22,7 +12,7 @@ export const SILICONCLOUD: ProviderEndpoint = {
   defaultTemperature: 0.7,
   writingTemperature: 1,
   models: [
-    // --- 2026-04 新上 ---
+    // LLM provider configuration and endpoints.
     { id: "Pro/moonshotai/Kimi-K2.6", maxOutput: 4096, contextWindowTokens: 262144, enabled: true, releasedAt: "2026-04-21", temperature: 1 },
     { id: "Pro/zai-org/GLM-5", maxOutput: 4096, contextWindowTokens: 198000 },
     { id: "Pro/zai-org/GLM-4.7", maxOutput: 4096, contextWindowTokens: 200000 },

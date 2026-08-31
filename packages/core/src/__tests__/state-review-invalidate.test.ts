@@ -43,7 +43,7 @@ function expectOnlyPathsChanged(
   expect(unexpected).toEqual([]);
 }
 
-function chapterEntry(number: number, status: ChapterMeta["status"], title = `第${number}章`) {
+function chapterEntry(number: number, status: ChapterMeta["status"], title = `Chương ${number}mock_text`) {
   return {
     number,
     title,
@@ -63,8 +63,8 @@ async function seedChapters(
   await mkdir(join(fixture.bookDir, "chapters"), { recursive: true });
   for (const entry of entries) {
     await writeFile(
-      join(fixture.bookDir, "chapters", `${String(entry.number).padStart(4, "0")}_旧.md`),
-      `# 第${entry.number}章 旧\n\n这是第${entry.number}章的旧正文。`,
+      join(fixture.bookDir, "chapters", `${String(entry.number).padStart(4, "0")}_mock_text.md`),
+      `# Chương ${entry.number}mock_text mock_text\n\nmock_textChương ${entry.number}mock_text。`,
       "utf-8",
     );
   }
@@ -94,12 +94,12 @@ async function seedReceipt(fixture: CanonBookFixture, chapter: number, reviewId 
     proseRevision: "1111222233334444",
     baseCanonRevision: "aaaabbbbccccdddd",
     resultingCanonRevision: "eeeeffff00001111",
-    proposals: [{ type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "北岸灯塔" } }],
+    proposals: [{ type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } }],
     decisions: [{ itemId: "current-state-fact:0:x", decision: "accepted" }],
-    effectiveChanges: [{ type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "北岸灯塔" } }],
+    effectiveChanges: [{ type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } }],
     evidence: [{
       itemId: "current-state-fact:0:x",
-      evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "他走向了北岸灯塔" },
+      evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" },
     }],
     resolvedAt: "2026-08-24T02:00:00.000Z",
     resolution: "confirmed-changes",
@@ -108,7 +108,7 @@ async function seedReceipt(fixture: CanonBookFixture, chapter: number, reviewId 
   return receipt;
 }
 
-const NEW_PROSE = "# 第16章 反转\n\n林秋在黎明烧毁了账本，决定留守伦敦追查遗嘱。";
+const NEW_PROSE = "# Chương 16 mock_text\n\nmock_text，mock_text。";
 
 describe("state-review-invalidation", () => {
   let fixture: CanonBookFixture;
@@ -171,13 +171,13 @@ describe("state-review-invalidation", () => {
     expect(result.reviewRequired).toBe(true);
     const after = await captureBookMetadata(fixture.root);
     expectOnlyPathsChanged(before, after, [
-      "chapters/0016_旧.md",
+      "chapters/0016_mock_text.md",
       SHELL_RELPATH,
       "chapters/index.json",
     ]);
 
     // Exact durable prose bytes (single trailing newline normalization).
-    await expect(readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8"))
+    await expect(readFile(join(fixture.bookDir, "chapters", "0016_mock_text.md"), "utf-8"))
       .resolves.toBe(`${NEW_PROSE}\n`);
     // Artifact REPLACED by the non-confirmable shell — no active fields survive.
     const reloaded = await loadStateReview(fixture.bookDir, 16);
@@ -207,7 +207,7 @@ describe("state-review-invalidation", () => {
       items: [
         {
           id: "current-state-fact:0:a", kind: "current-state-fact", origin: "ai",
-          title: "goal", proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前目标", object: "查账" } },
+          title: "goal", proposal: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "Kiem tra so sach" } },
           decision: "undecided",
         },
       ],
@@ -217,12 +217,12 @@ describe("state-review-invalidation", () => {
     await decideStateReviewItem({ bookDir: fixture.bookDir, chapter: 16, itemId: "current-state-fact:0:a", decision: "accept", expectedReviewRevision: 1 });
     const withEdit = await editStateReviewItem({
       bookDir: fixture.bookDir, chapter: 16, itemId: "current-state-fact:0:a",
-      expectedReviewRevision: 2, editedChange: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前目标", object: "焚账" } },
+      expectedReviewRevision: 2, editedChange: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } },
     });
     const withUser = await addUserStateReviewItem({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: withEdit.reviewRevision,
       kind: "current-state-fact", title: "missing",
-      change: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "西郊仓库" } },
+      change: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } },
     });
 
     await executeEditTransaction(replaceDeps(fixture), {
@@ -254,7 +254,7 @@ describe("state-review-invalidation", () => {
 
     const after = await captureBookMetadata(fixture.root);
     expectOnlyPathsChanged(before, after, [
-      "chapters/0016_旧.md",
+      "chapters/0016_mock_text.md",
       SHELL_RELPATH,
       "chapters/index.json",
       `${RECEIPTS_DIR(16)}/${REVIEW_ID}.json`,
@@ -278,7 +278,7 @@ describe("state-review-invalidation", () => {
       reviewRevision: 2, items: [], createdAt: CREATED_AT, language: "vi",
     });
     const beforeBytes = {
-      prose: await readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8"),
+      prose: await readFile(join(fixture.bookDir, "chapters", "0016_mock_text.md"), "utf-8"),
       artifact: await readFile(join(fixture.bookDir, SHELL_RELPATH), "utf-8"),
       index: await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8"),
     };
@@ -300,7 +300,7 @@ describe("state-review-invalidation", () => {
       kind: "chapter-replace", bookId: "demo-canon-book", chapterNumber: 16, fullText: NEW_PROSE,
     })).rejects.toThrow(/injected mid-set rename failure/);
 
-    expect(await readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8")).toBe(beforeBytes.prose);
+    expect(await readFile(join(fixture.bookDir, "chapters", "0016_mock_text.md"), "utf-8")).toBe(beforeBytes.prose);
     expect(await readFile(join(fixture.bookDir, SHELL_RELPATH), "utf-8")).toBe(beforeBytes.artifact);
     expect(await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8")).toBe(beforeBytes.index);
     // The legacy version-archive side-write (pre-transaction, by design) is
@@ -334,13 +334,13 @@ describe("state-review-invalidation", () => {
     const changedKeys = Object.keys(captureDiff(before, await captureBookMetadata(fixture.root)));
     const normalized = changedKeys.map((key) => key.replace(/\\/g, "/"));
     for (const key of normalized) {
-      expect(["chapters/0016_旧.md", SHELL_RELPATH, "chapters/index.json", `${RECEIPTS_DIR(16)}/${REVIEW_ID}.json`])
+      expect(["chapters/0016_mock_text.md", SHELL_RELPATH, "chapters/index.json", `${RECEIPTS_DIR(16)}/${REVIEW_ID}.json`])
         .toContain(key);
     }
     // Chapters 17–25 files untouched (only ch16 prose + shared index changed).
     for (let number = 17; number <= 25; number += 1) {
-      await expect(readFile(join(fixture.bookDir, "chapters", `${String(number).padStart(4, "0")}_旧.md`), "utf-8"))
-        .resolves.toContain(`这是第${number}章的旧正文`);
+      await expect(readFile(join(fixture.bookDir, "chapters", `${String(number).padStart(4, "0")}_mock_text.md`), "utf-8"))
+        .resolves.toContain(`mock_textChương ${number}mock_text`);
     }
     // Shell binds the HISTORICAL source chapter…
     const reloaded = await loadStateReview(fixture.bookDir, 16);
@@ -380,7 +380,7 @@ describe("state-review-invalidation", () => {
     await seedChapters(fixture, [{ number: 16, status: "needs-state-review" }]);
     await mkdir(join(fixture.bookDir, "story", "runtime"), { recursive: true });
     await writeFile(join(fixture.bookDir, "story", "runtime", "chapter-0016.plan.md"), "old plan", "utf-8");
-    await writeFile(join(fixture.bookDir, "story", "runtime", "chapter-0016.user-brief.md"), "保留雨夜证词。\n", "utf-8");
+    await writeFile(join(fixture.bookDir, "story", "runtime", "chapter-0016.user-brief.md"), "mock_text。\n", "utf-8");
     const writeSpy = vi.spyOn(WriterAgent.prototype, "writeChapter");
     const settleSpy = vi.spyOn(WriterAgent.prototype, "settleChapterState");
     const auditSpy = vi.spyOn(ContinuityAuditor.prototype, "auditChapter");
@@ -398,7 +398,7 @@ describe("state-review-invalidation", () => {
       .rejects.toMatchObject({ code: "ENOENT" });
     // User brief is preserved by legacy exclusion.
     await expect(readFile(join(fixture.bookDir, "story", "runtime", "chapter-0016.user-brief.md"), "utf-8"))
-      .resolves.toBe("保留雨夜证词。\n");
+      .resolves.toBe("mock_text。\n");
   });
 
   it("(P/N) editing over an existing rebuild_required shell keeps a fresh rebuild_required shell", async () => {
@@ -409,7 +409,7 @@ describe("state-review-invalidation", () => {
     const firstShell = await loadStateReview(fixture.bookDir, 16);
 
     await executeEditTransaction(replaceDeps(fixture), {
-      kind: "chapter-replace", bookId: "demo-canon-book", chapterNumber: 16, fullText: `${NEW_PROSE}\n\n补一段新的结尾。`,
+      kind: "chapter-replace", bookId: "demo-canon-book", chapterNumber: 16, fullText: `${NEW_PROSE}\n\nmock_text。`,
     });
 
     const secondShell = await loadStateReview(fixture.bookDir, 16);
@@ -429,11 +429,11 @@ describe("state-review-invalidation", () => {
 
     const after = await captureBookMetadata(fixture.root);
     expectOnlyPathsChanged(before, after, [
-      "chapters/0016_旧.md",
+      "chapters/0016_mock_text.md",
       SHELL_RELPATH,
       "chapters/index.json",
     ]);
-    await expect(readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8"))
+    await expect(readFile(join(fixture.bookDir, "chapters", "0016_mock_text.md"), "utf-8"))
       .resolves.toBe(`${NEW_PROSE}\n`);
     const indexOnDisk = JSON.parse(await readFile(join(fixture.bookDir, "chapters", "index.json"), "utf-8"));
     expect(indexOnDisk[0].status).toBe("needs-state-review");
@@ -473,7 +473,7 @@ describe("state-review-invalidation", () => {
         kind: "current-state-fact",
         origin: "ai",
         title: "stale proposal item",
-        proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "旧宅" } },
+        proposal: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } },
         decision: "accepted",
       }],
     });
@@ -487,11 +487,11 @@ describe("state-review-invalidation", () => {
 
     const after = await captureBookMetadata(fixture.root);
     expectOnlyPathsChanged(before, after, [
-      "chapters/0016_旧.md",
+      "chapters/0016_mock_text.md",
       SHELL_RELPATH,
       "chapters/index.json",
     ]);
-    await expect(readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8"))
+    await expect(readFile(join(fixture.bookDir, "chapters", "0016_mock_text.md"), "utf-8"))
       .resolves.toBe(`${NEW_PROSE}\n`);
     // Stale identity/items/decisions are NOT carried into the shell.
     const reloaded = await loadStateReview(fixture.bookDir, 16);

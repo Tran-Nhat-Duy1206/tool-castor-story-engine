@@ -142,7 +142,7 @@ describe("createStreamMonitor", () => {
     }, 1000);
 
     monitor.onChunk("hello");
-    monitor.onChunk("世界你好");
+    monitor.onChunk("mock_text");
 
     // Advance past one interval
     vi.advanceTimersByTime(1000);
@@ -168,7 +168,7 @@ describe("createStreamMonitor", () => {
     const monitor = createStreamMonitor(undefined);
     expect(() => {
       monitor.onChunk("test data");
-      monitor.onChunk("更多数据");
+      monitor.onChunk("mock_text");
       monitor.stop();
     }).not.toThrow();
   });

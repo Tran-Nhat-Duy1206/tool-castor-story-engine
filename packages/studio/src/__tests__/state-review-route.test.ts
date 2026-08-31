@@ -38,7 +38,7 @@ const CHAPTER = 13;
 const REVIEW_ID = "3f2504e0-4f89-41d3-9a0c-0305e82c3303";
 const OTHER_REVIEW_ID = "3f2504e0-4f89-41d3-9a0c-0305e82c3304";
 const CREATED_AT = "2026-08-24T00:00:00.000Z";
-const PROSE_13 = "林秋在北岸灯塔烧毁了账本，把灰烬撒进了海雾。";
+const PROSE_13 = "mock_val，mock_val。";
 
 function makeApp(root: string, overrides?: Parameters<typeof createStudioServer>[2]) {
   return createStudioServer({} as never, root, overrides);
@@ -67,8 +67,8 @@ function factItem(id: string): Parameters<typeof publishActiveProposal>[1]["item
     id,
     kind: "current-state-fact",
     origin: "ai",
-    title: "Current-state update: 当前位置",
-    proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "北岸灯塔" } },
+    title: "Current-state update: mock_val",
+    proposal: { type: "fact", change: { action: "set", subject: "mock_val", predicate: "mock_val", object: "mock_val" } },
     evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: PROSE_13 },
     decision: "accepted",
   } as never;
@@ -79,18 +79,18 @@ function summaryItem(id: string) {
     id,
     kind: "chapter-summary",
     origin: "ai",
-    title: "Chapter summary: ch 13 反转",
+    title: "Chapter summary: ch 13 mock_val",
     proposal: {
       type: "chapter-summary",
       row: {
         chapter: CHAPTER,
-        title: "反转",
-        characters: "主角；林秋",
-        events: "林秋在北岸灯塔烧毁了账本",
-        stateChanges: "当前位置→北岸灯塔",
+        title: "mock_val",
+        characters: "mock_val；mock_val",
+        events: "mock_val",
+        stateChanges: "mock_val→mock_val",
         hookActivity: "",
-        mood: "紧张",
-        chapterType: "调查",
+        mood: "mock_val",
+        chapterType: "mock_val",
       },
     },
     decision: "accepted",
@@ -115,12 +115,12 @@ async function seedBook(root: string): Promise<string> {
   );
   await writeFile(
     join(bookDir, "book.json"),
-    JSON.stringify({ id: BOOK_ID, title: "回声协议", language: "zh", createdAt: CREATED_AT, updatedAt: CREATED_AT }),
+    JSON.stringify({ id: BOOK_ID, title: "mock_val", language: "zh", createdAt: CREATED_AT, updatedAt: CREATED_AT }),
     "utf-8",
   );
   const index = Array.from({ length: 12 }, (_, i) => i + 1).map((number) => ({
     number,
-    title: `第${number}章`,
+    title: `mock_val${number}mock_val`,
     status: "approved",
     wordCount: 10,
     createdAt: CREATED_AT,
@@ -130,8 +130,8 @@ async function seedBook(root: string): Promise<string> {
   }));
   for (let chapter = 1; chapter <= 12; chapter += 1) {
     await writeFile(
-      join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_第${chapter}章.md`),
-      `# 第${chapter}章\n\n正文。`,
+      join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_mock_val${chapter}mock_val.md`),
+      `# mock_val${chapter}mock_val\n\nmock_val。`,
       "utf-8",
     );
   }
@@ -162,11 +162,11 @@ async function seedBook(root: string): Promise<string> {
 
 /** Durable prose + index entry + ACTIVE review for source chapter 13. */
 async function seedActiveReview(bookDir: string, reviewId: string = REVIEW_ID): Promise<void> {
-  await writeFile(join(bookDir, "chapters", "0013_反转.md"), PROSE_13, "utf-8");
+  await writeFile(join(bookDir, "chapters", "0013_mock_val.md"), PROSE_13, "utf-8");
   const index = [
     ...Array.from({ length: 12 }, (_, i) => i + 1).map((number) => ({
       number,
-      title: `第${number}章`,
+      title: `mock_val${number}mock_val`,
       status: "approved",
       wordCount: 10,
       createdAt: CREATED_AT,
@@ -176,7 +176,7 @@ async function seedActiveReview(bookDir: string, reviewId: string = REVIEW_ID): 
     })),
     {
       number: CHAPTER,
-      title: "反转",
+      title: "mock_val",
       status: "needs-state-review",
       wordCount: 20,
       createdAt: CREATED_AT,
@@ -288,7 +288,7 @@ describe("state-review HTTP routes (Task 14)", () => {
     const app = makeApp(root);
     const res = await post(app, `${base}/edit`, {
       itemId: "item-fact",
-      editedChange: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "南岸暗礁" } },
+      editedChange: { type: "fact", change: { action: "set", subject: "mock_val", predicate: "mock_val", object: "mock_val" } },
       expectedReviewRevision: 1,
     });
     expect(res.status).toBe(200);
@@ -302,7 +302,7 @@ describe("state-review HTTP routes (Task 14)", () => {
     const app = makeApp(root);
     const add = await post(app, `${base}/items`, {
       kind: "current-state-fact",
-      change: { type: "fact", change: { action: "set", subject: "林晚", predicate: "身份", object: "自由记者" } },
+      change: { type: "fact", change: { action: "set", subject: "mock_val", predicate: "mock_val", object: "mock_val" } },
       title: "User correction",
       expectedReviewRevision: 1,
     });
@@ -455,7 +455,7 @@ describe("state-review HTTP routes (Task 14)", () => {
   });
 
   it("rebuild from a rebuild_required shell with a failing settler ⇒ 409 state_review_rebuild_failed + durable shell", async () => {
-    await writeFile(join(bookDir, "chapters", "0013_反转.md"), PROSE_13, "utf-8");
+    await writeFile(join(bookDir, "chapters", "0013_mock_val.md"), PROSE_13, "utf-8");
     await saveStateReviewShell(bookDir, {
       status: "rebuild_required",
       schemaVersion: 1,

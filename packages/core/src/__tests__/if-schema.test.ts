@@ -5,12 +5,12 @@ const minimal = {
   schemaVersion: 1,
   projectId: "demo",
   title: "Demo",
-  variables: [{ name: "trust", type: "counter", default: 0, desc: "信任" }],
+  variables: [{ name: "trust", type: "counter", default: 0, desc: "mock_text" }],
   nodes: [
-    { id: "n1", title: "开场", type: "start", choices: [{ id: "c1", text: "去", targetNodeId: "n2" }] },
-    { id: "n2", title: "结局", type: "ending", choices: [] },
+    { id: "n1", title: "Mo dau", type: "start", choices: [{ id: "c1", text: "mock_text", targetNodeId: "n2" }] },
+    { id: "n2", title: "mock_text", type: "ending", choices: [] },
   ],
-  endings: [{ id: "e1", nodeId: "n2", title: "好结局", type: "good" }],
+  endings: [{ id: "e1", nodeId: "n2", title: "mock_text", type: "good" }],
 };
 
 describe("StoryGraphSchema", () => {

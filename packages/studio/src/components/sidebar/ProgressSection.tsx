@@ -17,21 +17,21 @@ interface ProgressStep {
 }
 
 const INIT_BOOK_STEPS: ReadonlyArray<ProgressStep> = [
-  { key: "生成基础设定", vi: "Tạo cài đặt nền tảng", en: "Generate foundation" },
-  { key: "保存书籍配置", vi: "Lưu cấu hình sách", en: "Save book config" },
-  { key: "写入基础设定文件", vi: "Ghi tệp nền tảng", en: "Write foundation files" },
-  { key: "初始化控制文档", vi: "Khởi tạo tài liệu điều khiển", en: "Initialize control docs" },
-  { key: "创建初始快照", vi: "Tạo snapshot ban đầu", en: "Create initial snapshot" },
+  { key: "", vi: "Tạo cài đặt nền tảng", en: "Generate foundation" },
+  { key: "", vi: "Lưu cấu hình sách", en: "Save book config" },
+  { key: "", vi: "Ghi tệp nền tảng", en: "Write foundation files" },
+  { key: "", vi: "Khởi tạo tài liệu điều khiển", en: "Initialize control docs" },
+  { key: "", vi: "Tạo snapshot ban đầu", en: "Create initial snapshot" },
 ];
 
 const WRITE_CHAPTER_STEPS: ReadonlyArray<ProgressStep> = [
-  { key: "准备章节输入", vi: "Chuẩn bị đầu vào chương", en: "Prepare chapter input" },
-  { key: "撰写章节草稿", vi: "Soạn bản nháp chương", en: "Draft the chapter" },
-  { key: "落盘最终章节", vi: "Lưu chương cuối cùng", en: "Save final chapter" },
-  { key: "生成最终真相文件", vi: "Tạo tệp sự thật cuối cùng", en: "Generate final truth files" },
-  { key: "校验真相文件变更", vi: "Xác thực thay đổi tệp sự thật", en: "Validate truth file changes" },
-  { key: "同步记忆索引", vi: "Đồng bộ chỉ mục ký ức", en: "Sync memory index" },
-  { key: "更新章节索引与快照", vi: "Cập nhật chỉ mục và snapshot chương", en: "Update chapter index and snapshot" },
+  { key: "", vi: "Chuẩn bị đầu vào chương", en: "Prepare chapter input" },
+  { key: "", vi: "Soạn bản nháp chương", en: "Draft the chapter" },
+  { key: "", vi: "Lưu chương cuối cùng", en: "Save final chapter" },
+  { key: "", vi: "Tạo tệp sự thật cuối cùng", en: "Generate final truth files" },
+  { key: "", vi: "Xác thực thay đổi tệp sự thật", en: "Validate truth file changes" },
+  { key: "", vi: "Đồng bộ chỉ mục ký ức", en: "Sync memory index" },
+  { key: "", vi: "Cập nhật chỉ mục và snapshot chương", en: "Update chapter index and snapshot" },
 ];
 
 type StepStatus = "pending" | "active" | "done";

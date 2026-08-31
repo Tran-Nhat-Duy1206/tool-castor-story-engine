@@ -4,21 +4,7 @@ import { GovernanceMarkersSchema } from "../governance/contracts.js";
 export const PlatformSchema = z.enum(["tomato", "feilu", "qidian", "other"]);
 export type Platform = z.infer<typeof PlatformSchema>;
 
-/**
- * Legacy compat: old books/configs may store platform as Chinese literals
- * "番茄", "起点", "飞卢", "其他"/"其它". We keep escaped \uXXXX checks so
- * existing data still normalizes correctly, but new code must not introduce
- * new literal Chinese — use canonical ids "tomato"/"qidian"/"feilu"/"other".
- *
- * Escaped forms:
- *  番茄 = \u756a\u8304
- *  起点 = \u8d77\u70b9
- *  飞卢 = \u98de\u5362
- *  其他 = \u5176\u4ed6
- *  其它 = \u5176\u5b83
- * Keeping \uXXXX here is intentional: it lets us read legacy books without
- * putting literal Han in new source. Do not add new Chinese literals.
- */
+// Core narrative engine processing.
 export function normalizePlatformId(platform: unknown): Platform | undefined {
   if (typeof platform !== "string") {
     return undefined;
@@ -32,16 +18,16 @@ export function normalizePlatformId(platform: unknown): Platform | undefined {
   const lowered = raw.toLowerCase();
   const compact = lowered.replace(/[\s_-]+/g, "");
 
-  if (compact === "tomato" || compact === "fanqie" || compact === "fanqienovel" || raw.includes("\u756a\u8304")) {
+  if (compact === "tomato" || compact === "fanqie" || compact === "fanqienovel") {
     return "tomato";
   }
-  if (compact === "qidian" || compact === "qidianzhongwenwang" || raw.includes("\u8d77\u70b9")) {
+  if (compact === "qidian" || compact === "qidianzhongwenwang") {
     return "qidian";
   }
-  if (compact === "feilu" || raw.includes("\u98de\u5362")) {
+  if (compact === "feilu") {
     return "feilu";
   }
-  if (compact === "other" || compact === "others" || raw.includes("\u5176\u4ed6") || raw.includes("\u5176\u5b83")) {
+  if (compact === "other" || compact === "others") {
     return "other";
   }
 

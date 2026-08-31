@@ -344,7 +344,7 @@ export class MemoryDB {
          payoff_timing AS payoffTiming,
          notes
        FROM hooks
-       WHERE lower(status) NOT IN ('resolved', 'closed', '已回收', '已解决')
+       WHERE lower(status) NOT IN ('resolved', 'closed', 'done', 'đã thu hồi', 'đã giải quyết', 'thu hồi')
        ORDER BY last_advanced_chapter DESC, start_chapter DESC, hook_id ASC`,
     ).all() as unknown as ReadonlyArray<StoredHook>;
   }

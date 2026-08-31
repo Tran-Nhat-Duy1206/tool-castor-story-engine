@@ -2,13 +2,13 @@ import { describe, it, expect } from "vitest";
 import { getAllEndpoints, getEndpoint } from "../llm/providers/index.js";
 
 describe("providers structural integrity", () => {
-  it("每个 provider 必填字段都存在", () => {
+  it("mock_text provider mock_text từmock_text", () => {
     const gatewayProviders = new Set(["custom", "newapi"]);
     for (const p of getAllEndpoints()) {
       expect(p.id).toBeTruthy();
       expect(p.label).toBeTruthy();
       expect(p.api).toMatch(/^(openai-completions|openai-responses|anthropic-messages|google-generative-ai)$/);
-      // gateway/anchor provider 允许 baseUrl 为空（由用户填）
+      // gateway/anchor provider mock_text baseUrl mock_text（mock_text）
       if (gatewayProviders.has(p.id)) {
         expect(typeof p.baseUrl).toBe("string");
       } else {
@@ -17,7 +17,7 @@ describe("providers structural integrity", () => {
     }
   });
 
-  it("每个 model card 必填字段都存在且 contextWindowTokens >= maxOutput", () => {
+  it("mock_text model card mock_text từmock_text contextWindowTokens >= maxOutput", () => {
     for (const p of getAllEndpoints()) {
       for (const m of p.models) {
         expect(m.id, `provider=${p.id}`).toBeTruthy();
@@ -27,19 +27,19 @@ describe("providers structural integrity", () => {
     }
   });
 
-  it("每个 provider 的 id 唯一", () => {
+  it("mock_text provider mock_text id mock_text", () => {
     const ids = getAllEndpoints().map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("每个 provider 里 models 的 id 唯一", () => {
+  it("mock_text provider mock_text models mock_text id mock_text", () => {
     for (const p of getAllEndpoints()) {
       const ids = p.models.map((m) => m.id);
-      expect(new Set(ids).size, `provider=${p.id} 有重复 model id`).toBe(ids.length);
+      expect(new Set(ids).size, `provider=${p.id} mock_text model id`).toBe(ids.length);
     }
   });
 
-  it("DeepSeek 官方 API model card 跟进 V4", () => {
+  it("DeepSeek mock_text API model card mock_text V4", () => {
     const deepseek = getEndpoint("deepseek");
     expect(deepseek?.checkModel).toBe("deepseek-v4-flash");
 
@@ -57,20 +57,20 @@ describe("providers structural integrity", () => {
     expect(zhipu?.models.some((model) => model.id === "glm-4-flash" && model.enabled !== false)).toBe(true);
   });
 
-  it("A 组至少有 5 个核心 provider", () => {
+  it("A mock_text 5 mock_text provider", () => {
     const ids = getAllEndpoints().map((p) => p.id);
     expect(ids).toContain("anthropic");
     expect(ids).toContain("openai");
     expect(ids).toContain("google");
     expect(ids).toContain("deepseek");
     expect(ids).toContain("minimax");
-    // 阿里通义千问：仅保留 bailian（Anthropic 协议，工具调用更稳），
-    // 已删除重复的 qwen endpoint（OpenAI 协议同家）
+    // mock_text：mock_text bailian（Anthropic mock_text，mock_text），
+    // mock_text qwen endpoint（OpenAI mock_text）
     expect(ids).toContain("bailian");
     expect(ids).not.toContain("qwen");
   });
 
-  it("B1：中国原厂批次 1 全部收录（9 个，PPIO 默认入口已下架）", () => {
+  it("B1：mock_text 1 mock_text（9 mock_text，PPIO mock_text）", () => {
     const ids = getAllEndpoints().map((p) => p.id);
     for (const id of [
       "moonshot", "zhipu", "siliconcloud", "bailian",
@@ -80,29 +80,29 @@ describe("providers structural integrity", () => {
     }
   });
 
-  it("B1：bailian 保留 anthropic-messages api（例外，不按 lobe 迁移）", () => {
+  it("B1：bailian mock_text anthropic-messages api（mock_text，mock_text lobe mock_text）", () => {
     expect(getEndpoint("bailian")?.api).toBe("anthropic-messages");
     expect(getEndpoint("bailian")?.baseUrl).toContain("/anthropic");
   });
 
-  it("B1：minimax 使用 OpenAI-compatible chat endpoint", () => {
+  it("B1：minimax mock_text OpenAI-compatible chat endpoint", () => {
     expect(getEndpoint("minimax")?.api).toBe("openai-completions");
     expect(getEndpoint("minimax")?.baseUrl).toBe("https://api.minimaxi.com/v1");
   });
 
-  it("B2：小米 MiMo 使用当前 OpenAI-compatible endpoint", () => {
+  it("B2：mock_text MiMo mock_text OpenAI-compatible endpoint", () => {
     expect(getEndpoint("xiaomimimo")?.api).toBe("openai-completions");
     expect(getEndpoint("xiaomimimo")?.baseUrl).toBe("https://api.xiaomimimo.com/v1");
   });
 
-  it("B2：中国原厂批次 2 全部收录（6 个）", () => {
+  it("B2：mock_text 2 mock_text（6 mock_text）", () => {
     const ids = getAllEndpoints().map((p) => p.id);
     for (const id of ["spark", "sensenova", "tencentcloud", "xiaomimimo", "longcat", "internlm"]) {
       expect(ids).toContain(id);
     }
   });
 
-  it("B3：中国原厂批次 3 保留公开服务列表中的原厂入口（R5 已删 higress）", () => {
+  it("B3：mock_text 3 mock_textCong khaimock_text（R5 mock_text higress）", () => {
     const ids = getAllEndpoints().map((p) => p.id);
     for (const id of ["zeroone", "ai360"]) {
       expect(ids).toContain(id);
@@ -113,24 +113,24 @@ describe("providers structural integrity", () => {
     expect(ids).not.toContain("higress");
   });
 
-  it("B4：海外/本地/自定义/聚合/GH 全部收录", () => {
+  it("B4：mock_text/mock_text/mock_text/mock_text/GH mock_text", () => {
     const ids = getAllEndpoints().map((p) => p.id);
     for (const id of ["ollama", "lmstudio", "openrouter", "custom", "mistral", "xai", "newapi", "githubCopilot", "kkaiapi"]) {
       expect(ids).toContain(id);
     }
   });
 
-  it("B4：custom / newapi baseUrl 为空（gateway 占位）", () => {
+  it("B4：custom / newapi baseUrl mock_text（gateway mock_text）", () => {
     expect(getEndpoint("custom")?.baseUrl).toBe("");
     expect(getEndpoint("newapi")?.baseUrl).toBe("");
   });
 
-  it("B4：总 provider 数 = 31（不含 CodingPlan 分组）", () => {
+  it("B4：mock_text provider mock_text = 31（mock_text CodingPlan mock_text）", () => {
     const nonCoding = getAllEndpoints().filter((p) => p.group !== "codingPlan");
     expect(nonCoding.length).toBe(31);
   });
 
-  it("B6：CodingPlan 8 个 provider 全部收录", () => {
+  it("B6：CodingPlan 8 mock_text provider mock_text", () => {
     const ids = getAllEndpoints().map((p) => p.id);
     for (const id of [
       "kimiCodingPlan", "minimaxCodingPlan", "bailianCodingPlan",
@@ -141,11 +141,11 @@ describe("providers structural integrity", () => {
     }
   });
 
-  it("B6：总 provider 数 = 39 (31 base + 8 CodingPlan)", () => {
+  it("B6：mock_text provider mock_text = 39 (31 base + 8 CodingPlan)", () => {
     expect(getAllEndpoints().length).toBe(39);
   });
 
-  it("B6：CodingPlan provider 都走 anthropic-messages", () => {
+  it("B6：CodingPlan provider mock_text anthropic-messages", () => {
     for (const id of [
       "kimiCodingPlan", "minimaxCodingPlan", "bailianCodingPlan",
       "glmCodingPlan", "volcengineCodingPlan", "opencodeCodingPlan",
@@ -155,7 +155,7 @@ describe("providers structural integrity", () => {
     }
   });
 
-  it("R3：endpoint 不再出现 piProvider 字段（已移到 provider-to-pi-ai adapter）", () => {
+  it("R3：endpoint mock_text piProvider  từmock_text（mock_text provider-to-pi-ai adapter）", () => {
     for (const ep of getAllEndpoints()) {
       expect((ep as any).piProvider, `endpoint=${ep.id}`).toBeUndefined();
     }

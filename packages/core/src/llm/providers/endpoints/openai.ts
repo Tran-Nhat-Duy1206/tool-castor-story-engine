@@ -1,12 +1,4 @@
-/**
- * OpenAI
- *
- * - 官网：https://openai.com/
- * - 控制台：https://platform.openai.com/
- * - API key：https://platform.openai.com/api-keys
- * - API 文档：https://platform.openai.com/docs/api-reference
- * - 模型列表：https://platform.openai.com/docs/models
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const OPENAI: ProviderEndpoint = {

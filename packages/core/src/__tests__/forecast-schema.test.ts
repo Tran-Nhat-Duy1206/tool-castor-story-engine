@@ -9,7 +9,7 @@ import { makeForecast, makeForecastBranch } from "./helpers/forecast-fixture.js"
 
 function modelBranches(count: number) {
   return Array.from({ length: count }, (_, index) => {
-    const { branchId: _branchId, ...rest } = makeForecastBranch({ title: `分支${index + 1}` });
+    const { branchId: _branchId, ...rest } = makeForecastBranch({ title: `mock_text${index + 1}` });
     return rest;
   });
 }
@@ -34,7 +34,7 @@ describe("narrative forecast schema", () => {
 
   it("rejects duplicate branch ids so sibling branches stay isolated", () => {
     const forecast = makeForecast({
-      branches: [makeForecastBranch(), makeForecastBranch({ title: "重复 id 的分支" })],
+      branches: [makeForecastBranch(), makeForecastBranch({ title: "mock_text id mock_text" })],
     });
     expect(() => NarrativeForecastSchema.parse(forecast)).toThrow(/branch-1/);
   });
@@ -42,7 +42,7 @@ describe("narrative forecast schema", () => {
   it("rejects an intent alignment score outside 0-100", () => {
     const forecast = makeForecast({
       branches: [
-        makeForecastBranch({ intentAlignment: { score: 101, rationale: "越界" } }),
+        makeForecastBranch({ intentAlignment: { score: 101, rationale: "mock_text" } }),
         makeForecastBranch({ branchId: "branch-2" }),
       ],
     });
@@ -52,7 +52,7 @@ describe("narrative forecast schema", () => {
   it("rejects unknown risk kinds", () => {
     const forecast = makeForecast({
       branches: [
-        makeForecastBranch({ risks: [{ kind: "vibes" as never, description: "不合法" }] }),
+        makeForecastBranch({ risks: [{ kind: "vibes" as never, description: "mock_text" }] }),
         makeForecastBranch({ branchId: "branch-2" }),
       ],
     });
@@ -74,7 +74,7 @@ describe("parseForecastModelOutput", () => {
   it("parses a plain JSON object", () => {
     const output = parseForecastModelOutput(JSON.stringify({ branches: modelBranches(2) }));
     expect(output.branches).toHaveLength(2);
-    expect(output.branches[0]?.title).toBe("分支1");
+    expect(output.branches[0]?.title).toBe("mock_text1");
   });
 
   it("parses JSON wrapped in a code fence", () => {
@@ -83,7 +83,7 @@ describe("parseForecastModelOutput", () => {
   });
 
   it("parses JSON surrounded by prose", () => {
-    const raw = `好的，以下是推演结果：\n${JSON.stringify({ branches: modelBranches(2) })}\n希望有帮助。`;
+    const raw = `mock_text，mock_text：\n${JSON.stringify({ branches: modelBranches(2) })}\nmock_text。`;
     expect(parseForecastModelOutput(raw).branches).toHaveLength(2);
   });
 
@@ -93,11 +93,11 @@ describe("parseForecastModelOutput", () => {
   });
 
   it("throws a JSON error on unparsable output", () => {
-    expect(() => parseForecastModelOutput("这不是 JSON")).toThrow(/not valid JSON/);
+    expect(() => parseForecastModelOutput("mock_text JSON")).toThrow(/not valid JSON/);
   });
 
   it("throws a schema error on the wrong shape", () => {
-    expect(() => parseForecastModelOutput(JSON.stringify({ branches: [{ title: "缺字段" }] })))
+    expect(() => parseForecastModelOutput(JSON.stringify({ branches: [{ title: "mock_text" }] })))
       .toThrow(/schema validation/);
   });
 

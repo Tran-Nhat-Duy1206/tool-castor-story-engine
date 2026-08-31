@@ -39,11 +39,11 @@ const SAFE_TRUTH_FLAT_FILE_NAMES = new Set([
 const SAFE_TRUTH_OUTLINE_FILE_NAMES = new Set([
   "outline/story_frame.md",
   "outline/volume_map.md",
-  "outline/节奏原则.md",
+  "outline/.md",
   "outline/rhythm_principles.md",
 ]);
 
-const SAFE_ROLE_TRUTH_FILE_RE = /^roles\/(主要角色|次要角色|major|minor)\/[^/\\]+\.md$/u;
+const SAFE_ROLE_TRUTH_FILE_RE = /^roles\/(||major|minor)\/[^/\\]+\.md$/u;
 
 export function assertSafeTruthFileName(fileName: string): string {
   const trimmed = fileName.trim();
@@ -117,14 +117,14 @@ function buildCreationExternalContext(input: {
   readonly constraints?: string;
 }): string | undefined {
   const sections = [
-    input.worldPremise ? `## 世界观与核心设定\n${input.worldPremise}` : undefined,
-    input.settingNotes ? `## 补充设定\n${input.settingNotes}` : undefined,
-    input.protagonist ? `## 主角设定\n${input.protagonist}` : undefined,
-    input.supportingCast ? `## 关键角色与势力\n${input.supportingCast}` : undefined,
-    input.conflictCore ? `## 核心冲突\n${input.conflictCore}` : undefined,
-    input.volumeOutline ? `## 卷纲方向\n${input.volumeOutline}` : undefined,
-    input.blurb ? `## 简介卖点\n${input.blurb}` : undefined,
-    input.constraints ? `## 创作约束\n${input.constraints}` : undefined,
+    input.worldPremise ? `## \n${input.worldPremise}` : undefined,
+    input.settingNotes ? `## \n${input.settingNotes}` : undefined,
+    input.protagonist ? `## \n${input.protagonist}` : undefined,
+    input.supportingCast ? `## \n${input.supportingCast}` : undefined,
+    input.conflictCore ? `## \n${input.conflictCore}` : undefined,
+    input.volumeOutline ? `## \n${input.volumeOutline}` : undefined,
+    input.blurb ? `## \n${input.blurb}` : undefined,
+    input.constraints ? `## \n${input.constraints}` : undefined,
   ].filter((section): section is string => Boolean(section?.trim()));
 
   if (sections.length === 0) {
@@ -176,28 +176,28 @@ function mapStageMessageToStatus(message: string): InteractionEvent["status"] | 
     || lower.includes("generating foundation")
     || lower.includes("reviewing foundation")
     || lower.includes("preparing chapter inputs")
-    || message.includes("规划下一章意图")
-    || message.includes("生成基础设定")
-    || message.includes("审核基础设定")
-    || message.includes("准备章节输入")
+    || message.includes("")
+    || message.includes("")
+    || message.includes("")
+    || message.includes("Chuẩn bị đầu vào chương")
   ) {
     return "planning";
   }
   if (
     lower.includes("composing chapter runtime context")
-    || message.includes("组装章节运行时上下文")
+    || message.includes("")
   ) {
     return "composing";
   }
   if (
     lower.includes("writing chapter draft")
-    || message.includes("撰写章节草稿")
+    || message.includes("")
   ) {
     return "writing";
   }
   if (
     lower.includes("auditing draft")
-    || message.includes("审计草稿")
+    || message.includes("Đánh giá bản nháp")
   ) {
     return "assessing";
   }
@@ -206,9 +206,9 @@ function mapStageMessageToStatus(message: string): InteractionEvent["status"] | 
     || lower.includes("revising chapter")
     || lower.includes("rewrite")
     || lower.includes("repair")
-    || message.includes("自动修复")
-    || message.includes("整章改写")
-    || message.includes("修订第")
+    || message.includes("")
+    || message.includes("")
+    || message.includes("Chương ")
   ) {
     return "repairing";
   }
@@ -219,12 +219,12 @@ function mapStageMessageToStatus(message: string): InteractionEvent["status"] | 
     || lower.includes("rebuilding final truth files")
     || lower.includes("validating truth file updates")
     || lower.includes("syncing memory indexes")
-    || message.includes("落盘")
-    || message.includes("保存")
-    || message.includes("快照")
-    || message.includes("校验真相文件变更")
-    || message.includes("生成最终真相文件")
-    || message.includes("同步记忆索引")
+    || message.includes("")
+    || message.includes("")
+    || message.includes("")
+    || message.includes("")
+    || message.includes("")
+    || message.includes("")
   ) {
     return "persisting";
   }
@@ -235,8 +235,8 @@ function extractStageDetail(message: string): string | undefined {
   if (message.startsWith("Stage: ")) {
     return message.slice("Stage: ".length).trim();
   }
-  if (message.startsWith("阶段：")) {
-    return message.slice("阶段：".length).trim();
+  if (message.startsWith("：")) {
+    return message.slice("：".length).trim();
   }
   return undefined;
 }

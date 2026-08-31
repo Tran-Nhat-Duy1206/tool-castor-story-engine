@@ -21,7 +21,7 @@ describe("generate_node_image tool", () => {
   beforeEach(async () => {
     generatedSize = "";
     root = await mkdtemp(join(tmpdir(), "if-imgtool-"));
-    await saveStoryGraph(root, "p", StoryGraphSchema.parse({ schemaVersion: 1, projectId: "p", title: "T", variables: [], nodes: [{ id: "s", type: "start", sceneDesc: "宫门前", choices: [] }], endings: [] }));
+    await saveStoryGraph(root, "p", StoryGraphSchema.parse({ schemaVersion: 1, projectId: "p", title: "T", variables: [], nodes: [{ id: "s", type: "start", sceneDesc: "Cong dien", choices: [] }], endings: [] }));
   });
   afterEach(async () => { await rm(root, { recursive: true, force: true }); });
 

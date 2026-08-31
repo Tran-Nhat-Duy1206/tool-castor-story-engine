@@ -80,10 +80,10 @@ describe("castor chapter sync", () => {
     const bookDir = await setupBook({
       bookId: "driftbook",
       chapters: [
-        // "风从码头吹进巷子。" → 9 chars after stripping heading + whitespace.
-        { file: "0001_起风.md", content: "# 第1章 起风\n\n风从码头吹进巷子。" },
+        // "test_mock。" → 9 chars after stripping heading + whitespace.
+        { file: "0001_test_mock.md", content: "# Chương 1 test_mock\n\ntest_mock。" },
       ],
-      index: [chapterEntry(1, "起风", 3000)],
+      index: [chapterEntry(1, "test_mock", 3000)],
     });
 
     const { chapterCommand } = await import("../commands/chapter.js");
@@ -104,8 +104,8 @@ describe("castor chapter sync", () => {
   it("prints a bilingual summary when the index is already in sync", async () => {
     await setupBook({
       bookId: "steadybook",
-      chapters: [{ file: "0001_起风.md", content: "# 第1章 起风\n\n风从码头吹进巷子。" }],
-      index: [chapterEntry(1, "起风", 9)],
+      chapters: [{ file: "0001_test_mock.md", content: "# Chương 1 test_mock\n\ntest_mock。" }],
+      index: [chapterEntry(1, "test_mock", 9)],
     });
 
     const { chapterCommand } = await import("../commands/chapter.js");
@@ -126,10 +126,10 @@ describe("castor chapter delete", () => {
     const bookDir = await setupBook({
       bookId: "delbook",
       chapters: [
-        { file: "0001_起风.md", content: "第一章。" },
-        { file: "0002_落雨.md", content: "第二章。" },
+        { file: "0001_test_mock.md", content: "test_mock。" },
+        { file: "0002_test_mock.md", content: "test_mock。" },
       ],
-      index: [chapterEntry(1, "起风", 4), chapterEntry(2, "落雨", 4)],
+      index: [chapterEntry(1, "test_mock", 4), chapterEntry(2, "test_mock", 4)],
       snapshotChapters: [1, 2],
     });
 
@@ -144,22 +144,22 @@ describe("castor chapter delete", () => {
     };
     expect(output.deletedChapter).toBe(2);
     expect(output.rolledBackTo).toBe(1);
-    expect(output.trashedFiles).toEqual(["chapters/.trash/0002_落雨.md"]);
+    expect(output.trashedFiles).toEqual(["chapters/.trash/0002_test_mock.md"]);
 
     const savedIndex = JSON.parse(await readFile(join(bookDir, "chapters", "index.json"), "utf-8")) as ChapterEntry[];
     expect(savedIndex.map((c) => c.number)).toEqual([1]);
-    await expect(readFile(join(bookDir, "chapters", ".trash", "0002_落雨.md"), "utf-8"))
-      .resolves.toBe("第二章。");
+    await expect(readFile(join(bookDir, "chapters", ".trash", "0002_test_mock.md"), "utf-8"))
+      .resolves.toBe("test_mock。");
   });
 
   it("fails with exit code 1 when asked to delete a non-latest chapter", async () => {
     await setupBook({
       bookId: "midbook",
       chapters: [
-        { file: "0001_起风.md", content: "第一章。" },
-        { file: "0002_落雨.md", content: "第二章。" },
+        { file: "0001_test_mock.md", content: "test_mock。" },
+        { file: "0002_test_mock.md", content: "test_mock。" },
       ],
-      index: [chapterEntry(1, "起风", 4), chapterEntry(2, "落雨", 4)],
+      index: [chapterEntry(1, "test_mock", 4), chapterEntry(2, "test_mock", 4)],
       snapshotChapters: [1, 2],
     });
 

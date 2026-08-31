@@ -22,7 +22,7 @@ export interface StudioCommandHooks {
 }
 
 async function prepareStudioRoot(root: string): Promise<{ readonly root: string; readonly initialized: boolean }> {
-  const initialized = await ensureProjectDirectoryInitialized(root, { language: "zh" });
+  const initialized = await ensureProjectDirectoryInitialized(root, { language: "vi" });
   return { root, initialized };
 }
 

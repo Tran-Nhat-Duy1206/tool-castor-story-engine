@@ -27,9 +27,9 @@ describe("applyStoryGraphDelta", () => {
     const input = baseGraph();
     const g = applyStoryGraphDelta({
       graph: input,
-      delta: StoryGraphDeltaSchema.parse({ nodes: { upsert: [{ id: "s", type: "start", title: "新开场", choices: [{ id: "c", text: "go", targetNodeId: "e" }] }] } }),
+      delta: StoryGraphDeltaSchema.parse({ nodes: { upsert: [{ id: "s", type: "start", title: "mock_textMo dau", choices: [{ id: "c", text: "go", targetNodeId: "e" }] }] } }),
     });
-    expect(g.nodes.find(n => n.id === "s")?.title).toBe("新开场");
+    expect(g.nodes.find(n => n.id === "s")?.title).toBe("mock_textMo dau");
     expect(input.nodes.find(n => n.id === "s")?.title).toBe(""); // unchanged
   });
 
@@ -44,7 +44,7 @@ describe("applyStoryGraphDelta", () => {
   it("upserts a character", () => {
     const g = applyStoryGraphDelta({
       graph: baseGraph(),
-      delta: StoryGraphDeltaSchema.parse({ characters: { upsert: [{ id: "mei", name: "阿梅" }] } }),
+      delta: StoryGraphDeltaSchema.parse({ characters: { upsert: [{ id: "mei", name: "A Mei" }] } }),
     });
     expect(g.characters.map(c => c.id)).toEqual(["mei"]);
   });

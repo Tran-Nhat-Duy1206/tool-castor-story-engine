@@ -19,7 +19,7 @@ export function renderHooksProjection(
   language: "vi" | "en" = "vi",
   options?: { readonly currentChapter?: number },
 ): string {
-  const title = language === "en" ? "# Pending Hooks" : "# 伏笔池";
+  const title = language === "en" ? "# Pending Hooks" : "# Gợi mở chưa giải quyết";
   // Phase 7 + hotfixes 1 & 2: depends_on / pays_off_in_arc / core_hook / half_life / promoted
   // are visible columns, so writer and reviewer both see the causal chain, planned payoff arc,
   // stale threshold, and promotion flag. stale / blocked diagnostic flags are appended to the
@@ -30,7 +30,7 @@ export function renderHooksProjection(
       "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     : [
-      "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 上游依赖 | 回收卷 | 核心 | 半衰期 | 升级 | 备注 |",
+      "| hook_id | Chương bắt đầu | Loại | Trạng thái | Chương thúc đẩy gần nhất | Thu hoạch dự kiến | Nhịp thu hoạch | Phụ thuộc | Mạch truyện thu hoạch | Gợi mở cốt lõi | Chu kỳ bán rã | Đã nâng cấp | Ghi chú |",
       "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ];
 
@@ -74,13 +74,13 @@ export function renderHooksProjection(
 }
 
 function renderDependsOnCell(ids: ReadonlyArray<string>, language: "vi" | "en"): string {
-  if (ids.length === 0) return language === "en" ? "none" : "无";
+  if (ids.length === 0) return language === "en" ? "none" : "không";
   return `[${ids.join(", ")}]`;
 }
 
 function renderCoreHookCell(isCore: boolean, language: "vi" | "en"): string {
   if (language === "en") return isCore ? "true" : "false";
-  return isCore ? "是" : "否";
+  return isCore ? "có" : "không";
 }
 
 function renderHalfLifeCell(value: number | undefined): string {
@@ -91,21 +91,21 @@ function renderHalfLifeCell(value: number | undefined): string {
 function renderPromotedCell(value: boolean | undefined, language: "vi" | "en"): string {
   if (value === undefined) return "";
   if (language === "en") return value ? "true" : "false";
-  return value ? "是" : "否";
+  return value ? "có" : "không";
 }
 
 export function renderChapterSummariesProjection(
   state: ChapterSummariesState,
   language: "vi" | "en" = "vi",
 ): string {
-  const title = language === "en" ? "# Chapter Summaries" : "# 章节摘要";
+  const title = language === "en" ? "# Chapter Summaries" : "# Tóm tắt chương";
   const headers = language === "en"
     ? [
       "| Chapter | Title | Characters | Key Events | State Changes | Hook Activity | Mood | Chapter Type |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     : [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| Chương | Tiêu đề | Nhân vật | Sự kiện chính | Thay đổi trạng thái | Hoạt động gợi mở | Tông cảm xúc | Loại chương |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ];
 
@@ -140,20 +140,20 @@ const CURRENT_STATE_SLOT_ALIASES: Readonly<Record<
   Readonly<Record<CurrentStateSlotKey, ReadonlyArray<string>>>
 >> = {
   vi: {
-    currentLocation: ["Vị trí hiện tại", "Current Location", "当前位置"],
-    protagonistState: ["Trạng thái nhân vật chính", "Protagonist State", "主角状态"],
-    currentGoal: ["Mục tiêu hiện tại", "Current Goal", "当前目标"],
-    currentConstraint: ["Ràng buộc hiện tại", "Current Constraint", "当前限制"],
-    currentAlliances: ["Quan hệ hiện tại", "Current Alliances", "Current Relationships", "当前敌我"],
-    currentConflict: ["Xung đột hiện tại", "Current Conflict", "当前冲突"],
+    currentLocation: ["Vị trí hiện tại", "Current Location"],
+    protagonistState: ["Trạng thái nhân vật chính", "Protagonist State"],
+    currentGoal: ["Mục tiêu hiện tại", "Current Goal"],
+    currentConstraint: ["Ràng buộc hiện tại", "Current Constraint"],
+    currentAlliances: ["Quan hệ hiện tại", "Current Alliances", "Current Relationships"],
+    currentConflict: ["Xung đột hiện tại", "Current Conflict"],
   },
   en: {
-    currentLocation: ["Current Location", "Vị trí hiện tại", "当前位置"],
-    protagonistState: ["Protagonist State", "Trạng thái nhân vật chính", "主角状态"],
-    currentGoal: ["Current Goal", "Mục tiêu hiện tại", "当前目标"],
-    currentConstraint: ["Current Constraint", "Ràng buộc hiện tại", "当前限制"],
-    currentAlliances: ["Current Alliances", "Current Relationships", "Quan hệ hiện tại", "当前敌我"],
-    currentConflict: ["Current Conflict", "Xung đột hiện tại", "当前冲突"],
+    currentLocation: ["Current Location", "Vị trí hiện tại"],
+    protagonistState: ["Protagonist State", "Trạng thái nhân vật chính"],
+    currentGoal: ["Current Goal", "Mục tiêu hiện tại"],
+    currentConstraint: ["Current Constraint", "Ràng buộc hiện tại"],
+    currentAlliances: ["Current Alliances", "Current Relationships", "Quan hệ hiện tại"],
+    currentConflict: ["Current Conflict", "Xung đột hiện tại"],
   },
 };
 
@@ -199,7 +199,10 @@ export interface CurrentStateSlotDef {
 export const CURRENT_STATE_SLOT_DEFS: ReadonlyArray<CurrentStateSlotDef> =
   (Object.keys(CURRENT_STATE_SLOT_ALIASES.en) as CurrentStateSlotKey[]).map((key) => ({
     key,
-    aliases: CURRENT_STATE_SLOT_ALIASES.en[key]!,
+    aliases: [...new Set([
+      ...CURRENT_STATE_SLOT_ALIASES.vi[key]!,
+      ...CURRENT_STATE_SLOT_ALIASES.en[key]!,
+    ])],
   }));
 
 const CURRENT_STATE_SLOT_LABELS: Record<"vi" | "en", Record<CurrentStateSlotKey, string>> = {

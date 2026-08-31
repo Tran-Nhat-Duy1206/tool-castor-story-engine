@@ -111,7 +111,7 @@ function buildAgentBookConfig(input: {
     targetChapters: input.targetChapters ?? defaults.targetChapters ?? 200,
     chapterWordCount: input.chapterWordCount
       ?? defaults.chapterWordCount
-      ?? defaultChapterLength((input.language === "en" ? "en" : "zh") as any),
+      ?? defaultChapterLength((input.language === "en" ? "en" : "vi") as any),
     ...(input.language ? { language: input.language as any } : {}),
     ...(input.parentBookId ? { parentBookId: input.parentBookId } : {}),
     ...(input.fanficMode ? { fanficMode: input.fanficMode } : {}),
@@ -172,7 +172,7 @@ function closePlayDB(db: PlayGraphDB): void {
   db.close?.();
 }
 
-// runnerFactory 注入的测试替身没有 close 方法，可选调用兜底。
+// runnerFactory injected test double may not have close method.
 function closePlayRunner(runner: unknown): void {
   (runner as { close?: () => void } | null | undefined)?.close?.();
 }
@@ -257,7 +257,7 @@ const ProposeActionParams = Type.Object({
       Type.Literal("qidian"),
       Type.Literal("feilu"),
       Type.Literal("other"),
-    ], { description: "Confirmed target platform, e.g. tomato for 番茄." })),
+    ], { description: "Confirmed target platform, e.g. tomato." })),
     language: Type.Optional(Type.Union([
       Type.Literal("vi"),
       Type.Literal("en"),
@@ -366,13 +366,13 @@ const ProposeActionParams = Type.Object({
     episodeCount: Type.Optional(Type.Number({ description: "Optional target episode/segment count." })),
     episodeDuration: Type.Optional(Type.String({ description: "Optional per-episode/per-segment duration." })),
     budget: Type.Optional(Type.String({ description: "Optional budget or production constraints." })),
-    referenceMode: Type.Optional(Type.String({ description: "Optional reference mode, e.g. 盛世天下-style multi-ending interactive drama." })),
+    referenceMode: Type.Optional(Type.String({ description: "Optional reference mode, e.g. multi-ending interactive drama." })),
     projectId: Type.Optional(Type.String({ description: "Optional output id under interactive-films/." })),
     outDir: Type.Optional(Type.String({ description: "Optional project-relative output directory. Default interactive-films/." })),
   }, { description: "Structured execution args for action=interactive_film_create." })),
   translationCreate: Type.Optional(Type.Object({
     filePath: Type.String({ description: "Project-relative EPUB/PDF/TXT/Markdown source file path to translate." }),
-    sourceLanguage: Type.String({ description: "Source language as a human-readable name, e.g. Auto detect, Japanese, English, Chinese (Simplified), 繁体中文（台湾）. Do not require ISO abbreviations." }),
+    sourceLanguage: Type.String({ description: "Source language as a human-readable name, e.g. Auto detect, Japanese, English, Vietnamese, Chinese. Do not require ISO abbreviations." }),
     targetLanguage: Type.String({ description: "Target language as a human-readable name, e.g. Chinese (Simplified), English, Japanese, Korean, Brazilian Portuguese. Do not require ISO abbreviations." }),
     title: Type.Optional(Type.String({ description: "Optional translation project title." })),
     segmentMaxChars: Type.Optional(Type.Number({ description: "Optional long-paragraph split threshold." })),
@@ -401,7 +401,7 @@ const ProposeActionParams = Type.Object({
     title: Type.Optional(Type.String({ description: "New continuation book title when bookId is omitted." })),
     sourcePath: Type.String({ description: "Project-relative uploaded novel file or chapter directory." }),
     splitPattern: Type.Optional(Type.String({ description: "Optional custom chapter-heading regex source." })),
-    resumeFrom: Type.Optional(Type.Number({ description: "Resume interrupted replay from this 1-based chapter number." })),
+    resumeFrom: Type.Optional(Type.Number({ description: "Resume an interrupted import from chapter N (1-based)." })),
     genre: Type.Optional(Type.String({ description: "Genre for a newly created continuation book." })),
     platform: Type.Optional(Type.Union([
       Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
@@ -1020,7 +1020,7 @@ export function createSubAgentTool(
                   language: resolvedLanguage as any,
                   status: "outlining" as any,
                   targetChapters: createBookPayload?.targetChapters ?? targetChapters ?? 200,
-                  chapterWordCount: createBookPayload?.chapterWordCount ?? chapterWordCount ?? defaultChapterLength((resolvedLanguage === "en" ? "en" : "zh") as any),
+                  chapterWordCount: createBookPayload?.chapterWordCount ?? chapterWordCount ?? defaultChapterLength((resolvedLanguage === "en" ? "en" : "vi") as any),
                   createdAt: now,
                   updatedAt: now,
                 },
@@ -1428,7 +1428,7 @@ export function createIngestMaterialTool(projectRoot: string): AgentTool<typeof 
 
 const RetrieveMaterialParams = Type.Object({
   query: Type.String({
-    description: "Natural-language query written by the agent from the user's current task, e.g. 冷库赔偿款 0607 账页 or storyboard shot requirements.",
+    description: "Natural-language query written by the agent from the user's current task, e.g. cold storage compensation 0607 accounting sheet or storyboard shot requirements.",
   }),
   purpose: Type.Optional(Type.Union([
     Type.Literal("reference"),
@@ -1521,7 +1521,7 @@ const ManageBookReferenceParams = Type.Object({
     description: "Exact material asset id returned by ingest_material. Required for bind and unbind.",
   })),
   uses: Type.Optional(Type.Array(Type.String(), {
-    description: "bind only: user-defined natural-language purposes, e.g. 开篇机制, 人物关系, 调查节奏. Preserve the user's words instead of mapping them to a fixed taxonomy.",
+    description: "bind only: user-defined natural-language purposes, e.g. opening mechanism, character relationships, investigation rhythm. Preserve the user's words instead of mapping them to a fixed taxonomy.",
   })),
   note: Type.Optional(Type.String({
     description: "bind only: optional user instruction that limits how this reference may be used.",
@@ -1627,7 +1627,6 @@ const ImportChaptersParams = Type.Object({
     description: "Local path of the chapter source: either the stored_path from the Uploaded Files block (project-relative, e.g. .castor/uploads/<session>/novel.txt) or an absolute path on this machine that the user provided. A directory imports each .md/.txt file as one chapter in filename order; a single file is split into chapters automatically by heading lines.",
   }),
   splitPattern: Type.Optional(Type.String({
-    description: "Single-file mode only: custom JavaScript regex source matching chapter heading lines. Omit to use the default pattern, which matches \"第X章/第X回\" and \"Chapter N\" headings.",
   })),
   resumeFrom: Type.Optional(Type.Number({
     description: "Resume an interrupted import from chapter N (1-based). Required when the book already has chapters: replay starts at chapter N and earlier chapters are kept. Omit for a fresh import into an empty book.",
@@ -1811,7 +1810,7 @@ export function createSpinoffBookTool(
         parentBookId,
         genre: params.genre ?? parent.genre,
         platform: params.platform ?? parent.platform,
-        language: (params.language ?? (parent.language as string === "zh" ? "vi" : parent.language)) as any,
+        language: (params.language ?? (parent.language as string === "vi" ? "vi" : parent.language)) as any,
         targetChapters: params.targetChapters ?? parent.targetChapters,
         chapterWordCount: params.chapterWordCount ?? parent.chapterWordCount,
       });
@@ -2004,7 +2003,7 @@ const ShortFictionRunParams = Type.Object({
     description: "Confirmed title or working title. When present, the host uses it as the stable project identity instead of guessing from generated outline prose.",
   })),
   direction: Type.String({
-    description: "Required short fiction direction, e.g. 女频短篇 婚姻背叛 证据反杀. Include genre, protagonist pressure, conflict, and desired payoff when known.",
+    description: "Required short fiction direction, e.g. female-oriented short, betrayal, evidence countersuit. Include genre, protagonist pressure, conflict, and desired payoff when known.",
   }),
   reference: Type.Optional(Type.String({
     description: "Optional user-provided reference notes or constraints. Do not paste copyrighted source text unless the user explicitly provided it.",
@@ -2158,7 +2157,7 @@ const TranslationCreateParams = Type.Object({
     description: "Project-relative EPUB/PDF/TXT/Markdown source file path to translate.",
   }),
   sourceLanguage: Type.String({
-    description: "Source language as a human-readable name, e.g. Auto detect, Japanese, English, Chinese (Simplified), 繁体中文（台湾）. Do not require ISO abbreviations.",
+    description: "Source language as a human-readable name, e.g. Auto detect, Japanese, English, Vietnamese, Chinese. Do not require ISO abbreviations.",
   }),
   targetLanguage: Type.String({
     description: "Target language as a human-readable name, e.g. Chinese (Simplified), English, Japanese, Korean, Brazilian Portuguese. Do not require ISO abbreviations.",
@@ -2437,7 +2436,7 @@ const InteractiveFilmCreateParams = Type.Object({
     description: "Optional budget or production constraints.",
   })),
   referenceMode: Type.Optional(Type.String({
-    description: "Optional reference mode, e.g. 盛世天下-style multi-ending interactive drama.",
+    description: "Optional reference mode, e.g. multi-ending interactive drama.",
   })),
   projectId: Type.Optional(Type.String({
     description: "Optional output id under interactive-films/.",
@@ -2523,7 +2522,7 @@ const GenerateCoverParams = Type.Object({
     description: "Optional synopsis or one-paragraph story hook to guide the cover.",
   })),
   sellingPoints: Type.Optional(Type.String({
-    description: "Optional selling points separated by semicolons or new lines, e.g. 婚姻背叛；证据反杀；女主冷笑.",
+    description: "Optional selling points separated by semicolons or new lines, e.g. betrayal; evidence countersuit; dramatic confrontation.",
   })),
   coverPrompt: Type.Optional(Type.String({
     description: "Optional concrete or revised visual direction. Use this when the user changes the cover prompt through chat. Keep it short and commercial; do not paste the whole story.",

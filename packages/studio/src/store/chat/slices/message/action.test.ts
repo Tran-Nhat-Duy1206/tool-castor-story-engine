@@ -112,7 +112,7 @@ describe("chat message actions", () => {
             toolExecutions: [{
               id: "short-task-1",
               tool: "short_fiction_run",
-              label: "短篇生产",
+              label: "mock_val",
               status: "running",
               startedAt: 10,
               background: true,
@@ -157,11 +157,11 @@ describe("chat message actions", () => {
     fetchJson
       .mockResolvedValueOnce({ session: { sessionId, bookId: null, sessionKind: "book-create" } })
       .mockResolvedValueOnce({
-        response: "已创建书籍。",
+        response: "mock_val。",
         session: { sessionId, activeBookId: "new-book", sessionKind: "book" },
       });
 
-    await store.getState().sendMessage(sessionId, "创建一本债务悬疑长篇", { sessionKind: "book-create" });
+    await store.getState().sendMessage(sessionId, "mock_val", { sessionKind: "book-create" });
 
     expect(store.getState().sessions[sessionId]).toMatchObject({
       bookId: "new-book",
@@ -184,7 +184,7 @@ describe("chat message actions", () => {
         session: { sessionId, activeBookId: "harbor-book", sessionKind: "book" },
       });
 
-    await store.getState().sendMessage(sessionId, "审第 1 章");
+    await store.getState().sendMessage(sessionId, "mock_valChương 1");
 
     const agentCall = fetchJson.mock.calls.find(([path]) => path === "/agent");
     expect(agentCall).toBeDefined();
@@ -206,14 +206,14 @@ describe("chat message actions", () => {
         session: { sessionId, bookId: null, sessionKind: "play" },
       });
 
-    await store.getState().sendMessage(sessionId, "@open-world-play 做一个魔兽风开放世界", {
+    await store.getState().sendMessage(sessionId, "@open-world-play mock_val", {
       sessionKind: "play",
     });
 
     const agentCall = fetchJson.mock.calls.find(([path]) => path === "/agent");
     expect(agentCall).toBeDefined();
     const body = JSON.parse((agentCall?.[1] as { body: string }).body);
-    expect(body.instruction).toBe("做一个魔兽风开放世界");
+    expect(body.instruction).toBe("mock_val");
     expect(body.requestedSkills).toEqual(["open-world-play"]);
   });
 
@@ -229,7 +229,7 @@ describe("chat message actions", () => {
         resolveAgent = resolve;
       }));
 
-    const sent = store.getState().sendMessage(sessionId, "创建一本债务悬疑长篇", { sessionKind: "book-create" });
+    const sent = store.getState().sendMessage(sessionId, "mock_val", { sessionKind: "book-create" });
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(1));
 
     fakeEventSources[0].emit("tool:start", {
@@ -246,8 +246,8 @@ describe("chat message actions", () => {
         action: "create_book",
         targetSessionKind: "book-create",
         sameSession: true,
-        title: "确认建书",
-        instruction: "创建一本债务悬疑长篇",
+        title: "mock_val",
+        instruction: "mock_val",
       },
     });
 
@@ -256,7 +256,7 @@ describe("chat message actions", () => {
 
     const messages = store.getState().sessions[sessionId]?.messages ?? [];
     const assistant = messages.find((message) => message.role === "assistant");
-    expect(assistant?.content).not.toContain("模型未返回文本内容");
+    expect(assistant?.content).not.toContain("mock_val");
     expect(assistant?.parts).toEqual([
       expect.objectContaining({
         type: "tool",
@@ -281,14 +281,14 @@ describe("chat message actions", () => {
           {
             id: "proposal-1",
             tool: "propose_action",
-            label: "确认动作",
+            label: "mock_val",
             status: "completed",
             startedAt: 1,
             details: {
               kind: "proposed_action",
               action: "play_start",
               targetSessionKind: "play",
-              instruction: "启动旧影院",
+              instruction: "mock_val",
             },
           },
         ],
@@ -301,7 +301,7 @@ describe("chat message actions", () => {
           {
             id: "play-1",
             tool: "play_start",
-            label: "启动互动世界",
+            label: "mock_val",
             status: "completed",
             startedAt: 2,
             details: { kind: "play_world_started" },
@@ -342,7 +342,7 @@ describe("chat message actions", () => {
   it("restores and reconnects a running production task when session detail reloads", async () => {
     const store = createTestStore();
     fetchJson.mockResolvedValueOnce({
-      session: { sessionId: "short-session-1", bookId: null, sessionKind: "short", title: "雨夜账本" },
+      session: { sessionId: "short-session-1", bookId: null, sessionKind: "short", title: "mock_val" },
     });
     const sessionId = await store.getState().createSession(null, "short");
     fetchJson.mockResolvedValueOnce({
@@ -350,7 +350,7 @@ describe("chat message actions", () => {
         sessionId,
         bookId: null,
         sessionKind: "short",
-        title: "雨夜账本",
+        title: "mock_val",
         messages: [],
       },
       task: {
@@ -361,10 +361,10 @@ describe("chat message actions", () => {
         execution: {
           id: "short-task-1",
           tool: "short_fiction_run",
-          label: "生成短篇",
+          label: "mock_val",
           status: "running",
           startedAt: 10,
-          logs: ["正在生成大纲"],
+          logs: ["mock_val"],
         },
       },
     });
@@ -375,7 +375,7 @@ describe("chat message actions", () => {
     expect(store.getState().sessions[sessionId]?.messages[0]?.toolExecutions?.[0]).toMatchObject({
       id: "short-task-1",
       status: "running",
-      logs: ["正在生成大纲"],
+      logs: ["mock_val"],
     });
     expect(fakeEventSources).toHaveLength(1);
     expect(fakeEventSources[0]?.url).toBe(`/api/v1/events?sessionId=${encodeURIComponent(sessionId)}`);
@@ -388,11 +388,11 @@ describe("chat message actions", () => {
       execution: {
         id: "short-task-1",
         tool: "short_fiction_run",
-        label: "生成短篇",
+        label: "mock_val",
         status: "completed",
         startedAt: 10,
         completedAt: 30,
-        result: "短篇已完成",
+        result: "mock_val",
       },
     });
 
@@ -401,7 +401,7 @@ describe("chat message actions", () => {
     expect(store.getState().sessions[sessionId]?.messages[0]?.toolExecutions?.[0]).toMatchObject({
       id: "short-task-1",
       status: "completed",
-      result: "短篇已完成",
+      result: "mock_val",
     });
   });
 
@@ -417,8 +417,8 @@ describe("chat message actions", () => {
         bookId: null,
         sessionKind: "short",
         title: null,
-        // 任务开始时预写进 transcript 的用户指令
-        messages: [{ role: "user", content: "写一篇雨夜档案馆悬疑短篇。", timestamp: 5 }],
+        // mock_val transcript mock_val
+        messages: [{ role: "user", content: "mock_val。", timestamp: 5 }],
       },
       task: {
         version: 1,
@@ -428,7 +428,7 @@ describe("chat message actions", () => {
         execution: {
           id: "short-task-2",
           tool: "short_fiction_run",
-          label: "生成短篇",
+          label: "mock_val",
           status: "running",
           startedAt: 10,
         },
@@ -438,12 +438,12 @@ describe("chat message actions", () => {
     await store.getState().loadSessionDetail(sessionId);
 
     const messages = store.getState().sessions[sessionId]?.messages ?? [];
-    // 用户气泡（来自 transcript）+ 运行中任务卡（来自快照 merge）共存且不重复
+    // mock_val（mock_val transcript）+ mock_val（mock_val merge）mock_val
     expect(messages).toHaveLength(2);
-    expect(messages[0]).toMatchObject({ role: "user", content: "写一篇雨夜档案馆悬疑短篇。" });
+    expect(messages[0]).toMatchObject({ role: "user", content: "mock_val。" });
     expect(messages[1]?.toolExecutions?.[0]).toMatchObject({ id: "short-task-2", status: "running" });
     expect(
-      messages.filter((message) => message.role === "user" && message.content === "写一篇雨夜档案馆悬疑短篇。"),
+      messages.filter((message) => message.role === "user" && message.content === "mock_val。"),
     ).toHaveLength(1);
   });
 
@@ -459,21 +459,21 @@ describe("chat message actions", () => {
         resolveAgent = resolve;
       }));
 
-    const sent = store.getState().sendMessage(sessionId, "再生成一篇短篇", { sessionKind: "short" });
+    const sent = store.getState().sendMessage(sessionId, "mock_val", { sessionKind: "short" });
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(1));
 
-    // 服务端在 SSE 连接建立时会重放该会话磁盘上的任务快照；
-    // 上一轮已完成的任务快照不能把本轮新建立的流关掉。
+    // mock_val SSE mock_val；
+    // mock_val。
     fakeEventSources[0]?.emit("task:snapshot", {
       sessionId,
       execution: {
         id: "finished-task-9",
         tool: "short_fiction_run",
-        label: "短篇生产",
+        label: "mock_val",
         status: "completed",
         startedAt: 100,
         completedAt: 200,
-        result: "上一轮短篇已完成",
+        result: "mock_val",
       },
     });
 
@@ -498,7 +498,7 @@ describe("chat message actions", () => {
       toolExecutions: [{
         id: "short-task-1",
         tool: "short_fiction_run",
-        label: "短篇生产",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
       }],
@@ -528,14 +528,14 @@ describe("chat message actions", () => {
       }))
       .mockResolvedValueOnce({});
 
-    const sent = store.getState().sendMessage(sessionId, "确认生成短篇", { sessionKind: "short" });
+    const sent = store.getState().sendMessage(sessionId, "mock_val", { sessionKind: "short" });
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(1));
     fakeEventSources[0]?.emit("task:snapshot", {
       sessionId,
       execution: {
         id: "short-task-1",
         tool: "short_fiction_run",
-        label: "短篇生产",
+        label: "mock_val",
         status: "running",
         startedAt: 1_100,
       },
@@ -561,16 +561,16 @@ describe("chat message actions", () => {
     now.mockRestore();
   });
 
-  // 恢复出一个"任务运行中"的会话：磁盘上有 running 任务快照，前端加载详情后
-  // 会 merge 任务卡、建立 SSE 连接并把 isStreaming 置为 true。
+  // mock_val"mock_val"mock_val：mock_val running mock_val，mock_val
+  // mock_val merge mock_val、mock_val SSE mock_val isStreaming mock_val true。
   async function setupRunningTaskSession(store: ReturnType<typeof createTestStore>): Promise<string> {
     fetchJson.mockResolvedValueOnce({
-      session: { sessionId: "task-session-1", bookId: null, sessionKind: "short", title: "雨夜账本" },
+      session: { sessionId: "task-session-1", bookId: null, sessionKind: "short", title: "mock_val" },
     });
     const sessionId = await store.getState().createSession(null, "short");
     store.getState().setSelectedModel("deepseek-v4-flash", "kkaiapi");
     fetchJson.mockResolvedValueOnce({
-      session: { sessionId, bookId: null, sessionKind: "short", title: "雨夜账本", messages: [] },
+      session: { sessionId, bookId: null, sessionKind: "short", title: "mock_val", messages: [] },
       task: {
         version: 1,
         sessionId,
@@ -579,7 +579,7 @@ describe("chat message actions", () => {
         execution: {
           id: "direct-short_run-1",
           tool: "short_fiction_run",
-          label: "短篇生产",
+          label: "mock_val",
           status: "running",
           startedAt: 10,
         },
@@ -601,26 +601,26 @@ describe("chat message actions", () => {
     const sessionId = await setupRunningTaskSession(store);
 
     fetchJson.mockClear();
-    fetchJson.mockResolvedValueOnce({ response: "任务还在跑。", session: { sessionId, sessionKind: "short" } });
+    fetchJson.mockResolvedValueOnce({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
 
-    await store.getState().sendMessage(sessionId, "写得怎么样了？");
+    await store.getState().sendMessage(sessionId, "mock_val？");
 
-    // 发送没有被挡、也没有调用 abort 接口
+    // mock_val、mock_val abort mock_val
     const calledPaths = fetchJson.mock.calls.map(([path]) => path);
     expect(calledPaths).toContain("/agent");
     expect(calledPaths).not.toContain(`/sessions/${sessionId}/abort`);
-    // 单连接原则：旧的任务恢复连接被换成新连接
+    // mock_val：mock_val
     expect(fakeEventSources).toHaveLength(2);
     expect(fakeEventSources[0]?.closed).toBe(true);
     expect(fakeEventSources[1]?.closed).toBe(false);
-    // 聊天轮结束后任务仍在跑：isStreaming 保持 true、连接保持、任务卡还在 running
+    // mock_val：isStreaming mock_val true、mock_val、mock_val running
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true, isChatStreaming: false });
     expect(store.getState().sessions[sessionId]?.stream).not.toBeNull();
     expect(findTaskExecution(store, sessionId)).toMatchObject({ status: "running" });
-    // 聊天回复正常写入
+    // mock_val
     expect(store.getState().sessions[sessionId]?.messages.at(-1)).toMatchObject({
       role: "assistant",
-      content: "任务还在跑。",
+      content: "mock_val。",
     });
   });
 
@@ -634,26 +634,26 @@ describe("chat message actions", () => {
       resolveAgent = resolve;
     }));
 
-    const sent = store.getState().sendMessage(sessionId, "顺便聊两句");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
 
-    // 聊天轮的 agent:complete 到达时任务仍在跑：不能把连接关掉
+    // mock_val agent:complete mock_val：mock_val
     fakeEventSources[1]?.emit("agent:complete", { sessionId });
     expect(fakeEventSources[1]?.closed).toBe(false);
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true });
 
-    resolveAgent({ response: "聊完了。", session: { sessionId, sessionKind: "short" } });
+    resolveAgent({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
     await sent;
 
     expect(fakeEventSources[1]?.closed).toBe(false);
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true, isChatStreaming: false });
 
-    // 任务完成：tool:end 按 execution id 找到早前消息里的任务卡收尾，随后的 agent:complete 关闭连接
+    // mock_val：tool:end mock_val execution id mock_val，mock_val agent:complete mock_val
     fakeEventSources[1]?.emit("tool:end", {
       sessionId,
       id: "direct-short_run-1",
       tool: "short_fiction_run",
-      result: { content: [{ type: "text", text: "短篇已完成" }] },
+      result: { content: [{ type: "text", text: "mock_val" }] },
     });
     fakeEventSources[1]?.emit("agent:complete", { sessionId });
 
@@ -672,38 +672,38 @@ describe("chat message actions", () => {
       resolveAgent = resolve;
     }));
 
-    const sent = store.getState().sendMessage(sessionId, "顺便聊两句");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
 
-    // 竞态：任务刚结束、消息里还有 in-flight 任务卡，此刻聊天轮建立的新连接
-    // 收到服务端重放的终态快照。任务卡要收尾，但正在流式的聊天连接不能被关掉。
+    // mock_val：mock_val、mock_val in-flight mock_val，mock_val
+    // mock_val。mock_val，mock_val。
     fakeEventSources[1]?.emit("task:snapshot", {
       sessionId,
       execution: {
         id: "direct-short_run-1",
         tool: "short_fiction_run",
-        label: "短篇生产",
+        label: "mock_val",
         status: "completed",
         startedAt: 10,
         completedAt: 40,
-        result: "短篇已完成",
+        result: "mock_val",
       },
     });
 
-    // 任务卡转为 completed
+    // mock_val completed
     expect(findTaskExecution(store, sessionId)).toMatchObject({
       status: "completed",
-      result: "短篇已完成",
+      result: "mock_val",
     });
-    // 聊天轮仍在流式：连接未关、流式状态保持
+    // mock_val：mock_val、mock_val
     expect(fakeEventSources[1]?.closed).toBe(false);
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true, isChatStreaming: true });
     expect(store.getState().sessions[sessionId]?.stream).not.toBeNull();
 
-    resolveAgent({ response: "聊完了。", session: { sessionId, sessionKind: "short" } });
+    resolveAgent({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
     await sent;
 
-    // 聊天轮自己收尾：任务已完成，连接关闭
+    // mock_val：mock_val，mock_val
     expect(store.getState().sessions[sessionId]).toMatchObject({
       isStreaming: false,
       isChatStreaming: false,
@@ -724,11 +724,11 @@ describe("chat message actions", () => {
         resolveAgent = resolve;
       }));
 
-    const sent = store.getState().sendMessage(sessionId, "你好");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(1));
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true, isChatStreaming: true });
 
-    resolveAgent({ response: "你好！", session: { sessionId, sessionKind: "chat" } });
+    resolveAgent({ response: "mock_val！", session: { sessionId, sessionKind: "chat" } });
     await sent;
 
     expect(store.getState().sessions[sessionId]).toMatchObject({
@@ -751,7 +751,7 @@ describe("chat message actions", () => {
       }))
       .mockResolvedValueOnce({ ok: true, aborted: true });
 
-    const sent = store.getState().sendMessage(sessionId, "顺便问一下");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
 
     await store.getState().abortSession(sessionId);
@@ -788,10 +788,10 @@ describe("chat message actions", () => {
     fetchJson.mockImplementationOnce(() => new Promise((resolve) => {
       resolveAgent = resolve;
     }));
-    const sent = store.getState().sendMessage(sessionId, "顺便审一下最新章节");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
 
-    // 聊天轮启动了自己的工具卡：它成为"最近一张运行中的卡"
+    // mock_val：mock_val"mock_val"
     fakeEventSources[1]?.emit("tool:start", {
       sessionId,
       id: "chat-tool-1",
@@ -799,26 +799,26 @@ describe("chat message actions", () => {
       args: { agent: "auditor" },
     });
 
-    // 带 executionId 的任务日志：附加到更早消息里的任务卡，而不是最新运行中的卡
+    // mock_val executionId mock_val：mock_val，mock_val
     fakeEventSources[1]?.emit("log", {
       sessionId,
       executionId: "direct-short_run-1",
       level: "info",
       tag: "studio",
-      message: "第 2 章草稿完成",
+      message: "Chương 2mock_val",
     });
-    // 不带 executionId 的日志：维持现有回退，附加到最新运行中的聊天工具卡
+    // mock_val executionId mock_val：mock_val，mock_val
     fakeEventSources[1]?.emit("log", {
       sessionId,
       level: "info",
       tag: "studio",
-      message: "审稿进行中",
+      message: "mock_val",
     });
 
-    expect(findTaskExecution(store, sessionId)?.logs).toEqual(["第 2 章草稿完成"]);
-    expect(findChatToolExecution(store, sessionId)?.logs).toEqual(["审稿进行中"]);
+    expect(findTaskExecution(store, sessionId)?.logs).toEqual(["Chương 2mock_val"]);
+    expect(findChatToolExecution(store, sessionId)?.logs).toEqual(["mock_val"]);
 
-    resolveAgent({ response: "审完了。", session: { sessionId, sessionKind: "short" } });
+    resolveAgent({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
     await sent;
   });
 
@@ -834,19 +834,19 @@ describe("chat message actions", () => {
         resolveAgent = resolve;
       }));
 
-    // free-text 发送：前端无法预知服务端会命中写章启发式，先按聊天轮对待
-    const sent = store.getState().sendMessage(sessionId, "写下一章");
+    // free-text mock_val：mock_val，mock_val
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(1));
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true, isChatStreaming: true });
     const agentRequest = fetchJson.mock.calls.find(([path]) => path === "/agent");
     const sourceRequestId = JSON.parse(String(agentRequest?.[1]?.body)).clientRequestId as string;
 
-    // 普通聊天轮工具启动（不带 background 标记）不改变轮次分类
+    // mock_val（mock_val background mock_val）mock_val
     fakeEventSources[0]?.emit("tool:start", { sessionId, id: "chat-tool-0", tool: "read" });
     expect(store.getState().sessions[sessionId]).toMatchObject({ isChatStreaming: true });
     fakeEventSources[0]?.emit("tool:end", { sessionId, id: "chat-tool-0", tool: "read", result: "ok" });
 
-    // 服务端广播带 background 标记的 tool:start：这轮实际按后台生产任务执行
+    // mock_val background mock_val tool:start：mock_val
     fakeEventSources[0]?.emit("tool:start", {
       sessionId,
       id: "direct-write_next-1",
@@ -856,20 +856,20 @@ describe("chat message actions", () => {
       sourceRequestId,
     });
 
-    // 重分类：isChatStreaming 归 false（停止按钮据此走 scope=all，能拿到任务控制器），
-    // isStreaming 维持 true（任务还在跑），工具卡带上 background 标记
+    // mock_val：isChatStreaming mock_val false（mock_val scope=all，mock_val），
+    // isStreaming mock_val true（mock_val），mock_val background mock_val
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true, isChatStreaming: false });
     const taskExecution = (store.getState().sessions[sessionId]?.messages ?? [])
       .flatMap((message) => message.toolExecutions ?? [])
       .find((execution) => execution.id === "direct-write_next-1");
     expect(taskExecution).toMatchObject({ status: "running", background: true });
 
-    // 任务结束：tool:end 收尾任务卡，挂起的 fetch 返回后 finally 正常收尾（不重复、不残留）
+    // mock_val：tool:end mock_val，mock_val fetch mock_val finally mock_val（mock_val、mock_val）
     fakeEventSources[0]?.emit("tool:end", {
       sessionId,
       id: "direct-write_next-1",
       tool: "sub_agent",
-      result: { content: [{ type: "text", text: "第 3 章已完成" }] },
+      result: { content: [{ type: "text", text: "Chương 3mock_val" }] },
     });
     resolveAgent({ response: "", session: { sessionId, sessionKind: "book" } });
     await sent;
@@ -894,7 +894,7 @@ describe("chat message actions", () => {
         resolveAgent = resolve;
       }));
 
-    const sent = store.getState().sendMessage(sessionId, "启动世界", {
+    const sent = store.getState().sendMessage(sessionId, "mock_val", {
       sessionKind: "play",
       playMode: "guided",
       actionSource: "button",
@@ -906,7 +906,7 @@ describe("chat message actions", () => {
     const execution = {
       id: "direct-play_start-1",
       tool: "play_start",
-      label: "启动互动世界",
+      label: "mock_val",
       status: "running" as const,
       startedAt: 10,
       background: true,
@@ -934,7 +934,7 @@ describe("chat message actions", () => {
       sessionId,
       id: execution.id,
       tool: execution.tool,
-      result: "世界已启动",
+      result: "mock_val",
     });
     resolveAgent({ response: "", session: { sessionId, sessionKind: "play", playMode: "guided" } });
     await sent;
@@ -952,7 +952,7 @@ describe("chat message actions", () => {
         resolveAgent = resolve;
       }));
 
-    const sent = store.getState().sendMessage(sessionId, "启动开放世界", {
+    const sent = store.getState().sendMessage(sessionId, "mock_val", {
       sessionKind: "play",
       playMode: "open",
       requestedIntent: "play_start",
@@ -970,7 +970,7 @@ describe("chat message actions", () => {
       sessionId,
       id: executionId,
       tool: "play_start",
-      details: { kind: "play_world_started", sceneText: "镇口日落。" },
+      details: { kind: "play_world_started", sceneText: "mock_val。" },
     });
 
     resolveAgent({
@@ -979,11 +979,11 @@ describe("chat message actions", () => {
         toolExecutions: [{
           id: executionId,
           tool: "play_start",
-          label: "启动互动世界",
+          label: "mock_val",
           status: "completed",
           startedAt: 10,
           completedAt: 20,
-          details: { kind: "play_world_started", sceneText: "镇口日落。" },
+          details: { kind: "play_world_started", sceneText: "mock_val。" },
         }],
       },
       session: { sessionId, sessionKind: "play", playMode: "open" },
@@ -997,7 +997,7 @@ describe("chat message actions", () => {
     expect(matching[0]).toMatchObject({
       status: "completed",
       completedAt: 20,
-      details: { kind: "play_world_started", sceneText: "镇口日落。" },
+      details: { kind: "play_world_started", sceneText: "mock_val。" },
     });
   });
 
@@ -1013,7 +1013,7 @@ describe("chat message actions", () => {
         resolveAgent = resolve;
       }));
 
-    const sent = store.getState().sendMessage(sessionId, "确认创建剧本", {
+    const sent = store.getState().sendMessage(sessionId, "mock_val", {
       sessionKind: "script",
       actionSource: "button",
       requestedIntent: "script_create",
@@ -1031,7 +1031,7 @@ describe("chat message actions", () => {
       execution: {
         id: executionId,
         tool: "script_create",
-        label: "剧本创作",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
       },
@@ -1050,7 +1050,7 @@ describe("chat message actions", () => {
         toolExecutions: [{
           id: executionId,
           tool: "script_create",
-          label: "剧本创作",
+          label: "mock_val",
           status: "completed",
           startedAt: 10,
           completedAt: 20,
@@ -1085,14 +1085,14 @@ describe("chat message actions", () => {
       }))
       .mockResolvedValueOnce({ ok: true, aborted: true });
 
-    const sent = store.getState().sendMessage(sessionId, "连续写五章");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(1));
     expect(store.getState().sessions[sessionId]).toMatchObject({ isStreaming: true, isChatStreaming: true });
     const agentRequest = fetchJson.mock.calls.find(([path]) => path === "/agent");
     const sourceRequestId = JSON.parse(String(agentRequest?.[1]?.body)).clientRequestId as string;
 
-    // EventSource 可能晚于生产任务启动才连上：实时 tool:start 已经错过，服务端
-    // 会回放带同一请求 ID 的 running 快照。它必须完成与 tool:start 相同的重分类。
+    // EventSource mock_val：mock_val tool:start mock_val，mock_val
+    // mock_val ID mock_val running mock_val。mock_val tool:start mock_val。
     fakeEventSources[0]?.emit("task:snapshot", {
       sessionId,
       sourceRequestId,
@@ -1125,7 +1125,7 @@ describe("chat message actions", () => {
       resolveAgent = resolve;
     }));
 
-    const sent = store.getState().sendMessage(sessionId, "顺便解释一下当前进度");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
     expect(store.getState().sessions[sessionId]?.isChatStreaming).toBe(true);
 
@@ -1141,7 +1141,7 @@ describe("chat message actions", () => {
     });
 
     expect(store.getState().sessions[sessionId]?.isChatStreaming).toBe(true);
-    resolveAgent({ response: "任务仍在运行。", session: { sessionId, sessionKind: "short" } });
+    resolveAgent({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
     await sent;
   });
 
@@ -1149,16 +1149,16 @@ describe("chat message actions", () => {
     const store = createTestStore();
     const sessionId = await setupRunningTaskSession(store);
 
-    // 服务端快照重放会带 stages：给任务卡一个 active 阶段
+    // mock_val stages：mock_val active mock_val
     fakeEventSources[0]?.emit("task:snapshot", {
       sessionId,
       execution: {
         id: "direct-short_run-1",
         tool: "short_fiction_run",
-        label: "短篇生产",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
-        stages: [{ label: "撰写正文", status: "active" }],
+        stages: [{ label: "mock_val", status: "active" }],
       },
     });
 
@@ -1167,51 +1167,51 @@ describe("chat message actions", () => {
     fetchJson.mockImplementationOnce(() => new Promise((resolve) => {
       resolveAgent = resolve;
     }));
-    const sent = store.getState().sendMessage(sessionId, "顺便聊两句");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
     fakeEventSources[1]?.emit("tool:start", {
       sessionId,
       id: "chat-tool-1",
       tool: "sub_agent",
       args: { agent: "auditor" },
-      stages: ["审稿"],
+      stages: ["mock_val"],
     });
 
     fakeEventSources[1]?.emit("llm:progress", {
       sessionId,
       executionId: "direct-short_run-1",
-      status: "写作中",
+      status: "mock_val",
       elapsedMs: 1200,
       totalChars: 800,
       chineseChars: 640,
     });
 
-    // 带 executionId 的进度精确写进任务卡的 active 阶段
+    // mock_val executionId mock_val active mock_val
     expect(findTaskExecution(store, sessionId)?.stages?.[0]?.progress).toMatchObject({
       elapsedMs: 1200,
       totalChars: 800,
       chineseChars: 640,
     });
-    // 最新运行中的聊天工具卡没有被任务进度污染
+    // mock_val
     expect(findChatToolExecution(store, sessionId)?.stages?.[0]?.progress).toBeUndefined();
 
-    resolveAgent({ response: "聊完了。", session: { sessionId, sessionKind: "short" } });
+    resolveAgent({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
     await sent;
   });
 
   it("drops id-less logs and progress instead of attaching them to a background task card", async () => {
     const store = createTestStore();
     const sessionId = await setupRunningTaskSession(store);
-    // 快照重放给任务卡一个 active 阶段，验证无 id 进度也不会写进去
+    // mock_val active mock_val，mock_val id mock_val
     fakeEventSources[0]?.emit("task:snapshot", {
       sessionId,
       execution: {
         id: "direct-short_run-1",
         tool: "short_fiction_run",
-        label: "短篇生产",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
-        stages: [{ label: "撰写正文", status: "active" }],
+        stages: [{ label: "mock_val", status: "active" }],
       },
     });
 
@@ -1220,20 +1220,20 @@ describe("chat message actions", () => {
     fetchJson.mockImplementationOnce(() => new Promise((resolve) => {
       resolveAgent = resolve;
     }));
-    const sent = store.getState().sendMessage(sessionId, "顺便聊两句");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
 
-    // 聊天轮还没有自己的工具卡：无 id 的 log / llm:progress 不能回退到
-    // 后台任务卡（会反向串排），只能丢弃（任务快照重放会带回累积日志）。
+    // mock_val：mock_val id mock_val log / llm:progress mock_val
+    // mock_val（mock_val），mock_val（mock_val）。
     fakeEventSources[1]?.emit("log", {
       sessionId,
       level: "info",
       tag: "studio",
-      message: "游离的聊天轮日志",
+      message: "mock_val",
     });
     fakeEventSources[1]?.emit("llm:progress", {
       sessionId,
-      status: "思考中",
+      status: "mock_val",
       elapsedMs: 900,
       totalChars: 120,
       chineseChars: 100,
@@ -1241,7 +1241,7 @@ describe("chat message actions", () => {
     expect(findTaskExecution(store, sessionId)?.logs).toBeUndefined();
     expect(findTaskExecution(store, sessionId)?.stages?.[0]?.progress).toBeUndefined();
 
-    // 聊天轮工具卡出现后：无 id 日志照旧落在聊天卡上，任务卡不受影响
+    // mock_val：mock_val id mock_val，mock_val
     fakeEventSources[1]?.emit("tool:start", {
       sessionId,
       id: "chat-tool-1",
@@ -1252,12 +1252,12 @@ describe("chat message actions", () => {
       sessionId,
       level: "info",
       tag: "studio",
-      message: "审稿进行中",
+      message: "mock_val",
     });
-    expect(findChatToolExecution(store, sessionId)?.logs).toEqual(["审稿进行中"]);
+    expect(findChatToolExecution(store, sessionId)?.logs).toEqual(["mock_val"]);
     expect(findTaskExecution(store, sessionId)?.logs).toBeUndefined();
 
-    resolveAgent({ response: "聊完了。", session: { sessionId, sessionKind: "short" } });
+    resolveAgent({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
     await sent;
   });
 
@@ -1269,14 +1269,14 @@ describe("chat message actions", () => {
       .mockResolvedValueOnce({ session: { sessionId, bookId: "demo-book", sessionKind: "book" } })
       .mockRejectedValueOnce(new Error("Request timed out"));
 
-    await store.getState().sendMessage(sessionId, "写下一章", {
+    await store.getState().sendMessage(sessionId, "mock_val", {
       sessionKind: "book",
       requestedSkills: ["style-guard"],
     });
 
     expect(store.getState().sessions[sessionId]?.lastError).toBe("Request timed out");
     expect(store.getState().sessions[sessionId]?.lastFailedSend).toEqual({
-      text: "写下一章",
+      text: "mock_val",
       options: { sessionKind: "book", requestedSkills: ["style-guard"] },
     });
   });
@@ -1288,13 +1288,13 @@ describe("chat message actions", () => {
     fetchJson
       .mockResolvedValueOnce({ session: { sessionId, bookId: null, sessionKind: "chat" } })
       .mockResolvedValueOnce({
-        error: { code: "upstream_error", message: "模型接口 500" },
+        error: { code: "upstream_error", message: "mock_val 500" },
         session: { sessionId, sessionKind: "chat" },
       });
 
-    await store.getState().sendMessage(sessionId, "你好");
+    await store.getState().sendMessage(sessionId, "mock_val");
 
-    expect(store.getState().sessions[sessionId]?.lastFailedSend).toEqual({ text: "你好" });
+    expect(store.getState().sessions[sessionId]?.lastFailedSend).toEqual({ text: "mock_val" });
   });
 
   it("retries the last failed send with identical business parameters and a fresh request id", async () => {
@@ -1306,7 +1306,7 @@ describe("chat message actions", () => {
       .mockRejectedValueOnce(new Error("Request timed out"))
       .mockResolvedValueOnce({ response: "ok", session: { sessionId, sessionKind: "book" } });
 
-    await store.getState().sendMessage(sessionId, "写下一章", {
+    await store.getState().sendMessage(sessionId, "mock_val", {
       sessionKind: "book",
       requestedSkills: ["style-guard"],
     });
@@ -1333,9 +1333,9 @@ describe("chat message actions", () => {
     store.getState().setSelectedModel("deepseek-v4-flash", "kkaiapi");
     fetchJson
       .mockResolvedValueOnce({ session: { sessionId, bookId: null, sessionKind: "chat" } })
-      .mockResolvedValueOnce({ response: "你好！", session: { sessionId, sessionKind: "chat" } });
+      .mockResolvedValueOnce({ response: "mock_val！", session: { sessionId, sessionKind: "chat" } });
 
-    await store.getState().sendMessage(sessionId, "你好");
+    await store.getState().sendMessage(sessionId, "mock_val");
 
     expect(store.getState().sessions[sessionId]?.lastFailedSend).toBeUndefined();
   });
@@ -1353,7 +1353,7 @@ describe("chat message actions", () => {
       }))
       .mockResolvedValueOnce({});
 
-    const sent = store.getState().sendMessage(sessionId, "你好");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(1));
 
     await store.getState().abortSession(sessionId);
@@ -1383,7 +1383,7 @@ describe("chat message actions", () => {
     fetchJson.mockImplementationOnce(() => new Promise((resolve) => {
       resolveAgent = resolve;
     }));
-    const sent = store.getState().sendMessage(sessionId, "顺便聊两句");
+    const sent = store.getState().sendMessage(sessionId, "mock_val");
     await vi.waitFor(() => expect(fakeEventSources).toHaveLength(2));
 
     const allExecutions = () => (store.getState().sessions[sessionId]?.messages ?? [])
@@ -1392,7 +1392,7 @@ describe("chat message actions", () => {
         ...(message.parts ?? []).flatMap((part) => (part.type === "tool" ? [part.execution] : [])),
       ]);
 
-    // 任务 pipeline 的压缩事件带任务 execution id：作为阶段挂到任务卡上
+    // mock_val pipeline mock_val execution id：mock_val
     fakeEventSources[1]?.emit("context:compression", {
       sessionId,
       executionId: "direct-short_run-1",
@@ -1403,7 +1403,7 @@ describe("chat message actions", () => {
     expect(findTaskExecution(store, sessionId)?.stages).toEqual([
       expect.objectContaining({ label: "Nén ngữ cảnh truyện", status: "active" }),
     ]);
-    // 不产生聊天流内容：没有 context-* 伪工具卡被写进消息
+    // mock_val：mock_val context-* mock_val
     expect(allExecutions().some((execution) => execution.id.startsWith("context-"))).toBe(false);
 
     fakeEventSources[1]?.emit("context:compression", {
@@ -1416,7 +1416,7 @@ describe("chat message actions", () => {
       expect.objectContaining({ label: "Nén ngữ cảnh truyện", status: "completed" }),
     ]);
 
-    // id 指向的卡不存在：事件丢弃，同样不写进聊天流
+    // id mock_val：mock_val，mock_val
     fakeEventSources[1]?.emit("context:compression", {
       sessionId,
       executionId: "direct-unknown-9",
@@ -1425,7 +1425,7 @@ describe("chat message actions", () => {
     });
     expect(allExecutions().some((execution) => execution.id.startsWith("context-"))).toBe(false);
 
-    resolveAgent({ response: "聊完了。", session: { sessionId, sessionKind: "short" } });
+    resolveAgent({ response: "mock_val。", session: { sessionId, sessionKind: "short" } });
     await sent;
   });
 });

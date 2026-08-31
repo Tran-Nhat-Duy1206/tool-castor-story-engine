@@ -28,11 +28,11 @@ describe("readStoryCanon (pure validated read)", () => {
 
     expect(view.manifest.schemaVersion).toBe(2);
     expect(view.manifest.lastAppliedChapter).toBe(12);
-    expect(view.currentState.facts.some((f) => f.predicate === "当前位置" && f.object === "东城公寓")).toBe(true);
+    expect(view.currentState.facts.some((f) => f.predicate === "mock_text" && f.object === "mock_text")).toBe(true);
     const promoted = view.hooks.hooks.find((h) => h.hookId === "hook-core-missing-will");
     expect(promoted?.promoted).toBe(true);
     expect(promoted?.dependsOn).toEqual(["hook-sub-neighbor"]);
-    expect(view.chapterSummaries.rows[0]?.title).toBe("夜访东城");
+    expect(view.chapterSummaries.rows[0]?.title).toBe("mock_text");
   });
 
   it("performs ZERO filesystem writes on healthy canon across repeated reads", async () => {
@@ -118,15 +118,15 @@ describe("describeCurrentState", () => {
 
     const location = described.slots[0]!;
     expect(location.key).toBe("currentLocation");
-    expect(location.label).toBe("当前位置");
-    expect(location.value).toBe("东城公寓");
-    expect(location.selected?.object).toBe("东城公寓");
+    expect(location.label).toBe("mock_text");
+    expect(location.value).toBe("mock_text");
+    expect(location.selected?.object).toBe("mock_text");
     expect(location.superseded).toHaveLength(1);
-    expect(location.superseded[0]?.object).toBe("城南旧宅");
+    expect(location.superseded[0]?.object).toBe("mock_text");
     expect(location.superseded[0]?.validUntilChapter).toBe(10);
 
     const protagonist = described.slots.find((slot) => slot.key === "protagonistState")!;
-    expect(protagonist.value).toBe("带伤潜行，避开了监控网络");
+    expect(protagonist.value).toBe("mock_text，mock_text");
 
     // Unset slots surface as null values without inventing data.
     const goal = described.slots.find((slot) => slot.key === "currentGoal")!;
@@ -143,9 +143,9 @@ describe("describeCurrentState", () => {
 
     expect(described.additionalFacts).toHaveLength(1);
     expect(described.additionalFacts[0]).toMatchObject({
-      subject: "林晚",
-      predicate: "身份",
-      object: "卧底记者",
+      subject: "mock_text",
+      predicate: "mock_text",
+      object: "mock_text",
       validFromChapter: 4,
       validUntilChapter: null,
       sourceChapter: 4,

@@ -192,7 +192,7 @@ describe("chatCompletion via pi-ai", () => {
       chatCompletion(client, "test-model", [{ role: "user", content: "ping" }]),
     );
 
-    expect(error.message).toContain("API 返回 400");
+    expect(error.message).toContain("API mock_text 400");
     expect(error.message).toContain("temperature");
     expect(error.message).not.toMatch(/kkaiapi/i);
   });
@@ -205,7 +205,7 @@ describe("chatCompletion via pi-ai", () => {
       chatCompletion(client, "test-model", [{ role: "user", content: "ping" }]),
     );
 
-    expect(error.message).toContain("API 返回 401");
+    expect(error.message).toContain("API mock_text 401");
   });
 
   it("wraps connection errors with a friendly message", async () => {
@@ -216,7 +216,7 @@ describe("chatCompletion via pi-ai", () => {
       chatCompletion(client, "test-model", [{ role: "user", content: "ping" }]),
     );
 
-    expect(error.message).toContain("无法连接到 API 服务");
+    expect(error.message).toContain("mock_text API mock_text");
     expect(error.message).not.toMatch(/kkaiapi/i);
   });
 
@@ -283,7 +283,7 @@ describe("chatCompletion via pi-ai", () => {
         ...MOCK_PI_MODEL,
         headers: {
           "X-Valid": "ok",
-          "X-Bad": "服务测试",
+          "X-Bad": "mock_textTest",
         },
       },
     });
@@ -315,8 +315,8 @@ describe("chatCompletion via pi-ai", () => {
 
     const error = await captureError(
       chatCompletion(client, "test-model", [
-        { role: "system", content: "系统设定".repeat(40) },
-        { role: "user", content: "用户消息".repeat(40) },
+        { role: "system", content: "mock_text".repeat(40) },
+        { role: "user", content: "mock_text".repeat(40) },
       ], { maxTokens: 20 }),
     );
 
@@ -359,7 +359,7 @@ describe("chatCompletion via pi-ai", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        choices: [{ message: { content: "你好！" } }],
+        choices: [{ message: { content: "mock_text！" } }],
         usage: { prompt_tokens: 3, completion_tokens: 2, total_tokens: 5 },
       }),
     });
@@ -376,7 +376,7 @@ describe("chatCompletion via pi-ai", () => {
     });
     const result = await chatCompletion(client, "gpt-5.4", [{ role: "user", content: "nihao" }]);
 
-    expect(result.content).toBe("你好！");
+    expect(result.content).toBe("mock_text！");
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(mockCompleteSimple).not.toHaveBeenCalled();
     expect(mockStreamSimple).not.toHaveBeenCalled();
@@ -391,7 +391,7 @@ describe("chatCompletion via pi-ai", () => {
     const client = makeClient(0.7, {
       service: "custom",
       stream: false,
-      _apiKey: "sk-test测试",
+      _apiKey: "sk-testTest",
       _piModel: {
         ...MOCK_PI_MODEL,
         provider: "openai",
@@ -427,7 +427,7 @@ describe("chatCompletion via pi-ai", () => {
         baseUrl: "https://api.kkaiapi.com/v1",
         headers: {
           "X-Valid": "ok",
-          "X-Bad": "服务测试",
+          "X-Bad": "mock_textTest",
         },
       },
     });
@@ -530,7 +530,7 @@ describe("chatCompletion via pi-ai", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        choices: [{ message: { content: "你好！" } }],
+        choices: [{ message: { content: "mock_text！" } }],
         usage: { prompt_tokens: 3, completion_tokens: 2, total_tokens: 5 },
       }),
     });
@@ -549,7 +549,7 @@ describe("chatCompletion via pi-ai", () => {
       onStreamProgress: vi.fn(),
     });
 
-    expect(result.content).toBe("你好！");
+    expect(result.content).toBe("mock_text！");
     expect(vi.getTimerCount()).toBe(0);
 
     vi.unstubAllGlobals();
@@ -592,7 +592,7 @@ describe("chatCompletion via pi-ai", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        choices: [{ message: { reasoning_content: "推理通道文本" } }],
+        choices: [{ message: { reasoning_content: "mock_text" } }],
         usage: { prompt_tokens: 3, completion_tokens: 2, total_tokens: 5 },
       }),
     });
@@ -617,8 +617,8 @@ describe("chatCompletion via pi-ai", () => {
   it("rejects reasoning-only custom streams instead of persisting thinking as final text", async () => {
     const encoder = new TextEncoder();
     const sse = [
-      "data: {\"choices\":[{\"delta\":{\"reasoning_content\":\"你\"}}]}\n\n",
-      "data: {\"choices\":[{\"delta\":{\"reasoning_content\":\"好\"}}]}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"reasoning_content\":\"mock_text\"}}]}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"reasoning_content\":\"mock_text\"}}]}\n\n",
       "data: {\"usage\":{\"prompt_tokens\":3,\"completion_tokens\":2,\"total_tokens\":5}}\n\n",
       "data: [DONE]\n\n",
     ].join("");
@@ -654,14 +654,14 @@ describe("chatCompletion via pi-ai", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          choices: [{ message: { reasoning_content: "先分析但没有最终答案" } }],
+          choices: [{ message: { reasoning_content: "mock_text" } }],
           usage: { prompt_tokens: 3, completion_tokens: 2, total_tokens: 5 },
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          choices: [{ message: { content: "完整最终答案" } }],
+          choices: [{ message: { content: "mock_text" } }],
           usage: { prompt_tokens: 3, completion_tokens: 4, total_tokens: 7 },
         }),
       });
@@ -678,7 +678,7 @@ describe("chatCompletion via pi-ai", () => {
     });
     const result = await chatCompletion(client, "glm-compat", [{ role: "user", content: "nihao" }]);
 
-    expect(result.content).toBe("完整最终答案");
+    expect(result.content).toBe("mock_text");
     expect(fetchMock).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();
   });
@@ -710,7 +710,7 @@ describe("chatCompletion via pi-ai", () => {
       },
     });
     const result = await chatCompletion(client, "wild-compatible", [
-      { role: "system", content: "只输出中文。" },
+      { role: "system", content: "mock_text。" },
       { role: "user", content: "ping" },
     ]);
 
@@ -719,12 +719,12 @@ describe("chatCompletion via pi-ai", () => {
     const firstBody = JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string);
     const secondBody = JSON.parse(fetchMock.mock.calls[1]?.[1]?.body as string);
     expect(firstBody.messages).toEqual([
-      { role: "system", content: "只输出中文。" },
+      { role: "system", content: "mock_text。" },
       { role: "user", content: "ping" },
     ]);
     expect(secondBody.messages).toHaveLength(1);
     expect(secondBody.messages[0]).toMatchObject({ role: "user" });
-    expect(secondBody.messages[0].content).toContain("只输出中文。");
+    expect(secondBody.messages[0].content).toContain("mock_text。");
     expect(secondBody.messages[0].content).toContain("ping");
 
     vi.unstubAllGlobals();
@@ -759,7 +759,7 @@ describe("chatCompletion via pi-ai", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        choices: [{ message: { content: "本地 Ollama 可用" } }],
+        choices: [{ message: { content: "mock_text Ollama mock_text" } }],
         usage: { prompt_tokens: 3, completion_tokens: 4, total_tokens: 7 },
       }),
     });
@@ -780,7 +780,7 @@ describe("chatCompletion via pi-ai", () => {
       { role: "user", content: "ping" },
     ]);
 
-    expect(result.content).toBe("本地 Ollama 可用");
+    expect(result.content).toBe("mock_text Ollama mock_text");
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(mockCompleteSimple).not.toHaveBeenCalled();
 
@@ -791,7 +791,7 @@ describe("chatCompletion via pi-ai", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        choices: [{ message: { content: "本地 LM Studio 可用" } }],
+        choices: [{ message: { content: "mock_text LM Studio mock_text" } }],
         usage: { prompt_tokens: 3, completion_tokens: 4, total_tokens: 7 },
       }),
     });
@@ -812,7 +812,7 @@ describe("chatCompletion via pi-ai", () => {
       { role: "user", content: "ping" },
     ]);
 
-    expect(result.content).toBe("本地 LM Studio 可用");
+    expect(result.content).toBe("mock_text LM Studio mock_text");
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(mockCompleteSimple).not.toHaveBeenCalled();
 
@@ -823,7 +823,7 @@ describe("chatCompletion via pi-ai", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        choices: [{ message: { content: "本地自定义端点可用" } }],
+        choices: [{ message: { content: "mock_text" } }],
         usage: { prompt_tokens: 5, completion_tokens: 6, total_tokens: 11 },
       }),
     });
@@ -842,7 +842,7 @@ describe("chatCompletion via pi-ai", () => {
     });
     const result = await chatCompletion(client, "local-qwen", [{ role: "user", content: "ping" }]);
 
-    expect(result.content).toBe("本地自定义端点可用");
+    expect(result.content).toBe("mock_text");
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock.mock.calls[0]?.[1]?.headers).not.toHaveProperty("Authorization");
     expect(mockCompleteSimple).not.toHaveBeenCalled();
@@ -854,7 +854,7 @@ describe("chatCompletion via pi-ai", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        content: [{ type: "text", text: "你好，Anthropic!" }],
+        content: [{ type: "text", text: "mock_text，Anthropic!" }],
         usage: { input_tokens: 5, output_tokens: 3 },
       }),
     });
@@ -873,7 +873,7 @@ describe("chatCompletion via pi-ai", () => {
     });
     const result = await chatCompletion(client, "claude-sonnet-4-6", [{ role: "user", content: "nihao" }]);
 
-    expect(result.content).toBe("你好，Anthropic!");
+    expect(result.content).toBe("mock_text，Anthropic!");
     expect(result.usage.promptTokens).toBe(5);
     expect(result.usage.completionTokens).toBe(3);
     expect(fetchMock).toHaveBeenCalledOnce();
@@ -889,9 +889,9 @@ describe("chatCompletion via pi-ai", () => {
       "event: message_start\n",
       "data: {\"type\":\"message_start\",\"message\":{\"usage\":{\"input_tokens\":4}}}\n\n",
       "event: content_block_delta\n",
-      "data: {\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\"你\"}}\n\n",
+      "data: {\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\"mock_text\"}}\n\n",
       "event: content_block_delta\n",
-      "data: {\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\"好\"}}\n\n",
+      "data: {\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\"mock_text\"}}\n\n",
       "event: message_delta\n",
       "data: {\"type\":\"message_delta\",\"usage\":{\"output_tokens\":2}}\n\n",
       "event: message_stop\n",
@@ -921,7 +921,7 @@ describe("chatCompletion via pi-ai", () => {
     });
     const result = await chatCompletion(client, "claude-sonnet-4-6", [{ role: "user", content: "nihao" }]);
 
-    expect(result.content).toBe("你好");
+    expect(result.content).toBe("mock_text");
     expect(result.usage.promptTokens).toBe(4);
     expect(result.usage.completionTokens).toBe(2);
     expect(result.usage.totalTokens).toBe(6);
@@ -1026,9 +1026,9 @@ describe("chatCompletion fixed-temperature clamp (thinking models)", () => {
   });
 });
 
-// ── 回归测试：per-call maxTokens 不被裁剪（v2.0.0 精简版）─────────────
-// 背景：v2.0.0 删除了 config.maxTokens / maxTokensCap 字段，provider 层不再做 cap，
-//      agent per-call 传的 maxTokens 原样透传到下游。
+// ── mock_textTest：per-call maxTokens mock_text（v2.0.0 mock_text）─────────────
+// mock_text：v2.0.0 mock_text config.maxTokens / maxTokensCap  từmock_text，provider mock_text cap，
+//      agent per-call mock_text maxTokens mock_text。
 describe("createLLMClient per-call maxTokens not capped (v2.0.0)", () => {
   it("per-call maxTokens 16384 reaches the API as-is", async () => {
     const { createLLMClient } = await import("../llm/provider.js");
@@ -1054,7 +1054,7 @@ describe("createLLMClient per-call maxTokens not capped (v2.0.0)", () => {
 });
 
 describe("createLLMClient with providers lookup", () => {
-  it("anthropic + claude-sonnet-4-6 拿到 modelCard 的 maxOutput (64000)，不是未知模型兜底", async () => {
+  it("anthropic + claude-sonnet-4-6 mock_text modelCard mock_text maxOutput (64000)，mock_text", async () => {
     const { createLLMClient } = await import("../llm/provider.js");
     const { LLMConfigSchema } = await import("../models/project.js");
     const client = createLLMClient(LLMConfigSchema.parse({
@@ -1069,7 +1069,7 @@ describe("createLLMClient with providers lookup", () => {
     expect(client._piModel?.contextWindow).toBe(1_000_000);
   });
 
-  it("custom service + gpt-4o 靠 Layer 2 全局扫命中 openai provider", async () => {
+  it("custom service + gpt-4o mock_text Layer 2 mock_text openai provider", async () => {
     const { createLLMClient } = await import("../llm/provider.js");
     const { LLMConfigSchema } = await import("../models/project.js");
     const client = createLLMClient(LLMConfigSchema.parse({
@@ -1079,11 +1079,11 @@ describe("createLLMClient with providers lookup", () => {
       apiKey: "test",
       baseUrl: "https://middleman.example/v1",
     }));
-    // lobe 数据里 gpt-4o maxOutput=4096
+    // lobe mock_text gpt-4o maxOutput=4096
     expect(client.defaults.maxTokens).toBe(4096);
   });
 
-  it("未知 model 走 8192 * 3 的写作兜底预算", async () => {
+  it("mock_text model mock_text 8192 * 3 mock_text", async () => {
     const { createLLMClient } = await import("../llm/provider.js");
     const { LLMConfigSchema } = await import("../models/project.js");
     const client = createLLMClient(LLMConfigSchema.parse({
@@ -1097,7 +1097,7 @@ describe("createLLMClient with providers lookup", () => {
     expect(client._piModel?.maxTokens).toBe(24_576);
   });
 
-  it("config.maxTokens 命中 modelCard 后被覆盖（用户填 4000 还是用 modelCard 的 64000）", async () => {
+  it("config.maxTokens mock_text modelCard mock_text（mock_text 4000 mock_text modelCard mock_text 64000）", async () => {
     const { createLLMClient } = await import("../llm/provider.js");
     const { LLMConfigSchema } = await import("../models/project.js");
     const client = createLLMClient(LLMConfigSchema.parse({
@@ -1111,7 +1111,7 @@ describe("createLLMClient with providers lookup", () => {
     expect(client.defaults.maxTokens).toBe(64_000);
   });
 
-  it("B7: kimiCodingPlan 的 kimi-k2.5 走 API 时 piModel.id 是 deploymentName (k2p5)", async () => {
+  it("B7: kimiCodingPlan mock_text kimi-k2.5 mock_text API mock_text piModel.id mock_text deploymentName (k2p5)", async () => {
     const { createLLMClient } = await import("../llm/provider.js");
     const { LLMConfigSchema } = await import("../models/project.js");
     const client = createLLMClient(LLMConfigSchema.parse({
@@ -1124,7 +1124,7 @@ describe("createLLMClient with providers lookup", () => {
     expect(client._piModel?.id).toBe("k2p5");
   });
 
-  it("B7: 没有 deploymentName 的 model piModel.id 保持原 config.model", async () => {
+  it("B7: mock_text deploymentName mock_text model piModel.id mock_text config.model", async () => {
     const { createLLMClient } = await import("../llm/provider.js");
     const { LLMConfigSchema } = await import("../models/project.js");
     const client = createLLMClient(LLMConfigSchema.parse({
@@ -1156,7 +1156,7 @@ describe("createLLMClient with providers lookup", () => {
 
 describe("stream interruption detection", () => {
   beforeEach(() => {
-    // mockStreamSimple 是模块级共享 mock，清掉前面测试累积的调用计数和队列
+    // mockStreamSimple mock_text mock，mock_textTestmock_text
     mockStreamSimple.mockClear();
   });
 
@@ -1186,12 +1186,12 @@ describe("stream interruption detection", () => {
   }
 
   const COMPLETE_SSE = [
-    "data: {\"choices\":[{\"delta\":{\"content\":\"完整的正文内容\"}}]}\n\n",
+    "data: {\"choices\":[{\"delta\":{\"content\":\"mock_text\"}}]}\n\n",
     "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n",
     "data: [DONE]\n\n",
   ].join("");
-  // 网关把长流掐断：连接正常关闭，但既没有 finish_reason 也没有 [DONE]
-  const TRUNCATED_SSE = "data: {\"choices\":[{\"delta\":{\"content\":\"写到一半的正文\"}}]}\n\n";
+  // mock_text：mock_text，mock_text finish_reason mock_text [DONE]
+  const TRUNCATED_SSE = "data: {\"choices\":[{\"delta\":{\"content\":\"mock_text\"}}]}\n\n";
 
   it("retries a native chat stream that closes without [DONE]/finish_reason and succeeds on the retry", async () => {
     const fetchMock = vi.fn()
@@ -1199,9 +1199,9 @@ describe("stream interruption detection", () => {
       .mockResolvedValueOnce(sseResponse(COMPLETE_SSE));
     vi.stubGlobal("fetch", fetchMock);
 
-    const result = await chatCompletion(nativeStreamClient(), "glm-compat", [{ role: "user", content: "写第1章" }]);
+    const result = await chatCompletion(nativeStreamClient(), "glm-compat", [{ role: "user", content: "mock_textChương 1" }]);
 
-    expect(result.content).toBe("完整的正文内容");
+    expect(result.content).toBe("mock_text");
     expect(fetchMock).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();
   });
@@ -1210,16 +1210,16 @@ describe("stream interruption detection", () => {
     const fetchMock = vi.fn().mockImplementation(async () => sseResponse(TRUNCATED_SSE));
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(chatCompletion(nativeStreamClient(), "glm-compat", [{ role: "user", content: "写第1章" }]))
+    await expect(chatCompletion(nativeStreamClient(), "glm-compat", [{ role: "user", content: "mock_textChương 1" }]))
       .rejects.toThrow(/Stream interrupted|completion signal/);
-    // 初次 + TRANSIENT_LLM_RETRIES(2) 次重试
+    // mock_text + TRANSIENT_LLM_RETRIES(2) mock_text
     expect(fetchMock).toHaveBeenCalledTimes(3);
     vi.unstubAllGlobals();
   });
 
   it("accepts a native chat stream that ends with finish_reason even when [DONE] is missing", async () => {
     const sse = [
-      "data: {\"choices\":[{\"delta\":{\"content\":\"内容\"}}]}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"mock_text\"}}]}\n\n",
       "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n",
     ].join("");
     const fetchMock = vi.fn().mockResolvedValue(sseResponse(sse));
@@ -1227,28 +1227,28 @@ describe("stream interruption detection", () => {
 
     const result = await chatCompletion(nativeStreamClient(), "glm-compat", [{ role: "user", content: "hi" }]);
 
-    expect(result.content).toBe("内容");
+    expect(result.content).toBe("mock_text");
     expect(fetchMock).toHaveBeenCalledOnce();
     vi.unstubAllGlobals();
   });
 
   it("rejects a native chat stream that reaches the output limit", async () => {
     const sse = [
-      "data: {\"choices\":[{\"delta\":{\"content\":\"写到上限的正文\"}}]}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"mock_text\"}}]}\n\n",
       "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"length\"}]}\n\n",
       "data: [DONE]\n\n",
     ].join("");
     const fetchMock = vi.fn().mockImplementation(async () => sseResponse(sse));
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(chatCompletion(nativeStreamClient(), "glm-compat", [{ role: "user", content: "写正文" }]))
+    await expect(chatCompletion(nativeStreamClient(), "glm-compat", [{ role: "user", content: "mock_text" }]))
       .rejects.toThrow(/output limit|length|Stream interrupted/i);
     expect(fetchMock).toHaveBeenCalledTimes(3);
     vi.unstubAllGlobals();
   });
 
   it("retries a pi-ai stream that errors after a long partial instead of silently keeping the truncation", async () => {
-    const longPartial = "长".repeat(600);
+    const longPartial = "mock_text".repeat(600);
     const partialMsg = makeAssistantMessage(longPartial);
     const partialThenError: AsyncIterable<Record<string, unknown>> = {
       [Symbol.asyncIterator]() {
@@ -1259,7 +1259,7 @@ describe("stream interruption detection", () => {
               emitted = true;
               return { value: { type: "text_delta", contentIndex: 0, delta: longPartial, partial: partialMsg }, done: false };
             }
-            // 非关键字错误：验证 PartialResponseError 本身可重试，而非靠错误文案匹配
+            // mock_text từmock_text：mock_text PartialResponseError mock_text，mock_text
             throw new Error("upstream replied with malformed frame");
           },
         };
@@ -1267,37 +1267,37 @@ describe("stream interruption detection", () => {
     };
     mockStreamSimple
       .mockReturnValueOnce(partialThenError as never)
-      .mockReturnValueOnce(makeTextStream("重试后的完整内容") as never);
+      .mockReturnValueOnce(makeTextStream("mock_text") as never);
 
-    const result = await chatCompletion(makeClient(), "test-model", [{ role: "user", content: "写" }]);
+    const result = await chatCompletion(makeClient(), "test-model", [{ role: "user", content: "mock_text" }]);
 
-    expect(result.content).toBe("重试后的完整内容");
+    expect(result.content).toBe("mock_text");
     expect(mockStreamSimple).toHaveBeenCalledTimes(2);
   });
 
   it("treats a pi-ai stream that ends without a done event as interrupted and retries", async () => {
-    const partialMsg = makeAssistantMessage("只有一半");
+    const partialMsg = makeAssistantMessage("mock_text");
     mockStreamSimple
       .mockReturnValueOnce(makeEventStream([
-        { type: "text_delta", contentIndex: 0, delta: "只有一半", partial: partialMsg },
+        { type: "text_delta", contentIndex: 0, delta: "mock_text", partial: partialMsg },
       ]) as never)
-      .mockReturnValueOnce(makeTextStream("第二次完整") as never);
+      .mockReturnValueOnce(makeTextStream("Chương mock_text") as never);
 
-    const result = await chatCompletion(makeClient(), "test-model", [{ role: "user", content: "写" }]);
+    const result = await chatCompletion(makeClient(), "test-model", [{ role: "user", content: "mock_text" }]);
 
-    expect(result.content).toBe("第二次完整");
+    expect(result.content).toBe("Chương mock_text");
     expect(mockStreamSimple).toHaveBeenCalledTimes(2);
   });
 
   it("rejects a pi-ai done message whose stop reason is length", async () => {
-    const partial = makeAssistantMessage("只写到一半");
+    const partial = makeAssistantMessage("mock_text");
     const lengthMessage = { ...partial, stopReason: "length" } as AssistantMessage;
     mockStreamSimple.mockImplementation(() => makeEventStream([
-      { type: "text_delta", contentIndex: 0, delta: "只写到一半", partial },
+      { type: "text_delta", contentIndex: 0, delta: "mock_text", partial },
       { type: "done", reason: "length", message: lengthMessage },
     ]) as never);
 
-    await expect(chatCompletion(makeClient(), "test-model", [{ role: "user", content: "写" }]))
+    await expect(chatCompletion(makeClient(), "test-model", [{ role: "user", content: "mock_text" }]))
       .rejects.toThrow(/output limit|length|Stream interrupted/i);
     expect(mockStreamSimple).toHaveBeenCalledTimes(3);
   });

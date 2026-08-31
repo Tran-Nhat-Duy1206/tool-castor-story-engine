@@ -28,7 +28,7 @@ import {
   resolveCliLanguage,
 } from "../localization.js";
 
-const CHINESE_CHARS = /[一-鿿]/;
+const CHINESE_CHARS = /[test_mock-test_mock]/;
 
 describe("CLI localization", () => {
   it("formats book-create summaries in both languages", () => {

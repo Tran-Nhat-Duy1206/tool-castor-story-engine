@@ -16,9 +16,9 @@ import {
 } from "./story-state-model";
 
 const fact = (overrides: Partial<CurrentStateFactDto> = {}): CurrentStateFactDto => ({
-  subject: "主角",
-  predicate: "当前位置",
-  object: "东城公寓",
+  subject: "mock_val",
+  predicate: "mock_val",
+  object: "mock_val",
   validFromChapter: 11,
   validUntilChapter: null,
   sourceChapter: 11,
@@ -56,12 +56,12 @@ describe("slotRows", () => {
       [
         {
           key: "currentLocation",
-          label: "当前位置",
-          value: "东城公寓",
+          label: "mock_val",
+          value: "mock_val",
           selected: fact(),
-          superseded: [fact({ object: "城南旧宅", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 })],
+          superseded: [fact({ object: "mock_val", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 })],
         },
-        { key: "currentGoal", label: "当前目标", value: null, selected: null, superseded: [] },
+        { key: "currentGoal", label: "mock_val", value: null, selected: null, superseded: [] },
       ],
       "vi",
     );
@@ -69,8 +69,8 @@ describe("slotRows", () => {
     expect(rows).toHaveLength(2);
     expect(rows[0]).toMatchObject({
       key: "currentLocation",
-      label: "当前位置",
-      value: "东城公寓",
+      label: "mock_val",
+      value: "mock_val",
       supersededCount: 1,
       validity: "từ chương 11",
     });
@@ -80,11 +80,11 @@ describe("slotRows", () => {
 
 describe("additionalFactRows", () => {
   it("attaches validity text to every non-slot fact so nothing is silently hidden", () => {
-    const rows = additionalFactRows([fact({ subject: "林晚", predicate: "身份", object: "卧底记者", validFromChapter: 4 })], "vi");
+    const rows = additionalFactRows([fact({ subject: "mock_val", predicate: "mock_val", object: "mock_val", validFromChapter: 4 })], "vi");
     expect(rows[0]).toMatchObject({
-      subject: "林晚",
-      predicate: "身份",
-      object: "卧底记者",
+      subject: "mock_val",
+      predicate: "mock_val",
+      object: "mock_val",
       validity: "từ chương 4",
     });
   });
@@ -97,10 +97,10 @@ describe("hookRows", () => {
     type: "core_mystery",
     status: "progressing",
     lastAdvancedChapter: 12,
-    expectedPayoff: "遗嘱真伪揭晓",
-    notes: "与林晚身份线交织",
+    expectedPayoff: "mock_val",
+    notes: "mock_val",
     dependsOn: ["hook-sub-neighbor"],
-    paysOffInArc: "第二卷",
+    paysOffInArc: "mock_val",
     coreHook: true,
     halfLifeChapters: 6,
     advancedCount: 5,
@@ -113,7 +113,7 @@ describe("hookRows", () => {
     expect(rows[0]).toMatchObject({
       hookId: "hook-core-missing-will",
       dependsOnText: "[hook-sub-neighbor]",
-      paysOffInArc: "第二卷",
+      paysOffInArc: "mock_val",
       coreHook: true,
       halfLifeChapters: 6,
       advancedCount: 5,

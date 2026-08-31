@@ -30,7 +30,7 @@ test("exported single-file HTML is self-contained and playable", async ({ page }
   await expect(page.locator("#if-player")).toBeVisible();
 
   // Step 4: click the single choice in the start node.
-  // The seed graph is start → (one choice "踏入宫殿") → ending, so one click
+  // The seed graph is start → (one choice "mock_val") → ending, so one click
   // reaches the ending and causes .ending-title to appear.
   await page.locator(".choice").first().click();
 

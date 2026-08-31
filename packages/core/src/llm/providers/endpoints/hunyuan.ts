@@ -1,15 +1,9 @@
-/**
- * 腾讯混元 (Hunyuan)
- *
- * - 官网：https://cloud.tencent.com/product/hunyuan
- * - 控制台 / API key：https://console.cloud.tencent.com/hunyuan/api-key
- * - API 文档：https://cloud.tencent.com/document/product/1729
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const HUNYUAN: ProviderEndpoint = {
   id: "hunyuan",
-  label: "腾讯混元",
+  label: "",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://api.hunyuan.cloud.tencent.com/v1",

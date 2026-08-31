@@ -54,7 +54,7 @@ function passingAudit(): AuditResult {
   return { passed: true, issues: [], summary: "clean", overallScore: 95, tokenUsage: ZERO_USAGE };
 }
 
-const CHAPTER_BODY = "林秋在雨夜重新核对了账本的真实去向";
+const CHAPTER_BODY = "mock_text";
 
 function gatedDelta(chapter = 1) {
   return {
@@ -84,18 +84,18 @@ function zeroProposalDelta(chapter = 1) {
 function stubOutput(overrides: Partial<WriteChapterOutput> = {}): WriteChapterOutput {
   return {
     chapterNumber: 1,
-    title: "雨夜提案",
+    title: "mock_text",
     content: CHAPTER_BODY,
     wordCount: CHAPTER_BODY.length,
     preWriteCheck: "",
     postSettlement: "",
-    updatedState: "# 当前状态\n\n- PROPOSED-STATE-B\n",
-    updatedHooks: "# 伏笔池\n",
-    updatedLedger: "# 粒子账本\n",
-    updatedSubplots: "# 支线进度\n",
-    updatedEmotionalArcs: "# 情感弧线\n",
-    updatedCharacterMatrix: "# 角色矩阵\n",
-    chapterSummary: "| 1 | 雨夜提案 | 林秋 | 核对账本 | 起疑 | | 平静 | 调查 |",
+    updatedState: "# mock_text\n\n- PROPOSED-STATE-B\n",
+    updatedHooks: "# mock_text\n",
+    updatedLedger: "# mock_text\n",
+    updatedSubplots: "# mock_text\n",
+    updatedEmotionalArcs: "# mock_text\n",
+    updatedCharacterMatrix: "# mock_text\n",
+    chapterSummary: "| 1 | mock_text | mock_text | mock_text | mock_text | | mock_text | mock_text |",
     postWriteErrors: [],
     postWriteWarnings: [],
     tokenUsage: ZERO_USAGE,
@@ -164,8 +164,8 @@ async function createGatedFixture() {
   const projectionSeeds = new Map<string, string>([
     // No trailing newline: persistAuditDriftGuidance sanitizes current_state.md
     // with trimEnd(), and a no-op must remain a no-op byte-for-byte.
-    ["current_state.md", "# 当前状态"],
-    ["pending_hooks.md", "# 伏笔池"],
+    ["current_state.md", "# mock_text"],
+    ["pending_hooks.md", "# mock_text"],
   ]);
   for (const [name, content] of projectionSeeds) {
     await writeFile(join(bookDir, "story", name), content, "utf-8");
@@ -231,18 +231,18 @@ describe("PipelineRunner gated Phase 4 publication", () => {
     vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockResolvedValue(passingAudit());
     vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter").mockImplementation(async (input) => ({
       chapterNumber: input.chapterNumber,
-      title: input.chapterTitle ?? "雨夜提案",
+      title: input.chapterTitle ?? "mock_text",
       content: input.chapterContent,
       wordCount: input.chapterContent.length,
       preWriteCheck: "",
       postSettlement: "",
-      updatedState: "# 当前状态\n\n- PROPOSED-STATE-B\n",
-      updatedHooks: "# 伏笔池\n",
-      updatedLedger: "# 粒子账本\n",
-      updatedSubplots: "# 支线进度\n",
-      updatedEmotionalArcs: "# 情感弧线\n",
-      updatedCharacterMatrix: "# 角色矩阵\n",
-      chapterSummary: "| 1 | 雨夜提案 | 林秋 | 核对账本 | 起疑 | | 平静 | 调查 |",
+      updatedState: "# mock_text\n\n- PROPOSED-STATE-B\n",
+      updatedHooks: "# mock_text\n",
+      updatedLedger: "# mock_text\n",
+      updatedSubplots: "# mock_text\n",
+      updatedEmotionalArcs: "# mock_text\n",
+      updatedCharacterMatrix: "# mock_text\n",
+      chapterSummary: "| 1 | mock_text | mock_text | mock_text | mock_text | | mock_text | mock_text |",
       postWriteErrors: [],
       postWriteWarnings: [],
       tokenUsage: ZERO_USAGE,
@@ -281,7 +281,7 @@ describe("PipelineRunner gated Phase 4 publication", () => {
       expect(writeSpy).toHaveBeenCalledTimes(1);
 
       // Prose persisted exactly once at the canonical path.
-      const durableProse = await readFile(join(bookDir, "chapters", "0001_雨夜提案.md"), "utf-8");
+      const durableProse = await readFile(join(bookDir, "chapters", "0001_mock_text.md"), "utf-8");
       expect(durableProse).toContain(CHAPTER_BODY);
 
       // Index on disk is gated IMMEDIATELY after the single commit.
@@ -332,7 +332,7 @@ describe("PipelineRunner gated Phase 4 publication", () => {
         normalizePaths(invocation).some((path) => path.startsWith("chapters/")));
       expect(writerCommits).toHaveLength(1);
       const paths = normalizePaths(writerCommits[0]!);
-      expect(paths).toContain("chapters/0001_雨夜提案.md");
+      expect(paths).toContain("chapters/0001_mock_text.md");
       expect(paths).toContain("chapters/index.json");
       expect(paths).toContain(ACTIVE_REVIEW_RELPATH(1));
 
@@ -375,24 +375,24 @@ describe("PipelineRunner gated Phase 4 publication", () => {
     vi.spyOn(WriterAgent.prototype, "writeChapter").mockResolvedValue(
       stubOutput({
         runtimeStateDelta: zeroProposalDelta(),
-        updatedState: "# 当前状态\n",
-        chapterSummary: "| 1 | 雨夜提案 | 林秋 | 核对账本 | 无变化 | | 平静 | 调查 |",
+        updatedState: "# mock_text\n",
+        chapterSummary: "| 1 | mock_text | mock_text | mock_text | mock_text | | mock_text | mock_text |",
       }),
     );
     vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter").mockImplementation(async (input) => ({
       chapterNumber: input.chapterNumber,
-      title: input.chapterTitle ?? "雨夜提案",
+      title: input.chapterTitle ?? "mock_text",
       content: input.chapterContent,
       wordCount: input.chapterContent.length,
       preWriteCheck: "",
       postSettlement: "",
-      updatedState: "# 当前状态\n",
-      updatedHooks: "# 伏笔池\n",
-      updatedLedger: "# 粒子账本\n",
-      updatedSubplots: "# 支线进度\n",
-      updatedEmotionalArcs: "# 情感弧线\n",
-      updatedCharacterMatrix: "# 角色矩阵\n",
-      chapterSummary: "| 1 | 雨夜提案 | 林秋 | 核对账本 | 无变化 | | 平静 | 调查 |",
+      updatedState: "# mock_text\n",
+      updatedHooks: "# mock_text\n",
+      updatedLedger: "# mock_text\n",
+      updatedSubplots: "# mock_text\n",
+      updatedEmotionalArcs: "# mock_text\n",
+      updatedCharacterMatrix: "# mock_text\n",
+      chapterSummary: "| 1 | mock_text | mock_text | mock_text | mock_text | | mock_text | mock_text |",
       postWriteErrors: [],
       postWriteWarnings: [],
       tokenUsage: ZERO_USAGE,
@@ -419,13 +419,13 @@ describe("PipelineRunner gated Phase 4 publication", () => {
     await writeFile(
       join(bookDir, "chapters", "index.json"),
       JSON.stringify([{
-        number: 1, title: "旧档与新伤", status: "ready-for-review", wordCount: 100,
+        number: 1, title: "mock_text", status: "ready-for-review", wordCount: 100,
         createdAt: "2026-03-19T00:00:00.000Z", updatedAt: "2026-03-19T00:00:00.000Z",
         auditIssues: [], lengthWarnings: [],
       }], null, 2),
       "utf-8",
     );
-    await writeFile(join(bookDir, "chapters", "0001_旧档与新伤.md"), "# 第1章 旧档与新伤\n\n正文。", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0001_mock_text.md"), "# Chương 1 mock_text\n\nmock_text。", "utf-8");
     // Re-converge idempotent bootstrap state (manifest.lastAppliedChapter now
     // reflects the seeded durable chapter file) BEFORE capturing the baseline.
     await state.getNextChapterNumber(bookId);
@@ -467,7 +467,7 @@ describe("PipelineRunner gated Phase 4 publication", () => {
       expect(await readFile(join(bookDir, ACTIVE_REVIEW_RELPATH(1)), "utf-8")).toBe(artifactBefore);
       expect(await readFile(join(bookDir, "chapters", "index.json"), "utf-8")).toBe(indexBefore);
       const chapterFiles = (await readdir(join(bookDir, "chapters"))).filter((f) => f.endsWith(".md"));
-      expect(chapterFiles).toEqual(["0001_雨夜提案.md"]);
+      expect(chapterFiles).toEqual(["0001_mock_text.md"]);
       expect(vi.mocked(WriterAgent.prototype.writeChapter).mock.calls).toHaveLength(1);
     } finally {
       await rm(root, { recursive: true, force: true }).catch(() => undefined);
@@ -547,8 +547,8 @@ describe("PipelineRunner gated Phase 4 publication", () => {
 
   it("audit-REVISED prose re-settles the FINAL content into gated State Review publication (C-1)", async () => {
     const { root, runner, bookId, bookDir } = await createGatedFixture();
-    const P1 = "林秋在雨夜核对了账本";
-    const P2 = "林秋在黎明烧毁了账本";
+    const P1 = "mock_text";
+    const P2 = "mock_text";
     const canonJsonBefore = await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8");
     const projectionBefore = await readFile(join(bookDir, "story", "current_state.md"), "utf-8");
     const hooksProjectionBefore = await readFile(join(bookDir, "story", "pending_hooks.md"), "utf-8");
@@ -556,8 +556,8 @@ describe("PipelineRunner gated Phase 4 publication", () => {
     // P1 carries the STALE proposal (Paris). The revision changes the story so
     // a stale D1 would be detectable. The analyzer mock mirrors the REAL
     // parser contract: it produces truth-file markdown but NO delta field.
-    const staleDelta = { ...gatedDelta(), currentStatePatch: { currentGoal: "前往巴黎核对账本" } };
-    const finalDelta = { ...gatedDelta(), currentStatePatch: { currentGoal: "留守伦敦追查遗嘱" } };
+    const staleDelta = { ...gatedDelta(), currentStatePatch: { currentGoal: "mock_text" } };
+    const finalDelta = { ...gatedDelta(), currentStatePatch: { currentGoal: "mock_text" } };
     const writeSpy = vi.spyOn(WriterAgent.prototype, "writeChapter").mockResolvedValue(
       stubOutput({ content: P1, wordCount: P1.length, runtimeStateDelta: staleDelta }),
     );
@@ -578,18 +578,18 @@ describe("PipelineRunner gated Phase 4 publication", () => {
     });
     vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter").mockImplementation(async (input) => ({
       chapterNumber: input.chapterNumber,
-      title: input.chapterTitle ?? "雨夜提案",
+      title: input.chapterTitle ?? "mock_text",
       content: input.chapterContent,
       wordCount: input.chapterContent.length,
       preWriteCheck: "",
       postSettlement: "",
-      updatedState: "# 当前状态\n\n- PROPOSED-STATE-B\n",
-      updatedHooks: "# 伏笔池\n",
-      updatedLedger: "# 粒子账本\n",
-      updatedSubplots: "# 支线进度\n",
-      updatedEmotionalArcs: "# 情感弧线\n",
-      updatedCharacterMatrix: "# 角色矩阵\n",
-      chapterSummary: "| 1 | 雨夜提案 | 林秋 | 烧毁账本 | 起疑 | | 平静 | 调查 |",
+      updatedState: "# mock_text\n\n- PROPOSED-STATE-B\n",
+      updatedHooks: "# mock_text\n",
+      updatedLedger: "# mock_text\n",
+      updatedSubplots: "# mock_text\n",
+      updatedEmotionalArcs: "# mock_text\n",
+      updatedCharacterMatrix: "# mock_text\n",
+      chapterSummary: "| 1 | mock_text | mock_text | mock_text | mock_text | | mock_text | mock_text |",
       postWriteErrors: [],
       postWriteWarnings: [],
       tokenUsage: ZERO_USAGE,
@@ -607,7 +607,7 @@ describe("PipelineRunner gated Phase 4 publication", () => {
       expect(result.status).toBe("needs-state-review");
 
       // FINAL prose P2 is what is durable — never P1.
-      const durableProse = await readFile(join(bookDir, "chapters", "0001_雨夜提案.md"), "utf-8");
+      const durableProse = await readFile(join(bookDir, "chapters", "0001_mock_text.md"), "utf-8");
       expect(durableProse).toContain(P2);
       expect(durableProse).not.toContain(P1.replace("。", ""));
 
@@ -623,8 +623,8 @@ describe("PipelineRunner gated Phase 4 publication", () => {
       expect(artifact.items).toEqual(
         buildStateReviewItems(finalDelta, { chapterContent: durableProse, language: "vi" }),
       );
-      expect(JSON.stringify(artifact.items)).toContain("留守伦敦追查遗嘱");
-      expect(JSON.stringify(artifact.items)).not.toContain("前往巴黎核对账本");
+      expect(JSON.stringify(artifact.items)).toContain("mock_text");
+      expect(JSON.stringify(artifact.items)).not.toContain("mock_text");
 
       // Canon A untouched; projections untouched; no proposed snapshot.
       expect(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8"))
@@ -641,7 +641,7 @@ describe("PipelineRunner gated Phase 4 publication", () => {
         normalizePaths(invocation).some((path) => path.startsWith("chapters/")));
       expect(writerCommits).toHaveLength(1);
       const paths = normalizePaths(writerCommits[0]!);
-      expect(paths).toContain("chapters/0001_雨夜提案.md");
+      expect(paths).toContain("chapters/0001_mock_text.md");
       expect(paths).toContain("chapters/index.json");
       expect(paths).toContain(ACTIVE_REVIEW_RELPATH(1));
       const options = writerSaveSpy.mock.calls[0]![4];

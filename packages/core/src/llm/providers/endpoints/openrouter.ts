@@ -1,15 +1,4 @@
-/**
- * OpenRouter
- *
- * - 官网：https://openrouter.ai/
- * - 控制台 / API key：https://openrouter.ai/keys
- * - 模型广场：https://openrouter.ai/models
- * - API 文档：https://openrouter.ai/docs/api-reference/overview
- * - 模型列表 JSON：https://openrouter.ai/api/v1/models
- *
- * 聚合所有主流家 (Anthropic / OpenAI / Google / xAI / Meta 等) 的统一入口。
- * 350+ 模型，bank 只列最常用的；完整清单用户侧 live /models probe。
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const OPENROUTER: ProviderEndpoint = {
@@ -18,8 +7,8 @@ export const OPENROUTER: ProviderEndpoint = {
   group: "aggregator",
   api: "openai-responses",
   baseUrl: "https://openrouter.ai/api/v1",
-  // openrouter/auto 是 OpenRouter 官方的自动路由入口，长期存在；
-  // 具体模型 id（如 google/gemma-2-9b-it:free）会随上游下架失效（issue #300）。
+  // LLM provider configuration and endpoints.
+  // LLM provider configuration and endpoints.
   checkModel: "openrouter/auto",
   temperatureRange: [0, 2],
   defaultTemperature: 0.7,

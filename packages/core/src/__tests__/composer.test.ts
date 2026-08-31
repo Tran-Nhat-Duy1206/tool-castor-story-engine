@@ -162,10 +162,10 @@ describe("ComposerAgent", () => {
       [
         "# Author Intent",
         "",
-        "标题：《桥洞来信》",
+        "mock_text：《mock_text》",
         "",
-        "必须使用第一人称叙事，不得改成第三人称。",
-        "主角的每次决定都要围绕“我不再替别人背债”展开。",
+        "mock_textChương mock_text，mock_textChương mock_text。",
+        "mock_text“mock_text”mock_text。",
       ].join("\n"),
       "utf-8",
     );
@@ -187,9 +187,9 @@ describe("ComposerAgent", () => {
     const authorIntentEntry = result.contextPackage.selectedContext.find((entry) =>
       entry.source === "story/author_intent.md",
     );
-    expect(authorIntentEntry?.excerpt).toContain("标题：《桥洞来信》");
-    expect(authorIntentEntry?.excerpt).toContain("必须使用第一人称叙事，不得改成第三人称。");
-    expect(authorIntentEntry?.excerpt).toContain("我不再替别人背债");
+    expect(authorIntentEntry?.excerpt).toContain("mock_text：《mock_text》");
+    expect(authorIntentEntry?.excerpt).toContain("mock_textChương mock_text，mock_textChương mock_text。");
+    expect(authorIntentEntry?.excerpt).toContain("mock_text");
   });
 
   it("preserves later canon constraints from file context instead of first-line excerpts", async () => {
@@ -198,10 +198,10 @@ describe("ComposerAgent", () => {
       [
         "# Parent Canon",
         "",
-        "档案编号：旧城案",
+        "mock_text：mock_text",
         "",
-        "父本正典约束：导师直到第二卷才知道档案馆火灾。",
-        "本章不能提前泄露档案馆火灾的真正纵火者。",
+        "mock_text：mock_textChương mock_text。",
+        "mock_text。",
       ].join("\n"),
       "utf-8",
     );
@@ -223,9 +223,9 @@ describe("ComposerAgent", () => {
     const parentCanonEntry = result.contextPackage.selectedContext.find((entry) =>
       entry.source === "story/parent_canon.md",
     );
-    expect(parentCanonEntry?.excerpt).toContain("档案编号：旧城案");
-    expect(parentCanonEntry?.excerpt).toContain("导师直到第二卷才知道档案馆火灾");
-    expect(parentCanonEntry?.excerpt).toContain("不能提前泄露档案馆火灾的真正纵火者");
+    expect(parentCanonEntry?.excerpt).toContain("mock_text：mock_text");
+    expect(parentCanonEntry?.excerpt).toContain("mock_textChương mock_text");
+    expect(parentCanonEntry?.excerpt).toContain("mock_text");
   });
 
   it("emits a rule stack with hard, soft, and diagnostic sections", async () => {
@@ -293,7 +293,7 @@ describe("ComposerAgent", () => {
   });
 
   it("compiles only compressible context when selected context exceeds budget", async () => {
-    const longTitle = `旧章标题${"旧案".repeat(800)}`;
+    const longTitle = `mock_text${"mock_text".repeat(800)}`;
     await writeFile(
       join(storyDir, "chapter_summaries.md"),
       [
@@ -330,7 +330,7 @@ describe("ComposerAgent", () => {
           protectedSources: request.protectedEntries.map((entry) => entry.source),
           compressibleSources: request.compressibleEntries.map((entry) => entry.source),
         };
-        return "压缩后的旧章标题历史：只保留旧案连续调查的节奏提醒。";
+        return "mock_text：mock_text。";
       },
     });
 
@@ -348,7 +348,7 @@ describe("ComposerAgent", () => {
     expect(sources).toContain("story/author_intent.md");
     expect(sources).not.toContain("story/chapter_summaries.md#recent_titles");
     expect(authorIntent?.excerpt).toContain("Keep the pressure on the mentor conflict.");
-    expect(compiled?.excerpt).toContain("压缩后的旧章标题历史");
+    expect(compiled?.excerpt).toContain("mock_text");
     expect(result.trace.notes).toContain("compiled-compressible-context");
     expect(result.trace.compression).toMatchObject({
       compiledSource: "runtime/compiled-compressible-context",
@@ -365,7 +365,7 @@ describe("ComposerAgent", () => {
         "",
         "| chapter | title | characters | events | stateChanges | hookActivity | mood | chapterType |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
-        `| 1 | ${"旧章".repeat(1000)} | Lin Yue | Old archive noise | None | none | tight | investigation |`,
+        `| 1 | ${"mock_text".repeat(1000)} | Lin Yue | Old archive noise | None | none | tight | investigation |`,
       ].join("\n"),
       "utf-8",
     );
@@ -377,7 +377,7 @@ describe("ComposerAgent", () => {
       chapterNumber: 4,
       plan,
       contextBudget: { contextWindowTokens: 900, reservedOutputTokens: 0 },
-      compressibleContextCompiler: async () => "压缩后的旧章标题历史。",
+      compressibleContextCompiler: async () => "mock_text。",
       onContextCompression: (event) => events.push(event),
     });
 
@@ -416,7 +416,7 @@ describe("ComposerAgent", () => {
         "",
         "| chapter | title | characters | events | stateChanges | hookActivity | mood | chapterType |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
-        `| 1 | ${"旧案".repeat(1200)} | Lin Yue | Old archive noise | None | none | tight | investigation |`,
+        `| 1 | ${"mock_text".repeat(1200)} | Lin Yue | Old archive noise | None | none | tight | investigation |`,
       ].join("\n"),
       "utf-8",
     );
@@ -441,7 +441,7 @@ describe("ComposerAgent", () => {
         "",
         "| chapter | title | characters | events | stateChanges | hookActivity | mood | chapterType |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
-        `| 1 | ${"旧案".repeat(1200)} | Lin Yue | Old archive noise | None | none | tight | investigation |`,
+        `| 1 | ${"mock_text".repeat(1200)} | Lin Yue | Old archive noise | None | none | tight | investigation |`,
       ].join("\n"),
       "utf-8",
     );
@@ -517,34 +517,34 @@ describe("ComposerAgent", () => {
       writeFile(
         join(storyDir, "outline", "story_frame.md"),
         [
-          "# 故事框架",
+          "# mock_text",
           "",
-          "## 一、主题和价值",
+          "## mock_text、mock_text",
           unrelatedNoise,
           "",
-          "## 三、世界观底色",
-          "商会债务规则不能被破坏；导师冲突来自旧誓约和账册证据。",
-          "本章必须维持玄幻壳下的调查压迫，不得突然改成轻喜剧。",
+          "## mock_text、mock_text",
+          "mock_text；mock_text。",
+          "mock_text，mock_text。",
           "",
-          "## 四、终局压力",
-          "终局是师债和商会路线在审判场合合流。",
+          "## mock_text、mock_text",
+          "mock_text。",
         ].join("\n"),
         "utf-8",
       ),
       writeFile(
         join(storyDir, "outline", "volume_map.md"),
         [
-          "# 分卷地图",
+          "# mock_text",
           "",
-          "## 第1-3章 旧案噪声",
+          "## Chương 1-3mock_text mock_text",
           unrelatedNoise,
           "",
-          "## 第4章 商会轨迹",
-          "Track the merchant guild trail. 林越要沿商会账册重新逼近导师冲突。",
-          "这一章只推进商会路线和旧誓约压力，不提前揭露幕后主使。",
+          "## Chương 4 mock_text",
+          "Track the merchant guild trail. mock_text。",
+          "mock_text，mock_text。",
           "",
-          "## 第5章 河口回声",
-          "导师债务在河口继续升级。",
+          "## Chương 5 mock_text",
+          "mock_text。",
         ].join("\n"),
         "utf-8",
       ),
@@ -571,7 +571,7 @@ describe("ComposerAgent", () => {
       .filter((entry) => entry.source.startsWith("story/outline/"))
       .map((entry) => entry.excerpt ?? "")
       .join("\n");
-    expect(outlineText).toContain("商会债务规则不能被破坏");
+    expect(outlineText).toContain("mock_text");
     expect(outlineText).toContain("Track the merchant guild trail");
     expect(outlineText).not.toContain("IRRELEVANT-ARCHIVE-NOISE");
     expect(result.trace.contextTiers.protectedSources.some((source) =>
@@ -588,26 +588,26 @@ describe("ComposerAgent", () => {
       writeFile(
         join(storyDir, "outline", "story_frame.md"),
         [
-          "# 故事框架",
+          "# mock_text",
           "",
-          "## 一、世界观底色",
-          "这一段有世界观关键词，但不是本章要用的暗线。",
+          "## mock_text、mock_text",
+          "mock_text，mock_text。",
           "",
-          "## 二、隐藏账册",
-          "这里承载导师债务的真正语义关联，虽然标题没有核心冲突、规则、终局等关键词。",
+          "## mock_text、mock_text",
+          "mock_text，mock_text、mock_text、mock_text。",
         ].join("\n"),
         "utf-8",
       ),
       writeFile(
         join(storyDir, "outline", "volume_map.md"),
         [
-          "# 分卷地图",
+          "# mock_text",
           "",
-          "## 第4章 明线",
-          "普通追查。",
+          "## Chương 4 mock_text",
+          "mock_text。",
           "",
-          "## 第4章 暗账",
-          "导师债务和隐藏账册在这一章真正合流。",
+          "## Chương 4 mock_text",
+          "mock_text。",
         ].join("\n"),
         "utf-8",
       ),
@@ -619,18 +619,18 @@ describe("ComposerAgent", () => {
       chapterNumber: 4,
       plan,
       outlineSectionSelector: async (request) => request.fileName === "outline/story_frame.md"
-        ? ["story/outline/story_frame.md#二-隐藏账册"]
-        : ["story/outline/volume_map.md#第4章-暗账"],
+        ? ["story/outline/story_frame.md#mock_text-mock_text"]
+        : ["story/outline/volume_map.md#Chương 4-mock_text"],
     });
 
     const outlineText = result.contextPackage.selectedContext
       .filter((entry) => entry.source.startsWith("story/outline/"))
       .map((entry) => entry.excerpt ?? "")
       .join("\n");
-    expect(outlineText).toContain("导师债务的真正语义关联");
-    expect(outlineText).toContain("导师债务和隐藏账册在这一章真正合流");
-    expect(outlineText).not.toContain("这一段有世界观关键词");
-    expect(outlineText).not.toContain("普通追查。");
+    expect(outlineText).toContain("mock_text");
+    expect(outlineText).toContain("mock_text");
+    expect(outlineText).not.toContain("mock_text");
+    expect(outlineText).not.toContain("mock_text。");
   });
 
   it("retrieves summary and hook evidence chunks instead of whole long memory files", async () => {
@@ -640,7 +640,7 @@ describe("ComposerAgent", () => {
         [
           "# Pending Hooks",
           "",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
           "| guild-route | 1 | mystery | open | 2 | 6 | Merchant guild trail |",
           "| mentor-oath | 8 | relationship | open | 9 | 11 | Mentor oath debt with Lin Yue |",
@@ -934,9 +934,9 @@ describe("ComposerAgent", () => {
       [
         "# Audit Drift",
         "",
-        "## 审计纠偏（自动生成，下一章写作前参照）",
+        "## mock_text（mock_text，mock_text）",
         "",
-        "> - [warning] 节奏单调: 最近4章章节类型持续停留在“调查章”。",
+        "> - [warning] mock_text: mock_text4mock_text“mock_text”。",
       ].join("\n"),
       "utf-8",
     );
@@ -959,7 +959,7 @@ describe("ComposerAgent", () => {
       entry.source === "story/audit_drift.md",
     );
     expect(driftEntry).toBeDefined();
-    expect(driftEntry?.excerpt).toContain("节奏单调");
+    expect(driftEntry?.excerpt).toContain("mock_text");
   });
 
   it("emits hook debt briefs for agenda-targeted hooks", async () => {
@@ -969,10 +969,10 @@ describe("ComposerAgent", () => {
         [
           "# Pending Hooks",
           "",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| mentor-oath | 8 | relationship | progressing | 9 | 揭开师债为何断裂 | 慢烧 | 师债需要跨更大弧线回收 |",
-          "| guild-route | 1 | mystery | open | 2 | 查清商会路线背后的买家 | 近期 | 商会路线仍在旁支干扰 |",
+          "| mentor-oath | 8 | relationship | progressing | 9 | mock_text | mock_text | mock_text |",
+          "| guild-route | 1 | mystery | open | 2 | mock_text | mock_text | mock_text |",
           "",
         ].join("\n"),
         "utf-8",
@@ -1021,8 +1021,8 @@ describe("ComposerAgent", () => {
     const hookDebtEntry = result.contextPackage.selectedContext.find((entry) => entry.source === "runtime/hook_debt#mentor-oath");
     expect(hookDebtEntry).toBeDefined();
     expect(hookDebtEntry?.excerpt).toContain("mentor-oath");
-    expect(hookDebtEntry?.excerpt).toContain("备忘引用旧债");
-    expect(hookDebtEntry?.excerpt).toContain("读者承诺");
+    expect(hookDebtEntry?.excerpt).toContain("mock_text");
+    expect(hookDebtEntry?.excerpt).toContain("mock_text");
     expect(hookDebtEntry?.excerpt).toContain("River Camp");
     expect(hookDebtEntry?.excerpt).toContain("Trial Echo");
   });
@@ -1034,9 +1034,9 @@ describe("ComposerAgent", () => {
         [
           "# Pending Hooks",
           "",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| black-ring | 6 | mystery | open | 7 | 揭开黑戒来源 | 中程 | 这一根还没进旧 hookAgenda |",
+          "| black-ring | 6 | mystery | open | 7 | mock_text | mock_text | mock_text hookAgenda |",
           "",
         ].join("\n"),
         "utf-8",

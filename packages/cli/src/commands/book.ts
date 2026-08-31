@@ -29,7 +29,7 @@ bookCommand
   .option("--target-chapters <n>", "Target chapter count", "200")
   .option("--chapter-words <n>", "Words per chapter", "3000")
   .option("--brief <path>", "Path to creative brief file (.md/.txt) — Architect builds from your ideas instead of generating from scratch")
-  .option("--lang <language>", "Writing language: zh (Chinese) or en (English). Defaults from genre.")
+  .option("--lang <language>", "Writing language: vi (Vietnamese) or en (English). Defaults from project.")
   .option("--json", "Output JSON")
   .action(async (opts) => {
     try {
@@ -109,7 +109,7 @@ bookCommand
   .option("--chapter-words <n>", "Words per chapter")
   .option("--target-chapters <n>", "Target chapter count")
   .option("--status <status>", "Book status (outlining/active/paused/completed)")
-  .option("--lang <language>", "Writing language: zh or en")
+  .option("--lang <language>", "Writing language: vi or en")
   .option("--json", "Output JSON")
   .action(async (bookIdArg: string | undefined, opts) => {
     try {

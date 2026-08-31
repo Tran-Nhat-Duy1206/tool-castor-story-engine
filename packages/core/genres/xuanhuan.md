@@ -16,10 +16,10 @@ auditDimensions: [1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,24,25,26]
 - Nhân vật chính vì thúc đẩy cốt truyện mà đột nhiên nhân từ, phạm sai lầm ngu ngốc hoặc giảng đạo đức
 - Tài nguyên đồng chất không viết hao hụt, mặc định quyết toán toàn phần
 - Dùng "tăng vọt", "khổng lồ" để bỏ qua quyết toán số liệu
-- Thức tỉnh năng lực không có铺垫
+- Thức tỉnh năng lực không có bước chuẩn bị
 - Phản diện như cọc gỗ xếp hàng chờ chết
-- Ép nhân vật đã rời sân khấu quay lại khi chưa có铺垫
-- Khi chưa có铺垫 đã đột ngột nhét hệ thống, bản đồ mới, ngoại掛 mới để giải quyết vấn đề
+- Ép nhân vật đã rời sân khấu quay lại khi chưa có bước chuẩn bị
+- Khi chưa có bước đệm đã đột ngột nhét hệ thống, bản đồ mới, công cụ gian lận mới để giải quyết vấn đề
 - Viết mọi chương thành chương chiến đấu bùng nổ cao trào
 - Tháo rời kho tri thức rồi làm ô nhiễm ngược văn bản, viết thành văn lắp ghép "dường như đã từng thấy"
 - Phong cách lẫn giọng đô thị, giọng khoa học viễn tưởng, giọng thông báo hệ thống trò chơi, giọng cà khịa tiểu thuyết nhẹ
@@ -44,8 +44,8 @@ auditDimensions: [1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,24,25,26]
 ## Quy tắc ngôn ngữ
 
 - Cảm giác về cấp độ của hệ thống sức mạnh truyền qua cảm nhận cơ thể, không dùng con số trừu tượng. ✗"hỏa nguyên của hắn tăng từ 12 sợi lên 24 sợi" → ✓"cánh tay mạnh hơn trước, khi nắm tay đốt ngón tay căng chặt"
-- Trong cùng một đoạn cao trào (nuốt lửa/đột phá/thức tỉnh), cùng một miền hình ảnh không渲染 quá hai lượt, lượt thứ ba phải chuyển sang thông tin mới hoặc hành động mới
-- Đoạn lục soát thi thể / kiểm kê / trang bị cấm liệt kê dạng danh sách, phải kèm phán đoán hoặc取舍 của nhân vật: ✗"hắn lục ra muối thô, túi nước, bánh mì đen" → ✓"túi nước đáng giá nhất, chỗ nước còn lại nhẹ không kém mạng người"
+- Trong cùng một đoạn cao trào (nuốt lửa/đột phá/thức tỉnh), cùng một miền hình ảnh không đặc tả quá hai lượt, lượt thứ ba phải chuyển sang thông tin mới hoặc hành động mới
+- Đoạn lục soát thi thể / kiểm kê / trang bị cấm liệt kê dạng danh sách, phải kèm phán đoán hoặc toan tính lựa chọn của nhân vật: ✗"hắn lục ra muối thô, túi nước, bánh mì đen" → ✓"túi nước đáng giá nhất, chỗ nước còn lại nhẹ không kém mạng người"
 
 ## Chỉ dẫn tự sự
 
@@ -54,11 +54,11 @@ Ngón tay vàng / hệ thống năng lực phải có hạn chế: tần suất 
 Thiết lập không được ăn sách: số liệu đã xác lập ở phần trước không được tùy ý thay đổi ở phần sau nếu chưa trải qua quá trình thăng cấp.
 
 Trong ba chương nên có phản hồi rõ rệt, nhưng phản hồi có thể là vả mặt, thu hoạch lợi ích, đảo chiều thông tin, thay đổi địa vị, không chỉ giới hạn ở giết người.
-Khi liên quan đến thôn phệ, lợi ích phải rơi đồng thời vào mô tả tài nguyên và mức tăng cụ thể, không chỉ viết提升 trừu tượng.
-Xung đột nhỏ兑现 phản hồi càng sớm càng tốt; đừng trì hoãn vô hạn điểm sướng.
+Khi liên quan đến thôn phệ, lợi ích phải rơi đồng thời vào mô tả tài nguyên và mức tăng cụ thể, không chỉ viết nâng cấp trừu tượng.
+Xung đột nhỏ thu hoạch kết quả phản hồi càng sớm càng tốt; đừng trì hoãn vô hạn điểm sướng.
 
 Đối thủ cốt lõi phải có đầu óc, có thăm dò, có phán đoán sai, có phản công.
-Có thể giữ người, thả câu,示弱, mượn dao giết người, nhưng tiền đề chỉ có thể là lợi ích lớn hơn, tuyệt đối không được vì mềm lòng.
+Có thể giữ người, thả câu, giả yếu thế, mượn dao giết người, nhưng tiền đề chỉ có thể là lợi ích lớn hơn, tuyệt đối không được vì mềm lòng.
 
-Dùng hành động, thương thế, âm thanh, trọng lượng, xung kích, nhiệt độ để làm rõ "mạnh", ít dùng phán đoán空泛.
+Dùng hành động, thương thế, âm thanh, trọng lượng, xung kích, nhiệt độ để làm rõ "mạnh", ít dùng phán đoán sáo rỗng.
 Mỗi cảnh ít nhất thúc đẩy một mục: thông tin, địa vị, tài nguyên, thương vong, thù hận, cảnh giới.

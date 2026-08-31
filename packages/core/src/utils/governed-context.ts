@@ -45,37 +45,37 @@ export function buildGovernedMemoryEvidenceBlocks(
       : undefined,
     hooksBlock: hookEntries.length > 0
       ? renderEvidenceBlock(
-          resolvedLanguage === "en" ? "Selected Hook Evidence" : "已选伏笔证据",
+          resolvedLanguage === "en" ? "Selected Hook Evidence" : "",
           hookEntries,
         )
       : undefined,
     summariesBlock: summaryEntries.length > 0
       ? renderEvidenceBlock(
-          resolvedLanguage === "en" ? "Selected Chapter Summary Evidence" : "已选章节摘要证据",
+          resolvedLanguage === "en" ? "Selected Chapter Summary Evidence" : "",
           summaryEntries,
         )
       : undefined,
     volumeSummariesBlock: volumeSummaryEntries.length > 0
       ? renderEvidenceBlock(
-          resolvedLanguage === "en" ? "Selected Volume Summary Evidence" : "已选卷级摘要证据",
+          resolvedLanguage === "en" ? "Selected Volume Summary Evidence" : "",
           volumeSummaryEntries,
         )
       : undefined,
     titleHistoryBlock: titleHistoryEntries.length > 0
       ? renderEvidenceBlock(
-          resolvedLanguage === "en" ? "Recent Title History" : "近期标题历史",
+          resolvedLanguage === "en" ? "Recent Title History" : "",
           titleHistoryEntries,
         )
       : undefined,
     moodTrailBlock: moodTrailEntries.length > 0
       ? renderEvidenceBlock(
-          resolvedLanguage === "en" ? "Recent Mood / Chapter Type Trail" : "近期情绪/章节类型轨迹",
+          resolvedLanguage === "en" ? "Recent Mood / Chapter Type Trail" : "/",
           moodTrailEntries,
         )
       : undefined,
     canonBlock: canonEntries.length > 0
       ? renderEvidenceBlock(
-          resolvedLanguage === "en" ? "Canon Evidence" : "正典约束证据",
+          resolvedLanguage === "en" ? "Canon Evidence" : "",
           canonEntries,
         )
       : undefined,

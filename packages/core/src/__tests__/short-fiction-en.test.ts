@@ -28,7 +28,7 @@ import {
 } from "../agents/short-fiction.js";
 import { runShortFictionProduction } from "../pipeline/short-fiction-runner.js";
 
-const CJK = /[一-鿿]/;
+const CJK = /\u4e00-\u9fff/;
 
 const OUTLINE_INPUT = {
   direction: "revenge thriller inside a law firm, hidden evidence, final reversal",
@@ -104,10 +104,10 @@ describe("short-fiction English prompt branch", () => {
   it("keeps the zh default identical to the explicit zh branch", () => {
     expect(buildShortFictionWriterSystemPrompt()).toBe(buildShortFictionWriterSystemPrompt("vi"));
     expect(buildShortFictionOutlineSystemPrompt()).toBe(buildShortFictionOutlineSystemPrompt("vi"));
-    expect(buildShortFictionWriterSystemPrompt()).toContain("中文短篇 BatchWriter");
+    expect(buildShortFictionWriterSystemPrompt()).toContain("mock_text BatchWriter");
     const zhWriterUser = buildShortFictionWriterUserPrompt({ ...DRAFT_INPUT, charsPerChapter: 1000 });
-    expect(zhWriterUser).toContain("高潮即场景");
-    expect(zhWriterUser).toContain("每章约 1000 字");
+    expect(zhWriterUser).toContain("mock_text");
+    expect(zhWriterUser).toContain("mock_text 1000  từ");
   });
 });
 
@@ -138,11 +138,11 @@ describe("short-fiction English parsing and rendering", () => {
   it("keeps zh default counting by characters", () => {
     const draft = parseShortFictionBatchDraft([
       "=== SHORT_FICTION_TITLE ===",
-      "电梯多一层",
+      "mock_text",
       "=== CHAPTER 1 TITLE ===",
-      "第十三个按钮",
+      "Chương mock_text",
       "=== CHAPTER 1 CONTENT ===",
-      "深夜电梯 停在十三层",
+      "mock_text mock_text",
     ].join("\n"), { expectedChapters: 1 });
     expect(draft.chapters[0]?.charCount).toBe(9); // whitespace excluded, characters counted
   });

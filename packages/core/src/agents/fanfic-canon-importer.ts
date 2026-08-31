@@ -11,10 +11,10 @@ export interface FanficCanonOutput {
 }
 
 const MODE_LABELS: Record<FanficMode, string> = {
-  canon: "原作向（严格遵守原作设定）",
-  au: "AU/平行世界（世界规则可改，角色保留）",
-  ooc: "OOC（角色性格可偏离原作）",
-  cp: "CP（以配对关系为核心）",
+  canon: "Canon (strictly follows source material)",
+  au: "AU / Alternate Universe (rules may vary, core personas retained)",
+  ooc: "OOC (personas may deviate from source)",
+  cp: "CP / Pairing (relationship dynamics focused)",
 };
 
 const SOURCE_CHUNK_CHARS = 50_000;
@@ -33,65 +33,65 @@ export class FanficCanonImporter extends BaseAgent {
 
     const modeLabel = MODE_LABELS[fanficMode];
 
-    const systemPrompt = `你是一个专业的同人创作素材分析师。你的任务是从用户提供的原作素材中提取结构化正典信息，供同人写作系统使用。
+    const systemPrompt = `You are a professional fanfiction canon analyst. Your task is to extract structured canon information from source material for a fanfiction writing engine.
 
-同人模式：${modeLabel}
+Fanfic mode: ${modeLabel}
 
-你需要从原作素材中提取以下内容，每个部分用 === SECTION: <name> === 分隔：
+Extract the following sections separated by === SECTION: <name> === markers:
 
 === SECTION: world_rules ===
-世界规则（地理、物理法则、魔法/力量体系、阵营组织、社会结构）。
-如果原作素材不包含明确的世界规则，从已有信息合理推断。
+World rules (geography, physical laws, magic/power systems, factions/organizations, social structures).
+If the source does not contain explicit world rules, infer reasonably from available information.
 
 === SECTION: character_profiles ===
-角色档案表格，每个重要角色一行：
+Character profile table, one row per important character:
 
-| 角色 | 身份 | 性格底色 | 语癖/口头禅 | 说话风格 | 行为模式 | 关键关系 | 信息边界 |
-|------|------|----------|-------------|----------|----------|----------|----------|
+| Character | Role / Identity | Persona Core | Catchphrases / Verbal Tics | Speaking Style | Behavioral Patterns | Key Relationships | Info Boundary |
+|-----------|-----------------|--------------|----------------------------|----------------|---------------------|-------------------|---------------|
 
-要求：
-- 语癖/口头禅必须从原文中精确提取，如有的话
-- 说话风格描述该角色的语气、用词偏好、句式特征
-- 行为模式描述该角色在特定情境下的典型反应
-- 信息边界标注该角色知道什么、不知道什么
-- 至少提取 3 个角色，不超过 15 个
+Requirements:
+- Catchphrases / verbal tics must be precisely extracted from source text if present
+- Speaking style describes tone, word choice preferences, sentence patterns
+- Behavioral patterns describe typical reactions in concrete situations
+- Info boundary notes what the character knows vs does not know
+- Extract between 3 and 15 characters
 
 === SECTION: key_events ===
-关键事件时间线：
+Key event timeline:
 
-| 序号 | 事件 | 涉及角色 | 对同人写作的约束 |
-|------|------|----------|------------------|
+| No. | Event | Involved Characters | Constraints on Fanfic Writing |
+|-----|-------|---------------------|--------------------------------|
 
-按时间/出现顺序排列，标注每个事件对同人创作的约束程度。
+Ordered chronologically or by appearance, noting constraints on fanfic creation.
 
 === SECTION: power_system ===
-力量/能力体系（如果适用）。包括等级划分、核心规则、已知限制。
-如果原作没有明确的力量体系，输出"（原作无明确力量体系）"。
+Power / ability system (if applicable). Include tier classifications, core rules, known limitations.
+If the source has no explicit power system, output "(Source has no explicit power system)".
 
 === SECTION: writing_style ===
-原作写作风格特征（供同人写作模仿）：
+Source writing style characteristics:
 
-1. 叙事人称与视角（第一人称/第三人称有限/全知，是否频繁切换）
-2. 句式节奏（长短句交替模式、段落平均长度感受、对话占比）
-3. 场景描写手法（五感偏好、意象选择、环境描写密度）
-4. 对话标记习惯（说/道/笑道 等用法，对话前后是否有动作/表情补充）
-5. 情绪表达方式（直白内心独白 vs 动作外化 vs 环境映射）
-6. 比喻/修辞倾向（常用比喻类型、修辞频率）
-7. 节奏转换（紧张→舒缓的过渡方式、章节结尾习惯）
+1. Narrative POV and person (first-person / third-person limited / omniscient, switching frequency)
+2. Sentence cadence (long/short variation, paragraph length, dialogue ratio)
+3. Scene description methods (sensory details, imagery, environmental density)
+4. Dialogue tags and formatting
+5. Emotional expression (interiority vs exterior action vs environmental reflection)
+6. Rhetorical tendencies (metaphors, figurative language)
+7. Pacing shifts (tension -> release transitions, chapter endings)
 
-每项用1-2个原文例句佐证。只提取原文实际存在的特征，不要泛泛描述。
+Support each item with 1-2 source quotes. Extract only genuine textual features.
 
-提取原则：
-- 忠实于原作素材，不捏造原作中没有的信息
-- 信息不足时标注"（素材未提及）"而非编造
-- 角色语癖是最重要的字段——同人读者最在意角色"像不像"
-- 写作风格提取必须基于实际文本特征，附原文例句
-${source.compiled ? "\n注意：原作素材较长。下面输入是逐段读取完整素材后生成的语义资料包，不是截断文本；请以资料包中的片段编号和证据为准。" : ""}`;
+Extraction principles:
+- Faithful to source material; do not fabricate information
+- When info is missing, mark "(Not mentioned in source)" rather than making things up
+- Character voice and tics are top priority
+- Writing style extraction must be grounded in actual text evidence
+${source.compiled ? "\nNote: The source is long. The input below is a compiled semantic dossier; refer to chunk numbers and evidence." : ""}`;
 
     const response = await this.chat(
       [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `以下是原作《${sourceName}》的素材：\n\n${source.text}` },
+        { role: "user", content: `Source material for "${sourceName}":\n\n${source.text}` },
       ],
       { temperature: 0.3 },
     );
@@ -120,22 +120,22 @@ ${source.compiled ? "\n注意：原作素材较长。下面输入是逐段读取
     ].join("\n");
 
     const fullDocument = [
-      `# 同人正典（《${sourceName}》）`,
+      `# Fanfic Canon ("${sourceName}")`,
       "",
-      "## 世界规则",
-      worldRules || "（素材中未提取到明确世界规则）",
+      "## World Rules",
+      worldRules || "(No explicit world rules extracted from source)",
       "",
-      "## 角色档案",
-      characterProfiles || "（素材中未提取到角色信息）",
+      "## Character Profiles",
+      characterProfiles || "(No character profiles extracted from source)",
       "",
-      "## 关键事件时间线",
-      keyEvents || "（素材中未提取到关键事件）",
+      "## Key Event Timeline",
+      keyEvents || "(No key events extracted from source)",
       "",
-      "## 力量体系",
-      powerSystem || "（原作无明确力量体系）",
+      "## Power System",
+      powerSystem || "(Source has no explicit power system)",
       "",
-      "## 原作写作风格",
-      writingStyle || "（素材不足以提取风格特征）",
+      "## Writing Style",
+      writingStyle || "(Insufficient source material for style extraction)",
       "",
       meta,
     ].join("\n");
@@ -156,16 +156,16 @@ ${source.compiled ? "\n注意：原作素材较长。下面输入是逐段读取
           {
             role: "system",
             content: [
-              "你是同人正典资料编译器。任务是把一个原作片段压成后续抽取可用的 Markdown 资料包。",
-              "不要续写、不要创作、不要补不存在的信息。只保留片段里实际出现的世界规则、人物、关系、关键事件、能力体系、口头禅、说话风格和原文证据。",
-              "如果片段没有某类信息，直接省略该类。保留片段编号，方便后续追溯。",
+              "You are a fanfic canon compiler. Your job is to compress a source fragment into a structured Markdown dossier for downstream extraction.",
+              "Do not continue the story, do not invent facts. Retain only genuine world rules, characters, relationships, key events, power systems, catchphrases, speaking styles, and textual evidence.",
+              "Omit sections that have no information in this chunk. Preserve chunk index for traceability.",
             ].join("\n"),
           },
           {
             role: "user",
             content: [
-              `原作：《${sourceName}》`,
-              `片段：${index + 1}/${chunks.length}`,
+              `Source: "${sourceName}"`,
+              `Chunk: ${index + 1}/${chunks.length}`,
               "",
               chunks[index],
             ].join("\n"),
@@ -175,16 +175,16 @@ ${source.compiled ? "\n注意：原作素材较长。下面输入是逐段读取
       );
       const content = response.content.trim();
       if (content) {
-        notes.push([`## 片段 ${index + 1}/${chunks.length}`, content].join("\n\n"));
+        notes.push([`## Chunk ${index + 1}/${chunks.length}`, content].join("\n\n"));
       }
     }
 
     return {
       compiled: true,
       text: [
-        `# 《${sourceName}》语义资料包`,
+        `# "${sourceName}" Semantic Dossier`,
         "",
-        "以下内容由 Castor 逐段读取完整原作素材后压缩生成，用于后续正典抽取。它不是原文截断。",
+        "The following content was compiled from the full source text by Castor for downstream canon extraction. It is not truncated.",
         "",
         ...notes,
       ].join("\n"),

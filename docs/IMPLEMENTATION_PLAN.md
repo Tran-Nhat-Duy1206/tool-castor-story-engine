@@ -473,7 +473,7 @@ Ordering rationale: schemas → utilities → prompts/parsers → projections �
 - Verify: CORE-F(migration-journal).
 
 **T9.3 Translation executor (schema-aware).**
-- Files: CREATE `migration/translate.ts` — adapter over the EXISTING translation subsystem (`translation/index.ts#createLLMTranslationModel` + segmenters) with per-artifact handlers: markdown files translated body-only (headings re-written by a heading-map step: `第N章`→`Chương N`/`Chapter N`); JSON artifacts translated ONLY through field whitelists (e.g., `CurrentStateFact.object` yes, `predicate` normalized-to-canonical-alias then mapped, `hookId` never); role FILENAMES transliterated via T8.4 slug fn (sheets referenced by display name, not id — verified safe).
+- Files: CREATE `migration/translate.ts` — adapter over the EXISTING translation subsystem (`translation/index.ts#createLLMTranslationModel` + segmenters) with per-artifact handlers: markdown files translated body-only (headings re-written by a heading-map step: `N`→`Chương N`/`Chapter N`); JSON artifacts translated ONLY through field whitelists (e.g., `CurrentStateFact.object` yes, `predicate` normalized-to-canonical-alias then mapped, `hookId` never); role FILENAMES transliterated via T8.4 slug fn (sheets referenced by display name, not id — verified safe).
 - Tests-first: `src/__tests__/migrate-translate.test.ts` with the LLM stub — whitelist enforcement (attempt to feed a schema key ⇒ refused), heading rewriting, filename transliteration, journal entries per file, abort-on-error leaving journal resumable.
 - Verify: CORE-F(migrate-translate).
 

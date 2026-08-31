@@ -14,7 +14,7 @@ export interface ParsedDraftResponse {
   fields: Record<string, string>;
   /** Raw text with all ::: directive blocks stripped (for TUI display) */
   textContent: string;
-  /** Auto-generated turn summary, e.g. "确立了书名、世界观和主角" */
+  // Core narrative engine processing.
   summary: string;
   /** Original LLM output, untouched */
   raw: string;
@@ -183,11 +183,11 @@ function extractValue(type: string, contentLines: string[]): string {
 
 function buildSummary(labels: string[]): string {
   if (labels.length === 0) return "";
-  if (labels.length === 1) return `确立了${labels[0]}`;
-  if (labels.length === 2) return `确立了${labels[0]}和${labels[1]}`;
-  // 3+: 确立了A、B和C
+  if (labels.length === 1) return `${labels[0]}`;
+  if (labels.length === 2) return `${labels[0]}${labels[1]}`;
+  // Core narrative engine processing.
   const allButLast = labels.slice(0, -1).join("、");
-  return `确立了${allButLast}和${labels[labels.length - 1]}`;
+  return `${allButLast}${labels[labels.length - 1]}`;
 }
 
 // ---------------------------------------------------------------------------

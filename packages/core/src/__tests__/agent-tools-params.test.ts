@@ -55,10 +55,10 @@ describe("SubAgentParams schema", () => {
   it("normalizes platform aliases before sub_agent schema validation", () => {
     const prepared = tool.prepareArguments?.({
       agent: "architect",
-      instruction: "创建一本番茄都市文",
-      title: "夜港账本",
+      instruction: "mock_text",
+      title: "mock_text",
       genre: "urban",
-      platform: "番茄小说",
+      platform: "mock_text",
       language: "vi",
     });
 
@@ -70,8 +70,8 @@ describe("SubAgentParams schema", () => {
 
     const blankPlatform = tool.prepareArguments?.({
       agent: "architect",
-      instruction: "创建一本都市文",
-      title: "空平台测试",
+      instruction: "mock_text",
+      title: "mock_textTest",
       genre: "urban",
       platform: "",
       language: "vi",
@@ -99,7 +99,7 @@ describe("architect agent — BookConfig construction", () => {
     await tool.execute("tc1", {
       agent: "architect",
       instruction: "Create a xuanhuan novel",
-      title: "天道独行",
+      title: "mock_text",
       genre: "xuanhuan",
       platform: "tomato",
       language: "vi",
@@ -108,7 +108,7 @@ describe("architect agent — BookConfig construction", () => {
     });
     expect(initBookMock).toHaveBeenCalledOnce();
     const [bookConfig, options] = initBookMock.mock.calls[0];
-    expect(bookConfig.title).toBe("天道独行");
+    expect(bookConfig.title).toBe("mock_text");
     expect(bookConfig.genre).toBe("xuanhuan");
     expect(bookConfig.platform).toBe("tomato");
     expect(bookConfig.language).toBe("vi");
@@ -130,7 +130,7 @@ describe("architect agent — BookConfig construction", () => {
   });
 
   it("infers zh and its native chapter length from a Chinese brief", async () => {
-    await tool.execute("tc2b", { agent: "architect", instruction: "写一本都市重生爽文", title: "回到二零零八" });
+    await tool.execute("tc2b", { agent: "architect", instruction: "mock_text", title: "mock_text" });
     const [bookConfig] = initBookMock.mock.calls[0];
     expect(bookConfig.language).toBe("vi");
     expect(bookConfig.chapterWordCount).toBe(3000);

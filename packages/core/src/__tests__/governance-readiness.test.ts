@@ -130,8 +130,8 @@ async function setupChapter1Book(units: ReadonlyArray<FoundationUnitManifest>, l
   await mkdir(join(c1BookDir, "story", "state"), { recursive: true });
   if (legacyMarkdown) {
     await writeFile(join(c1BookDir, "story", "outline", "story_frame.md"), "## A\n1\n\n## B\n2\n\n## C\n3\n\n## D\n4\n", "utf-8");
-    await writeFile(join(c1BookDir, "story", "outline", "volume_map.md"), "## 卷一\n卷。\n", "utf-8");
-    await writeFile(join(c1BookDir, "story", "book_rules.md"), "## 主角\n- 名字：X\n", "utf-8");
+    await writeFile(join(c1BookDir, "story", "outline", "volume_map.md"), "## mock_text\nmock_text。\n", "utf-8");
+    await writeFile(join(c1BookDir, "story", "book_rules.md"), "## mock_text\n- mock_text từ：X\n", "utf-8");
     await writeFile(join(c1BookDir, "story", "pending_hooks.md"), "| hook_id |\n| --- |\n| H1 |\n", "utf-8");
     await writeFile(join(c1BookDir, "book.json"), JSON.stringify({ id: "c1-book", title: "C1", platform: "tomato", genre: "xuanhuan", status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" }), "utf-8");
   } else {

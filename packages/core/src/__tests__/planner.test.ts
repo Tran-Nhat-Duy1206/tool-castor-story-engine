@@ -8,58 +8,58 @@ import type { LLMClient } from "../llm/provider.js";
 import type { BookConfig } from "../models/book.js";
 
 const VALID_BODY = `
-## 场景与篇幅预算
-- 场景一（900字）：进入七号门现场，确认锁芯刮痕并排除自然磨损。
-- 场景二（1200字）：对照监控时间线与门禁记录，形成可复核的证据链。
-- 场景三（900字）：带着实证离场，同时让幕后主使的压力逼近但不揭底。
+## Cảnh và ngân sách độ dài
+- mock_text（900 từ）：mock_text，mock_text。
+- mock_text（1200 từ）：mock_text，mock_text。
+- mock_text（900 từ）：mock_text，mock_text。
 
-## 当前任务
-主角进入七号门现场，比对锁芯刮痕与监控时间线，把"被动过手脚"从猜测钉成实证。
+## Nhiệm vụ hiện tại
+mock_text，mock_text，mock_text"mock_text"mock_text。
 
-## 读者此刻在等什么
-1) 读者在等七号门是否有异常实锤
-2) 本章完全兑现，钉成现场实证
+## Độc giả đang chờ đợi điều gì lúc này
+1) mock_text
+2) mock_text，mock_text
 
-## 该兑现的 / 暂不掀的
-- 该兑现：七号门异常 → 钉成现场实证
-- 暂不掀：幕后主使 → 压到第 20 章
+## Cần thực hiện / tạm giữ lại
+- mock_text：mock_text → mock_text
+- mock_text：mock_text → mock_textChương 20
 
-## 日常/过渡承担什么任务
-不适用 - 本章为高压实证章，无日常过渡段。
+## Nhịp chậm / chuyển cảnh đảm nhận điều gì
+mock_text - mock_text，mock_text。
 
-## 关键抉择过三连问
-- 主角本章最关键的一次选择：
-  - 为什么这么做？线索只剩这一条
-  - 符合当前利益吗？符合
-  - 符合他的人设吗？符合
-- 对手/配角本章最关键的一次选择：
-  - 为什么这么做？掩盖踪迹
-  - 符合当前利益吗？符合
-  - 符合他的人设吗？符合
+## Kiểm tra ba câu hỏi cho lựa chọn then chốt
+- mock_text：
+  - mock_text？mock_text
+  - mock_text？mock_text
+  - mock_text？mock_text
+- mock_text/mock_text：
+  - mock_text？mock_text
+  - mock_text？mock_text
+  - mock_text？mock_text
 
-## 章尾必须发生的改变
-- 信息改变：主角掌握实证，可以面对幕后主使前先压住对手的退路
+## Thay đổi bắt buộc cuối chương
+- mock_text：mock_text，mock_text
 
-## 本章 hook 账
+## Sổ hook chương này
 advance:
-- H03 "七号门异常" → 从 pressured → near_payoff（本章钉成实证）
+- H03 "mock_text" → mock_text pressured → near_payoff（mock_text）
 resolve:
-- S004 "锁芯刮痕" → 核验完毕，本章结清
+- S004 "mock_text" → mock_text，mock_text
 defer:
-- H07 "幕后主使" → 第 20 章再动
+- H07 "mock_text" → Chương 20mock_text
 
-## 不要做
-- 不要让对手突然降智
-- 不要直接点破幕后主使
+## Không làm
+- mock_text
+- mock_text
 `.trim();
 
 function validMemoRaw(chapter: number): string {
-  return `# 第 ${chapter} 章 memo
+  return `# Chương  ${chapter} mock_text memo
 
-## 本章目标
-把七号门被动过手脚钉成现场实证
+## mock_text
+mock_text
 
-## 关联线索
+## mock_text
 - H03
 - S004
 
@@ -101,11 +101,11 @@ async function seedStoryFiles(bookDir: string): Promise<void> {
   await Promise.all([
     writeFile(join(storyDir, "author_intent.md"), "# Intent\n- Tell a taut mystery.", "utf-8"),
     writeFile(join(storyDir, "current_focus.md"), "# Focus\n- Keep pressure on the seventh gate.", "utf-8"),
-    writeFile(join(storyDir, "story_bible.md"), "# Bible\n- Protagonist: 阿泽", "utf-8"),
-    writeFile(join(storyDir, "volume_outline.md"), "# Outline\n- 第 1 章：开场", "utf-8"),
+    writeFile(join(storyDir, "story_bible.md"), "# Bible\n- Protagonist: mock_text", "utf-8"),
+    writeFile(join(storyDir, "volume_outline.md"), "# Outline\n- Chương 1：Mo dau", "utf-8"),
     writeFile(join(storyDir, "chapter_summaries.md"), "# Summaries\n", "utf-8"),
-    writeFile(join(storyDir, "book_rules.md"), "# Rules\n- 禁止反派降智", "utf-8"),
-    writeFile(join(storyDir, "current_state.md"), "# State\n- 主角在七号门附近", "utf-8"),
+    writeFile(join(storyDir, "book_rules.md"), "# Rules\n- mock_text", "utf-8"),
+    writeFile(join(storyDir, "current_state.md"), "# State\n- mock_text", "utf-8"),
     writeFile(join(storyDir, "pending_hooks.md"), "# Hooks\n", "utf-8"),
     writeFile(join(storyDir, "subplot_board.md"), "# Subplot\n", "utf-8"),
     writeFile(join(storyDir, "emotional_arcs.md"), "# Arcs\n", "utf-8"),
@@ -152,9 +152,9 @@ describe("PlannerAgent.planChapter memo generation", () => {
     expect(chatSpy).toHaveBeenCalledTimes(1);
     expect(result.memo.chapter).toBe(1);
     expect(result.memo.isGoldenOpening).toBe(true); // ch1 zh → golden opening, authoritative over LLM
-    expect(result.memo.goal).toBe("把七号门被动过手脚钉成现场实证");
+    expect(result.memo.goal).toBe("mock_text");
     expect(result.memo.threadRefs).toEqual(["H03", "S004"]);
-    expect(result.memo.body).toContain("## 当前任务");
+    expect(result.memo.body).toContain("## Nhiệm vụ hiện tại");
   });
 
   it("does not hard-cap memo generation below the configured model output budget", async () => {
@@ -185,15 +185,15 @@ describe("PlannerAgent.planChapter memo generation", () => {
       book: makeBook(),
       bookDir,
       chapterNumber: 1,
-      externalContext: "本章标题：雨夜账本\n必须围绕账本失窃后的当面对质展开。",
+      externalContext: "mock_text：mock_text\nmock_text。",
     });
 
     const callArgs = chatSpy.mock.calls[0]!;
     const messages = callArgs[2] as ReadonlyArray<{ role: string; content: string }>;
     const userMsg = messages.find((m) => m.role === "user");
-    expect(userMsg?.content).toContain("本章用户指令");
-    expect(userMsg?.content).toContain("本章标题：雨夜账本");
-    expect(userMsg?.content).toContain("当面对质");
+    expect(userMsg?.content).toContain("mock_text");
+    expect(userMsg?.content).toContain("mock_text：mock_text");
+    expect(userMsg?.content).toContain("mock_text");
   });
 
   it("retries when the first response is malformed and succeeds on retry", async () => {
@@ -225,7 +225,7 @@ describe("PlannerAgent.planChapter memo generation", () => {
     const secondCallArgs = chatSpy.mock.calls[1]!;
     const secondMessages = secondCallArgs[2] as ReadonlyArray<{ role: string; content: string }>;
     const userMsg = secondMessages.find((m) => m.role === "user");
-    expect(userMsg?.content).toContain("上次输出的错误");
+    expect(userMsg?.content).toContain("mock_text");
   });
 
   // Phase hotfix 4: English books must receive English system + user prompts
@@ -311,18 +311,18 @@ ${VALID_EN_BODY}
     // English system prompt markers
     expect(systemMsg?.content).toContain("editor-in-chief");
     expect(systemMsg?.content).toContain("Output format (strict)");
-    expect(systemMsg?.content).not.toContain("你是这本小说的创作总编");
+    expect(systemMsg?.content).not.toContain("mock_text");
 
     // English user template markers
     expect(userMsg?.content).toContain("# Chapter 1 memo request");
     expect(userMsg?.content).toContain("Last screen of previous chapter");
     expect(userMsg?.content).toContain("Golden opening chapter: yes");
-    expect(userMsg?.content).not.toContain("# 第 1 章 memo 请求");
+    expect(userMsg?.content).not.toContain("# Chương 1 memo mock_text");
 
     // English golden-opening guidance appended for ch ≤ 3
     expect(userMsg?.content).toContain("Golden Opening Guidance");
     expect(userMsg?.content).toContain("Chapter 1");
-    expect(userMsg?.content).not.toContain("黄金三章规划指引");
+    expect(userMsg?.content).not.toContain("mock_text");
   });
 
   it("returns a degraded memo instead of throwing when all 3 attempts fail", async () => {
@@ -339,7 +339,7 @@ ${VALID_EN_BODY}
 
     expect(result.memo.chapter).toBe(2);
     expect(result.memo.goal.length).toBeGreaterThan(0);
-    expect(result.memo.body).toContain("## 当前任务");
+    expect(result.memo.body).toContain("## Nhiệm vụ hiện tại");
     expect(result.memo.body).toContain("## Planner warning");
     expect(result.intentMarkdown).toContain("Planner warning");
   });
@@ -358,22 +358,22 @@ ${VALID_EN_BODY}
         "---",
         "version: \"1.0\"",
         "protagonist:",
-        "  name: 阿泽",
+        "  name: mock_text",
         "  personalityLock: []",
         "  behavioralConstraints: []",
         "prohibitions:",
-        "  - 禁止主角降智",
-        "  - 禁止神化反派",
+        "  - mock_text",
+        "  - mock_text",
         "---",
         "",
-        "## 主题与基调",
-        "调查与压制。",
+        "## mock_text",
+        "mock_text。",
       ].join("\n"),
       "utf-8",
     );
     await writeFile(
       join(storyDir, "book_rules.md"),
-      "# 本书规则（兼容指针——已废弃）\n\n> 本文件仅为外部读取保留。",
+      "# mock_text（mock_text——mock_text）\n\n> mock_text。",
       "utf-8",
     );
 
@@ -388,7 +388,7 @@ ${VALID_EN_BODY}
       chapterNumber: 2,
     });
 
-    expect(result.intent.mustAvoid).toContain("禁止主角降智");
-    expect(result.intent.mustAvoid).toContain("禁止神化反派");
+    expect(result.intent.mustAvoid).toContain("mock_text");
+    expect(result.intent.mustAvoid).toContain("mock_text");
   });
 });

@@ -46,18 +46,18 @@ function deferredDelta(chapter = 13) {
 function chapterOutput(chapter = 13, delta = deferredDelta(chapter)): WriteChapterOutput {
   return {
     chapterNumber: chapter,
-    title: "雨夜提案",
-    content: `第${chapter}章正文。`,
+    title: "mock_text",
+    content: `Chương ${chapter}mock_text。`,
     wordCount: 10,
     preWriteCheck: "",
     postSettlement: "",
-    updatedState: "# 当前状态\n\n- PROPOSED-STATE-B\n",
-    updatedHooks: "# 伏笔池\n",
-    chapterSummary: `| ${chapter} | 雨夜提案 | 林秋 | 提案内容 | 待审 | H13 提案 | 平静 | 调查 |`,
-    updatedLedger: "# 粒子账本\n",
-    updatedSubplots: "# 支线进度\n",
-    updatedEmotionalArcs: "# 情感弧线\n",
-    updatedCharacterMatrix: "# 角色矩阵\n",
+    updatedState: "# mock_text\n\n- PROPOSED-STATE-B\n",
+    updatedHooks: "# mock_text\n",
+    chapterSummary: `| ${chapter} | mock_text | mock_text | mock_text | mock_text | H13 mock_text | mock_text | mock_text |`,
+    updatedLedger: "# mock_text\n",
+    updatedSubplots: "# mock_text\n",
+    updatedEmotionalArcs: "# mock_text\n",
+    updatedCharacterMatrix: "# mock_text\n",
     postWriteErrors: [],
     postWriteWarnings: [],
     runtimeStateDelta: delta,
@@ -78,8 +78,8 @@ function makeAgent(root: string): WriterAgent {
 }
 
 const INDEX_JSON = JSON.stringify([
-  { number: 13, title: "雨夜提案", status: "needs-state-review", createdAt: "2026-08-24T00:00:00.000Z", updatedAt: "2026-08-24T00:00:00.000Z" },
-  { number: 12, title: "旧档与新伤", status: "approved", createdAt: "2026-08-24T00:00:00.000Z", updatedAt: "2026-08-24T00:00:00.000Z" },
+  { number: 13, title: "mock_text", status: "needs-state-review", createdAt: "2026-08-24T00:00:00.000Z", updatedAt: "2026-08-24T00:00:00.000Z" },
+  { number: 12, title: "mock_text", status: "approved", createdAt: "2026-08-24T00:00:00.000Z", updatedAt: "2026-08-24T00:00:00.000Z" },
 ]);
 const ARTIFACT_JSON = JSON.stringify({ placeholder: "Task 7 supplies a real ACTIVE artifact" });
 
@@ -103,8 +103,8 @@ describe("WriterAgent.saveChapter deferred publication", () => {
   it("LEGACY DEFAULT: persists prose plus runtime state exactly as before", async () => {
     await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi");
 
-    expect(await readFile(join(fixture.bookDir, "chapters", "0013_雨夜提案.md"), "utf-8"))
-      .toContain("第13章正文");
+    expect(await readFile(join(fixture.bookDir, "chapters", "0013_mock_text.md"), "utf-8"))
+      .toContain("Chương 13mock_text");
     const currentState = await readFile(
       join(fixture.bookDir, "story", "state", "current_state.json"), "utf-8",
     );
@@ -122,8 +122,8 @@ describe("WriterAgent.saveChapter deferred publication", () => {
 
     await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", deferredOptions);
 
-    expect(await readFile(join(fixture.bookDir, "chapters", "0013_雨夜提案.md"), "utf-8"))
-      .toContain("第13章正文");
+    expect(await readFile(join(fixture.bookDir, "chapters", "0013_mock_text.md"), "utf-8"))
+      .toContain("Chương 13mock_text");
     // Canon unchanged — proposed state B must not leak anywhere authoritative.
     expect(await readFile(join(fixture.bookDir, "story", "state", "current_state.json"), "utf-8"))
       .toBe(beforeState);
@@ -135,7 +135,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
     const changedKeys = Object.keys(after)
       .filter((key) => JSON.stringify(after[key]) !== JSON.stringify(treeBefore[key]));
     const normalized = changedKeys.map((key) => key.replace(/\\/g, "/"));
-    expect(normalized).toEqual(["books/demo-canon-book/chapters/0013_雨夜提案.md"]);
+    expect(normalized).toEqual(["books/demo-canon-book/chapters/0013_mock_text.md"]);
   });
 
   it("UPDATED INDEX PARTICIPATES: chapters/index.json equals the exact supplied bytes", async () => {
@@ -181,7 +181,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
 
     expect(seam.invocations).toHaveLength(1);
     const paths = seam.invocations[0]!.writes.map((entry) => entry.relativePath.replace(/\\/g, "/"));
-    expect(paths).toContain("chapters/0013_雨夜提案.md");
+    expect(paths).toContain("chapters/0013_mock_text.md");
     expect(paths).toContain("chapters/index.json");
     expect(paths).toContain(ACTIVE_REVIEW_RELPATH(13));
     // Deferred mode excludes every CANONICAL-STATE story/** write; only the

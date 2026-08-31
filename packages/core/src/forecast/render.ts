@@ -1,22 +1,18 @@
 import type { ForecastBranch, NarrativeForecast } from "./schema.js";
 
-// Deterministic markdown renderers for forecast artifacts. Both documents are
-// derived purely from forecast.json so re-rendering never needs another LLM
-// call and tests stay clock-free.
-
 export function renderForecastComparisonMarkdown(forecast: NarrativeForecast): string {
-  const zh = forecast.language === "vi";
-  const header = zh
+  const vi = forecast.language === "vi";
+  const header = vi
     ? [
-        `# 叙事推演对比：${forecast.divergence}`,
+        `# So sánh suy diễn diễn biến: ${forecast.divergence}`,
         "",
-        `- 推演 ID：${forecast.forecastId}`,
-        `- 书籍：${forecast.bookId}`,
-        `- 基准章节：第 ${forecast.baseChapter} 章`,
-        `- 推演跨度：约 ${forecast.horizon} 章`,
-        `- 生成时间：${forecast.createdAt}`,
+        `- Mã suy diễn: ${forecast.forecastId}`,
+        `- Sách: ${forecast.bookId}`,
+        `- Chương cơ sở: Chương ${forecast.baseChapter}`,
+        `- Phạm vi suy diễn: khoảng ${forecast.horizon} chương`,
+        `- Thời gian tạo: ${forecast.createdAt}`,
         "",
-        "> 本文件是非正史规划材料，不会改动正文或权威状态。",
+        "> Tài liệu này là bản thảo định hướng kế hoạch, không làm thay đổi trực tiếp văn bản chính thống.",
       ]
     : [
         `# Narrative forecast comparison: ${forecast.divergence}`,
@@ -30,13 +26,13 @@ export function renderForecastComparisonMarkdown(forecast: NarrativeForecast): s
         "> Non-canonical planning material. Nothing here modifies prose or authoritative state.",
       ];
 
-  const tableHeader = zh
-    ? ["| 分支 | 标题 | 意图匹配 | 风险数 | 前提 |", "| --- | --- | --- | --- | --- |"]
+  const tableHeader = vi
+    ? ["| Nhánh | Tiêu đề | Khớp ý đồ | Số rủi ro | Tiền đề |", "| --- | --- | --- | --- | --- |"]
     : ["| Branch | Title | Intent fit | Risks | Premise |", "| --- | --- | --- | --- | --- |"];
   const tableRows = forecast.branches.map((branch) =>
     `| ${branch.branchId} | ${escapeCell(branch.title)} | ${branch.intentAlignment.score} | ${branch.risks.length} | ${escapeCell(branch.premise)} |`);
 
-  const sections = forecast.branches.map((branch) => renderBranchSection(branch, zh));
+  const sections = forecast.branches.map((branch) => renderBranchSection(branch, vi));
 
   return [...header, "", ...tableHeader, ...tableRows, "", sections.join("\n\n")].join("\n");
 }
@@ -48,23 +44,23 @@ export function renderSelectedBranchPlanMarkdown(input: {
   readonly stale: boolean;
 }): string {
   const { forecast, branch } = input;
-  const zh = forecast.language === "vi";
+  const vi = forecast.language === "vi";
 
   const staleWarning = input.stale
-    ? (zh
-        ? "> ⚠️ 该推演已过期：正史章节或状态在推演生成后发生了变化。以下计划基于旧上下文，采用前请重新核对，必要时重新生成推演。"
+    ? (vi
+        ? "> ⚠️ Bản suy diễn này đã cũ: các chương hoặc trạng thái chính thống đã thay đổi sau khi tạo bản suy diễn. Kế hoạch dưới đây dựa trên bối cảnh cũ — vui lòng kiểm tra lại trước khi áp dụng, hoặc tạo lại bản suy diễn mới nếu cần."
         : "> ⚠️ This forecast is stale: canonical chapters or state changed after it was generated. The plan below is based on outdated context — re-check before applying, and regenerate if needed.")
     : "";
 
-  const header = zh
+  const header = vi
     ? [
-        `# 已选分支计划：${branch.title}`,
+        `# Kế hoạch nhánh đã chọn: ${branch.title}`,
         "",
-        `- 推演 ID：${forecast.forecastId}`,
-        `- 分支：${branch.branchId}`,
-        `- 分歧点：${forecast.divergence}`,
-        `- 基准章节：第 ${forecast.baseChapter} 章`,
-        `- 选择时间：${input.selectedAt}`,
+        `- Mã suy diễn: ${forecast.forecastId}`,
+        `- Nhánh: ${branch.branchId}`,
+        `- Điểm phân kỳ: ${forecast.divergence}`,
+        `- Chương cơ sở: Chương ${forecast.baseChapter}`,
+        `- Thời gian chọn: ${input.selectedAt}`,
       ]
     : [
         `# Selected branch plan: ${branch.title}`,
@@ -76,15 +72,15 @@ export function renderSelectedBranchPlanMarkdown(input: {
         `- Selected at: ${input.selectedAt}`,
       ];
 
-  const footer = zh
-    ? "> 本计划不修改正史。要把它应用到大纲、章节意图或权威状态，需要另行确认的操作（v1 不自动执行）。"
+  const footer = vi
+    ? "> Kế hoạch này không thay đổi văn bản chính thống. Để áp dụng vào đề cương, ý đồ chương hoặc trạng thái chính thức, cần thực hiện thao tác xác nhận riêng."
     : "> This plan does not modify canon. Applying it to the outline, chapter intents, or authoritative state is a separate, explicitly confirmed operation (not automated in v1).";
 
   return [
     ...header,
     ...(staleWarning ? ["", staleWarning] : []),
     "",
-    renderBranchSection(branch, zh, { headingLevel: 2, includeBranchId: false }),
+    renderBranchSection(branch, vi, { headingLevel: 2, includeBranchId: false }),
     "",
     footer,
   ].join("\n");
@@ -92,30 +88,30 @@ export function renderSelectedBranchPlanMarkdown(input: {
 
 function renderBranchSection(
   branch: ForecastBranch,
-  zh: boolean,
+  vi: boolean,
   options: { readonly headingLevel?: number; readonly includeBranchId?: boolean } = {},
 ): string {
   const level = "#".repeat(options.headingLevel ?? 2);
   const sub = `${level}#`;
   const heading = options.includeBranchId === false
     ? `${level} ${branch.title}`
-    : `${level} ${branch.branchId}：${branch.title}`;
+    : `${level} ${branch.branchId}: ${branch.title}`;
 
-  const labels = zh
+  const labels = vi
     ? {
-        premise: "前提与假设",
-        beats: "未来章节节拍",
-        decisions: "人物决策",
-        changes: "预计变化",
-        characters: "人物",
-        relationships: "关系",
-        world: "世界",
-        hooks: "伏笔",
-        risks: "一致性风险",
-        uncertainties: "不确定性",
-        alignment: "作者意图匹配度",
-        chapterPrefix: (n: number) => `第 ${n} 章`,
-        none: "（无）",
+        premise: "Tiền đề và giả định",
+        beats: "Nhịp chương tương lai",
+        decisions: "Quyết định nhân vật",
+        changes: "Thay đổi dự kiến",
+        characters: "Nhân vật",
+        relationships: "Mối quan hệ",
+        world: "Thế giới",
+        hooks: "Hook",
+        risks: "Rủi ro nhất quán",
+        uncertainties: "Điều chưa chắc chắn",
+        alignment: "Mức độ phù hợp ý định tác giả",
+        chapterPrefix: (n: number) => `Chương ${n}`,
+        none: "(không có)",
       }
     : {
         premise: "Premise and assumptions",
@@ -145,18 +141,18 @@ function renderBranchSection(
     "",
     `${sub} ${labels.beats}`,
     "",
-    list(branch.beats.map((beat) => `${labels.chapterPrefix(beat.chapter)}：${beat.summary}`)),
+    list(branch.beats.map((beat) => `${labels.chapterPrefix(beat.chapter)}: ${beat.summary}`)),
     "",
     `${sub} ${labels.decisions}`,
     "",
-    list(branch.characterDecisions.map((decision) => `${decision.character}：${decision.decision}`)),
+    list(branch.characterDecisions.map((decision) => `${decision.character}: ${decision.decision}`)),
     "",
     `${sub} ${labels.changes}`,
     "",
-    `- ${labels.characters}：${joinOrNone(branch.projectedChanges.characters, labels.none)}`,
-    `- ${labels.relationships}：${joinOrNone(branch.projectedChanges.relationships, labels.none)}`,
-    `- ${labels.world}：${joinOrNone(branch.projectedChanges.world, labels.none)}`,
-    `- ${labels.hooks}：${joinOrNone(branch.projectedChanges.hooks, labels.none)}`,
+    `- ${labels.characters}: ${joinOrNone(branch.projectedChanges.characters, labels.none)}`,
+    `- ${labels.relationships}: ${joinOrNone(branch.projectedChanges.relationships, labels.none)}`,
+    `- ${labels.world}: ${joinOrNone(branch.projectedChanges.world, labels.none)}`,
+    `- ${labels.hooks}: ${joinOrNone(branch.projectedChanges.hooks, labels.none)}`,
     "",
     `${sub} ${labels.risks}`,
     "",
@@ -173,7 +169,7 @@ function renderBranchSection(
 }
 
 function joinOrNone(items: ReadonlyArray<string>, none: string): string {
-  return items.length > 0 ? items.join("；") : none;
+  return items.length > 0 ? items.join("; ") : none;
 }
 
 function escapeCell(value: string): string {

@@ -49,10 +49,10 @@ const MANIFEST = {
 };
 
 const FACTS = [
-  { subject: "主角", predicate: "当前位置", object: "城南旧宅", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 },
-  { subject: "主角", predicate: "当前位置", object: "东城公寓", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
-  { subject: "主角", predicate: "主角状态", object: "带伤潜行，避开了监控网络", validFromChapter: 12, validUntilChapter: null, sourceChapter: 12 },
-  { subject: "林晚", predicate: "身份", object: "卧底记者", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val，mock_val", validFromChapter: 12, validUntilChapter: null, sourceChapter: 12 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 },
 ];
 
 const HOOKS = [
@@ -62,11 +62,11 @@ const HOOKS = [
     type: "core_mystery",
     status: "progressing",
     lastAdvancedChapter: 12,
-    expectedPayoff: "遗嘱真伪揭晓",
+    expectedPayoff: "mock_val",
     payoffTiming: "mid-arc",
-    notes: "与林晚身份线交织",
+    notes: "mock_val",
     dependsOn: ["hook-sub-neighbor"],
-    paysOffInArc: "第二卷",
+    paysOffInArc: "mock_val",
     coreHook: true,
     halfLifeChapters: 6,
     advancedCount: 5,
@@ -78,7 +78,7 @@ const HOOKS = [
     type: "subplot",
     status: "open",
     lastAdvancedChapter: 9,
-    expectedPayoff: "邻居目击证词",
+    expectedPayoff: "mock_val",
     payoffTiming: "near-term",
     notes: "",
   },
@@ -87,23 +87,23 @@ const HOOKS = [
 const SUMMARY_ROWS = [
   {
     chapter: 11,
-    title: "夜访东城",
-    characters: "主角；房东",
-    events: "主角搬入东城公寓",
-    stateChanges: "当前位置→东城公寓",
+    title: "mock_val",
+    characters: "mock_val；mock_val",
+    events: "mock_val",
+    stateChanges: "mock_val→mock_val",
     hookActivity: "",
-    mood: "压抑",
-    chapterType: "过渡",
+    mood: "mock_val",
+    chapterType: "mock_val",
   },
   {
     chapter: 12,
-    title: "旧档与新伤",
-    characters: "主角；林晚",
-    events: "发现遗嘱副本",
-    stateChanges: "主角状态→带伤潜行",
-    hookActivity: "hook-core-missing-will 推进",
-    mood: "紧张",
-    chapterType: "调查",
+    title: "mock_val",
+    characters: "mock_val；mock_val",
+    events: "mock_val",
+    stateChanges: "mock_val→mock_val",
+    hookActivity: "hook-core-missing-will mock_val",
+    mood: "mock_val",
+    chapterType: "mock_val",
   },
 ];
 
@@ -115,14 +115,14 @@ async function seedBook(root: string, opts: { stateChapterAhead?: boolean; corru
   }
   await writeFile(
     join(bookDir, "book.json"),
-    JSON.stringify({ id: BOOK_ID, title: "回声协议", language: "zh", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }),
+    JSON.stringify({ id: BOOK_ID, title: "mock_val", language: "zh", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }),
     "utf-8",
   );
   // Bootstrap re-derives manifest.lastAppliedChapter from the contiguous
   // chapter-file prefix, so chapters 1..12 must exist for lastAppliedChapter
   // 12 to stay valid.
   for (let chapter = 1; chapter <= 12; chapter += 1) {
-    await writeFile(join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_第${chapter}章.md`), `# 第${chapter}章\n\n正文。`, "utf-8");
+    await writeFile(join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_mock_val${chapter}mock_val.md`), `# mock_val${chapter}mock_val\n\nmock_val。`, "utf-8");
   }
   if (opts.omitState) {
     return bookDir;
@@ -175,16 +175,16 @@ describe("GET /api/v1/books/:id/canon", () => {
 
     expect(body.bookId).toBe(BOOK_ID);
     expect(body.manifest.lastAppliedChapter).toBe(12);
-    expect(body.currentState.facts.some((fact) => fact.object === "东城公寓")).toBe(true);
+    expect(body.currentState.facts.some((fact) => fact.object === "mock_val")).toBe(true);
     // Core-computed display projection rides along so the UI never re-derives
     // slot semantics from raw facts.
     expect(body.description.chapter).toBe(12);
-    expect(body.description.slots[0]).toMatchObject({ key: "currentLocation", label: "当前位置", value: "东城公寓" });
+    expect(body.description.slots[0]).toMatchObject({ key: "currentLocation", label: "mock_val", value: "mock_val" });
     expect(body.description.additionalFacts).toHaveLength(1);
     // Full-fidelity hook record: promotion metadata survives transport — no
     // lossy client-side markdown parsing anywhere in this path.
     expect(body.hooks.hooks.find((hook) => hook.hookId === "hook-core-missing-will")?.promoted).toBe(true);
-    expect(body.chapterSummaries.rows[0]?.title).toBe("夜访东城");
+    expect(body.chapterSummaries.rows[0]?.title).toBe("mock_val");
   });
 
   it("filters to a single section via ?section=", async () => {

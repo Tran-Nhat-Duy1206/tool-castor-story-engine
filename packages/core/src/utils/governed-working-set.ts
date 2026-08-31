@@ -16,7 +16,7 @@ export function buildGovernedHookWorkingSet(params: {
   readonly keepRecent?: number;
 }): string {
   const { hooksMarkdown } = params;
-  if (!hooksMarkdown || hooksMarkdown === "(文件不存在)" || hooksMarkdown === "(文件尚未创建)") {
+  if (!hooksMarkdown || hooksMarkdown === "()" || hooksMarkdown === "(file not created yet)") {
     return hooksMarkdown;
   }
 
@@ -175,7 +175,7 @@ export function buildGovernedCharacterMatrixWorkingSet(params: {
   readonly protagonistName?: string;
 }): string {
   const { matrixMarkdown } = params;
-  if (!matrixMarkdown || matrixMarkdown === "(文件不存在)" || matrixMarkdown === "(文件尚未创建)") {
+  if (!matrixMarkdown || matrixMarkdown === "()" || matrixMarkdown === "(file not created yet)") {
     return matrixMarkdown;
   }
 

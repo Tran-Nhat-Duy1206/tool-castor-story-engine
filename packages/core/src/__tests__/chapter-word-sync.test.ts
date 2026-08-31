@@ -46,14 +46,14 @@ describe("syncChapterWordCounts", () => {
     const { root, bookDir } = await setupBook({
       bookId: "driftbook",
       chapters: [
-        // Heading stripped, whitespace stripped: "风从码头吹进巷子。" → 9 chars.
-        { file: "0001_起风.md", content: "# 第1章 起风\n\n风从码头吹进巷子。" },
-        // "她收起伞，走进当铺。" → 10 chars — index below is already correct.
-        { file: "0002_落雨.md", content: "# 第2章 落雨\n\n她收起伞，走进当铺。" },
+        // Heading stripped, whitespace stripped: "mock_text。" → 9 chars.
+        { file: "0001_mock_text.md", content: "# Chương 1 mock_text\n\nmock_text。" },
+        // "mock_text，mock_text。" → 10 chars — index below is already correct.
+        { file: "0002_mock_text.md", content: "# Chương 2 mock_text\n\nmock_text，mock_text。" },
       ],
       index: [
-        chapterEntry(1, "起风", 3000),
-        chapterEntry(2, "落雨", 10),
+        chapterEntry(1, "mock_text", 3000),
+        chapterEntry(2, "mock_text", 10),
       ],
     });
 
@@ -64,7 +64,7 @@ describe("syncChapterWordCounts", () => {
     expect(result.countingMode).toBe("zh_chars");
     expect(result.checkedChapters).toBe(2);
     expect(result.changes).toEqual([
-      { number: 1, title: "起风", previousWordCount: 3000, wordCount: 9 },
+      { number: 1, title: "mock_text", previousWordCount: 3000, wordCount: 9 },
     ]);
     expect(result.missingChapterFiles).toEqual([]);
 
@@ -78,8 +78,8 @@ describe("syncChapterWordCounts", () => {
   it("reports no changes when the index already matches the files", async () => {
     const { root } = await setupBook({
       bookId: "steadybook",
-      chapters: [{ file: "0001_起风.md", content: "# 第1章 起风\n\n风从码头吹进巷子。" }],
-      index: [chapterEntry(1, "起风", 9)],
+      chapters: [{ file: "0001_mock_text.md", content: "# Chương 1 mock_text\n\nmock_text。" }],
+      index: [chapterEntry(1, "mock_text", 9)],
     });
 
     const state = new StateManager(root);
@@ -109,10 +109,10 @@ describe("syncChapterWordCounts", () => {
   it("leaves entries without a chapter file untouched and reports them", async () => {
     const { root, bookDir } = await setupBook({
       bookId: "gapbook",
-      chapters: [{ file: "0001_起风.md", content: "# 第1章 起风\n\n风从码头吹进巷子。" }],
+      chapters: [{ file: "0001_mock_text.md", content: "# Chương 1 mock_text\n\nmock_text。" }],
       index: [
-        chapterEntry(1, "起风", 1),
-        chapterEntry(2, "缺失", 777),
+        chapterEntry(1, "mock_text", 1),
+        chapterEntry(2, "mock_text", 777),
       ],
     });
 
@@ -121,7 +121,7 @@ describe("syncChapterWordCounts", () => {
 
     expect(result.missingChapterFiles).toEqual([2]);
     expect(result.changes).toEqual([
-      { number: 1, title: "起风", previousWordCount: 1, wordCount: 9 },
+      { number: 1, title: "mock_text", previousWordCount: 1, wordCount: 9 },
     ]);
 
     const savedIndex = JSON.parse(

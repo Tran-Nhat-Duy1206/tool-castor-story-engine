@@ -275,7 +275,7 @@ Book-creation platform hotfix: fixes the `sub_agent.platform` parameter possibly
 ### Bug Fixes
 
 - Fixed tool calls during book creation failing with `Validation failed for tool "sub_agent": - platform: must be equal to constant`, which prevented book files from being generated
-- Unified platform alias normalization across the Studio, CLI, TUI, and agent create-book chains; inputs like `番茄` (Cà Chua) / `fanqie` / `番茄小说` (Cà Chua Tiểu Thuyết) now resolve to a legal enum value
+- Unified platform alias normalization across the Studio, CLI, TUI, and agent create-book chains; inputs like `` (Cà Chua) / `fanqie` / `` (Cà Chua Tiểu Thuyết) now resolve to a legal enum value
 - Unknown platform values degrade to `other`, preventing a wrong platform id from being written into the book config and affecting later flows
 - Updated the README WeChat group QR code to group 13
 
@@ -468,7 +468,7 @@ Unified interaction core — the TUI, Studio, `castor interact`, and the OpenCla
 - **Ink TUI dashboard**: `castor` opens a full-screen Ink + React dashboard directly, with conversational creation, slash-command Tab completion, themed animations (writing/auditing/revising/planning each with their own), and bilingual Chinese/English i18n
 - **Studio assistant panel**: the right-side AI assistant connects to the shared interaction core, operating books in natural language (write chapters, rename, audit, export), with SSE real-time status push and execution stage icons
 - **Conversational book creation**: brainstorm the book concept, setting, and target chapter count step by step through the Studio assistant, then create with one click once the draft is ready
-- **Whole-book entity rename**: `把林烬改成张三` / `/rename 林烬 => 张三`, a full scan of chapters + truth files replaced in one pass
+- **Whole-book entity rename**: `` / `/rename  => `, a full scan of chapters + truth files replaced in one pass
 - **Single-chapter text replacement**: `/replace 5 old-text => new-text`, precise patching of a specific chapter
 - **`castor interact --json`**: the shared interaction JSON entry, returning request / response / session / events, callable directly by OpenClaw and external agents
 - **Thinking-model temperature clamping** (PR #174): thinking models like kimi-k2.5 automatically get temperature=1, compatible with per-call temperature tuning, warning once per model
@@ -505,7 +505,7 @@ Unified interaction core — the TUI, Studio, `castor interact`, and the OpenCla
 
 - **#151** — Architect section parsing tolerates heading drift like `book-rules` / `Book Rules` / full-width colons; creation no longer fails because a `book_rules` section is slightly deformed
 - **#152** — The state validator is now fail-closed: empty responses raise an error directly, and multi-line JSON balanced extraction is restored, so a missing `passed` field is no longer misjudged
-- **#154** — Post-write rules add detection of chapter-number references in prose, blocking narration like `第33章` / `Chapter 33`
+- **#154** — Post-write rules add detection of chapter-number references in prose, blocking narration like `33` / `Chapter 33`
 - **#155** — `repair-state` supports same-chapter recomputation of the latest `state-degraded` chapter, no longer failing with `delta chapter N goes backwards`
 
 ### Improvements
@@ -685,7 +685,7 @@ Native English writing + system stability fixes.
 - 10 English genres (LitRPG, Progression Fantasy, Isekai, Romantasy, Sci-Fi, Cozy Fantasy, Tower Climber, Dungeon Core, System Apocalypse, Cultivation)
 - `--lang en` flows through the whole pipeline: the Architect generates English foundations, the Writer writes English prose, the Settler produces English truth files, the Auditor audits in English, and the Reviser revises in English
 - English post-write validator: AI-tell word detection (delve/tapestry/testament etc.), paragraph length, fatigue words
-- Automatic chapter title switching: `Chapter X:` vs `第X章`
+- Automatic chapter title switching: `Chapter X:` vs `X`
 - EPUB export lang tag adaptation
 
 ### System Stability
@@ -749,21 +749,21 @@ Continuation + spinoff writing + style imitation + multi-provider routing + post
 Import an existing novel (single file or a chapter directory) into castor; the system splits chapters automatically and reverse-engineers the full set of truth files (world state, hooks, character matrix, etc.), after which `write next` continues directly.
 
 ```bash
-castor import chapters 我的小说 --from 已有章节/        # import from a directory
-castor import chapters 我的小说 --from 全书.txt          # import from a single file (auto-split on "第X章")
-castor import chapters 我的小说 --from 全书.txt --split "Chapter\\s+\\d+"  # custom chapter-split regex
-castor write next 我的小说                               # continue seamlessly
+castor import chapters  --from /        # import from a directory
+castor import chapters  --from .txt          # import from a single file (auto-split on "X")
+castor import chapters  --from .txt --split "Chapter\\s+\\d+"  # custom chapter-split regex
+castor write next                                # continue seamlessly
 ```
 
-Single-file mode splits chapters on `第X章` automatically, and `--split <regex>` supports custom patterns. Interrupted imports can resume with `--resume-from <n>`.
+Single-file mode splits chapters on `X` automatically, and `--split <regex>` supports custom patterns. Interrupted imports can resume with `--resume-from <n>`.
 
 ### Spinoff Writing
 
 Create a prequel, sequel, side story, or what-if line based on an existing book. The spinoff and the parent share the worldview and characters but have an independent plot line.
 
 ```bash
-castor import canon 烈焰前传 --from 吞天魔帝   # import the parent canon into the spinoff
-castor write next 烈焰前传                     # the writer automatically reads the canon constraints
+castor import canon  --from    # import the parent canon into the spinoff
+castor write next                      # the writer automatically reads the canon constraints
 ```
 
 Import generates `story/parent_canon.md`, containing the parent's world rules, character snapshots (with information boundaries), key-event timeline, and hook status. The writer consults the canon before writing, and the auditor automatically activates 4 spinoff-specific dimensions:
@@ -782,8 +782,8 @@ Activated automatically when `parent_canon.md` is detected — no extra configur
 Feed in excerpts from a human-written novel; the system extracts a statistical fingerprint + generates a style guide, automatically injected into the writer prompt for every subsequent chapter.
 
 ```bash
-castor style analyze 参考小说.txt                     # analyze: sentence length, TTR, rhetorical features
-castor style import 参考小说.txt 吞天魔帝 --name 某作者  # import the style into a book
+castor style analyze .txt                     # analyze: sentence length, TTR, rhetorical features
+castor style import .txt  --name   # import the style into a book
 ```
 
 Two files are produced:
@@ -798,15 +798,15 @@ The writer reads the style guide for every chapter, and the auditor cross-checks
 
 | Rule | Description |
 |------|------|
-| Banned sentence pattern | 「不是……而是……」 |
+| Banned sentence pattern | 「…………」 |
 | Banned dash | 「——」 |
-| Transition-word density | 仿佛/忽然/竟然 etc., ≤1 occurrence per 3,000 characters |
+| Transition-word density | // etc., ≤1 occurrence per 3,000 characters |
 | High-fatigue words | genre fatigue words, ≤1 occurrence per word per chapter |
 | Meta-narrative | screenwriter-style narration |
 | Report jargon | analysis-framework terms must not enter prose |
-| Authorial preaching | 显然/不言而喻 and the like |
-| Collective reactions | boilerplate like 「全场震惊」 |
-| Consecutive 「了」 | ≥6 consecutive sentences containing 「了」 |
+| Authorial preaching | / and the like |
+| Collective reactions | boilerplate like 「」 |
+| Consecutive 「」 | ≥6 consecutive sentences containing 「」 |
 | Overlong paragraphs | ≥2 paragraphs over 300 characters |
 | Book-specific taboos | prohibitions from book_rules.md |
 
@@ -843,8 +843,8 @@ Each agent independently configures `--base-url`, `--provider`, `--api-key-env`,
 ### Analytics
 
 ```bash
-castor analytics 吞天魔帝          # audit pass rate, most frequent issue categories, chapters with the most issues
-castor analytics 吞天魔帝 --json   # structured output
+castor analytics           # audit pass rate, most frequent issue categories, chapters with the most issues
+castor analytics  --json   # structured output
 ```
 
 ### Other v0.4 Changes
@@ -856,7 +856,7 @@ castor analytics 吞天魔帝 --json   # structured output
 - `additionalAuditDimensions` in `book_rules.md` supports Chinese-name matching
 - All 5 genres activate dims 24-26 (subplot stagnation / flat arcs / monotonous pacing)
 - `castor export` supports `--format md`, `--output <path>`, `--approved-only`
-- The post-write validator's "consecutive 了" threshold raised from 4 sentences to 6 (fewer false positives in Chinese narration)
+- The post-write validator's "consecutive " threshold raised from 4 sentences to 6 (fewer false positives in Chinese narration)
 - Security hardening: overwrite-protection checks for `init`/`book create`/`import chapters`, type inference + key validation for `config set`, downgrade protection for `update`, `doctor` can test the API outside a project, status display consistency, `genre show` rejects invalid IDs
 
 ---
@@ -888,8 +888,8 @@ The Writer automatically generates a summary for each chapter and updates the su
 
 ```bash
 castor style analyze reference.txt         # analyze the reference text's style
-castor style import reference.txt 吞天魔帝  # import the style into a book
-castor detect 吞天魔帝 --all               # whole-book AIGC detection
+castor style import reference.txt   # import the style into a book
+castor detect  --all               # whole-book AIGC detection
 castor detect --stats                      # detection statistics
 ```
 
@@ -912,7 +912,7 @@ Pipeline events are POSTed as JSON to a configured URL (HMAC-SHA256 signed), wit
 Specify the genre at book creation, and the corresponding rules take effect automatically:
 
 ```bash
-castor book create --title "吞天魔帝" --genre xuanhuan
+castor book create --title "" --genre xuanhuan
 ```
 
 Genre rules can be inspected, copied into a project for editing, or created from scratch:
@@ -921,16 +921,16 @@ Genre rules can be inspected, copied into a project for editing, or created from
 castor genre list                      # view all genres
 castor genre show xuanhuan             # view the complete xuanhuan rules
 castor genre copy xuanhuan             # copy into the project; edit freely
-castor genre create wuxia --name 武侠   # create a new genre from scratch
+castor genre create wuxia --name    # create a new genre from scratch
 ```
 
 After copying into a project, add or remove taboos, adjust fatigue words, change pacing rules, or customize the iron language rules — the changes take effect automatically on the next chapter.
 
 Each genre has its own iron language rules (with ✗→✓ examples), enforced by both the writer and the auditor:
 
-- **Xuanhuan**: ✗ "火元从12缕增加到24缕" → ✓ "手臂比先前有力了，握拳时指骨发紧"
-- **Urban**: ✗ "迅速分析了当前的债务状况" → ✓ "把那叠皱巴巴的白条翻了三遍"
-- **Horror**: ✗ "感到一阵恐惧" → ✓ "后颈的汗毛一根根立起来"
+- **Xuanhuan**: ✗ "1224" → ✓ "，"
+- **Urban**: ✗ "" → ✓ ""
+- **Horror**: ✗ "" → ✓ ""
 
 ### Per-Book Rules
 
@@ -938,17 +938,17 @@ Every book has its own `book_rules.md`, generated automatically by the architect
 
 ```yaml
 protagonist:
-  name: 林烬
-  personalityLock: ["强势冷静", "能忍能杀", "有脑子不是疯狗"]
-  behavioralConstraints: ["不圣母不留手", "对盟友有温度但不煽情"]
+  name: 
+  personalityLock: ["", "", ""]
+  behavioralConstraints: ["", ""]
 numericalSystemOverrides:
   hardCap: 840000000
-  resourceTypes: ["微粒", "血脉浓度", "灵石"]
+  resourceTypes: ["", "", ""]
 prohibitions:
-  - 主角关键时刻心软
-  - 无意义后宫暧昧拖剧情
-  - 配角戏份喧宾夺主
-fatigueWordsOverride: ["瞳孔骤缩", "不可置信"]   # overrides the genre default
+  - 
+  - 
+  - 
+fatigueWordsOverride: ["", ""]   # overrides the genre default
 ```
 
 Protagonist personality lock, numerical caps, custom prohibitions, fatigue-word overrides — each book's rules are tuned independently without touching the genre template.
@@ -965,9 +965,9 @@ Dims 20-23 (AI traces) + dim 27 (sensitive words) are detected by the pure rule 
 
 5 universal rules + genre-specific language rules control AI marker-word density and narration habits:
 
-- AI marker-word frequency cap: 仿佛/忽然/竟然/不禁/宛如/猛地, ≤1 occurrence per 3,000 characters
+- AI marker-word frequency cap: /////, ≤1 occurrence per 3,000 characters
 - The narrator does not draw conclusions for the reader; write actions only
-- No analysis-report language ("核心动机", "信息落差" must not enter prose)
+- No analysis-report language ("", "" must not enter prose)
 - The same imagery is not rendered more than twice
 - Methodology jargon must not enter prose
 

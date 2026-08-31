@@ -1,15 +1,9 @@
-/**
- * 360 智脑 (360 AI)
- *
- * - 官网：https://ai.360.com/
- * - 控制台 / API key：https://ai.360.com/platform/keys
- * - API 文档：https://ai.360.com/platform/docs
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const AI360: ProviderEndpoint = {
   id: "ai360",
-  label: "360 智脑",
+  label: "360 ",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://api.360.cn/v1",

@@ -20,7 +20,7 @@ describe("project bootstrap", () => {
   it("creates a minimal Studio-first project when none exists", async () => {
     const { ensureProjectDirectoryInitialized } = await import("../project-bootstrap.js");
 
-    const initialized = await ensureProjectDirectoryInitialized(tempDir, { language: "zh" });
+    const initialized = await ensureProjectDirectoryInitialized(tempDir, { language: "vi" });
 
     expect(initialized).toBe(true);
     const config = JSON.parse(await readFile(join(tempDir, "castor.json"), "utf-8"));
@@ -39,7 +39,7 @@ describe("project bootstrap", () => {
     await writeFile(join(tempDir, ".gitignore"), "CUSTOM\n", "utf-8");
 
     const { ensureProjectDirectoryInitialized } = await import("../project-bootstrap.js");
-    await ensureProjectDirectoryInitialized(tempDir, { language: "zh" });
+    await ensureProjectDirectoryInitialized(tempDir, { language: "vi" });
 
     await expect(readFile(join(tempDir, ".env"), "utf-8")).resolves.toBe("EXISTING=1\n");
     const gitignore = await readFile(join(tempDir, ".gitignore"), "utf-8");
@@ -53,7 +53,7 @@ describe("project bootstrap", () => {
     await writeFile(join(tempDir, ".gitignore"), "dist/\n# keep me\n", "utf-8");
 
     const { initializeProjectDirectory } = await import("../project-bootstrap.js");
-    await initializeProjectDirectory(tempDir, { language: "zh" });
+    await initializeProjectDirectory(tempDir, { language: "vi" });
 
     const gitignore = await readFile(join(tempDir, ".gitignore"), "utf-8");
     expect(gitignore).toContain("dist/\n# keep me\n");
@@ -66,6 +66,6 @@ describe("project bootstrap", () => {
     await writeFile(join(tempDir, "castor.json"), "{}\n", "utf-8");
     const { ensureProjectDirectoryInitialized } = await import("../project-bootstrap.js");
 
-    await expect(ensureProjectDirectoryInitialized(tempDir, { language: "zh" })).resolves.toBe(false);
+    await expect(ensureProjectDirectoryInitialized(tempDir, { language: "vi" })).resolves.toBe(false);
   });
 });

@@ -44,7 +44,7 @@ async function processProjectInteractionRequestInternal(params: {
         status: "failed",
         bookId: sessionWithBook.activeBookId,
         chapterNumber: sessionWithBook.activeChapterNumber,
-        stageLabel: localizedRequest.language === "en" ? `failed ${localizedRequest.intent}` : `执行失败：${localizedRequest.intent}`,
+        stageLabel: localizedRequest.language === "en" ? `failed ${localizedRequest.intent}` : `failed：${localizedRequest.intent}`,
       },
     }, {
       kind: "task.failed",

@@ -34,7 +34,7 @@ function hookRecord(hookId: string) {
   return {
     hookId,
     startChapter: 12,
-    type: "线索",
+    type: "mock_text",
     status: "open" as const,
     lastAdvancedChapter: 13,
     expectedPayoff: "",
@@ -49,8 +49,8 @@ function baseItems(): ReviewItem[] {
       kind: "current-state-fact",
       origin: "ai",
       title: "Location change",
-      proposal: factChange("东城公寓"),
-      evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "他推开了门" },
+      proposal: factChange("mock_text"),
+      evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" },
       decision: "undecided",
     },
     {
@@ -58,7 +58,7 @@ function baseItems(): ReviewItem[] {
       kind: "current-state-fact",
       origin: "ai",
       title: "Goal change",
-      proposal: factChange("雨夜码头"),
+      proposal: factChange("mock_text"),
       evidence: { claimedLevel: "inferred", verifiedLevel: "inferred" },
       decision: "undecided",
     },
@@ -68,7 +68,7 @@ function baseItems(): ReviewItem[] {
       origin: "ai",
       title: "Hook upsert: H09",
       proposal: { type: "hook-upsert", hook: hookRecord("H09") },
-      evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "怀里的铜牌" },
+      evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" },
       decision: "undecided",
     },
     {
@@ -185,7 +185,7 @@ describe("state-review-decisions", () => {
       });
       const reloaded = await loadActive(fixture.bookDir, 13);
       const item = reloaded!.items.find((entry) => entry.id === "current-state-fact:1:inferred")!;
-      expect(resolveReviewItemEffectiveChange(item)).toEqual(factChange("雨夜码头"));
+      expect(resolveReviewItemEffectiveChange(item)).toEqual(factChange("mock_text"));
     });
   });
 
@@ -194,7 +194,7 @@ describe("state-review-decisions", () => {
       const seeded = await seedActive(fixture);
       const proposalBefore = structuredClone(seeded.items[0]!.proposal);
       const evidenceBefore = structuredClone(seeded.items[0]!.evidence);
-      const edited: ProposalChange = factChange("北岸灯塔");
+      const edited: ProposalChange = factChange("mock_text");
 
       const result = await editStateReviewItem({
         bookDir: fixture.bookDir,
@@ -225,7 +225,7 @@ describe("state-review-decisions", () => {
         chapter: 13,
         itemId: "hook-upsert:0:u1",
         expectedReviewRevision: 1,
-        editedChange: factChange("北岸灯塔"),
+        editedChange: factChange("mock_text"),
       })).rejects.toMatchObject({
         name: "StateReviewError",
         code: "state_review_invalid_change",
@@ -259,7 +259,7 @@ describe("state-review-decisions", () => {
         chapter: 13,
         itemId: "note:0:n1",
         expectedReviewRevision: 1,
-        editedChange: factChange("北岸灯塔"),
+        editedChange: factChange("mock_text"),
       })).rejects.toMatchObject({ code: "state_review_invalid_change", itemId: "note:0:n1" });
 
       expect(await captureBookMetadata(fixture.root)).toEqual(before);
@@ -284,7 +284,7 @@ describe("state-review-decisions", () => {
       const reloaded = await loadActive(fixture.bookDir, 13);
       const rejected = reloaded!.items.find((entry) => entry.id === "current-state-fact:1:inferred")!;
       expect(rejected.decision).toBe("rejected");
-      expect(rejected.proposal).toEqual(factChange("雨夜码头"));
+      expect(rejected.proposal).toEqual(factChange("mock_text"));
       expect(resolveReviewItemEffectiveChange(rejected)).toEqual({ type: "none" });
     });
 
@@ -342,7 +342,7 @@ describe("state-review-decisions", () => {
     it("adds a user item: origin user, typed change, immediately accepted, unique stable id, revision +1", async () => {
       await seedActive(fixture);
       const before = await captureBookMetadata(fixture.root);
-      const change = factChange("西郊仓库");
+      const change = factChange("mock_text");
 
       const result = await addUserStateReviewItem({
         bookDir: fixture.bookDir,
@@ -367,7 +367,7 @@ describe("state-review-decisions", () => {
 
     it("generates UNIQUE ids for identical user payloads and keeps them stable across later mutations", async () => {
       await seedActive(fixture);
-      const change = factChange("西郊仓库");
+      const change = factChange("mock_text");
 
       const first = await addUserStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, expectedReviewRevision: 1,
@@ -398,11 +398,11 @@ describe("state-review-decisions", () => {
       await seedActive(fixture);
       const added = await addUserStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, expectedReviewRevision: 1,
-        kind: "current-state-fact", change: factChange("西郊仓库"), title: "missing",
+        kind: "current-state-fact", change: factChange("mock_text"), title: "missing",
       });
       const userId = added.items.at(-1)!.id;
       const before = await captureBookMetadata(fixture.root);
-      const edited: ProposalChange = factChange("南港旧仓");
+      const edited: ProposalChange = factChange("mock_text");
 
       const result = await editStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, itemId: userId,
@@ -416,7 +416,7 @@ describe("state-review-decisions", () => {
       expect(item.origin).toBe("user");
       expect(item.id).toBe(userId);
       expect(item.decision).toBe("edited");
-      expect(item.proposal).toEqual(factChange("西郊仓库"));
+      expect(item.proposal).toEqual(factChange("mock_text"));
       expect(item.editedChange).toEqual(edited);
       expect(resolveReviewItemEffectiveChange(item)).toEqual(edited);
     });
@@ -425,7 +425,7 @@ describe("state-review-decisions", () => {
       await seedActive(fixture);
       const added = await addUserStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, expectedReviewRevision: 1,
-        kind: "current-state-fact", change: factChange("西郊仓库"), title: "missing",
+        kind: "current-state-fact", change: factChange("mock_text"), title: "missing",
       });
       const userId = added.items.at(-1)!.id;
 
@@ -462,11 +462,11 @@ describe("state-review-decisions", () => {
       const seeded = await seedActive(fixture);
       const withEdits = await editStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, itemId: "current-state-fact:0:explicit",
-        expectedReviewRevision: 1, editedChange: factChange("北岸灯塔"),
+        expectedReviewRevision: 1, editedChange: factChange("mock_text"),
       });
       const withUser = await addUserStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, expectedReviewRevision: withEdits.reviewRevision,
-        kind: "current-state-fact", change: factChange("西郊仓库"), title: "missing",
+        kind: "current-state-fact", change: factChange("mock_text"), title: "missing",
       });
       const before = await captureBookMetadata(fixture.root);
 
@@ -488,7 +488,7 @@ describe("state-review-decisions", () => {
       expect(byId.get("current-state-fact:1:inferred")!.decision).toBe("rejected");
       expect(byId.get("hook-upsert:0:u1")!.decision).toBe("rejected");
       // …its earlier human edit layer survives as history…
-      expect(byId.get("current-state-fact:0:explicit")!.editedChange).toEqual(factChange("北岸灯塔"));
+      expect(byId.get("current-state-fact:0:explicit")!.editedChange).toEqual(factChange("mock_text"));
       // …the note is untouched and undecided…
       expect(byId.get("note:0:n1")!.decision).toBe("undecided");
       // …and the user-added item is NOT silently rejected or deleted.
@@ -635,12 +635,12 @@ describe("state-review-decisions", () => {
       });
       await editStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, itemId: "current-state-fact:0:explicit",
-        expectedReviewRevision: 2, editedChange: factChange("北岸灯塔"),
+        expectedReviewRevision: 2, editedChange: factChange("mock_text"),
       });
       await addUserStateReviewItem({
         bookDir: fixture.bookDir, chapter: 13, expectedReviewRevision: 3,
         kind: "chapter-summary",
-        change: { type: "chapter-summary", row: { chapter: 14, title: "雨夜追踪", characters: "林秋", events: "跟踪疑犯", stateChanges: "", hookActivity: "", mood: "", chapterType: "" } },
+        change: { type: "chapter-summary", row: { chapter: 14, title: "mock_text", characters: "mock_text", events: "mock_text", stateChanges: "", hookActivity: "", mood: "", chapterType: "" } },
         title: "missing summary",
       });
 
@@ -676,9 +676,9 @@ describe("state-review-decisions", () => {
       await import("node:fs/promises").then(({ mkdir, writeFile }) =>
         Promise.all([
           mkdir(chaptersDir, { recursive: true }),
-          writeFile(join(chaptersDir, "0013_雨夜.md"), "# 第13章 雨夜\n\n正文。", "utf-8"),
+          writeFile(join(chaptersDir, "0013_mock_text.md"), "# Chương 13 mock_text\n\nmock_text。", "utf-8"),
           writeFile(join(chaptersDir, "index.json"), JSON.stringify([
-            { number: 13, title: "雨夜", status: "needs-state-review", wordCount: 4, createdAt: CREATED_AT, updatedAt: CREATED_AT, auditIssues: [], lengthWarnings: [] },
+            { number: 13, title: "mock_text", status: "needs-state-review", wordCount: 4, createdAt: CREATED_AT, updatedAt: CREATED_AT, auditIssues: [], lengthWarnings: [] },
           ], null, 2), "utf-8"),
         ]),
       );

@@ -186,7 +186,7 @@ describe("ChapterAnalyzerAgent", () => {
       expect(messages[1]?.content).toContain("Analyze chapter 1");
       expect(messages[1]?.content).toContain("## Chapter Content");
       expect(messages[1]?.content).toContain("## Current State");
-      expect(messages[1]?.content).not.toContain("请分析第1章正文");
+      expect(messages[1]?.content).not.toContain("mock_textChương 1mock_text");
     } finally {
       await rm(bookDir, { recursive: true, force: true });
     }

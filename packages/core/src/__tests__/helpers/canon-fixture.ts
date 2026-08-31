@@ -17,7 +17,7 @@ import type {
 /**
  * Canonical structured state used by every canon-boundary test. Shape mirrors
  * what the engine persists after Phase 7: slot facts plus additional facts,
- * a closed historical interval on 当前位置, and a fully-populated promoted hook.
+ * a closed historical interval on mock_text, and a fully-populated promoted hook.
  */
 export const CANON_FIXTURE_MANIFEST: StateManifest = {
   schemaVersion: 2,
@@ -31,10 +31,10 @@ export const CANON_FIXTURE_CURRENT_STATE: CurrentStateState = {
   chapter: 12,
   facts: [
     // Closed historical interval: must stay visible as superseded history.
-    { subject: "主角", predicate: "当前位置", object: "城南旧宅", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 },
-    { subject: "主角", predicate: "当前位置", object: "东城公寓", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
-    { subject: "主角", predicate: "主角状态", object: "带伤潜行，避开了监控网络", validFromChapter: 12, validUntilChapter: null, sourceChapter: 12 },
-    { subject: "林晚", predicate: "身份", object: "卧底记者", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 },
+    { subject: "mock_text", predicate: "mock_text", object: "mock_text", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 },
+    { subject: "mock_text", predicate: "mock_text", object: "mock_text", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
+    { subject: "mock_text", predicate: "mock_text", object: "mock_text，mock_text", validFromChapter: 12, validUntilChapter: null, sourceChapter: 12 },
+    { subject: "mock_text", predicate: "mock_text", object: "mock_text", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 },
   ],
 };
 
@@ -46,11 +46,11 @@ export const CANON_FIXTURE_HOOKS: HooksState = {
       type: "core_mystery",
       status: "progressing",
       lastAdvancedChapter: 12,
-      expectedPayoff: "遗嘱真伪揭晓",
+      expectedPayoff: "mock_text",
       payoffTiming: "mid-arc",
-      notes: "与林晚身份线交织",
+      notes: "mock_text",
       dependsOn: ["hook-sub-neighbor"],
-      paysOffInArc: "第二卷",
+      paysOffInArc: "Chương mock_text",
       coreHook: true,
       halfLifeChapters: 6,
       advancedCount: 5,
@@ -62,7 +62,7 @@ export const CANON_FIXTURE_HOOKS: HooksState = {
       type: "subplot",
       status: "open",
       lastAdvancedChapter: 9,
-      expectedPayoff: "邻居目击证词",
+      expectedPayoff: "mock_text",
       payoffTiming: "near-term",
       notes: "",
     },
@@ -73,23 +73,23 @@ export const CANON_FIXTURE_SUMMARIES: ChapterSummariesState = {
   rows: [
     {
       chapter: 11,
-      title: "夜访东城",
-      characters: "主角；房东",
-      events: "主角搬入东城公寓",
-      stateChanges: "当前位置→东城公寓",
+      title: "mock_text",
+      characters: "mock_text；mock_text",
+      events: "mock_text",
+      stateChanges: "mock_text→mock_text",
       hookActivity: "",
-      mood: "压抑",
-      chapterType: "过渡",
+      mood: "mock_text",
+      chapterType: "mock_text",
     },
     {
       chapter: 12,
-      title: "旧档与新伤",
-      characters: "主角；林晚",
-      events: "发现遗嘱副本",
-      stateChanges: "主角状态→带伤潜行",
-      hookActivity: "hook-core-missing-will 推进",
-      mood: "紧张",
-      chapterType: "调查",
+      title: "mock_text",
+      characters: "mock_text；mock_text",
+      events: "mock_text",
+      stateChanges: "mock_text→mock_text",
+      hookActivity: "hook-core-missing-will mock_text",
+      mood: "mock_text",
+      chapterType: "mock_text",
     },
   ],
 };
@@ -199,7 +199,7 @@ export async function createCanonBook(options: CreateCanonBookOptions = {}): Pro
     join(bookDir, "book.json"),
     JSON.stringify({
       id: "demo-canon-book",
-      title: "回声协议",
+      title: "mock_text",
       genre: "urban",
       language: "vi",
       platform: "other",
@@ -212,10 +212,10 @@ export async function createCanonBook(options: CreateCanonBookOptions = {}): Pro
   // lastAppliedChapter from the contiguous chapter-file prefix on every
   // load, so the fixture must contain chapters 1..chapterCount for
   // lastAppliedChapter to survive validation.
-  const chapterTitles: Record<number, string> = { 11: "夜访东城", 12: "旧档与新伤" };
+  const chapterTitles: Record<number, string> = { 11: "mock_text", 12: "mock_text" };
   for (let chapter = 1; chapter <= chapterCount; chapter += 1) {
-    const title = chapterTitles[chapter] ?? `第${chapter}章`;
-    await writeFile(join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_${title}.md`), `# 第${chapter}章 ${title}\n\n正文。`, "utf-8");
+    const title = chapterTitles[chapter] ?? `Chương ${chapter}mock_text`;
+    await writeFile(join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_${title}.md`), `# Chương ${chapter}mock_text ${title}\n\nmock_text。`, "utf-8");
   }
 
   if (!options.omitStateJson) {

@@ -29,17 +29,17 @@ describe("memory-link", () => {
   sqliteIt("writes character facts and reads them back by name", () => {
     const db = new MemoryDB(dir);
     writeCharacterFacts(db, [
-      { id: "mei", name: "阿梅", role: "protagonist", motivation: "查账", voiceProfile: { speakingRhythm: "短促", vocabulary: "市井", sampleLines: [] } },
+      { id: "mei", name: "A Mei", role: "protagonist", motivation: "Kiem tra so sach", voiceProfile: { speakingRhythm: "mock_text", vocabulary: "mock_text", sampleLines: [] } },
     ], 1);
-    const facts = readCharacterVoices(db, ["阿梅"]);
+    const facts = readCharacterVoices(db, ["A Mei"]);
     db.close();
     const predicates = facts.map(f => f.predicate);
-    expect(facts.some(f => f.subject === "阿梅")).toBe(true);
+    expect(facts.some(f => f.subject === "A Mei")).toBe(true);
     expect(predicates).toContain("motivation");
   });
 
   it("buildUpsertCharactersDelta puts characters in characters.upsert", () => {
-    const d = buildUpsertCharactersDelta([{ id: "mei", name: "阿梅", role: "other", motivation: "" }]);
+    const d = buildUpsertCharactersDelta([{ id: "mei", name: "A Mei", role: "other", motivation: "" }]);
     expect(d.characters?.upsert?.[0].id).toBe("mei");
   });
 });

@@ -14,7 +14,7 @@ import type { BookConfig } from "../models/book.js";
 //
 // A brief side-trip restored current_state as a 6th "narrow env/era" section,
 // but the bench run showed the LLM emits an empty block for 3 out of 3 books
-// (修仙/玄幻/系统 genres have no real year; urban/period genres already weave
+// (mock_text/mock_text/mock_text genres have no real year; urban/period genres already weave
 // the era into world-tonal-ground naturally). The section is back to optional:
 // architect may omit it entirely, writeFoundationFiles still seeds
 // current_state.md with a placeholder so the consolidator has a file to
@@ -71,7 +71,7 @@ function buildAgent(): ArchitectAgent {
 function baseBook(): BookConfig {
   return {
     id: "phase5-consolidated-book",
-    title: "Phase5 合并测试书",
+    title: "Phase5 mock_textTestmock_text",
     platform: "other",
     genre: "urban",
     status: "active",
@@ -85,88 +85,88 @@ function baseBook(): BookConfig {
 
 const CONSOLIDATED_RESPONSE = [
   "=== SECTION: story_frame ===",
-  "## 主题与基调",
-  "一段主题散文，结尾指向主角卡：本书主角是林辞，完整弧线详见 roles/主要角色/林辞.md。",
-  "## 核心冲突与对手定性",
-  "主角 vs 体制。对手有自己的逻辑。",
-  "## 世界观底色",
-  "湿冷的沿海城市，记录者与被记录者的对撞。含本书铁律：凡被记录的名字都会消失。",
-  "## 终局方向",
-  "最后一个镜头：码头日出。",
+  "## mock_text",
+  "mock_text，mock_text：mock_text，mock_text roles/major/mock_text.md。",
+  "## mock_text",
+  "mock_text vs mock_text。mock_text。",
+  "## mock_text",
+  "mock_text，mock_text。mock_text：mock_text từmock_text。",
+  "## mock_text",
+  "mock_text：mock_text。",
   "",
   "=== SECTION: volume_map ===",
-  "## 各卷主题与情绪曲线",
-  "三卷结构。",
-  "## 关键节点章",
-  "第 17 章让他回家。",
-  "## 卷间钩子与回收承诺",
-  "第 1 卷埋笔记本。",
-  "## 角色阶段性目标",
-  "卷一末：主角决定留下。",
-  "## 卷尾必须发生的改变",
-  "身份暴露。",
-  "## 节奏原则（具体化 + 通用）",
-  "1. 高潮间距：每 8-10 章一个大高潮。",
-  "2. 喘息频率：3 章高压后插 1 章喘息。",
-  "3. 钩子密度：每章章末 1 个主钩。",
-  "4. 信息释放节奏：前 1/3 释放 30%。",
-  "5. 爽点节奏：每 5 章一个智商爽点。",
-  "6. 情感节点递进：每 6 章一次。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "Chương 17mock_text。",
+  "## mock_text",
+  "Chương  1 mock_text。",
+  "## mock_text",
+  "mock_text：mock_text。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text（mock_text + mock_text）",
+  "1. mock_text：mock_text 8-10 mock_text。",
+  "2. mock_text：3 mock_text 1 mock_text。",
+  "3. mock_text：mock_text 1 mock_text。",
+  "4. mock_text：mock_text 1/3 mock_text 30%。",
+  "5. mock_text：mock_text 5 mock_text。",
+  "6. mock_text：mock_text 6 mock_text。",
   "",
   "=== SECTION: roles ===",
   "---ROLE---",
   "tier: major",
-  "name: 林辞",
+  "name: mock_text",
   "---CONTENT---",
-  "## 核心标签",
-  "沉默、执拗",
-  "## 反差细节",
-  "会给流浪狗留罐头",
-  "## 人物小传",
-  "十五岁时失去父亲。",
-  "## 主角弧线（起点 → 终点 → 代价）",
-  "从沉默的旁观者走向沉默的见证人——代价是离开故乡。",
-  "## 当前现状",
-  "第 0 章时在码头边上的旧书店做账房，最近最烦心的是账本对不上。",
-  "## 关系网络",
-  "与沈默是旧友。",
-  "## 内在驱动",
-  "想知道父亲死前那一夜发生了什么。",
-  "## 成长弧光",
-  "从独行到托付。",
+  "## mock_text",
+  "mock_text、mock_text",
+  "## mock_text",
+  "mock_text",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text（mock_text → mock_text → mock_text）",
+  "mock_text——mock_text。",
+  "## mock_text",
+  "Chương 0mock_textPhong so sach，mock_text。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_text。",
   "---ROLE---",
   "tier: major",
-  "name: 沈默",
+  "name: mock_text",
   "---CONTENT---",
-  "## 核心标签",
-  "精致、疏离",
-  "## 反差细节",
-  "唯独对林辞从不说谎",
-  "## 人物小传",
-  "体制内家庭。",
-  "## 当前现状",
-  "新任区域办公室副职，第 0 章刚上任一周。",
-  "## 关系网络",
-  "与林辞复杂。",
-  "## 内在驱动",
-  "在规则内做到最好。",
-  "## 成长弧光",
-  "被迫选择。",
+  "## mock_text",
+  "mock_text、mock_text",
+  "## mock_text",
+  "mock_text",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_text，Chương 0mock_text。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_text。",
   "",
   "=== SECTION: book_rules ===",
-  "## 主角",
-  "- 名字：林辞",
-  "- 性格锁：沉默、执拗",
-  "- 行为约束：不对长辈失礼",
+  "## mock_text",
+  "- mock_text từ：mock_text",
+  "- mock_text：mock_text、mock_text",
+  "- mock_text：mock_text",
   "",
-  "## 禁止事项",
-  "- 不得美化体制暴力",
+  "## mock_text",
+  "- mock_text",
   "",
   "=== SECTION: pending_hooks ===",
-  "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 上游依赖 | 回收卷 | 核心 | 半衰期 | 备注 |",
+  "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
   "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-  "| H01 | 1 | 主线 | 未开启 | 0 | 终章揭晓 | 终局 | 无 | 第3卷终章前 | 是 | 80 | 父亲的笔记本 |",
-  "| H02 | 0 | 初始世界 | 未开启 | 0 | 首卷中段 | 近期 | 无 | 第1卷中段 | 否 | 20 | 初始状态：体制已监视码头 |",
+  "| H01 | 1 | mock_text | mock_text | 0 | mock_text | mock_text | mock_text | Chương 3mock_text | mock_text | 80 | mock_text |",
+  "| H02 | 0 | mock_text | mock_text | 0 | mock_text | mock_text | mock_text | Chương 1mock_text | mock_text | 20 | mock_text：mock_text |",
 ].join("\n");
 
 describe("Phase 5 consolidation — 7→5 sections, prompt contract", () => {
@@ -193,7 +193,7 @@ describe("Phase 5 consolidation — 7→5 sections, prompt contract", () => {
     // lives inside the last paragraph of volume_map.
     expect(headers).not.toContain("rhythm_principles");
     // current_state is no longer emitted by the architect either — era/setting
-    // context, when relevant, lives inside story_frame.世界观底色.
+    // context, when relevant, lives inside story_frame.mock_text.
     expect(headers).not.toContain("current_state");
   });
 
@@ -206,15 +206,15 @@ describe("Phase 5 consolidation — 7→5 sections, prompt contract", () => {
     const system = (chat.mock.calls[0]?.[0] as Array<{ content: string }>)[0]?.content ?? "";
 
     // Protagonist arc: authoritative home is roles
-    expect(system).toContain("主角弧线只写在 roles");
-    // World hard rules: authoritative home is story_frame.世界观底色
-    expect(system).toContain("世界铁律只写在 story_frame.世界观底色");
+    expect(system).toContain("mock_text roles");
+    // World hard rules: authoritative home is story_frame.mock_text
+    expect(system).toContain("mock_text story_frame.mock_text");
     // Rhythm principles: authoritative home is volume_map's closing paragraph
-    expect(system).toContain("节奏原则只写在 volume_map 最后一段");
-    // Era/setting guidance: weave into story_frame.世界观底色 for year-anchored
+    expect(system).toContain("mock_text volume_map mock_text");
+    // Era/setting guidance: weave into story_frame.mock_text for year-anchored
     // genres, omit entirely for others. NOT a separate current_state section.
-    expect(system).toContain("年代文");
-    expect(system).not.toContain("只写在 current_state");
+    expect(system).toContain("mock_text");
+    expect(system).not.toContain("mock_text current_state");
   });
 
   it("the prompt carries explicit per-section char budget markers (NO current_state budget)", async () => {
@@ -227,7 +227,7 @@ describe("Phase 5 consolidation — 7→5 sections, prompt contract", () => {
 
     expect(system).toContain("story_frame ≤ 3000 chars");
     expect(system).toContain("volume_map ≤ 5000 chars");
-    expect(system).toContain("roles 总 ≤ 8000 chars");
+    expect(system).toContain("roles mock_text ≤ 8000 chars");
     expect(system).toContain("book_rules ≤ 1000 chars");
     expect(system).toContain("pending_hooks ≤ 2000 chars");
     // current_state budget is gone — it's not a section any more.
@@ -243,13 +243,13 @@ describe("Phase 5 consolidation — 7→5 sections, prompt contract", () => {
     const system = (chat.mock.calls[0]?.[0] as Array<{ content: string }>)[0]?.content ?? "";
 
     // Header renamed to signal the mix is legal
-    expect(system).toContain("节奏原则（具体化 + 通用）");
+    expect(system).toContain("mock_text（mock_text + mock_text）");
     // Rule: at least 3 of 6 must be concretized to this book
-    expect(system).toContain("至少 3 条必须具体化到本书");
+    expect(system).toContain("mock_text 3 mock_text");
     // Universal principles are explicitly allowed as examples
-    expect(system).toContain("拒绝机械降神");
+    expect(system).toContain("mock_text");
     // And the mix is explicitly called legal
-    expect(system).toContain("具体化 + 通用混合是合法的");
+    expect(system).toContain("mock_text + mock_text");
   });
 
   it("the English prompt also carries the 5-section / dedup / budget rules and rhythm universal allowance", async () => {
@@ -286,11 +286,11 @@ describe("Phase 5 consolidation — 7→5 sections, prompt contract", () => {
     await agent.generateFoundation(baseBook());
     const system = (chat.mock.calls[0]?.[0] as Array<{ content: string }>)[0]?.content ?? "";
 
-    expect(system).toContain("输出普通 Markdown");
-    expect(system).toContain("不要 YAML frontmatter");
-    expect(system).toMatch(/=== SECTION: book_rules ===[\s\S]*?## 主角/);
-    expect(system).toMatch(/=== SECTION: book_rules ===[\s\S]*?## 禁止事项/);
-    expect(system).not.toContain("只输出 YAML frontmatter 一块——零散文");
+    expect(system).toContain("mock_text Markdown");
+    expect(system).toContain("mock_text YAML frontmatter");
+    expect(system).toMatch(/=== SECTION: book_rules ===[\s\S]*?## mock_text/);
+    expect(system).toMatch(/=== SECTION: book_rules ===[\s\S]*?## mock_text/);
+    expect(system).not.toContain("mock_text YAML frontmatter mock_text——mock_text");
     expect(system).not.toContain("YAML only");
   });
 });
@@ -323,7 +323,7 @@ describe("Phase 5 consolidation — parser accepts 5-section output (current_sta
     // placeholder the fallback reader can detect.
     const onDisk = await readFile(join(bookDir, "story/current_state.md"), "utf-8");
     expect(isCurrentStateSeedPlaceholder(onDisk)).toBe(true);
-    expect(onDisk).toContain("建书时占位");
+    expect(onDisk).toContain("mock_text");
   });
 
   it("accepts section markers when the model emits them as Markdown headings", async () => {
@@ -337,12 +337,12 @@ describe("Phase 5 consolidation — parser accepts 5-section output (current_sta
 
     const out = await agent.generateFoundation(baseBook());
 
-    expect(out.storyFrame).toContain("主题与基调");
-    expect(out.storyBible).toContain("兼容指针");
-    expect(out.volumeOutline).toContain("节奏原则");
-    expect(out.bookRules).toContain("## 主角");
+    expect(out.storyFrame).toContain("mock_text");
+    expect(out.storyBible).toContain("mock_text");
+    expect(out.volumeOutline).toContain("mock_text");
+    expect(out.bookRules).toContain("## mock_text");
     expect(out.pendingHooks).toContain("H01");
-    expect(out.roles?.map((role) => role.name)).toContain("林辞");
+    expect(out.roles?.map((role) => role.name)).toContain("mock_text");
   });
 
   it("accepts plain Markdown section headings without SECTION markers", async () => {
@@ -350,45 +350,45 @@ describe("Phase 5 consolidation — parser accepts 5-section output (current_sta
     vi.spyOn(agent as unknown as { chat: (...args: unknown[]) => Promise<unknown> }, "chat")
       .mockResolvedValue({
         content: [
-          "# 故事框架",
-          "## 主题与基调",
-          "旧城债务调查，第一人称现实压迫。",
+          "# mock_text",
+          "## mock_text",
+          "mock_text，Chương mock_text。",
           "",
-          "# 分卷地图",
-          "## 第一卷",
-          "第 1 章从雨水泡开的旧账本开始。",
+          "# mock_text",
+          "## Chương mock_text",
+          "Chương 1mock_text。",
           "",
-          "# 角色",
+          "# mock_text",
           "---ROLE---",
           "tier: major",
-          "name: 沈临",
+          "name: mock_text",
           "---CONTENT---",
-          "## 核心标签",
-          "茶馆老板，慢但准。",
+          "## mock_text",
+          "mock_text，mock_text。",
           "",
-          "# 本书规则",
-          "## 主角",
-          "- 名字：沈临",
-          "## 叙事人称",
-          "- 第一人称",
-          "## 禁止事项",
-          "- 不要突然开挂。",
+          "# mock_text",
+          "## mock_text",
+          "- mock_text từ：mock_text",
+          "## mock_text",
+          "- Chương mock_text",
+          "## mock_text",
+          "- mock_text。",
           "",
-          "# 待回收钩子",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 备注 |",
+          "# mock_text",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| H01 | 0 | 主线 | open | 0 | 旧账本名单 | 近期 | 雨巷旧账本 |",
+          "| H01 | 0 | mock_text | open | 0 | mock_text | mock_text | mock_text |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
     const out = await agent.generateFoundation(baseBook());
 
-    expect(out.storyFrame).toContain("旧城债务调查");
-    expect(out.volumeMap).toContain("雨水泡开的旧账本");
-    expect(out.bookRules).toContain("第一人称");
+    expect(out.storyFrame).toContain("mock_text");
+    expect(out.volumeMap).toContain("mock_text");
+    expect(out.bookRules).toContain("Chương mock_text");
     expect(out.pendingHooks).toContain("H01");
-    expect(out.roles?.map((role) => role.name)).toContain("沈临");
+    expect(out.roles?.map((role) => role.name)).toContain("mock_text");
   });
 
   it("preserves legacy 7-section input (current_state + rhythm_principles still present)", async () => {
@@ -402,39 +402,39 @@ describe("Phase 5 consolidation — parser accepts 5-section output (current_sta
       "=== SECTION: roles ===",
       "---ROLE---",
       "tier: major",
-      "name: 林辞",
+      "name: mock_text",
       "---CONTENT---",
-      "## 核心标签",
-      "沉默",
-      "## 反差细节",
-      "会给流浪狗留罐头",
-      "## 人物小传",
-      "过往。",
-      "## 当前现状",
-      "码头账房。",
-      "## 关系网络",
-      "无。",
-      "## 内在驱动",
-      "查清真相。",
-      "## 成长弧光",
-      "从独行到托付。",
+      "## mock_text",
+      "mock_text",
+      "## mock_text",
+      "mock_text",
+      "## mock_text",
+      "mock_text。",
+      "## mock_text",
+      "mock_textPhong so sach。",
+      "## mock_text",
+      "mock_text。",
+      "## mock_text",
+      "mock_textSu that。",
+      "## mock_text",
+      "mock_text。",
       "=== SECTION: book_rules ===",
-      "## 主角",
-      "- 名字：林辞",
-      "## 禁止事项",
-      "- 不得美化体制暴力",
+      "## mock_text",
+      "- mock_text từ：mock_text",
+      "## mock_text",
+      "- mock_text",
       "",
-      "## 叙事视角",
-      "第三人称（legacy prose body — parser accepts but it no longer drives anything）",
+      "## mock_text",
+      "Chương mock_text（legacy prose body — parser accepts but it no longer drives anything）",
       "=== SECTION: current_state ===",
-      "| 字段 | 值 |",
+      "|  từmock_text | mock_text |",
       "| --- | --- |",
-      "| 当前章节 | 0 |",
-      "| 当前位置 | 码头 |",
+      "| mock_text | 0 |",
+      "| mock_text | mock_text |",
       "=== SECTION: pending_hooks ===",
-      "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 备注 |",
+      "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| H01 | 1 | 主线 | 未开启 | 0 | 终章 | 终局 | 父亲的笔记本 |",
+      "| H01 | 1 | mock_text | mock_text | 0 | mock_text | mock_text | mock_text |",
     ].join("\n");
 
     const agent = buildAgent();
@@ -444,7 +444,7 @@ describe("Phase 5 consolidation — parser accepts 5-section output (current_sta
     const out = await agent.generateFoundation(baseBook());
 
     // Legacy content is preserved as-is
-    expect(out.currentState).toContain("当前位置");
+    expect(out.currentState).toContain("mock_text");
     expect(out.rhythmPrinciples).toContain("legacy rhythm");
     expect((out.roles ?? []).length).toBeGreaterThanOrEqual(1);
   });
@@ -474,11 +474,11 @@ describe("Phase 5 consolidation — readCurrentStateWithFallback derives initial
 
     const derived = await readCurrentStateWithFallback(bookDir, "(missing)");
     // Derived block should mention the role names and their Current_State text.
-    expect(derived).toContain("初始状态");
-    expect(derived).toContain("林辞");
-    expect(derived).toContain("码头边上的旧书店做账房");
-    expect(derived).toContain("沈默");
-    expect(derived).toContain("新任区域办公室副职");
+    expect(derived).toContain("mock_text");
+    expect(derived).toContain("mock_text");
+    expect(derived).toContain("mock_textPhong so sach");
+    expect(derived).toContain("mock_text");
+    expect(derived).toContain("mock_text");
     // Seed hook row startChapter=0 surfaces in the derived block.
     expect(derived).toContain("H02");
   });
@@ -486,7 +486,7 @@ describe("Phase 5 consolidation — readCurrentStateWithFallback derives initial
   it("returns the file content as-is when current_state.md already has runtime content", async () => {
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
-    const runtime = "# 当前状态\n\n- 第 5 章后主角正式加入合作社。\n- 与体制的关系：明面协作、暗中抵抗。\n";
+    const runtime = "# mock_text\n\n- Chương 5mock_text。\n- mock_text：mock_text、mock_text。\n";
     await writeFile(join(storyDir, "current_state.md"), runtime, "utf-8");
 
     const derived = await readCurrentStateWithFallback(bookDir, "(missing)");
@@ -495,12 +495,12 @@ describe("Phase 5 consolidation — readCurrentStateWithFallback derives initial
 
   it("isCurrentStateSeedPlaceholder correctly identifies seeds vs real content", () => {
     expect(isCurrentStateSeedPlaceholder("")).toBe(true);
-    expect(isCurrentStateSeedPlaceholder("# 当前状态\n\n> 建书时占位。后续章节补。\n")).toBe(true);
+    expect(isCurrentStateSeedPlaceholder("# mock_text\n\n> mock_text。mock_text。\n")).toBe(true);
     expect(isCurrentStateSeedPlaceholder("# Current State\n\n> Seeded at book creation.\n")).toBe(true);
     // A real consolidator-appended block — no seed marker
-    expect(isCurrentStateSeedPlaceholder("# 当前状态\n\n- 主角现状一二三\n- 体制关系四五六\n")).toBe(false);
+    expect(isCurrentStateSeedPlaceholder("# mock_text\n\n- mock_text\n- mock_text\n")).toBe(false);
     // A long file that happens to contain the seed marker in prose — NOT a seed
-    const longContent = "# 当前状态\n\n" + "一段很长的实际内容。".repeat(200) + "\n建书时占位\n";
+    const longContent = "# mock_text\n\n" + "mock_text。".repeat(200) + "\nmock_text\n";
     expect(isCurrentStateSeedPlaceholder(longContent)).toBe(false);
   });
 });

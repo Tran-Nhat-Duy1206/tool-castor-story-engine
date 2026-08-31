@@ -50,7 +50,7 @@ export class StateValidatorAgent extends BaseAgent {
 
     const langInstruction = language === "en"
       ? "Respond in English."
-      : "用中文回答。";
+      : "Answer in natural language.";
 
     const systemPrompt = `You are a continuity validator for a novel writing system. ${langInstruction}
 

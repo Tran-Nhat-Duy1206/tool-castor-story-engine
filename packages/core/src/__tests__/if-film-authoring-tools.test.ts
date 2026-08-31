@@ -26,14 +26,14 @@ describe("direct-write authoring tools", () => {
 
   it("set_world_anchor applies a delta and persists worldAnchor", async () => {
     const tool = createSetWorldAnchorTool(root, "p");
-    const res = await tool.execute("call-1", { storyCore: "查账复仇", theme: "信任" } as never);
-    expect((res.content[0] as { type: "text"; text: string }).text).toMatch(/world|锚点|updated|rev/i);
-    expect((await loadStoryGraph(root, "p"))?.worldAnchor?.storyCore).toBe("查账复仇");
+    const res = await tool.execute("call-1", { storyCore: "Kiem tra so sachmock_text", theme: "mock_text" } as never);
+    expect((res.content[0] as { type: "text"; text: string }).text).toMatch(/world|mock_text|updated|rev/i);
+    expect((await loadStoryGraph(root, "p"))?.worldAnchor?.storyCore).toBe("Kiem tra so sachmock_text");
   });
 
   it("add_variable applies a delta and persists the variable", async () => {
     const tool = createAddVariableTool(root, "p");
-    await tool.execute("call-2", { name: "trust", type: "counter", default: 0, desc: "信任" } as never);
+    await tool.execute("call-2", { name: "trust", type: "counter", default: 0, desc: "mock_text" } as never);
     expect((await loadStoryGraph(root, "p"))?.variables.map(v => v.name)).toContain("trust");
   });
 
@@ -51,12 +51,12 @@ describe("direct-write authoring tools", () => {
     const res = await tool.execute("call-3", {
       id: "end-good",
       nodeId: "e",
-      title: "美好结局",
+      title: "mock_text",
       type: "good",
-      description: "主角完成复仇",
+      description: "mock_text",
     } as never);
 
-    expect((res.content[0] as { type: "text"; text: string }).text).toMatch(/美好结局|Ending|defined/i);
+    expect((res.content[0] as { type: "text"; text: string }).text).toMatch(/mock_text|Ending|defined/i);
     const graph = await loadStoryGraph(root, "p");
     const ending = graph?.endings.find((e) => e.id === "end-good");
     expect(ending).toBeDefined();
@@ -72,10 +72,10 @@ describe("direct-write authoring tools", () => {
     await tool.execute("call-4", {
       characters: [{
         id: "mei",
-        name: "阿梅",
+        name: "A Mei",
         role: "protagonist",
-        motivation: "查账复仇",
-        voiceProfile: { speakingRhythm: "短促", vocabulary: "市井", sampleLines: ["你敢！"] },
+        motivation: "Kiem tra so sachmock_text",
+        voiceProfile: { speakingRhythm: "mock_text", vocabulary: "mock_text", sampleLines: ["mock_text！"] },
       }],
     } as never);
 
@@ -83,14 +83,14 @@ describe("direct-write authoring tools", () => {
     const graph = await loadStoryGraph(root, "p");
     const char = graph?.characters.find((c) => c.id === "mei");
     expect(char).toBeDefined();
-    expect(char?.name).toBe("阿梅");
+    expect(char?.name).toBe("A Mei");
 
     // Assert fact written to MemoryDB.
     const db = new MemoryDB(join(root, "interactive-films", "p"));
     try {
-      const facts = db.getFactsForCharacters(["阿梅"]);
+      const facts = db.getFactsForCharacters(["A Mei"]);
       expect(facts.length).toBeGreaterThan(0);
-      expect(facts.some((f) => f.subject === "阿梅")).toBe(true);
+      expect(facts.some((f) => f.subject === "A Mei")).toBe(true);
     } finally {
       db.close();
     }

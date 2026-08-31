@@ -52,7 +52,7 @@ vi.mock("@actalk/castor-core", () => ({
 }));
 
 vi.mock("node:fs/promises", () => ({
-  readdir: vi.fn(async () => ["0005_第五章.md"]),
+  readdir: vi.fn(async () => ["0005_test_mock.md"]),
   stat: vi.fn(async () => ({ mtimeMs: 0 })),
   unlink: vi.fn(async () => undefined),
 }));
@@ -151,8 +151,8 @@ describe("castor write next — State Review gate refusal surfacing", () => {
 describe("castor write rewrite — State Review gate refusal surfacing", () => {
   function setupRewriteFixtures(): void {
     loadChapterIndexMock.mockResolvedValue([
-      { number: 4, title: "第四章", wordCount: 1000, status: "approved" },
-      { number: 5, title: "第五章", wordCount: 1000, status: "ready-for-review" },
+      { number: 4, title: "test_mock", wordCount: 1000, status: "approved" },
+      { number: 5, title: "test_mock", wordCount: 1000, status: "ready-for-review" },
     ]);
     getNextChapterNumberMock.mockResolvedValue(5);
   }

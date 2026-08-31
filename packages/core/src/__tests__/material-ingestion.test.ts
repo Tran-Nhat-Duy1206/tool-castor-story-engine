@@ -16,7 +16,7 @@ describe("material ingestion", () => {
   });
 
   it("archives a project text file as traceable markdown material", async () => {
-    await writeFile(join(root, "brief.md"), "# Brief\n\n第一人称，县城冷库旧账。", "utf-8");
+    await writeFile(join(root, "brief.md"), "# Brief\n\nChương mock_text，mock_text。", "utf-8");
 
     const asset = await ingestMaterial(root, {
       sourceKind: "file",
@@ -30,18 +30,18 @@ describe("material ingestion", () => {
     expect(asset.kind).toBe("text");
     expect(asset.markdownPath).toMatch(/^\.castor\/materials\//);
     expect(asset.source).toBe("brief.md");
-    expect(asset.excerpt).toContain("县城冷库旧账");
+    expect(asset.excerpt).toContain("mock_text");
     const markdown = await readFile(join(root, asset.markdownPath), "utf-8");
     expect(markdown).toContain("## Metadata");
     expect(markdown).toContain("- purpose: worldbuilding");
-    expect(markdown).toContain("第一人称，县城冷库旧账。");
+    expect(markdown).toContain("Chương mock_text，mock_text。");
     const manifest = JSON.parse(await readFile(join(root, asset.manifestPath), "utf-8")) as { markdownPath?: string };
     expect(manifest.markdownPath).toBe(asset.markdownPath);
   });
 
   it("extracts and archives HTML fetched from a URL", async () => {
     const fetchImpl = async () => new Response(
-      "<html><head><title>旧账资料</title><style>x{}</style></head><body><h1>冷库流程</h1><script>bad()</script><p>入库单需要签字。</p></body></html>",
+      "<html><head><title>mock_text</title><style>x{}</style></head><body><h1>mock_text</h1><script>bad()</script><p>mock_text từ。</p></body></html>",
       { status: 200, headers: { "content-type": "text/html; charset=utf-8" } },
     );
 
@@ -55,9 +55,9 @@ describe("material ingestion", () => {
     });
 
     expect(asset.kind).toBe("webpage");
-    expect(asset.title).toBe("旧账资料");
+    expect(asset.title).toBe("mock_text");
     expect(asset.source).toBe("https://example.com/cold-storage");
-    expect(asset.excerpt).toContain("入库单需要签字");
+    expect(asset.excerpt).toContain("mock_text từ");
     expect(asset.excerpt).not.toContain("bad()");
   });
 });

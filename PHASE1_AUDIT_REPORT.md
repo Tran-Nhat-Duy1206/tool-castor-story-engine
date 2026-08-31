@@ -19,109 +19,109 @@ Total Han lines: 11622, files: 455
 ## Detailed sample per file (first 3 lines per file, truncated)
 | File | Line | Category | Current text (truncated) | Target | Behavior-sensitive | Proposed |
 |------|------|----------|--------------------------|--------|--------------------|----------------|
-| .gitignore | 37 | OTHER_LANGUAGE_DOC | # 用户运行时数据（会话记录、书籍内容、项目密钥、提示词模板不属于项目代码） | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| CHANGELOG.en.md | 3 | DOC_VI | [中文](CHANGELOG.md) \| English | Tiếng Việt | Không | Xem chi tiết |
-| CHANGELOG.en.md | 278 | DOC_VI | - Unified platform alias normalization across the Studio, CLI, TUI, and agent create-book chains; inputs like `番茄` / `fa | Tiếng Việt | Không | Xem chi tiết |
-| CHANGELOG.en.md | 471 | DOC_VI | - **Whole-book entity rename**: `把林烬改成张三` / `/rename 林烬 => 张三`, a full scan of chapters + truth files replaced in one pa | Tiếng Việt | Không | Xem chi tiết |
-| CHANGELOG.md | 3 | DOC_VI | [English](CHANGELOG.en.md) \| 中文 | Tiếng Việt | Không | Xem chi tiết |
-| CHANGELOG.md | 9 | DOC_VI | 统一 Pi Agent Harness 与专业创作内核：Studio Chat、TUI、外部 Agent 和各类作品生产 worker 现在共享同一套 pi-agent 工具循环、结构化 action/result、Skill 绑定、检索与 | Tiếng Việt | Không | Xem chi tiết |
-| CHANGELOG.md | 13 | DOC_VI | - 新增统一 production harness，长篇、短篇、剧本、分镜、互动影游、Play 和翻译共用运行快照、观测、取消、恢复与原子提交语义 | Tiếng Việt | Không | Xem chi tiết |
-| README.en.md | 13 | DOC_VI | <a href="README.md">中文</a> \| English \| <a href="README.ja.md">日本語</a> | Tiếng Việt | Không | Xem chi tiết |
-| README.ja.md | 4 | OTHER_LANGUAGE_DOC | <strong>長編・短編小説、脚本、インタラクティブ影遊、IP コンテンツ、多言語翻訳のための AI 創作システム（CLI: <code>castor</code>）</strong> | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| README.ja.md | 13 | OTHER_LANGUAGE_DOC | <a href="README.md">中文</a> \| <a href="README.en.md">English</a> \| 日本語 | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| README.ja.md | 18 | OTHER_LANGUAGE_DOC | > **派生プロジェクトのお知らせ** | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| README.md | 13 | DOC_VI | <a href="README.en.md">English</a> \| <a href="README.md">中文</a> \| <a href="README.ja.md">日本語</a> | Tiếng Việt | Không | Xem chi tiết |
-| assets/arch-memory.svg | 28 | USER_UI_VI | <text class="t2" x="44" y="56">长期记忆与状态</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-memory.svg | 32 | USER_UI_VI | <text class="nm2k" x="64" y="125">写手正文</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-memory.svg | 34 | USER_UI_VI | <text class="nm2" x="252" y="125">提取九类事实</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-pipeline.svg | 24 | USER_UI_VI | <text class="t" x="44" y="56">章节生产管线</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-pipeline.svg | 28 | USER_UI_VI | <text class="d" x="558" y="54">建筑师 · 建书 / 导入 / 番外时生成设定</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-pipeline.svg | 30 | USER_UI_VI | <text class="d" x="870" y="54">雷达 · 趋势（可跳过）</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-system.svg | 25 | USER_UI_VI | <text class="t3" x="44" y="56">整体系统</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-system.svg | 28 | USER_UI_VI | <text class="d3" x="682" y="54">底层共享：模型配置 · 多模型路由 · 封面 / 图片服务</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| assets/arch-system.svg | 30 | USER_UI_VI | <rect class="pill" x="150" y="92" width="170" height="46" filter="url(#s3)"/><text class="pl" x="200" y="120">Studio 对话< | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| audit_phase1.py | 27 | OTHER_LANGUAGE_DOC | if any(x in line_content for x in ["hook_id","起始章节","伏笔","当前位置","当前位置","是","否","无","字段","值"]): | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| docs/ARCHITECTURE_AUDIT.md | 111 | DOC_VI | ├── outline/{story_frame.md,volume_map.md,rhythm_principles.md\|节奏原则.md} | Tiếng Việt | Không | Xem chi tiết |
-| docs/ARCHITECTURE_AUDIT.md | 112 | DOC_VI | ├── roles/{主要角色,次要角色,major,minor}/<name>.md        # role cards | Tiếng Việt | Không | Xem chi tiết |
+| .gitignore | 37 | OTHER_LANGUAGE_DOC | # （、、、） | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| CHANGELOG.en.md | 3 | DOC_VI | [](CHANGELOG.md) \| English | Tiếng Việt | Không | Xem chi tiết |
+| CHANGELOG.en.md | 278 | DOC_VI | - Unified platform alias normalization across the Studio, CLI, TUI, and agent create-book chains; inputs like `` / `fa | Tiếng Việt | Không | Xem chi tiết |
+| CHANGELOG.en.md | 471 | DOC_VI | - **Whole-book entity rename**: `` / `/rename  => `, a full scan of chapters + truth files replaced in one pa | Tiếng Việt | Không | Xem chi tiết |
+| CHANGELOG.md | 3 | DOC_VI | [English](CHANGELOG.en.md) \|  | Tiếng Việt | Không | Xem chi tiết |
+| CHANGELOG.md | 9 | DOC_VI |  Pi Agent Harness ：Studio Chat、TUI、 Agent  worker  pi-agent 、 action/result、Skill 、 | Tiếng Việt | Không | Xem chi tiết |
+| CHANGELOG.md | 13 | DOC_VI | -  production harness，、、、、、Play 、、、 | Tiếng Việt | Không | Xem chi tiết |
+| README.en.md | 13 | DOC_VI | <a href="README.md"></a> \| English \| <a href="README.ja.md"></a> | Tiếng Việt | Không | Xem chi tiết |
+| README.ja.md | 4 | OTHER_LANGUAGE_DOC | <strong>・、、インタラクティブ、IP コンテンツ、のための AI システム（CLI: <code>castor</code>）</strong> | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| README.ja.md | 13 | OTHER_LANGUAGE_DOC | <a href="README.md"></a> \| <a href="README.en.md">English</a> \|  | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| README.ja.md | 18 | OTHER_LANGUAGE_DOC | > **プロジェクトのおらせ** | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| README.md | 13 | DOC_VI | <a href="README.en.md">English</a> \| <a href="README.md"></a> \| <a href="README.ja.md"></a> | Tiếng Việt | Không | Xem chi tiết |
+| assets/arch-memory.svg | 28 | USER_UI_VI | <text class="t2" x="44" y="56"></text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-memory.svg | 32 | USER_UI_VI | <text class="nm2k" x="64" y="125"></text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-memory.svg | 34 | USER_UI_VI | <text class="nm2" x="252" y="125"></text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-pipeline.svg | 24 | USER_UI_VI | <text class="t" x="44" y="56"></text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-pipeline.svg | 28 | USER_UI_VI | <text class="d" x="558" y="54"> ·  /  / </text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-pipeline.svg | 30 | USER_UI_VI | <text class="d" x="870" y="54"> · （）</text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-system.svg | 25 | USER_UI_VI | <text class="t3" x="44" y="56"></text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-system.svg | 28 | USER_UI_VI | <text class="d3" x="682" y="54">： ·  ·  / </text> | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| assets/arch-system.svg | 30 | USER_UI_VI | <rect class="pill" x="150" y="92" width="170" height="46" filter="url(#s3)"/><text class="pl" x="200" y="120">Studio < | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| audit_phase1.py | 27 | OTHER_LANGUAGE_DOC | if any(x in line_content for x in ["hook_id","","","","","","","","",""]): | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| docs/ARCHITECTURE_AUDIT.md | 111 | DOC_VI | ├── outline/{story_frame.md,volume_map.md,rhythm_principles.md\|.md} | Tiếng Việt | Không | Xem chi tiết |
+| docs/ARCHITECTURE_AUDIT.md | 112 | DOC_VI | ├── roles/{,,major,minor}/<name>.md        # role cards | Tiếng Việt | Không | Xem chi tiết |
 | docs/ARCHITECTURE_AUDIT.md | 145 | DOC_VI | 3. Staging dir `books/.tmp-book-create-*`: `saveBookConfigAt` → `book.json`; `writeFoundationFiles` (:842) writes `outli | Tiếng Việt | Không | Xem chi tiết |
 | docs/IMPLEMENTATION_PLAN.md | 476 | DOC_VI | - Files: CREATE `migration/translate.ts` — adapter over the EXISTING translation subsystem (`translation/index.ts#create | Tiếng Việt | Không | Xem chi tiết |
-| docs/superpowers/plans/2026-08-24-human-governed-post-chapter-state-review.md | 21 | DOC_VI | - Fixtures: `createCanonBook({seedSnapshotsThrough: 12})` from the same helper module (facts: 主角/当前位置 closed@10 + open 东 | Tiếng Việt | Không | Xem chi tiết |
-| docs/superpowers/plans/2026-08-24-human-governed-post-chapter-state-review.md | 96 | DOC_VI | // (zh books: ["当前位置","Current Location"], en books: ["Current Location","当前位置"], …) | Tiếng Việt | Không | Xem chi tiết |
-| docs/superpowers/plans/2026-08-27-phase-5-foundation-planning-intelligence.md | 478 | DOC_VI | //     heading text (e.g. "数值/资源规则" CONTAINS "/" because the real book_rules | Tiếng Việt | Không | Xem chi tiết |
-| docs/superpowers/plans/2026-08-29-castor-machine-prompt-language-migration.md | 104 | DOC_VI | 你是一个章节规划器... | Tiếng Việt | Không | Xem chi tiết |
-| docs/superpowers/plans/2026-08-29-castor-ui-localization.md | 38 | DOC_VI | rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' '中文\|zh-CN\|/bzh/b' packages README*.md docs scripts | Tiếng Việt | Không | Xem chi tiết |
-| packages/cli/src/__tests__/analytics.test.ts | 32 | TEST_FIXTURE | { number: 2, status: "audit-failed", wordCount: 3000, auditIssues: ["[critical] 连续性：角色位置矛盾"] }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/analytics.test.ts | 65 | TEST_FIXTURE | "[critical] 连续性：角色位置矛盾", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/analytics.test.ts | 66 | TEST_FIXTURE | "[warning] 数值错误：灵石数量不一致", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/auto-command.test.ts | 47 | TEST_FIXTURE | title: `第${chapterNumber}章`, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/book-backup.test.ts | 28 | TEST_FIXTURE | await writeFile(join(bookDir, "chapters", "0001_起风.md"), "第一章原文。", "utf-8"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/book-backup.test.ts | 29 | TEST_FIXTURE | await writeFile(join(bookDir, "story", "current_state.md"), "原始状态", "utf-8"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/book-backup.test.ts | 43 | TEST_FIXTURE | await expect(readFile(join(backupDir, "chapters", "0001_起风.md"), "utf-8")).resolves.toBe("第一章原文。"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/chapter-command.test.ts | 83 | TEST_FIXTURE | // "风从码头吹进巷子。" → 9 chars after stripping heading + whitespace. | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/chapter-command.test.ts | 84 | TEST_FIXTURE | { file: "0001_起风.md", content: "# 第1章 起风/n/n风从码头吹进巷子。" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/chapter-command.test.ts | 86 | TEST_FIXTURE | index: [chapterEntry(1, "起风", 3000)], | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/cli-integration.test.ts | 165 | TEST_FIXTURE | expect(output).not.toContain("我的小说"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/cli-integration.test.ts | 221 | TEST_FIXTURE | const output = run(["interact", "--json", "--message", "切换到全自动"]); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/cli-integration.test.ts | 394 | TEST_FIXTURE | expect(output).not.toContain("7字"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/genre-command.test.ts | 4 | TEST_FIXTURE | const CHINESE_CHARS = /[一-鿿]/; | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/localization.test.ts | 31 | TEST_FIXTURE | const CHINESE_CHARS = /[一-鿿]/; | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/notify-option.test.ts | 33 | TEST_FIXTURE | formatLengthCount: (count: number) => `${count}字`, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/notify-option.test.ts | 56 | TEST_FIXTURE | title: `第${chapterNumber}章`, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/notify-option.test.ts | 71 | TEST_FIXTURE | title: "示例书", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/progress-text.test.ts | 62 | TEST_FIXTURE | totalCountLabel: "24000字", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/progress-text.test.ts | 68 | TEST_FIXTURE | "  Tổng độ dài: 24000字", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/revision-command.test.ts | 70 | TEST_FIXTURE | await reviseCommand.parseAsync(["node", "revise", "demo-book", "3", "--mode", "rewrite", "--brief", "把注意力拉回师债主线。"], { fr | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/revision-command.test.ts | 73 | TEST_FIXTURE | externalContext: "把注意力拉回师债主线。", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/revision-command.test.ts | 82 | TEST_FIXTURE | await writeCommand.parseAsync(["node", "write", "sync", "demo-book", "3", "--brief", "以师债线为准同步状态。"], { from: "node" }); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-agent-session.test.ts | 25 | TEST_FIXTURE | title: "雨夜", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-agent-session.test.ts | 83 | TEST_FIXTURE | responseText: "这是 agent 直接返回的回复。", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-agent-session.test.ts | 85 | TEST_FIXTURE | { role: "user", content: "帮我整理这一章" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-dashboard.test.tsx | 192 | TEST_FIXTURE | concept: "港风商战悬疑，主角从灰产洗白。", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-dashboard.test.tsx | 193 | TEST_FIXTURE | title: "夜港账本", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-dashboard.test.tsx | 194 | TEST_FIXTURE | nextQuestion: "你更想写长篇连载，还是十来章能收住？", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-local-commands.test.ts | 8 | TEST_FIXTURE | expect(classifyLocalTuiCommand("帮助")).toBe("help"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-local-commands.test.ts | 14 | TEST_FIXTURE | expect(classifyLocalTuiCommand("状态")).toBe("status"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/tui-local-commands.test.ts | 23 | TEST_FIXTURE | expect(classifyLocalTuiCommand("退出")).toBe("quit"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/write-command.test.ts | 55 | TEST_FIXTURE | readdir: vi.fn(async () => ["0005_第五章.md"]), | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/write-command.test.ts | 154 | TEST_FIXTURE | { number: 4, title: "第四章", wordCount: 1000, status: "approved" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/write-command.test.ts | 155 | TEST_FIXTURE | { number: 5, title: "第五章", wordCount: 1000, status: "ready-for-review" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/write-phase5.test.ts | 39 | TEST_FIXTURE | readdir: vi.fn(async () => ["0005_第五章.md"]), | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/write-phase5.test.ts | 81 | TEST_FIXTURE | chapterNumber: 5, title: "第五章", wordCount: 2000, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/__tests__/write-review-mode.test.ts | 51 | TEST_FIXTURE | title: "第四章", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
-| packages/cli/src/commands/agent.ts | 22 | MACHINE_PROMPT_EN | ? `${instruction}/n/n补充信息：${context}` | English | Có | Xem chi tiết |
-| packages/cli/src/commands/config.ts | 307 | USER_UI_VI | // B17: list-models 命令 —— 列出指定 service 的可用模型（含元数据） | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/cli/src/commands/doctor.ts | 347 | USER_UI_VI | if (!connected && //b(?:401\|403\|429)/b\|unauthorized\|forbidden\|quota\|balance\|insufficient\|exceeded\|额度\|余额\|配额/i. | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/cli/src/tui/__tests__/markdown.test.ts | 11 | USER_UI_VI | const result = renderMarkdown("这是 **加粗** 文本"); | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/cli/src/tui/__tests__/markdown.test.ts | 12 | USER_UI_VI | // Should contain ANSI bold on/off around 加粗 | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/cli/src/tui/__tests__/markdown.test.ts | 13 | USER_UI_VI | expect(result).toContain("/x1b[1m加粗/x1b[22m"); | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/cli/src/tui/agent-input.ts | 219 | MACHINE_PROMPT_EN | : "我想创建一本新书，请先和我确认方向。")); | English | Có | Xem chi tiết |
-| packages/cli/src/tui/agent-input.ts | 226 | MACHINE_PROMPT_EN | : "我想做 Castor Short，请先和我确认方向。")); | English | Có | Xem chi tiết |
-| packages/cli/src/tui/agent-input.ts | 233 | MACHINE_PROMPT_EN | : "我想生成或重做封面，请先和我确认目标。")); | English | Có | Xem chi tiết |
-| packages/cli/src/tui/local-commands.ts | 11 | USER_UI_VI | if (/^//help$/i.test(value) \|\| /^(help\|giup\|giúp\|tro giup\|trợ giúp\|帮助)$/i.test(value)) { | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/cli/src/tui/local-commands.ts | 15 | USER_UI_VI | if (/^//status$/i.test(value) \|\| /^(status\|trang thai\|trạng thái\|状态)$/i.test(value)) { | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/cli/src/tui/local-commands.ts | 19 | USER_UI_VI | if (/^//clear$/i.test(value) \|\| /^(xoa man hinh\|xóa màn hình\|清屏)$/i.test(value)) { | Tiếng Việt (có dấu) | Không | Xem chi tiết |
-| packages/core/genres/horror.md | 2 | LEGACY_COMPAT | name: 恐怖 | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/horror.md | 4 | LEGACY_COMPAT | chapterTypes: ["氛围章", "事件章", "揭示章", "过渡章", "回收章"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/horror.md | 5 | LEGACY_COMPAT | fatigueWords: ["毛骨悚然", "不寒而栗", "浑身发冷", "头皮发麻", "鸡皮疙瘩", "心跳加速", "仿佛", "不禁", "宛如", "竟然"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/other.md | 2 | LEGACY_COMPAT | name: 通用 | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/other.md | 4 | LEGACY_COMPAT | chapterTypes: ["推进章", "布局章", "过渡章", "回收章"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/other.md | 5 | LEGACY_COMPAT | fatigueWords: ["震惊", "不可思议", "难以置信", "深吸一口气", "仿佛", "不禁", "宛如", "竟然"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/urban.md | 2 | LEGACY_COMPAT | name: 都市 | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/urban.md | 4 | LEGACY_COMPAT | chapterTypes: ["商战章", "社交章", "布局章", "过渡章", "回收章"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/urban.md | 5 | LEGACY_COMPAT | fatigueWords: ["冷笑", "不可思议", "震惊", "难以置信", "深吸一口气", "眼中闪过一丝", "仿佛", "不禁", "宛如", "竟然", "核心动机", "信息边界"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/xianxia.md | 2 | LEGACY_COMPAT | name: 仙侠 | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/xianxia.md | 4 | LEGACY_COMPAT | chapterTypes: ["战斗章", "悟道章", "布局章", "过渡章", "回收章"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/xianxia.md | 5 | LEGACY_COMPAT | fatigueWords: ["冷笑", "蝼蚁", "倒吸凉气", "瞳孔骤缩", "天道", "大道", "因果", "气运", "仿佛", "不禁", "宛如", "竟然"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/xuanhuan.md | 2 | LEGACY_COMPAT | name: 玄幻 | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/xuanhuan.md | 4 | LEGACY_COMPAT | chapterTypes: ["战斗章", "布局章", "过渡章", "回收章"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/genres/xuanhuan.md | 5 | LEGACY_COMPAT | fatigueWords: ["冷笑", "蝼蚁", "倒吸凉气", "瞳孔骤缩", "不可置信", "轰然炸裂", "满场死寂", "难以置信", "仿佛", "不禁", "宛如", "竟然"] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
-| packages/core/skills/castor-interactive-film/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 互动影游的剧情树、变量旗标、可拍节点、多结局与资产连续性方法。Used for creation and authoring of interactive-film projects. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| packages/core/skills/castor-long-market-research/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 长篇网文市场、榜单、平台趋势与对标研究。Use for evidence-based long-form fiction market research, not for ordinary drafting. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| packages/core/skills/castor-long-story-analysis/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 长篇小说拆稿、文风分析与可迁移机制提炼。Use when analyzing a full novel or long sample without copying its expression. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| packages/core/skills/castor-long-writing/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 长篇小说的场景构造、人物因果、信息释放与连载节奏。Used by Castor long-form workers as their shared craft method. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| packages/core/skills/castor-play-world/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 品类中立的开放世界与分支互动推进方法。Used by Castor Play workers for coherent action, state, time, and scene progression. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| packages/core/skills/castor-script-writing/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 小说、创意与大纲到可演剧本的改编方法。Used for confirmed script and short-drama production. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
-| packages/core/skills/castor-short-market-research/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 商业短篇市场、平台样本、标题与移动端阅读趋势研究。Use for evidence-based short-fiction market research. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| docs/superpowers/plans/2026-08-24-human-governed-post-chapter-state-review.md | 21 | DOC_VI | - Fixtures: `createCanonBook({seedSnapshotsThrough: 12})` from the same helper module (facts: / closed@10 + open  | Tiếng Việt | Không | Xem chi tiết |
+| docs/superpowers/plans/2026-08-24-human-governed-post-chapter-state-review.md | 96 | DOC_VI | // (zh books: ["","Current Location"], en books: ["Current Location",""], …) | Tiếng Việt | Không | Xem chi tiết |
+| docs/superpowers/plans/2026-08-27-phase-5-foundation-planning-intelligence.md | 478 | DOC_VI | //     heading text (e.g. "/" CONTAINS "/" because the real book_rules | Tiếng Việt | Không | Xem chi tiết |
+| docs/superpowers/plans/2026-08-29-castor-machine-prompt-language-migration.md | 104 | DOC_VI | ... | Tiếng Việt | Không | Xem chi tiết |
+| docs/superpowers/plans/2026-08-29-castor-ui-localization.md | 38 | DOC_VI | rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' '\|zh-CN\|/bzh/b' packages README*.md docs scripts | Tiếng Việt | Không | Xem chi tiết |
+| packages/cli/src/__tests__/analytics.test.ts | 32 | TEST_FIXTURE | { number: 2, status: "audit-failed", wordCount: 3000, auditIssues: ["[critical] ："] }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/analytics.test.ts | 65 | TEST_FIXTURE | "[critical] ：", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/analytics.test.ts | 66 | TEST_FIXTURE | "[warning] ：", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/auto-command.test.ts | 47 | TEST_FIXTURE | title: `${chapterNumber}`, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/book-backup.test.ts | 28 | TEST_FIXTURE | await writeFile(join(bookDir, "chapters", "0001_.md"), "。", "utf-8"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/book-backup.test.ts | 29 | TEST_FIXTURE | await writeFile(join(bookDir, "story", "current_state.md"), "", "utf-8"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/book-backup.test.ts | 43 | TEST_FIXTURE | await expect(readFile(join(backupDir, "chapters", "0001_.md"), "utf-8")).resolves.toBe("。"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/chapter-command.test.ts | 83 | TEST_FIXTURE | // "。" → 9 chars after stripping heading + whitespace. | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/chapter-command.test.ts | 84 | TEST_FIXTURE | { file: "0001_.md", content: "# 1 /n/n。" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/chapter-command.test.ts | 86 | TEST_FIXTURE | index: [chapterEntry(1, "", 3000)], | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/cli-integration.test.ts | 165 | TEST_FIXTURE | expect(output).not.toContain(""); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/cli-integration.test.ts | 221 | TEST_FIXTURE | const output = run(["interact", "--json", "--message", ""]); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/cli-integration.test.ts | 394 | TEST_FIXTURE | expect(output).not.toContain("7"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/genre-command.test.ts | 4 | TEST_FIXTURE | const CHINESE_CHARS = /[-]/; | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/localization.test.ts | 31 | TEST_FIXTURE | const CHINESE_CHARS = /[-]/; | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/notify-option.test.ts | 33 | TEST_FIXTURE | formatLengthCount: (count: number) => `${count}`, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/notify-option.test.ts | 56 | TEST_FIXTURE | title: `${chapterNumber}`, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/notify-option.test.ts | 71 | TEST_FIXTURE | title: "", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/progress-text.test.ts | 62 | TEST_FIXTURE | totalCountLabel: "24000", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/progress-text.test.ts | 68 | TEST_FIXTURE | "  Tổng độ dài: 24000", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/revision-command.test.ts | 70 | TEST_FIXTURE | await reviseCommand.parseAsync(["node", "revise", "demo-book", "3", "--mode", "rewrite", "--brief", "。"], { fr | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/revision-command.test.ts | 73 | TEST_FIXTURE | externalContext: "。", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/revision-command.test.ts | 82 | TEST_FIXTURE | await writeCommand.parseAsync(["node", "write", "sync", "demo-book", "3", "--brief", "。"], { from: "node" }); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-agent-session.test.ts | 25 | TEST_FIXTURE | title: "", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-agent-session.test.ts | 83 | TEST_FIXTURE | responseText: " agent 。", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-agent-session.test.ts | 85 | TEST_FIXTURE | { role: "user", content: "" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-dashboard.test.tsx | 192 | TEST_FIXTURE | concept: "，。", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-dashboard.test.tsx | 193 | TEST_FIXTURE | title: "", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-dashboard.test.tsx | 194 | TEST_FIXTURE | nextQuestion: "，？", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-local-commands.test.ts | 8 | TEST_FIXTURE | expect(classifyLocalTuiCommand("")).toBe("help"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-local-commands.test.ts | 14 | TEST_FIXTURE | expect(classifyLocalTuiCommand("")).toBe("status"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/tui-local-commands.test.ts | 23 | TEST_FIXTURE | expect(classifyLocalTuiCommand("")).toBe("quit"); | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/write-command.test.ts | 55 | TEST_FIXTURE | readdir: vi.fn(async () => ["0005_.md"]), | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/write-command.test.ts | 154 | TEST_FIXTURE | { number: 4, title: "", wordCount: 1000, status: "approved" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/write-command.test.ts | 155 | TEST_FIXTURE | { number: 5, title: "", wordCount: 1000, status: "ready-for-review" }, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/write-phase5.test.ts | 39 | TEST_FIXTURE | readdir: vi.fn(async () => ["0005_.md"]), | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/write-phase5.test.ts | 81 | TEST_FIXTURE | chapterNumber: 5, title: "", wordCount: 2000, | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/__tests__/write-review-mode.test.ts | 51 | TEST_FIXTURE | title: "", | Tiếng Việt có dấu / English | Không | Xem chi tiết |
+| packages/cli/src/commands/agent.ts | 22 | MACHINE_PROMPT_EN | ? `${instruction}/n/n：${context}` | English | Có | Xem chi tiết |
+| packages/cli/src/commands/config.ts | 307 | USER_UI_VI | // B17: list-models  ——  service （） | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/cli/src/commands/doctor.ts | 347 | USER_UI_VI | if (!connected && //b(?:401\|403\|429)/b\|unauthorized\|forbidden\|quota\|balance\|insufficient\|exceeded\|\|\|/i. | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/cli/src/tui/__tests__/markdown.test.ts | 11 | USER_UI_VI | const result = renderMarkdown(" **** "); | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/cli/src/tui/__tests__/markdown.test.ts | 12 | USER_UI_VI | // Should contain ANSI bold on/off around  | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/cli/src/tui/__tests__/markdown.test.ts | 13 | USER_UI_VI | expect(result).toContain("/x1b[1m/x1b[22m"); | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/cli/src/tui/agent-input.ts | 219 | MACHINE_PROMPT_EN | : "，。")); | English | Có | Xem chi tiết |
+| packages/cli/src/tui/agent-input.ts | 226 | MACHINE_PROMPT_EN | : " Castor Short，。")); | English | Có | Xem chi tiết |
+| packages/cli/src/tui/agent-input.ts | 233 | MACHINE_PROMPT_EN | : "，。")); | English | Có | Xem chi tiết |
+| packages/cli/src/tui/local-commands.ts | 11 | USER_UI_VI | if (/^//help$/i.test(value) \|\| /^(help\|giup\|giúp\|tro giup\|trợ giúp\|)$/i.test(value)) { | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/cli/src/tui/local-commands.ts | 15 | USER_UI_VI | if (/^//status$/i.test(value) \|\| /^(status\|trang thai\|trạng thái\|)$/i.test(value)) { | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/cli/src/tui/local-commands.ts | 19 | USER_UI_VI | if (/^//clear$/i.test(value) \|\| /^(xoa man hinh\|xóa màn hình\|)$/i.test(value)) { | Tiếng Việt (có dấu) | Không | Xem chi tiết |
+| packages/core/genres/horror.md | 2 | LEGACY_COMPAT | name:  | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/horror.md | 4 | LEGACY_COMPAT | chapterTypes: ["", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/horror.md | 5 | LEGACY_COMPAT | fatigueWords: ["", "", "", "", "", "", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/other.md | 2 | LEGACY_COMPAT | name:  | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/other.md | 4 | LEGACY_COMPAT | chapterTypes: ["", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/other.md | 5 | LEGACY_COMPAT | fatigueWords: ["", "", "", "", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/urban.md | 2 | LEGACY_COMPAT | name:  | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/urban.md | 4 | LEGACY_COMPAT | chapterTypes: ["", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/urban.md | 5 | LEGACY_COMPAT | fatigueWords: ["", "", "", "", "", "", "", "", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/xianxia.md | 2 | LEGACY_COMPAT | name:  | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/xianxia.md | 4 | LEGACY_COMPAT | chapterTypes: ["", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/xianxia.md | 5 | LEGACY_COMPAT | fatigueWords: ["", "", "", "", "", "", "", "", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/xuanhuan.md | 2 | LEGACY_COMPAT | name:  | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/xuanhuan.md | 4 | LEGACY_COMPAT | chapterTypes: ["", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/genres/xuanhuan.md | 5 | LEGACY_COMPAT | fatigueWords: ["", "", "", "", "", "", "", "", "", "", "", ""] | Escaped \uXXXX (giữ compat) | Có | Xem chi tiết |
+| packages/core/skills/castor-interactive-film/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 、、、。Used for creation and authoring of interactive-film projects. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| packages/core/skills/castor-long-market-research/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 、、。Use for evidence-based long-form fiction market research, not for ordinary drafting. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| packages/core/skills/castor-long-story-analysis/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 、。Use when analyzing a full novel or long sample without copying its expression. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| packages/core/skills/castor-long-writing/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 、、。Used by Castor long-form workers as their shared craft method. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| packages/core/skills/castor-play-world/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 。Used by Castor Play workers for coherent action, state, time, and scene progression. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| packages/core/skills/castor-script-writing/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 、。Used for confirmed script and short-drama production. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
+| packages/core/skills/castor-short-market-research/SKILL.md | 3 | OTHER_LANGUAGE_DOC | description: 、、。Use for evidence-based short-fiction market research. | Giữ nguyên (Japanese) hoặc hỏi Human | Không | Xem chi tiết |
 
 ## Full file list with counts
 - CHANGELOG.md: 525 lines - DOC_VI
@@ -590,23 +590,23 @@ Total Han lines: 11622, files: 455
 
 | BAD (ASCII fake) | GOOD (có dấu) | File ví dụ |
 |------------------|---------------|------------|
-| Chuong | Chương | `assets/arch-pipeline.svg:24` `章节生产管线` -> `Dây chuyền sản xuất chương` |
-| Nhiem vu | Nhiệm vụ | `writer.ts: verifyPreWriteCheck` `当前任务` -> `Nhiệm vụ hiện tại` |
-| Khong lam | Không làm | `writer.ts` `不要做` -> `Không làm` |
-| Kiem tra | Kiểm tra | `continuity.ts` `OOC检查` -> `Kiểm tra OOC` |
-| Vi tri hien tai | Vị trí hiện tại | `state-projections.ts` `当前位置` -> `Vị trí hiện tại` |
-| Huyen Ao | Huyền Ảo | `genres/xuanhuan.md` `玄幻` -> `Huyền Ảo` |
-| Chien Dau | Chiến Đấu | `genres/xuanhuan.md` `战斗章` -> `Chương Chiến Đấu` |
+| Chuong | Chương | `assets/arch-pipeline.svg:24` `` -> `Dây chuyền sản xuất chương` |
+| Nhiem vu | Nhiệm vụ | `writer.ts: verifyPreWriteCheck` `` -> `Nhiệm vụ hiện tại` |
+| Khong lam | Không làm | `writer.ts` `` -> `Không làm` |
+| Kiem tra | Kiểm tra | `continuity.ts` `OOC` -> `Kiểm tra OOC` |
+| Vi tri hien tai | Vị trí hiện tại | `state-projections.ts` `` -> `Vị trí hiện tại` |
+| Huyen Ao | Huyền Ảo | `genres/xuanhuan.md` `` -> `Huyền Ảo` |
+| Chien Dau | Chiến Đấu | `genres/xuanhuan.md` `` -> `Chương Chiến Đấu` |
 
 Machine prompts must be English canonical, e.g.:
 
-- `polisher.ts: buildChineseSystemPrompt()` Chinese `你是一位专业中文网文文字层润色编辑...` -> English `You are a professional English web-fiction prose polisher...` (already has en version, copy it)
-- `continuity.ts: Dimension 1 zh "OOC检查"` -> keep `vi: "Kiểm tra OOC"` for UI, but system prompt `OOC模式下...` -> English `In OOC mode, personality drift can be intentional;...`
+- `polisher.ts: buildChineseSystemPrompt()` Chinese `...` -> English `You are a professional English web-fiction prose polisher...` (already has en version, copy it)
+- `continuity.ts: Dimension 1 zh "OOC"` -> keep `vi: "Kiểm tra OOC"` for UI, but system prompt `OOC...` -> English `In OOC mode, personality drift can be intentional;...`
 
 ## Legacy compatibility (escaped \uXXXX) - only where required
 
-- `packages/core/src/models/book.ts` `raw.includes("番茄")` -> `raw.includes("\u756a\u8304")` (keeps reading old books with platform "番茄")
-- `packages/core/src/utils/story-markdown.ts` headers `章节` -> `"\u7ae0\u8282"` escaped, booleans `是/否` -> `"\u662f"/"\u5426"` - needed to parse old markdown files
+- `packages/core/src/models/book.ts` `raw.includes("")` -> `raw.includes("\u756a\u8304")` (keeps reading old books with platform "")
+- `packages/core/src/utils/story-markdown.ts` headers `` -> `"\u7ae0\u8282"` escaped, booleans `/` -> `"\u662f"/"\u5426"` - needed to parse old markdown files
 - `packages/core/genres/*.md` - if genre templates are legacy Chinese, should be translated to Vietnamese with diacritics, not escaped. Only keep escaped if genre must support old books. Proposed: translate genre files to Vietnamese (as above).
 - Do NOT use escaped to pretend translation: `"\u7ae0\u8282"` is not Vietnamese, it's Chinese escaped.
 
@@ -625,16 +625,16 @@ Machine prompts must be English canonical, e.g.:
 
 Recommended order (as per spec):
 
-A. Studio user-facing Vietnamese (ví dụ `packages/studio/src/api/server.ts:327-332` `## 后台任务状态` -> `## Trạng thái tác vụ nền` with diacritics, `本会话有一个正在后台运行...` -> `Phiên này có một tác vụ đang chạy nền...`)
+A. Studio user-facing Vietnamese (ví dụ `packages/studio/src/api/server.ts:327-332` `## ` -> `## Trạng thái tác vụ nền` with diacritics, `...` -> `Phiên này có một tác vụ đang chạy nền...`)
    - TDD: update `server.test.ts` expectation, verify `tr("Tiến độ","Progress")` already correct
    - After: `pnpm --filter @actalk/castor-studio typecheck && pnpm --filter @actalk/castor-studio build`
 
 B. CLI / TUI / Doctor Vietnamese (`packages/cli/src/commands/*`, `tui/i18n.ts`)
-   - Example: `tui/local-commands.ts` `帮助` -> already has `giúp`, but need to ensure `Tiếng Việt` with diacritics, not `Tieng Viet`
+   - Example: `tui/local-commands.ts` `` -> already has `giúp`, but need to ensure `Tiếng Việt` with diacritics, not `Tieng Viet`
    - After: `pnpm --filter @actalk/castor typecheck` etc.
 
 C. README / active docs Vietnamese (`README.md` already Vietnamese, `CHANGELOG.md` Chinese parts -> Vietnamese)
-D. Test fixtures (`packages/core/src/__tests__/*` Chinese prose `这是一段测试文本` -> `Đây là đoạn văn bản kiểm thử` with diacritics)
+D. Test fixtures (`packages/core/src/__tests__/*` Chinese prose `` -> `Đây là đoạn văn bản kiểm thử` with diacritics)
 E. Machine prompts family-by-family to English canonical (`polisher.ts`, `continuity.ts`, `writer-prompts.ts` etc. - copy en branch, do not bulk)
 F. Legacy compatibility cleanup (only where `rg` shows active product still depends on Chinese headers)
 

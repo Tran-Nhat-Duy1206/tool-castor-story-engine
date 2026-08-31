@@ -1,25 +1,37 @@
 import type { StoryGraph, StoryNode } from "./graph-schema.js";
 import { enumerateRuntimePaths } from "./paths.js";
 
-// Initial lexicon (extendable). Maps common Chinese emotion words to a valence in [-1,1].
+// Maps emotion words (Vietnamese and English) to a valence in [-1, 1].
 const EMOTION_LEXICON: Record<string, number> = {
-  "喜悦": 0.9, "高兴": 0.8, "快乐": 0.8, "希望": 0.6, "坚定": 0.5, "温暖": 0.6, "感动": 0.6, "释然": 0.4, "平静": 0.0, "中性": 0.0,
-  "紧张": -0.4, "焦虑": -0.5, "愤怒": -0.6, "恐惧": -0.7, "悲伤": -0.8, "绝望": -0.95, "痛苦": -0.8, "失落": -0.5, "犹豫": -0.2, "冷漠": -0.3,
+  // Vietnamese
+  "vui": 0.8, "vui vẻ": 0.9, "hạnh phúc": 0.8, "hy vọng": 0.6, "kiên định": 0.5,
+  "ấm áp": 0.6, "xúc động": 0.6, "nhẹ nhõm": 0.4, "bình tĩnh": 0.0, "trung tính": 0.0,
+  "căng thẳng": -0.4, "lo âu": -0.5, "lo lắng": -0.5, "tức giận": -0.6, "phẫn nộ": -0.6,
+  "sợ hãi": -0.7, "kinh hoàng": -0.85, "đau buồn": -0.8, "buồn": -0.6, "tuyệt vọng": -0.95,
+  "đau khổ": -0.8, "thất vọng": -0.5, "do dự": -0.2, "lạnh lùng": -0.3,
+
+  // English
+  "joy": 0.9, "happy": 0.8, "hope": 0.6, "determined": 0.5, "warm": 0.6,
+  "moved": 0.6, "relieved": 0.4, "calm": 0.0, "neutral": 0.0,
+  "tense": -0.4, "anxious": -0.5, "angry": -0.6, "fear": -0.7, "horror": -0.85,
+  "sad": -0.8, "grief": -0.8, "despair": -0.95, "suffering": -0.8, "disappointed": -0.5,
+  "hesitant": -0.2, "cold": -0.3
 };
 
+const NEGATION_WORDS = ["không", "chẳng", "chưa", "not", "un", "no"];
+
 export function emotionScore(word: string): number {
-  const w = word.trim();
+  const w = word.trim().toLowerCase();
   if (!w) return 0;
   if (w in EMOTION_LEXICON) return EMOTION_LEXICON[w];
-  // partial match: if any lexicon key is contained in the word (e.g. "很悲伤")
-  // Negation guard: if the character immediately before the matched key is a negation character
-  // (不/没/无/别/未), flip the valence so "不高兴" scores negative rather than positive.
+
   for (const key of Object.keys(EMOTION_LEXICON)) {
     if (w.includes(key)) {
-      const keyIdx = w.indexOf(key);
-      const charBefore = keyIdx > 0 ? w[keyIdx - 1] : "";
-      if ("不没无别未".includes(charBefore)) return -EMOTION_LEXICON[key];
-      return EMOTION_LEXICON[key];
+      const isNegated = NEGATION_WORDS.some(neg => {
+        const regex = new RegExp(`\\b${neg}\\s+${key}`, "i");
+        return regex.test(w) || w.startsWith(neg + key);
+      });
+      return isNegated ? -EMOTION_LEXICON[key] : EMOTION_LEXICON[key];
     }
   }
   return 0;

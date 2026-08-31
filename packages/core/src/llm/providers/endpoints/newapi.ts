@@ -1,19 +1,10 @@
-/**
- * NewAPI (自建网关)
- *
- * - New API (one-api fork)：https://github.com/Calcium-Ion/new-api
- * - 自建 OpenAI 兼容网关，模型清单由部署方自定义，castor 只提供协议对接。
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
-/**
- * newapi 是 OneAPI / new-api 中转网关的锚点 provider。
- * 跟 custom 类似：baseUrl 由用户在 Studio 填（指向自己部署的 new-api 网关），
- * models 默认为空，实际可走 live /models probe（跟 custom 共用逻辑）。
- */
+// LLM provider configuration and endpoints.
 export const NEWAPI: ProviderEndpoint = {
   id: "newapi",
-  label: "New API (中转网关)",
+  label: "New API ()",
   group: "aggregator",
   api: "openai-completions",
   baseUrl: "",

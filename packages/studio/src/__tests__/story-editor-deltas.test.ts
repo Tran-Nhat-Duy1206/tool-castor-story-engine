@@ -16,7 +16,7 @@ describe("editor delta builders", () => {
     expect(d.delta.nodes.upsert[0].id).toBe("n2");
   });
   it("addChoiceDelta appends a choice to the source node", () => {
-    const d = addChoiceDelta(node, { id: "c2", text: "新选项", targetNodeId: "e2" }) as { delta: { nodes: { upsert: any[] } } };
+    const d = addChoiceDelta(node, { id: "c2", text: "mock_val", targetNodeId: "e2" }) as { delta: { nodes: { upsert: any[] } } };
     const up = d.delta.nodes.upsert[0];
     expect(up.choices.map((c: any) => c.id)).toEqual(["c1", "c2"]);
   });

@@ -9,7 +9,7 @@ import type { ProviderEndpoint } from "../types.js";
 
 export const LMSTUDIO: ProviderEndpoint = {
   id: "lmstudio",
-  label: "LM Studio (本地)",
+  label: "LM Studio ()",
   group: "local",
   api: "openai-completions",
   baseUrl: "http://localhost:1234/v1",

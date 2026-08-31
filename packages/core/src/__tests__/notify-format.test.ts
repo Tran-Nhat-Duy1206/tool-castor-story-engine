@@ -17,8 +17,8 @@ function lastRequestBody(): Record<string, unknown> {
 }
 
 const message = {
-  title: "示例书 第4章",
-  body: "**第四章** | 3000字\n- [major] 时间线冲突",
+  title: "mock_text Chương 4",
+  body: "**Chương mock_text** | 3000 từ\n- [major] mock_text",
 };
 
 describe("NotifyChannelSchema format field", () => {
@@ -82,7 +82,7 @@ describe("dispatchNotification telegram formats", () => {
     expect(mockFetch).toHaveBeenCalledOnce();
     const body = lastRequestBody();
     expect(body.parse_mode).toBe("Markdown");
-    expect(body.text).toBe("**示例书 第4章**\n\n**第四章** | 3000字\n- [major] 时间线冲突");
+    expect(body.text).toBe("**mock_text Chương 4**\n\n**Chương mock_text** | 3000 từ\n- [major] mock_text");
   });
 
   it("text format omits parse_mode and strips markdown marks", async () => {
@@ -93,7 +93,7 @@ describe("dispatchNotification telegram formats", () => {
 
     const body = lastRequestBody();
     expect(body).not.toHaveProperty("parse_mode");
-    expect(body.text).toBe("示例书 第4章\n\n第四章 | 3000字\n- [major] 时间线冲突");
+    expect(body.text).toBe("mock_text Chương 4\n\nChương mock_text | 3000 từ\n- [major] mock_text");
   });
 });
 
@@ -107,7 +107,7 @@ describe("dispatchNotification wechat-work formats", () => {
     const body = lastRequestBody();
     expect(body.msgtype).toBe("markdown");
     expect(body.markdown).toEqual({
-      content: "**示例书 第4章**\n\n**第四章** | 3000字\n- [major] 时间线冲突",
+      content: "**mock_text Chương 4**\n\n**Chương mock_text** | 3000 từ\n- [major] mock_text",
     });
   });
 
@@ -120,7 +120,7 @@ describe("dispatchNotification wechat-work formats", () => {
     const body = lastRequestBody();
     expect(body.msgtype).toBe("text");
     expect(body.text).toEqual({
-      content: "示例书 第4章\n\n第四章 | 3000字\n- [major] 时间线冲突",
+      content: "mock_text Chương 4\n\nChương mock_text | 3000 từ\n- [major] mock_text",
     });
     expect(body).not.toHaveProperty("markdown");
   });
@@ -139,7 +139,7 @@ describe("dispatchNotification feishu formats", () => {
       header: { title: { content: string } };
       elements: Array<{ tag: string; content: string }>;
     };
-    expect(card.header.title.content).toBe("示例书 第4章");
+    expect(card.header.title.content).toBe("mock_text Chương 4");
     expect(card.elements[0]).toEqual({ tag: "markdown", content: message.body });
   });
 
@@ -152,7 +152,7 @@ describe("dispatchNotification feishu formats", () => {
     const body = lastRequestBody();
     expect(body.msg_type).toBe("text");
     expect(body.content).toEqual({
-      text: "示例书 第4章\n\n第四章 | 3000字\n- [major] 时间线冲突",
+      text: "mock_text Chương 4\n\nChương mock_text | 3000 từ\n- [major] mock_text",
     });
     expect(body).not.toHaveProperty("card");
   });

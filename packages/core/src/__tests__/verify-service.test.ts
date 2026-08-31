@@ -9,26 +9,26 @@ describe("verifyService (B9)", () => {
     vi.restoreAllMocks();
   });
 
-  it("probe 成功 → probe.ok=true + chat 字段非 null（chat 步骤被执行）", async () => {
+  it("probe mock_text → probe.ok=true + chat  từmock_text null（chat mock_text）", async () => {
     global.fetch = vi.fn()
-      // probe /models 成功
+      // probe /models mock_text
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ data: [{ id: "gpt-4o" }, { id: "gpt-4o-mini" }] }),
       } as any)
-      // 后续 chat 请求失败（测试环境没真实 openai SDK 支持），但这 OK —— 只要 chat 被尝试了就行
+      // mock_text chat mock_text（Testmock_text openai SDK mock_text），mock_text OK —— mock_text chat mock_text
       .mockRejectedValue(new Error("test: no real chat backend"));
 
     const result = await verifyService("openai", "sk-test");
     expect(result.probe.ok).toBe(true);
     expect(result.probe.models).toBe(2);
-    // chat 字段不为 null 说明 checkModel 存在 + chat 步骤被执行（ok=true/false 都可以）
+    // chat  từmock_text null mock_text checkModel mock_text + chat mock_text（ok=true/false mock_text）
     expect(result.chat).not.toBeNull();
     expect(typeof result.chat?.ok).toBe("boolean");
     expect(result.chat?.latencyMs).toBeGreaterThanOrEqual(0);
   });
 
-  it("probe 401 → probe.ok=false, error 带 401", async () => {
+  it("probe 401 → probe.ok=false, error mock_text 401", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 401,
@@ -40,14 +40,14 @@ describe("verifyService (B9)", () => {
     expect(result.probe.error).toContain("401");
   });
 
-  it("probe 网络挂 → probe.ok=false, error 是 fetch 错误", async () => {
+  it("probe mock_text → probe.ok=false, error mock_text fetch mock_text", async () => {
     global.fetch = vi.fn().mockRejectedValue(new Error("ECONNREFUSED")) as typeof fetch;
     const result = await verifyService("openai", "sk-test");
     expect(result.probe.ok).toBe(false);
     expect(result.probe.error).toContain("ECONNREFUSED");
   });
 
-  it("probe 使用显式 proxyUrl 连接 /models", async () => {
+  it("probe mock_text proxyUrl mock_text /models", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce({
         ok: true,
@@ -63,13 +63,13 @@ describe("verifyService (B9)", () => {
     });
   });
 
-  it("provider 没 checkModel（custom baseUrl 空）→ chat 字段返回 null，不发 chat 请求", async () => {
-    // custom 没 checkModel，verifyService 跳过 chat step
+  it("provider mock_text checkModel（custom baseUrl mock_text）→ chat  từmock_text null，mock_text chat mock_text", async () => {
+    // custom mock_text checkModel，verifyService mock_text chat step
     const result = await verifyService("custom", "sk-x");
     expect(result.chat).toBeNull();
   });
 
-  it("未知 service → probe 报 '无 baseUrl'", async () => {
+  it("mock_text service → probe mock_text 'mock_text baseUrl'", async () => {
     const result = await verifyService("nonexistent-xyz", "sk-test");
     expect(result.probe.ok).toBe(false);
     expect(result.probe.error).toContain("baseUrl");

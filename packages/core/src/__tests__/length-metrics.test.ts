@@ -9,7 +9,7 @@ import {
 
 describe("length metrics", () => {
   it("counts Chinese chapter length using zh_chars", () => {
-    expect(countChapterLength("他抬头看天。", "zh_chars")).toBe(6);
+    expect(countChapterLength("mock_text。", "zh_chars")).toBe(6);
   });
 
   it("counts English chapter length using en_words", () => {
@@ -25,15 +25,15 @@ describe("length metrics", () => {
   it("counts prose only for markdown-shaped Chinese chapters", () => {
     const markdownChapter = [
       "---",
-      "title: 第1章 归来",
+      "title: Chương 1 mock_text",
       "---",
       "",
-      "# 第1章 归来",
+      "# Chương 1 mock_text",
       "",
-      "陈风抬头看天。",
+      "mock_text。",
     ].join("\n");
 
-    expect(countChapterLength(markdownChapter, "zh_chars")).toBe("陈风抬头看天。".length);
+    expect(countChapterLength(markdownChapter, "zh_chars")).toBe("mock_text。".length);
   });
 
   it("builds a conservative length spec for Chinese chapters", () => {

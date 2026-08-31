@@ -13,12 +13,12 @@ export async function seedAuthoringGraph(): Promise<void> {
     StoryGraphSchema.parse({
       schemaVersion: 1,
       projectId: E2E_FILM_ID,
-      title: "E2E 创作样例",
+      title: "E2E mock_val",
       worldAnchor: {
-        storyCore: "查账",
-        theme: "信任",
-        genre: "宫斗",
-        worldRules: "无魔法",
+        storyCore: "Kiem tra so sach",
+        theme: "mock_val",
+        genre: "mock_val",
+        worldRules: "mock_val",
         durationMinutes: 20,
       },
       variables: [],
@@ -27,19 +27,19 @@ export async function seedAuthoringGraph(): Promise<void> {
         {
           id: "s",
           type: "start",
-          title: "开场",
-          sceneDesc: "旧场景",
+          title: "Mo dau",
+          sceneDesc: "mock_val",
           choices: [{ id: "c", text: "go", targetNodeId: "e" }],
         },
         {
           id: "e",
           type: "ending",
-          title: "结局",
+          title: "mock_val",
           choices: [],
         },
       ],
       endings: [
-        { id: "g", nodeId: "e", title: "好结局", type: "good", description: "" },
+        { id: "g", nodeId: "e", title: "mock_val", type: "good", description: "" },
       ],
     }),
   );

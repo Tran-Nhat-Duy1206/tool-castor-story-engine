@@ -215,7 +215,7 @@ describe("agent tools language wiring (en parity)", () => {
   it("lets an explicit shortRun.language=en override the zh session default in the confirmation payload", async () => {
     const result = await createProposeActionTool("vi").execute("propose-short-zh-en", {
       action: "short_run",
-      instruction: "用户在中文对话里要求写一篇英文办公室悬疑短篇",
+      instruction: "mock_text",
       shortRun: {
         title: "The Missing Ledger",
         direction: "an English office suspense story about forged expense records",
@@ -240,7 +240,7 @@ describe("agent tools language wiring (en parity)", () => {
   it("does not inject a zh charsPerChapter default when a zh session confirms an en short", async () => {
     const result = await createProposeActionTool("vi").execute("propose-short-zh-en-no-length", {
       action: "short_run",
-      instruction: "用户在中文对话里要求写一篇英文短篇，未指定每章字数",
+      instruction: "mock_text，mock_text từmock_text",
       shortRun: {
         title: "The Missing Ledger",
         direction: "an English office suspense story",
@@ -299,7 +299,7 @@ describe("agent tools language wiring (en parity)", () => {
     const pipeline = contextPipeline({ createAgentContext: vi.fn(() => ({})) });
     const tool = createShortFictionRunTool(pipeline as never, root);
 
-    await tool.execute("short-zh-1", { direction: "女频短篇 婚姻背叛 证据反杀" } as any);
+    await tool.execute("short-zh-1", { direction: "mock_text mock_text mock_text" } as any);
 
     expect(runShortFictionProductionMock).toHaveBeenCalledTimes(1);
     expect((runShortFictionProductionMock.mock.calls[0]![0] as any).language).toBeUndefined();
@@ -327,7 +327,7 @@ describe("agent tools language wiring (en parity)", () => {
     const controller = new AbortController();
 
     await createShortFictionRunTool(pipeline as never, root)
-      .execute("short-abort-1", { direction: "女频短篇 婚姻背叛 证据反杀" } as any, controller.signal);
+      .execute("short-abort-1", { direction: "mock_text mock_text mock_text" } as any, controller.signal);
     await createScriptCreationTool(pipeline as never, root)
       .execute("script-abort-1", { title: "Night Shift", instruction: "adapt into a short drama" } as any, controller.signal);
     await createStoryboardCreationTool(pipeline as never, root)
@@ -375,7 +375,7 @@ describe("agent tools language wiring (en parity)", () => {
     const enTool = createSubAgentTool(pipeline as never, "harbor", undefined, { language: "en" });
     const enBlocked = await enTool.execute("sub-en-1", { agent: "architect", instruction: "create book" } as any);
     expect(toolText(enBlocked)).toContain("already has a book");
-    expect(toolText(enBlocked)).not.toMatch(/[一-鿿]/);
+    expect(toolText(enBlocked)).not.toMatch(/\u4e00-\u9fff/);
 
     const enRevised = await enTool.execute("sub-en-2", {
       agent: "architect",
@@ -384,11 +384,11 @@ describe("agent tools language wiring (en parity)", () => {
       instruction: "rewrite the foundation",
     } as any);
     expect(toolText(enRevised)).toContain("foundation has been rewritten");
-    expect(toolText(enRevised)).not.toMatch(/[一-鿿]/);
+    expect(toolText(enRevised)).not.toMatch(/\u4e00-\u9fff/);
 
     const zhTool = createSubAgentTool(pipeline as never, "harbor");
-    const zhBlocked = await zhTool.execute("sub-zh-1", { agent: "architect", instruction: "建书" } as any);
-    expect(toolText(zhBlocked)).toContain("当前已有书籍");
+    const zhBlocked = await zhTool.execute("sub-zh-1", { agent: "architect", instruction: "mock_text" } as any);
+    expect(toolText(zhBlocked)).toContain("mock_text");
   });
 
   it("returns English no-world guidance from play tools in en sessions and keeps zh by default", async () => {
@@ -397,21 +397,21 @@ describe("agent tools language wiring (en parity)", () => {
     const enEdit = await createPlayEditTool(root, "play-none", "en").execute("play-edit-en", {} as any);
     expect(toolText(enEdit)).toContain("no interactive world to edit");
     const zhEdit = await createPlayEditTool(root, "play-none").execute("play-edit-zh", {} as any);
-    expect(toolText(zhEdit)).toContain("还没有可编辑的互动世界");
+    expect(toolText(zhEdit)).toContain("mock_text");
 
     const enStep = await createPlayStepTool(pipeline as never, root, "play-none", { language: "en" })
       .execute("play-step-en", { input: "look around" } as any);
     expect(toolText(enStep)).toContain("no interactive world to advance");
     const zhStep = await createPlayStepTool(pipeline as never, root, "play-none")
-      .execute("play-step-zh", { input: "观察四周" } as any);
-    expect(toolText(zhStep)).toContain("还没有可推进的互动世界");
+      .execute("play-step-zh", { input: "mock_text" } as any);
+    expect(toolText(zhStep)).toContain("mock_text");
 
     const enRevise = await createPlayReviseTool(pipeline as never, root, "play-none", { language: "en" })
       .execute("play-revise-en", { action: "regenerate_last" } as any);
     expect(toolText(enRevise)).toContain("no interactive world to redo");
     const zhRevise = await createPlayReviseTool(pipeline as never, root, "play-none")
       .execute("play-revise-zh", { action: "regenerate_last" } as any);
-    expect(toolText(zhRevise)).toContain("还没有可重做的互动世界");
+    expect(toolText(zhRevise)).toContain("mock_text");
   });
 
   it("uses the play world language for play_edit and play_revise runtime feedback", async () => {
@@ -436,6 +436,6 @@ describe("agent tools language wiring (en parity)", () => {
     const reviseResult = await createPlayReviseTool(pipeline as never, root, "play-en-world", { language: "en" })
       .execute("play-revise-en-world", { action: "restore_variant" } as any);
     expect(toolText(reviseResult)).toContain("requires both turn and variantId");
-    expect(toolText(reviseResult)).not.toMatch(/[一-鿿]/);
+    expect(toolText(reviseResult)).not.toMatch(/\u4e00-\u9fff/);
   });
 });

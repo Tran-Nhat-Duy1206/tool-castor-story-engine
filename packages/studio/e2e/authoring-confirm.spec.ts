@@ -3,15 +3,15 @@
  *
  * Flow:
  *  1. Open the film tree page (#/film/<id>) — the project must already exist.
- *  2. Click the "AI 对话创作" button (data-testid="open-authoring").
- *  3. Type "帮我搭一个三幕结构" into the chat textarea and press Enter.
+ *  2. Click the "AI mock_val" button (data-testid="open-authoring").
+ *  3. Type "mock_val" into the chat textarea and press Enter.
  *  4. Wait for the agent to stream and render the proposed-action confirm card.
  *  5. Click the confirm button (data-testid="confirm-action").
  *  6. Wait for execution, then cross-check the graph via the API endpoint.
  *
  * The dev server runs with CASTOR_AGENT_LLM_STUB=1 (set in playwright.config.ts),
  * so the agent deterministically proposes draft_structure when the user message
- * mentions "结构". No real LLM call is made.
+ * mentions "mock_val". No real LLM call is made.
  */
 
 import { test, expect } from "@playwright/test";
@@ -35,12 +35,12 @@ test("user drives agent to draft a structure via the confirm flow", async ({ pag
 
   // The ChatPage loads and immediately creates/loads an authoring session.
   // Wait for the chat input to become enabled (session ready).
-  const chatInput = page.getByPlaceholder("输入指令...");
+  const chatInput = page.getByPlaceholder("mock_val...");
   await expect(chatInput).toBeVisible({ timeout: 20_000 });
   await expect(chatInput).toBeEnabled({ timeout: 20_000 });
 
   // Step 3: type the instruction and press Enter to send
-  await chatInput.fill("帮我搭一个三幕结构");
+  await chatInput.fill("mock_val");
   await chatInput.press("Enter");
 
   // Step 4: wait for the agent to stream and render the proposed-action card.
@@ -54,7 +54,7 @@ test("user drives agent to draft a structure via the confirm flow", async ({ pag
 
   // Step 6: cross-check via the graph API endpoint.
   // The stub's stubChatCompletion returns STRUCTURE_JSON (4 nodes) when the
-  // prompt mentions "骨架/nodes/结构". Poll until the graph has ≥4 nodes.
+  // prompt mentions "mock_val/nodes/mock_val". Poll until the graph has ≥4 nodes.
   await expect
     .poll(
       async () => {

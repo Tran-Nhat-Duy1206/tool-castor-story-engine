@@ -11,16 +11,16 @@ import { StoryNodeSchema } from "../interactive-film/graph-schema.js";
 
 describe("delta builders", () => {
   it("world anchor patch", () => {
-    const d = buildWorldAnchorDelta({ theme: "信任" });
+    const d = buildWorldAnchorDelta({ theme: "mock_text" });
     expect(() => StoryGraphDeltaSchema.parse(d)).not.toThrow();
-    expect(d.worldAnchor).toEqual({ theme: "信任" });
+    expect(d.worldAnchor).toEqual({ theme: "mock_text" });
   });
   it("add variable", () => {
-    const d = buildAddVariableDelta({ name: "trust", type: "counter", default: 0, desc: "信任" });
+    const d = buildAddVariableDelta({ name: "trust", type: "counter", default: 0, desc: "mock_text" });
     expect(d.variables?.upsert?.[0].name).toBe("trust");
   });
   it("define ending", () => {
-    const d = buildDefineEndingDelta({ id: "g", nodeId: "e", title: "好", type: "good", description: "" });
+    const d = buildDefineEndingDelta({ id: "g", nodeId: "e", title: "mock_text", type: "good", description: "" });
     expect(d.endings?.upsert?.[0].nodeId).toBe("e");
   });
   it("remove node", () => {

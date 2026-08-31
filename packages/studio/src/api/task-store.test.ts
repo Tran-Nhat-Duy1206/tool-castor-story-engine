@@ -29,10 +29,10 @@ describe("Studio task snapshots", () => {
       execution: {
         id: "task-1",
         tool: "short_fiction_run",
-        label: "生成短篇",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
-        logs: ["正在生成大纲"],
+        logs: ["mock_val"],
       },
     });
 
@@ -45,10 +45,10 @@ describe("Studio task snapshots", () => {
       execution: {
         id: "task-1",
         tool: "short_fiction_run",
-        label: "生成短篇",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
-        logs: ["正在生成大纲"],
+        logs: ["mock_val"],
       },
     });
   });
@@ -61,20 +61,20 @@ describe("Studio task snapshots", () => {
       execution: {
         id: "task-2",
         tool: "script_create",
-        label: "生成剧本",
+        label: "mock_val",
         status: "running" as const,
         startedAt: 10,
       },
     };
 
     await Promise.all([
-      saveStudioTaskSnapshot(root, { ...base, updatedAt: 20, execution: { ...base.execution, logs: ["第一步"] } }),
-      saveStudioTaskSnapshot(root, { ...base, updatedAt: 30, execution: { ...base.execution, logs: ["第一步", "第二步"] } }),
+      saveStudioTaskSnapshot(root, { ...base, updatedAt: 20, execution: { ...base.execution, logs: ["mock_val"] } }),
+      saveStudioTaskSnapshot(root, { ...base, updatedAt: 30, execution: { ...base.execution, logs: ["mock_val", "mock_val"] } }),
     ]);
 
     await expect(loadStudioTaskSnapshot(root, "session-2")).resolves.toMatchObject({
       updatedAt: 30,
-      execution: { logs: ["第一步", "第二步"] },
+      execution: { logs: ["mock_val", "mock_val"] },
     });
   });
 
@@ -88,7 +88,7 @@ describe("Studio task snapshots", () => {
       execution: {
         id: "task-3",
         tool: "short_fiction_run",
-        label: "生成短篇",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
       },

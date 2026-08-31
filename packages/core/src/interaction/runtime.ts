@@ -113,8 +113,8 @@ function resolveRuntimeLanguage(request: InteractionRequest): RuntimeLanguage {
   return request.language === "en" ? "en" : "vi";
 }
 
-function localize<T>(language: RuntimeLanguage, messages: { zh: T; en: T }): T {
-  return language === "en" ? messages.en : messages.zh;
+function localize<T>(language: RuntimeLanguage, messages: { vi: T; en: T }): T {
+  return language === "en" ? messages.en : messages.vi;
 }
 
 function localizeMode(mode: AutomationMode, language: RuntimeLanguage): string {
@@ -123,9 +123,9 @@ function localizeMode(mode: AutomationMode, language: RuntimeLanguage): string {
   }
 
   return {
-    auto: "自动",
-    semi: "半自动",
-    manual: "手动",
+    auto: "",
+    semi: "",
+    manual: "",
   }[mode] ?? mode;
 }
 
@@ -147,16 +147,16 @@ function renderCreationDraft(
         draft.nextQuestion ? `- Next: ${draft.nextQuestion}` : undefined,
       ]
     : [
-        "# 当前创作草案",
-        draft.title ? `- 书名：${draft.title}` : undefined,
-        draft.genre ? `- 题材：${draft.genre}` : undefined,
-        draft.platform ? `- 平台：${draft.platform}` : undefined,
-        draft.worldPremise ? `- 世界观：${draft.worldPremise}` : undefined,
-        draft.protagonist ? `- 主角：${draft.protagonist}` : undefined,
-        draft.conflictCore ? `- 核心冲突：${draft.conflictCore}` : undefined,
-        draft.volumeOutline ? `- 卷纲方向：${draft.volumeOutline}` : undefined,
-        draft.blurb ? `- 简介：${draft.blurb}` : undefined,
-        draft.nextQuestion ? `- 下一步：${draft.nextQuestion}` : undefined,
+        "# ",
+        draft.title ? `- ：${draft.title}` : undefined,
+        draft.genre ? `- ：${draft.genre}` : undefined,
+        draft.platform ? `- ：${draft.platform}` : undefined,
+        draft.worldPremise ? `- ：${draft.worldPremise}` : undefined,
+        draft.protagonist ? `- ：${draft.protagonist}` : undefined,
+        draft.conflictCore ? `- ：${draft.conflictCore}` : undefined,
+        draft.volumeOutline ? `- ：${draft.volumeOutline}` : undefined,
+        draft.blurb ? `- ：${draft.blurb}` : undefined,
+        draft.nextQuestion ? `- ：${draft.nextQuestion}` : undefined,
       ];
   return lines.filter(Boolean).join("\n");
 }
@@ -174,7 +174,7 @@ function buildTaskStartedState(
         bookId: request.bookId ?? session.activeBookId,
         chapterNumber: session.activeChapterNumber,
         stageLabel: localize(language, {
-          zh: "准备章节输入",
+          vi: "Chuẩn bị đầu vào chương",
           en: "preparing chapter inputs",
         }),
       };
@@ -183,7 +183,7 @@ function buildTaskStartedState(
         status: "planning",
         bookId: request.bookId ?? session.activeBookId,
         stageLabel: localize(language, {
-          zh: "创建作品基础",
+          vi: "Tạo cài đặt nền tảng tác phẩm",
           en: "creating book foundation",
         }),
       };
@@ -193,7 +193,7 @@ function buildTaskStartedState(
         bookId: request.bookId ?? session.activeBookId,
         chapterNumber: session.activeChapterNumber,
         stageLabel: localize(language, {
-          zh: "导出作品文件",
+          vi: "Xuất tệp tác phẩm",
           en: "exporting book artifacts",
         }),
       };
@@ -204,8 +204,8 @@ function buildTaskStartedState(
         bookId: request.bookId ?? session.activeBookId,
         chapterNumber: request.chapterNumber ?? session.activeChapterNumber,
         stageLabel: request.intent === "rewrite_chapter"
-          ? localize(language, { zh: "重写章节", en: "rewriting chapter" })
-          : localize(language, { zh: "修订章节", en: "revising chapter" }),
+          ? localize(language, { vi: "Viết lại chương", en: "rewriting chapter" })
+          : localize(language, { vi: "Chỉnh sửa chương", en: "revising chapter" }),
       };
     case "update_focus":
     case "update_author_intent":
@@ -215,7 +215,7 @@ function buildTaskStartedState(
         bookId: request.bookId ?? session.activeBookId,
         chapterNumber: session.activeChapterNumber,
         stageLabel: localize(language, {
-          zh: "应用项目修改",
+          vi: "Áp dụng chỉnh sửa dự án",
           en: "applying project edit",
         }),
       };
@@ -226,7 +226,7 @@ function buildTaskStartedState(
         bookId: request.bookId ?? session.activeBookId,
         chapterNumber: session.activeChapterNumber,
         stageLabel: localize(language, {
-          zh: "已由用户暂停",
+          vi: "Đã bị người dùng tạm dừng",
           en: "paused by user",
         }),
       };
@@ -236,7 +236,7 @@ function buildTaskStartedState(
         bookId: request.bookId ?? session.activeBookId,
         chapterNumber: session.activeChapterNumber,
         stageLabel: localize(language, {
-          zh: `处理中：${request.intent}`,
+          vi: `Đang xử lý: ${request.intent}`,
           en: `handling ${request.intent}`,
         }),
       };
@@ -288,11 +288,11 @@ function buildPendingDecision(
     ...(chapterNumber !== undefined ? { chapterNumber } : {}),
     summary: session.automationMode === "manual"
       ? localize(language, {
-          zh: "执行已完成。请明确选择下一步操作。",
+          vi: "Thực thi đã hoàn tất. Vui lòng chọn rõ bước tiếp theo.",
           en: "Execution finished. Choose the next action explicitly.",
         })
       : localize(language, {
-          zh: "执行已完成，等待你的下一步决定。",
+          vi: "Thực thi đã hoàn tất, đang chờ quyết định tiếp theo của bạn.",
           en: "Execution finished. Waiting for your next decision.",
         }),
   };
@@ -309,7 +309,7 @@ function buildWaitingExecution(
     bookId: request.bookId ?? session.activeBookId,
     ...(chapterNumber !== undefined ? { chapterNumber } : {}),
     stageLabel: localize(language, {
-      zh: "等待你的下一步决定",
+      vi: "Đang chờ quyết định tiếp theo của bạn",
       en: "waiting for your next decision",
     }),
   };
@@ -356,7 +356,7 @@ async function handleDraftLifecycleRequest(params: {
         return {
           session: markCompleted(session),
           responseText: localize(language, {
-            zh: "当前还没有创作草案。先告诉我你想写什么，再逐步把书收出来。",
+            vi: "Hiện chưa có bản thảo sáng tác nào. Hãy cho tôi biết bạn muốn viết gì, rồi chúng ta sẽ từng bước hoàn thiện sách.",
             en: "There is no active book draft yet. Start by telling me what you want to write.",
           }),
         };
@@ -369,7 +369,7 @@ async function handleDraftLifecycleRequest(params: {
     case "create_book": {
       if (!tools.createBook) {
         throw new Error(localize(language, {
-          zh: "交互运行时暂未实现创建作品。",
+          vi: "Runtime tương tác chưa hỗ trợ tạo tác phẩm.",
           en: "Book creation is not implemented in the interaction runtime yet.",
         }));
       }
@@ -377,7 +377,7 @@ async function handleDraftLifecycleRequest(params: {
       const title = request.title ?? effectiveDraft?.title;
       if (!title) {
         throw new Error(localize(language, {
-          zh: "创建作品需要标题。",
+          vi: "Tạo tác phẩm cần tiêu đề.",
           en: "Book creation requires a title.",
         }));
       }
@@ -406,7 +406,7 @@ async function handleDraftLifecycleRequest(params: {
         : undefined;
       if (!createdBookId) {
         throw new Error(localize(language, {
-          zh: "创建作品工具没有返回作品 ID。",
+          vi: " ID。",
           en: "Create-book tool did not return a book id.",
         }));
       }
@@ -420,11 +420,11 @@ async function handleDraftLifecycleRequest(params: {
       };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已创建作品 ${createdBookId}。`,
+          vi: ` ${createdBookId}。`,
           en: `Created ${createdBookId}.`,
         })),
         responseText: metadata.responseText ?? localize(language, {
-          zh: `已创建作品 ${createdBookId}。`,
+          vi: ` ${createdBookId}。`,
           en: `Created ${createdBookId}.`,
         }),
         details: metadata.details,
@@ -434,11 +434,11 @@ async function handleDraftLifecycleRequest(params: {
       const completed = markCompleted(clearCreationDraft(session));
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: "已丢弃当前创作草案。",
+          vi: "。",
           en: "Discarded the current book draft.",
         })),
         responseText: localize(language, {
-          zh: "已丢弃当前创作草案。",
+          vi: "。",
           en: "Discarded the current book draft.",
         }),
       };
@@ -463,16 +463,16 @@ async function handleBookSelectionRequest(params: {
       const completed = markCompleted(session);
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已列出 ${books.length} 本作品。`,
+          vi: ` ${books.length} 。`,
           en: `Listed ${books.length} book(s).`,
         })),
         responseText: books.length > 0
           ? localize(language, {
-              zh: `作品列表：${books.join("、")}`,
+              vi: `：${books.join("、")}`,
               en: `Books: ${books.join(", ")}`,
             })
           : localize(language, {
-              zh: "当前项目下没有作品。",
+              vi: "。",
               en: "No books found in this project.",
             }),
       };
@@ -480,25 +480,25 @@ async function handleBookSelectionRequest(params: {
     case "select_book": {
       if (!request.bookId) {
         throw new Error(localize(language, {
-          zh: "切换作品需要提供作品 ID。",
+          vi: " ID。",
           en: "Book selection requires a book id.",
         }));
       }
       const books = await tools.listBooks();
       if (!books.includes(request.bookId)) {
         throw new Error(localize(language, {
-          zh: `当前项目中找不到作品「${request.bookId}」。`,
+          vi: `「${request.bookId}」。`,
           en: `Book "${request.bookId}" not found in this project.`,
         }));
       }
       const completed = markCompleted(bindActiveBook(session, request.bookId));
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已切换当前作品到 ${request.bookId}。`,
+          vi: `Đã chuyển tác phẩm hiện tại sang ${request.bookId}。`,
           en: `Bound active book to ${request.bookId}.`,
         })),
         responseText: localize(language, {
-          zh: `当前作品：${request.bookId}`,
+          vi: `：${request.bookId}`,
           en: `Active book: ${request.bookId}`,
         }),
       };
@@ -539,7 +539,7 @@ export async function runInteractionRequest(params: {
     currentExecution: buildTaskStartedState(session, request, language),
   });
   session = addEvent(session, "task.started", session.currentExecution!.status, localize(language, {
-    zh: `开始执行 ${request.intent}。`,
+    vi: ` ${request.intent}。`,
     en: `Started ${request.intent}.`,
   }));
 
@@ -550,7 +550,7 @@ export async function runInteractionRequest(params: {
       bookId: nextSession.activeBookId,
       chapterNumber: nextSession.activeChapterNumber,
       stageLabel: localize(language, {
-        zh: "已完成",
+        vi: "completed",
         en: "completed",
       }),
     },
@@ -588,7 +588,7 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
@@ -614,17 +614,17 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已为 ${bookId} 完成下一章写作。`,
+          vi: ` ${bookId} 。`,
           en: `Completed write_next for ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: `已为 ${bookId} 完成下一章写作，等待你的下一步决定。`,
+                vi: ` ${bookId} ，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Completed write_next for ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: `已为 ${bookId} 完成下一章写作。`,
+                vi: ` ${bookId} 。`,
                 en: `Completed write_next for ${bookId}.`,
               })
         ),
@@ -635,13 +635,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
       if (!request.chapterNumber) {
         throw new Error(localize(language, {
-          zh: "修订章节需要章节号。",
+          vi: "Chỉnh sửa chương。",
           en: "Chapter number is required for chapter revision.",
         }));
       }
@@ -669,23 +669,23 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: request.intent === "rewrite_chapter"
-            ? `已为 ${bookId} 完成章节重写。`
-            : `已为 ${bookId} 完成章节修订。`,
+          vi: request.intent === "rewrite_chapter"
+            ? ` ${bookId} 。`
+            : ` ${bookId} 。`,
           en: `Completed ${request.intent} for ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: request.intent === "rewrite_chapter"
-                  ? `已为 ${bookId} 完成章节重写，等待你的下一步决定。`
-                  : `已为 ${bookId} 完成章节修订，等待你的下一步决定。`,
+                vi: request.intent === "rewrite_chapter"
+                  ? ` ${bookId} ，Đang chờ quyết định tiếp theo của bạn。`
+                  : ` ${bookId} ，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Completed ${request.intent} for ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: request.intent === "rewrite_chapter"
-                  ? `已为 ${bookId} 完成章节重写。`
-                  : `已为 ${bookId} 完成章节修订。`,
+                vi: request.intent === "rewrite_chapter"
+                  ? ` ${bookId} 。`
+                  : ` ${bookId} 。`,
                 en: `Completed ${request.intent} for ${bookId}.`,
               })
         ),
@@ -695,13 +695,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
       if (!request.chapterNumber || !request.targetText || !request.replacementText) {
         throw new Error(localize(language, {
-          zh: "正文修补需要章节号、目标文本和替换文本。",
+          vi: "、。",
           en: "Chapter patch requires chapter number, target text, and replacement text.",
         }));
       }
@@ -733,17 +733,17 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已修补 ${bookId} 的第 ${chapterNumber} 章。`,
+          vi: ` ${bookId} Chương  ${chapterNumber} 。`,
           en: `Patched chapter ${chapterNumber} for ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: `已修补 ${bookId} 的第 ${chapterNumber} 章，等待你的下一步决定。`,
+                vi: ` ${bookId} Chương  ${chapterNumber} ，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Patched chapter ${chapterNumber} for ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: `已修补 ${bookId} 的第 ${chapterNumber} 章。`,
+                vi: ` ${bookId} Chương  ${chapterNumber} 。`,
                 en: `Patched chapter ${chapterNumber} for ${bookId}.`,
               })
         ),
@@ -753,13 +753,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
       if (!request.chapterNumber || !request.fullText) {
         throw new Error(localize(language, {
-          zh: "整章替换需要章节号和完整正文。",
+          vi: "。",
           en: "Whole-chapter replacement requires chapter number and fullText.",
         }));
       }
@@ -790,17 +790,17 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已替换 ${bookId} 的第 ${chapterNumber} 章。`,
+          vi: ` ${bookId} Chương  ${chapterNumber} 。`,
           en: `Replaced chapter ${chapterNumber} for ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: `已替换 ${bookId} 的第 ${chapterNumber} 章，等待你的下一步决定。`,
+                vi: ` ${bookId} Chương  ${chapterNumber} ，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Replaced chapter ${chapterNumber} for ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: `已替换 ${bookId} 的第 ${chapterNumber} 章。`,
+                vi: ` ${bookId} Chương  ${chapterNumber} 。`,
                 en: `Replaced chapter ${chapterNumber} for ${bookId}.`,
               })
         ),
@@ -810,13 +810,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
       if (!request.oldValue || !request.newValue) {
         throw new Error(localize(language, {
-          zh: "实体改名需要旧值和新值。",
+          vi: "。",
           en: "Entity rename requires old and new values.",
         }));
       }
@@ -842,17 +842,17 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已在 ${bookId} 中把 ${request.oldValue} 改成 ${request.newValue}。`,
+          vi: ` ${bookId}  ${request.oldValue}  ${request.newValue}。`,
           en: `Renamed ${request.oldValue} to ${request.newValue} in ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: `已在 ${bookId} 中把 ${request.oldValue} 改成 ${request.newValue}，等待你的下一步决定。`,
+                vi: ` ${bookId}  ${request.oldValue}  ${request.newValue}，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Renamed ${request.oldValue} to ${request.newValue} in ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: `已在 ${bookId} 中把 ${request.oldValue} 改成 ${request.newValue}。`,
+                vi: ` ${bookId}  ${request.oldValue}  ${request.newValue}。`,
                 en: `Renamed ${request.oldValue} to ${request.newValue} in ${bookId}.`,
               })
         ),
@@ -862,13 +862,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
       if (!request.instruction) {
         throw new Error(localize(language, {
-          zh: "更新焦点需要提供内容。",
+          vi: "。",
           en: "Focus update requires instruction content.",
         }));
       }
@@ -889,17 +889,17 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已更新 ${bookId} 的当前焦点。`,
+          vi: ` ${bookId} 。`,
           en: `Updated current focus for ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: `已更新 ${bookId} 的当前焦点，等待你的下一步决定。`,
+                vi: ` ${bookId} ，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Updated current focus for ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: `已更新 ${bookId} 的当前焦点。`,
+                vi: ` ${bookId} 。`,
                 en: `Updated current focus for ${bookId}.`,
               })
         ),
@@ -909,13 +909,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
       if (!request.instruction) {
         throw new Error(localize(language, {
-          zh: "更新作者意图需要提供内容。",
+          vi: "。",
           en: "Author intent update requires instruction content.",
         }));
       }
@@ -936,17 +936,17 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已更新 ${bookId} 的作者意图。`,
+          vi: ` ${bookId} 。`,
           en: `Updated author intent for ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: `已更新 ${bookId} 的作者意图，等待你的下一步决定。`,
+                vi: ` ${bookId} ，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Updated author intent for ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: `已更新 ${bookId} 的作者意图。`,
+                vi: ` ${bookId} 。`,
                 en: `Updated author intent for ${bookId}.`,
               })
         ),
@@ -956,13 +956,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
       if (!request.fileName || !request.instruction) {
         throw new Error(localize(language, {
-          zh: "编辑真相文件需要文件名和内容。",
+          vi: "。",
           en: "Truth-file edit requires a file name and content.",
         }));
       }
@@ -983,17 +983,17 @@ export async function runInteractionRequest(params: {
           };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已更新 ${bookId} 的 ${request.fileName}。`,
+          vi: ` ${bookId}  ${request.fileName}。`,
           en: `Updated ${request.fileName} for ${bookId}.`,
         })),
         responseText: metadata.responseText ?? (
           pendingDecision
             ? localize(language, {
-                zh: `已更新 ${bookId} 的 ${request.fileName}，等待你的下一步决定。`,
+                vi: ` ${bookId}  ${request.fileName}，Đang chờ quyết định tiếp theo của bạn。`,
                 en: `Updated ${request.fileName} for ${bookId}; waiting for your next decision.`,
               })
             : localize(language, {
-                zh: `已更新 ${bookId} 的 ${request.fileName}。`,
+                vi: ` ${bookId}  ${request.fileName}。`,
                 en: `Updated ${request.fileName} for ${bookId}.`,
               })
         ),
@@ -1003,13 +1003,13 @@ export async function runInteractionRequest(params: {
       const bookId = request.bookId ?? session.activeBookId;
       if (!params.tools.exportBook) {
         throw new Error(localize(language, {
-          zh: "交互运行时暂未实现导出作品。",
+          vi: "。",
           en: "Book export is not implemented in the interaction runtime yet.",
         }));
       }
       if (!bookId) {
         throw new Error(localize(language, {
-          zh: "当前交互会话还没有绑定作品。",
+          vi: "。",
           en: "No active book is bound to the interaction session.",
         }));
       }
@@ -1027,11 +1027,11 @@ export async function runInteractionRequest(params: {
       };
       return {
         session: addEvent(completed, "task.completed", "completed", localize(language, {
-          zh: `已导出 ${bookId}。`,
+          vi: ` ${bookId}。`,
           en: `Exported ${bookId}.`,
         })),
         responseText: metadata.responseText ?? localize(language, {
-          zh: `已导出 ${bookId}。`,
+          vi: ` ${bookId}。`,
           en: `Exported ${bookId}.`,
         }),
         details: metadata.details,
@@ -1046,18 +1046,18 @@ export async function runInteractionRequest(params: {
           bookId,
           chapterNumber: session.activeChapterNumber,
           stageLabel: localize(language, {
-            zh: "已由用户暂停",
+            vi: "Đã bị người dùng tạm dừng",
             en: "paused by user",
           }),
         },
       };
       return {
         session: addEvent(paused, "task.completed", "blocked", localize(language, {
-          zh: `已暂停${bookId ?? "当前作品"}。`,
+          vi: `${bookId ?? ""}。`,
           en: `Paused ${bookId ?? "current book"}.`,
         })),
         responseText: localize(language, {
-          zh: `已暂停${bookId ?? "当前作品"}。`,
+          vi: `${bookId ?? ""}。`,
           en: `Paused ${bookId ?? "current book"}.`,
         }),
       };
@@ -1071,18 +1071,18 @@ export async function runInteractionRequest(params: {
           bookId,
           chapterNumber: session.activeChapterNumber,
           stageLabel: localize(language, {
-            zh: "可继续执行",
+            vi: "",
             en: "ready to continue",
           }),
         },
       };
       return {
         session: addEvent(resumed, "task.completed", "completed", localize(language, {
-          zh: `已恢复${bookId ?? "当前作品"}。`,
+          vi: `${bookId ?? ""}。`,
           en: `Resumed ${bookId ?? "current book"}.`,
         })),
         responseText: localize(language, {
-          zh: `已恢复${bookId ?? "当前作品"}。`,
+          vi: `${bookId ?? ""}。`,
           en: `Resumed ${bookId ?? "current book"}.`,
         }),
       };
@@ -1098,11 +1098,11 @@ export async function runInteractionRequest(params: {
       const metadata = extractToolMetadata(toolResult);
       const responseText = metadata.responseText ?? (bookId
         ? localize(language, {
-            zh: `我在。当前作品是 ${bookId}。你可以让我继续写、修订章节、重写、调整焦点，或者查看流水线为何停止。`,
+            vi: `。 ${bookId}。、Chỉnh sửa chương、、，。`,
             en: `I’m here. Active book is ${bookId}. You can ask me to continue, revise a chapter, rewrite, change focus, or inspect why the pipeline stopped.`,
           })
         : localize(language, {
-            zh: "我在。当前还没有绑定作品。先打开作品、列出作品，或者直接描述你要写什么。",
+            vi: "。。、，。",
             en: "I’m here. No active book is bound yet. Open a book, list books, or describe what you want to write.",
           }));
       const completed = markCompleted(session);
@@ -1118,11 +1118,11 @@ export async function runInteractionRequest(params: {
       const stage = baselineExecution?.stageLabel ?? baselineExecution?.status ?? "idle";
       const summary = request.intent === "explain_failure"
         ? localize(language, {
-            zh: `当前失败上下文：${bookId ?? "当前无激活作品"} 处于 ${stage}。`,
+            vi: `failed：${bookId ?? ""}  ${stage}。`,
             en: `Current failure context: ${bookId ?? "no active book"} is at ${stage}.`,
           })
         : localize(language, {
-            zh: `当前状态：${bookId ?? "当前无激活作品"} 处于 ${stage}。`,
+            vi: `：${bookId ?? ""}  ${stage}。`,
             en: `Current status: ${bookId ?? "no active book"} is at ${stage}.`,
           });
       const completed = markCompleted(session);
@@ -1133,7 +1133,7 @@ export async function runInteractionRequest(params: {
     }
     default:
       throw new Error(localize(language, {
-        zh: `交互运行时暂未实现意图「${request.intent}」。`,
+        vi: `「${request.intent}」。`,
         en: `Intent "${request.intent}" is not implemented in the interaction runtime yet.`,
       }));
   }

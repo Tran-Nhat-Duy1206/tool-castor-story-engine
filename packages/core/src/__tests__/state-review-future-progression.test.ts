@@ -64,7 +64,7 @@ const CLIENT = {
 function makeBook(now: string): BookConfig {
   return {
     id: "demo-canon-book",
-    title: "回声协议",
+    title: "mock_text",
     platform: "other",
     genre: "urban",
     language: "vi",
@@ -85,18 +85,18 @@ async function writeFileDirect(path: string, content: string): Promise<void> {
 function sourceDelta26(): RuntimeStateDelta {
   return {
     chapter: SLOT,
-    currentStatePatch: { currentGoal: "追查灰烬的下落" },
+    currentStatePatch: { currentGoal: "mock_text" },
     hookOps: { upsert: [], mention: [], resolve: [], defer: [] },
     newHookCandidates: [],
     chapterSummary: {
       chapter: SLOT, // source-truthful: Task 11 owns application-time retargeting
-      title: "雨夜复盘",
-      characters: "林秋",
-      events: "复盘账本灰烬的线索",
-      stateChanges: "当前目标→追查灰烬的下落",
+      title: "mock_text",
+      characters: "mock_text",
+      events: "mock_text",
+      stateChanges: "mock_text→mock_text",
       hookActivity: "",
-      mood: "平静",
-      chapterType: "调查",
+      mood: "mock_text",
+      chapterType: "mock_text",
     },
     subplotOps: [],
     emotionalArcOps: [],
@@ -105,23 +105,23 @@ function sourceDelta26(): RuntimeStateDelta {
   };
 }
 
-const BODY_26 = "林秋在雨夜复盘了账本灰烬留下的唯一线索";
+const BODY_26 = "mock_text";
 
 function stubWriterOutput26(overrides: Partial<WriteChapterOutput> = {}): WriteChapterOutput {
   return {
     chapterNumber: SLOT,
-    title: "雨夜复盘",
+    title: "mock_text",
     content: BODY_26,
     wordCount: BODY_26.length,
     preWriteCheck: "",
     postSettlement: "",
-    updatedState: "# 当前状态\n\n- 追查灰烬的下落\n",
-    updatedHooks: "# 伏笔池\n",
-    updatedLedger: "# 粒子账本\n",
-    updatedSubplots: "# 支线进度\n",
-    updatedEmotionalArcs: "# 情感弧线\n",
-    updatedCharacterMatrix: "# 角色矩阵\n",
-    chapterSummary: "| 26 | 雨夜复盘 | 林秋 | 复盘线索 | 起疑 | | 平静 | 调查 |",
+    updatedState: "# mock_text\n\n- mock_text\n",
+    updatedHooks: "# mock_text\n",
+    updatedLedger: "# mock_text\n",
+    updatedSubplots: "# mock_text\n",
+    updatedEmotionalArcs: "# mock_text\n",
+    updatedCharacterMatrix: "# mock_text\n",
+    chapterSummary: "| 26 | mock_text | mock_text | mock_text | mock_text | | mock_text | mock_text |",
     postWriteErrors: [],
     postWriteWarnings: [],
     tokenUsage: ZERO_USAGE,
@@ -155,13 +155,13 @@ async function seedPostCorrectionBook(options?: { readonly semanticHead?: number
   // Durable prose prefix 1..25, distinct bytes per chapter.
   for (let chapter = 1; chapter <= HEAD; chapter += 1) {
     await writeFileDirect(
-      join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_第${chapter}章.md`),
-      `# 第${chapter}章 独有正文${chapter}\n\n第${chapter}章的无级联比对字节。\n`,
+      join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_Chương ${chapter}mock_text.md`),
+      `# Chương ${chapter}mock_text mock_text${chapter}\n\nChương ${chapter}mock_text từmock_text。\n`,
     );
   }
   const index = Array.from({ length: HEAD }, (_, i) => i + 1).map((number) => ({
     number,
-    title: `第${number}章`,
+    title: `Chương ${number}mock_text`,
     status: "approved",
     wordCount: 100 + number,
     createdAt: now,
@@ -181,8 +181,8 @@ async function seedPostCorrectionBook(options?: { readonly semanticHead?: number
     chapter: semanticHead,
     facts: [{
       subject: "protagonist",
-      predicate: "当前位置",
-      object: "悔痕灯塔",
+      predicate: "mock_text",
+      object: "mock_text",
       validFromChapter: SLOT,
       validUntilChapter: null,
       sourceChapter: SLOT,
@@ -194,18 +194,18 @@ async function seedPostCorrectionBook(options?: { readonly semanticHead?: number
     "hooks.json": JSON.stringify({ hooks: [] }, null, 2),
     "chapter_summaries.json": JSON.stringify({
       rows: [{
-        chapter: SLOT, title: "反转重写", characters: "主角；林秋",
-        events: "林秋烧毁账本并把灰烬撒进海雾", stateChanges: "当前位置→悔痕灯塔",
-        hookActivity: "", mood: "紧张", chapterType: "调查",
+        chapter: SLOT, title: "mock_text", characters: "mock_text；mock_text",
+        events: "mock_text", stateChanges: "mock_text→mock_text",
+        hookActivity: "", mood: "mock_text", chapterType: "mock_text",
       }],
     }, null, 2),
   };
   for (const [name, content] of Object.entries(canonDocs)) {
     await writeFileDirect(join(storyDir, "state", name), content);
   }
-  await writeFileDirect(join(storyDir, "current_state.md"), "# 当前状态\n");
-  await writeFileDirect(join(storyDir, "pending_hooks.md"), "# 伏笔池\n");
-  await writeFileDirect(join(storyDir, "chapter_summaries.md"), "# 章节摘要\n");
+  await writeFileDirect(join(storyDir, "current_state.md"), "# mock_text\n");
+  await writeFileDirect(join(storyDir, "pending_hooks.md"), "# mock_text\n");
+  await writeFileDirect(join(storyDir, "chapter_summaries.md"), "# mock_text\n");
 
   // Historical snapshot mirror for the consumed slot (immutability target).
   for (const [name, content] of Object.entries(canonDocs)) {
@@ -280,8 +280,8 @@ describe("future progression after a historical correction (Task 13 follow-up)",
       vi.spyOn(settleTarget, "settle").mockResolvedValue({
         settlement: {
           runtimeStateDelta: sourceDelta26(),
-          updatedState: "# 当前状态\n\n- 追查灰烬的下落\n",
-          updatedHooks: "# 伏笔池\n",
+          updatedState: "# mock_text\n\n- mock_text\n",
+          updatedHooks: "# mock_text\n",
         },
         usage: ZERO_USAGE,
       });
@@ -292,7 +292,7 @@ describe("future progression after a historical correction (Task 13 follow-up)",
         book: makeBook("2026-08-24T00:00:00.000Z"),
         bookDir: fixture.bookDir,
         chapterNumber: SLOT,
-        title: "雨夜复盘",
+        title: "mock_text",
         content: BODY_26,
         deferStateApplication: true, // governed publication contract (Task 6/7)
       });
@@ -326,8 +326,8 @@ describe("future progression after a historical correction (Task 13 follow-up)",
       vi.spyOn(settleTarget, "settle").mockResolvedValue({
         settlement: {
           runtimeStateDelta: { ...sourceDelta26(), chapterSummary: undefined },
-          updatedState: "# 当前状态\n\n- 追查灰烬的下落\n",
-          updatedHooks: "# 伏笔池\n",
+          updatedState: "# mock_text\n\n- mock_text\n",
+          updatedHooks: "# mock_text\n",
         },
         usage: ZERO_USAGE,
       });
@@ -336,7 +336,7 @@ describe("future progression after a historical correction (Task 13 follow-up)",
         book: makeBook("2026-08-24T00:00:00.000Z"),
         bookDir: fixture.bookDir,
         chapterNumber: SLOT,
-        title: "雨夜复盘",
+        title: "mock_text",
         content: BODY_26,
         // NO deferStateApplication ⇒ legacy behavior must be preserved.
       });
@@ -540,8 +540,8 @@ describe("future progression after a historical correction (Task 13 follow-up)",
 
       // Draft vs revised final prose — same byte length so the length budget
       // never interferes with the pass/fail branching under test.
-      const DRAFT_26 = "林秋在雨夜翻看了账本灰烬留下的每条线索";
-      const REVISED_26 = "林秋在雨夜复盘了账本灰烬留下的铅盒秘密";
+      const DRAFT_26 = "mock_text";
+      const REVISED_26 = "mock_text";
       expect(DRAFT_26.length).toBe(REVISED_26.length);
 
       vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockImplementation(
@@ -549,7 +549,7 @@ describe("future progression after a historical correction (Task 13 follow-up)",
           ? { passed: true, issues: [], summary: "revised-clean", overallScore: 92, tokenUsage: ZERO_USAGE }
           : {
               passed: false,
-              issues: [{ severity: "warning", category: "style", description: "初稿平淡", suggestion: "深化复盘细节" }],
+              issues: [{ severity: "warning", category: "style", description: "mock_text", suggestion: "mock_text" }],
               summary: "needs polish", overallScore: 40, tokenUsage: ZERO_USAGE,
             },
       );
@@ -565,7 +565,7 @@ describe("future progression after a historical correction (Task 13 follow-up)",
       // (buildPersistenceOutput re-analyzes); mirror that here.
       vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter").mockImplementation(
         async (input) => stubWriterOutput26({
-          title: "雨夜复盘",
+          title: "mock_text",
           content: input.chapterContent,
           wordCount: input.chapterContent.length,
         }),
@@ -591,8 +591,8 @@ describe("future progression after a historical correction (Task 13 follow-up)",
         return {
           settlement: {
             runtimeStateDelta: sourceDelta26(),
-            updatedState: "# 当前状态\n\n- 追查灰烬的下落\n",
-            updatedHooks: "# 伏笔池\n",
+            updatedState: "# mock_text\n\n- mock_text\n",
+            updatedHooks: "# mock_text\n",
           },
           usage: ZERO_USAGE,
         };
@@ -702,7 +702,7 @@ describe("future progression after a historical correction (Task 13 follow-up)",
       );
       vi.spyOn(ContinuityAuditor.prototype, "auditChapter").mockResolvedValue({
         passed: false,
-        issues: [{ severity: "critical", category: "continuity", description: "时间线断裂", suggestion: "重排场景顺序" }],
+        issues: [{ severity: "critical", category: "continuity", description: "mock_text", suggestion: "mock_text" }],
         summary: "broken timeline", overallScore: 30, tokenUsage: ZERO_USAGE,
       });
       const capturedWriteInputs: Array<Parameters<WriterAgent["writeChapter"]>[0]> = [];

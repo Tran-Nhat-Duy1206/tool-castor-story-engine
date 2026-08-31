@@ -31,7 +31,7 @@ describe("confirm-class authoring tools", () => {
 
   it("draft_structure (stubbed LLM) creates the node skeleton", async () => {
     const tool = createDraftStructureTool(root, "p", filmDeps());
-    await tool.execute("call-1", { instruction: "三幕" } as never);
+    await tool.execute("call-1", { instruction: "mock_text" } as never);
     expect((await loadStoryGraph(root, "p"))?.nodes.map(n => n.id).sort()).toEqual(["e", "s"]);
   });
 
@@ -46,7 +46,7 @@ describe("confirm-class authoring tools", () => {
       },
     }));
 
-    const result = await tool.execute("call-1", { instruction: "三幕" } as never);
+    const result = await tool.execute("call-1", { instruction: "mock_text" } as never);
 
     expect(systemPrompt).toContain("Prompt Pack Guidance");
     expect(systemPrompt).toContain("PROJECT STORY GRAPH OVERRIDE");

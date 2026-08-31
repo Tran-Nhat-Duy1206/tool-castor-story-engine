@@ -108,9 +108,9 @@ vi.mock("@mariozechner/pi-ai", async () => {
               name: "propose_action",
               arguments: {
                 action: "short_run",
-                title: "生成短篇",
-                summary: "确认后生成一篇短篇。",
-                instruction: "生成一篇短篇。",
+                title: "mock_text",
+                summary: "mock_text。",
+                instruction: "mock_text。",
               },
             },
           ], timestamp)
@@ -159,14 +159,14 @@ vi.mock("@mariozechner/pi-ai", async () => {
           ? assistant([
               {
                 type: "text",
-                text: "# 第2章\n\n我把账页摊在桌上，冷库的灯一盏盏暗下去。".repeat(80),
+                text: "# Chương 2\n\nmock_text，mock_text。".repeat(80),
               },
             ], timestamp)
         : prompt === "revision instructions"
           ? assistant([
               {
                 type: "text",
-                text: "## 第2章 修改指令\n\n目标：把这一章从润色改成重写，先删掉原来的寒暄，再让主角主动发现账页异常。\n\n执行：保留冷库线索，重写对话，补足动机。".repeat(30),
+                text: "## Chương 2 mock_text\n\nmock_text：mock_text，mock_text，mock_text。\n\nmock_text：mock_text，mock_text，mock_text。".repeat(30),
               },
             ], timestamp)
         : prompt === "write next" || allUserText.includes("write next")
@@ -262,12 +262,12 @@ describe("runAgentSession cache — bookId switch", () => {
     await mkdir(join(projectRoot, "books", "book-a", "story"), { recursive: true });
     await writeFile(
       join(projectRoot, "books", "book-a", "story", "story_bible.md"),
-      "书A 的真相",
+      "mock_textA mock_textSu that",
     );
     await mkdir(join(projectRoot, "books", "book-b", "story"), { recursive: true });
     await writeFile(
       join(projectRoot, "books", "book-b", "story", "story_bible.md"),
-      "书B 的真相",
+      "mock_textB mock_textSu that",
     );
     agentInstances.length = 0;
     streamCalls.length = 0;
@@ -316,8 +316,8 @@ describe("runAgentSession cache — bookId switch", () => {
     expect(agentInstances).toHaveLength(2);
 
     const body = JSON.stringify(streamCalls.at(-1)?.context.messages);
-    expect(body).toContain("书B 的真相");
-    expect(body).not.toContain("书A 的真相");
+    expect(body).toContain("mock_textB mock_textSu that");
+    expect(body).not.toContain("mock_textA mock_textSu that");
     expect(body).toContain("earlier question about book A");
   });
 
@@ -337,7 +337,7 @@ describe("runAgentSession cache — bookId switch", () => {
     );
 
     expect(agentInstances).toHaveLength(2);
-    expect(JSON.stringify(streamCalls.at(-1)?.context.messages)).toContain("书A 的真相");
+    expect(JSON.stringify(streamCalls.at(-1)?.context.messages)).toContain("mock_textA mock_textSu that");
   });
 
   it("rejects unsafe bookId before building the system prompt", async () => {
@@ -421,30 +421,30 @@ describe("runAgentSession cache — bookId switch", () => {
   it("injects backgroundTaskContext into the system prompt and rebuilds when it changes", async () => {
     const model = { provider: "x", id: "y", api: "anthropic-messages" } as any;
     const pipeline = {} as any;
-    const taskBlock = "## 后台任务状态\n短篇生产正在后台运行，已运行 2 分 10 秒。";
+    const taskBlock = "## mock_text\nmock_text，mock_text 2 mock_text 10 mock_text。";
 
     await runAgentSession(
       { sessionId: "s1", bookId: null, language: "vi", pipeline, projectRoot, model },
       "hi",
     );
     expect(agentInstances).toHaveLength(1);
-    expect(String(streamCalls.at(-1)?.context.systemPrompt)).not.toContain("后台任务状态");
+    expect(String(streamCalls.at(-1)?.context.systemPrompt)).not.toContain("mock_text");
 
-    // 任务开始运行：注入状态块，缓存的 Agent 必须重建（否则系统提示词是旧的）
+    // mock_text：mock_text，mock_text Agent mock_text（mock_text）
     await runAgentSession(
       { sessionId: "s1", bookId: null, language: "vi", pipeline, projectRoot, model, backgroundTaskContext: taskBlock },
-      "任务在跑吗？",
+      "mock_text？",
     );
     expect(agentInstances).toHaveLength(2);
-    expect(String(streamCalls.at(-1)?.context.systemPrompt)).toContain("短篇生产正在后台运行");
+    expect(String(streamCalls.at(-1)?.context.systemPrompt)).toContain("mock_text");
 
-    // 任务结束：状态块移除，Agent 再次重建，系统提示词不再包含任务状态
+    // mock_text：mock_text，Agent mock_text，mock_text
     await runAgentSession(
       { sessionId: "s1", bookId: null, language: "vi", pipeline, projectRoot, model },
-      "现在呢？",
+      "mock_text？",
     );
     expect(agentInstances).toHaveLength(3);
-    expect(String(streamCalls.at(-1)?.context.systemPrompt)).not.toContain("后台任务状态");
+    expect(String(streamCalls.at(-1)?.context.systemPrompt)).not.toContain("mock_text");
   });
 
   it("keeps cached Agents isolated by projectRoot for the same sessionId", async () => {
@@ -454,7 +454,7 @@ describe("runAgentSession cache — bookId switch", () => {
     await mkdir(join(otherProjectRoot, "books", "book-a", "story"), { recursive: true });
     await writeFile(
       join(otherProjectRoot, "books", "book-a", "story", "story_bible.md"),
-      "另一个 projectRoot 的真相",
+      "mock_text projectRoot mock_textSu that",
     );
 
     await runAgentSession(
@@ -479,8 +479,8 @@ describe("runAgentSession cache — bookId switch", () => {
 
     expect(agentInstances).toHaveLength(2);
     const body = JSON.stringify(streamCalls.at(-1)?.context.messages);
-    expect(body).toContain("书A 的真相");
-    expect(body).not.toContain("另一个 projectRoot 的真相");
+    expect(body).toContain("mock_textA mock_textSu that");
+    expect(body).not.toContain("mock_text projectRoot mock_textSu that");
   });
 
   it("rebuilds Agent when model id is unchanged but API protocol changes", async () => {
@@ -706,11 +706,11 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "我想把一批真实样本拆明白再开始创作",
+      "mock_text",
     );
 
     expect(agentInstances[0].state.tools.map((tool: any) => tool.name)).toContain("use_skill");
-    expect(agentInstances[0].state.systemPrompt).toContain("可按意图调用的 Skill");
+    expect(agentInstances[0].state.systemPrompt).toContain("mock_text Skill");
 
     await runAgentSession(
       {
@@ -725,7 +725,7 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "确认创建这本书",
+      "mock_text",
     );
 
     expect(agentInstances[1].state.tools.map((tool: any) => tool.name)).not.toContain("use_skill");
@@ -753,12 +753,12 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "按这个专业能力分析我的世界设定",
+      "mock_text",
     );
 
     expect(agentInstances[0].state.tools.map((tool: any) => tool.name)).not.toContain("use_skill");
-    expect(agentInstances[0].state.systemPrompt).toContain("open-world-play (强制)");
-    expect(agentInstances[0].state.systemPrompt).not.toContain("可按意图调用的 Skill");
+    expect(agentInstances[0].state.systemPrompt).toContain("open-world-play (mock_text)");
+    expect(agentInstances[0].state.systemPrompt).not.toContain("mock_text Skill");
   });
 
   it("expires intent-selected skill instructions before the next turn and transcript restore", async () => {
@@ -830,7 +830,7 @@ describe("runAgentSession cache — bookId switch", () => {
 
     const result = await runAgentSession(
       { sessionId: "book-create-repair-session", bookId: null, sessionKind: "book-create", language: "vi", pipeline, projectRoot, model },
-      "请建一本番茄长篇",
+      "mock_text",
     );
 
     expect(result.responseText).toBe("ok");
@@ -858,7 +858,7 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "确认创建这本都市悬疑长篇",
+      "mock_text",
     );
 
     expect(agentInstances[0].state.tools.map((tool: any) => tool.name)).toEqual([
@@ -890,7 +890,7 @@ describe("runAgentSession cache — bookId switch", () => {
           projectRoot,
           model,
         },
-        `确认执行 ${requestedIntent}`,
+        `mock_text ${requestedIntent}`,
       );
       expect(agentInstances.at(-1).state.tools.map((tool: any) => tool.name)).toEqual([toolName]);
       evictAgentCache(sessionId);
@@ -905,7 +905,7 @@ describe("runAgentSession cache — bookId switch", () => {
       const sessionId = `project-source-${sessionKind}`;
       await runAgentSession(
         { sessionId, bookId: null, sessionKind, language: "vi", pipeline, projectRoot, model },
-        "先读项目里的素材，只讨论，不创建",
+        "mock_text，mock_text，mock_text",
       );
       expect(agentInstances.at(-1).state.tools.map((tool: any) => tool.name)).toEqual([
         "propose_action",
@@ -981,7 +981,7 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "确认创建一本书，建书后再写第一章。",
+      "mock_text，mock_textChương mock_text。",
     );
 
     const subAgent = agentInstances.at(-1).state.tools.find((tool: any) => tool.name === "sub_agent");
@@ -999,7 +999,7 @@ describe("runAgentSession cache — bookId switch", () => {
       runWithAgentContext: vi.fn(async (_context: unknown, task: () => Promise<unknown>) => task()),
       writeNextChapter: vi.fn(async () => ({
         chapterNumber: 1,
-        title: "第一章",
+        title: "Chương mock_text",
         wordCount: 1200,
         status: "audit-failed",
       })),
@@ -1067,8 +1067,8 @@ describe("runAgentSession cache — bookId switch", () => {
     } as any;
     await new PlayStore(projectRoot).createWorld({
       id: "play-revise-terminal-session",
-      title: "雨巷账本",
-      premise: "玩家在雨巷里查一笔旧账。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "open",
     });
 
@@ -1095,8 +1095,8 @@ describe("runAgentSession cache — bookId switch", () => {
       "raw chapter",
     );
 
-    expect(result.responseText).toContain("# 第2章");
-    expect(result.responseText).not.toContain("没有调用落盘工具");
+    expect(result.responseText).toContain("# Chương 2");
+    expect(result.responseText).not.toContain("mock_text");
   });
 
   it("does not replace chapter-scoped revision instructions as raw chapter prose", async () => {
@@ -1108,9 +1108,9 @@ describe("runAgentSession cache — bookId switch", () => {
       "revision instructions",
     );
 
-    expect(result.responseText).toContain("第2章 修改指令");
-    expect(result.responseText).toContain("把这一章从润色改成重写");
-    expect(result.responseText).not.toContain("没有调用落盘工具");
+    expect(result.responseText).toContain("Chương 2 mock_text");
+    expect(result.responseText).toContain("mock_text");
+    expect(result.responseText).not.toContain("mock_text");
   });
 
   it("exposes play_edit, play_revise, and play_step after the play world exists for this session", async () => {
@@ -1118,14 +1118,14 @@ describe("runAgentSession cache — bookId switch", () => {
     const pipeline = {} as any;
     await new PlayStore(projectRoot).createWorld({
       id: "play-active-session",
-      title: "雨巷账本",
-      premise: "玩家在雨巷里查一笔旧账。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "guided",
     });
 
     await runAgentSession(
       { sessionId: "play-active-session", bookId: null, sessionKind: "play", language: "vi", pipeline, projectRoot, model },
-      "我查看门缝下的账本",
+      "mock_text",
     );
 
     expect(agentInstances[0].state.tools.map((tool: any) => tool.name)).toEqual([
@@ -1154,7 +1154,7 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "确认生成婚姻反杀短篇",
+      "mock_text",
     );
     expect(agentInstances[0].state.tools.map((tool: any) => tool.name)).toEqual([
       "short_fiction_run",
@@ -1172,7 +1172,7 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "确认生成封面",
+      "mock_text",
     );
     expect(agentInstances[1].state.tools.map((tool: any) => tool.name)).toEqual([
       "generate_cover",
@@ -1195,7 +1195,7 @@ describe("runAgentSession cache — bookId switch", () => {
         projectRoot,
         model,
       },
-      "确认启动雨夜茶馆互动世界",
+      "mock_text",
     );
     expect(agentInstances[0].state.tools.map((tool: any) => tool.name)).toEqual([
       "play_start",
@@ -1239,12 +1239,12 @@ describe("runAgentSession cache — bookId switch", () => {
     const model = { provider: "x", id: "y", api: "anthropic-messages" } as any;
     const pipeline = {} as any;
 
-    // 同会话后台生产任务运行中：host 传 suppressProductionTools，工具表剔除
-    // 会创建/修改书籍与产物的生产工具，只保留读取与资料类工具。
-    // 叙事推演三工具只读写 story/runtime/ 下的非正史产物、不碰正史，任务运行期间保留。
+    // mock_text：host mock_text suppressProductionTools，mock_text
+    // mock_text/mock_text，mock_text。
+    // mock_text story/runtime/ mock_text、mock_text，mock_text。
     await runAgentSession(
       { sessionId: "suppress-session", bookId: "book-a", language: "vi", pipeline, projectRoot, model, suppressProductionTools: true },
-      "任务在跑吗？",
+      "mock_text？",
     );
     expect(agentInstances[0].state.tools.map((tool: any) => tool.name)).toEqual([
       "read",
@@ -1260,10 +1260,10 @@ describe("runAgentSession cache — bookId switch", () => {
       "use_skill",
     ]);
 
-    // 任务结束：flag 变化必须让缓存的 Agent 重建，生产工具恢复
+    // mock_text：flag mock_text Agent mock_text，mock_text
     await runAgentSession(
       { sessionId: "suppress-session", bookId: "book-a", language: "vi", pipeline, projectRoot, model },
-      "现在呢？",
+      "mock_text？",
     );
     expect(agentInstances).toHaveLength(2);
     expect(agentInstances[1].state.tools.map((tool: any) => tool.name)).toEqual([
@@ -1316,7 +1316,7 @@ describe("runAgentSession cache — bookId switch", () => {
     ]);
   });
 
-  it("把真实 Agent 的 message_end 写入 JSONL，并在 cache 失效后只恢复可见对话", async () => {
+  it("mock_text Agent mock_text message_end mock_text JSONL，mock_text cache mock_text", async () => {
     const model = { provider: "anthropic", id: "fake", api: "anthropic-messages" } as any;
     const pipeline = {} as any;
 
@@ -1345,7 +1345,7 @@ describe("runAgentSession cache — bookId switch", () => {
     );
   });
 
-  it("恢复 transcript 时把历史 toolResult 折叠成状态摘要", async () => {
+  it("mock_text transcript mock_text toolResult mock_text", async () => {
     const model = { provider: "anthropic", id: "fake", api: "anthropic-messages" } as any;
     const pipeline = {} as any;
 
@@ -1363,9 +1363,9 @@ describe("runAgentSession cache — bookId switch", () => {
 
     expect(agentInstances).toHaveLength(2);
     const body = JSON.stringify(streamCalls.at(-1)?.context.messages ?? []);
-    expect(body).toContain("历史状态摘要");
+    expect(body).toContain("mock_text");
     expect(body).toContain("read");
-    expect(body).toContain("书A 的真相");
+    expect(body).toContain("mock_textA mock_textSu that");
     expect(body).not.toContain("\"toolCall\"");
     expect(body).not.toContain("\"toolResult\"");
 
@@ -1380,7 +1380,7 @@ describe("runAgentSession cache — bookId switch", () => {
     expect(toolResult.sourceToolAssistantUuid).toBe(toolAssistant.uuid);
   });
 
-  it("Gemini OpenAI-compatible 模型不向 LLM replay 原生 toolCall/toolResult 历史", async () => {
+  it("Gemini OpenAI-compatible mock_text LLM replay mock_text toolCall/toolResult mock_text", async () => {
     const model = {
       provider: "google",
       id: "gemini-pro-latest",
@@ -1410,10 +1410,10 @@ describe("runAgentSession cache — bookId switch", () => {
     );
     expect(body).toContain("read");
     expect(body).toContain("tool-1");
-    expect(body).toContain("书A 的真相");
+    expect(body).toContain("mock_textA mock_textSu that");
   });
 
-  it("非 Google 的 openai-completions 端点也把 toolResult 折叠成 user 文本(避免上游 503)", async () => {
+  it("mock_text Google mock_text openai-completions mock_text toolResult mock_text user mock_text(mock_text 503)", async () => {
     const model = {
       provider: "openai",
       id: "deepseek-v4-pro",
@@ -1437,7 +1437,7 @@ describe("runAgentSession cache — bookId switch", () => {
     );
   });
 
-  it("Gemini OpenAI-compatible 从历史恢复时使用状态摘要而不是 toolResult bridge", async () => {
+  it("Gemini OpenAI-compatible mock_text toolResult bridge", async () => {
     const model = {
       provider: "google",
       id: "gemini-pro-latest",
@@ -1507,7 +1507,7 @@ describe("runAgentSession cache — bookId switch", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "read",
-        content: [{ type: "text", text: "资料" }],
+        content: [{ type: "text", text: "mock_text" }],
         isError: false,
         timestamp: 4,
       },
@@ -1528,13 +1528,13 @@ describe("runAgentSession cache — bookId switch", () => {
 
     const body = JSON.stringify(streamCalls.at(-1)?.context.messages ?? []);
     expect(body).not.toContain("I have processed the tool results.");
-    expect(body).toContain("历史状态摘要");
-    expect(body).toContain("资料");
+    expect(body).toContain("mock_text");
+    expect(body).toContain("mock_text");
     expect(body).not.toContain("[Tool results]");
     expect(body).not.toContain("\"toolResult\"");
   });
 
-  it("切到 DeepSeek 时不 replay 其他模型的原生 toolCall/toolResult 历史", async () => {
+  it("mock_text DeepSeek mock_text replay mock_text toolCall/toolResult mock_text", async () => {
     const pipeline = {} as any;
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
@@ -1584,7 +1584,7 @@ describe("runAgentSession cache — bookId switch", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "read",
-        content: [{ type: "text", text: "资料" }],
+        content: [{ type: "text", text: "mock_text" }],
         isError: false,
         timestamp: 3,
       },
@@ -1614,8 +1614,8 @@ describe("runAgentSession cache — bookId switch", () => {
     const body = JSON.stringify(messages);
     expect(body).not.toContain("\"toolCall\"");
     expect(messages.some((message: any) => message.role === "toolResult")).toBe(false);
-    expect(body).toContain("历史状态摘要");
-    expect(body).toContain("资料");
+    expect(body).toContain("mock_text");
+    expect(body).toContain("mock_text");
   });
 
   it("final assistant error writes request_failed instead of request_committed", async () => {

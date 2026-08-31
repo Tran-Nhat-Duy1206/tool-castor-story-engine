@@ -74,9 +74,9 @@ const MAX_RESTORED_DIALOGUE_MESSAGES = 12;
 const MAX_RESTORED_TOOL_SUMMARY_ITEMS = 8;
 const EXPIRED_SKILL_RESULT_TEXT = "Skill instructions expired after their original turn.";
 const RESTORED_HISTORY_BOUNDARY_ZH =
-  "[已完成的历史上下文]\n" +
-  "以上是已经完成并提交的历史上下文，只能用于回忆，不代表当前轮已经执行了动作。\n" +
-  "当前轮必须优先遵循用户接下来输入的最新指令；如果最新输入是提问、讨论或确认，直接回答，不要因为历史工具结果跳过判断或继续执行旧动作。";
+  "[completed]\n" +
+  "，，。\n" +
+  "；、，，。";
 const RESTORED_HISTORY_BOUNDARY_EN =
   "[Completed history context]\n" +
   "The messages above are completed and committed history. Use them only as memory; they do not mean any action has already run in the current turn.\n" +
@@ -458,8 +458,8 @@ function buildHistoricalToolSummary(
   const latest = summaries.slice(-MAX_RESTORED_TOOL_SUMMARY_ITEMS);
   const timestamp = latest.reduce((max, item) => Math.max(max, item.timestamp), 0) || Date.now();
   return systemMessage([
-    "[历史状态摘要]",
-    "以下是已经完成的历史工具动作摘要，只说明当前状态；不是当前用户的新指令，也不表示本轮已经执行。",
+    "[]",
+    "，；，。",
     ...latest.map((item) => item.line),
   ].join("\n"), timestamp);
 }
@@ -619,27 +619,27 @@ function messageEventsToInteractionMessages(events: MessageEvent[]): Interaction
   };
 
   const agentLabels: Record<string, string> = {
-    architect: "建书",
-    writer: "写作",
-    auditor: "审计",
-    reviser: "修订",
-    exporter: "导出",
+    architect: "",
+    writer: "",
+    auditor: "",
+    reviser: "",
+    exporter: "",
   };
   const toolLabels: Record<string, string> = {
-    read: "读取文件",
-    edit: "编辑文件",
-    grep: "搜索",
-    ls: "列目录",
-    propose_action: "确认动作",
-    short_fiction_run: "短篇生产",
-    generate_cover: "生成封面",
-    play_edit: "编辑互动世界",
-    play_start: "启动互动世界",
-    play_revise: "重做互动回合",
-    play_step: "推进互动世界",
-    create_narrative_forecast: "剧情多线推演",
-    get_narrative_forecast: "核验剧情推演",
-    select_narrative_branch: "采用候选分支",
+    read: "",
+    edit: "",
+    grep: "",
+    ls: "",
+    propose_action: "",
+    short_fiction_run: "",
+    generate_cover: "",
+    play_edit: "",
+    play_start: "",
+    play_revise: "",
+    play_step: "",
+    create_narrative_forecast: "",
+    get_narrative_forecast: "",
+    select_narrative_branch: "",
   };
 
   const messages: InteractionMessage[] = [];

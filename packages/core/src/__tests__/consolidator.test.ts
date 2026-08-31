@@ -12,11 +12,11 @@ describe("ConsolidatorAgent", () => {
     const outline = [
       "# Volume Outline",
       "",
-      "### 第一卷：死而复生的实习期（1-20章）",
-      "- 主角重返公司，卷入第一起异常事故",
+      "### Chương mock_text：mock_text（1-20mock_text）",
+      "- mock_text，mock_textChương mock_text",
       "",
-      "### 第二卷：时间线上的猎手（21-60章）",
-      "- 追查时间裂隙背后的操控者",
+      "### Chương mock_text：mock_text（21-60mock_text）",
+      "- mock_text",
       "",
     ].join("\n");
 
@@ -25,8 +25,8 @@ describe("ConsolidatorAgent", () => {
     }).parseVolumeBoundaries(outline);
 
     expect(boundaries).toEqual([
-      { name: "第一卷：死而复生的实习期", startCh: 1, endCh: 20 },
-      { name: "第二卷：时间线上的猎手", startCh: 21, endCh: 60 },
+      { name: "Chương mock_text：mock_text", startCh: 1, endCh: 20 },
+      { name: "Chương mock_text：mock_text", startCh: 21, endCh: 60 },
     ]);
   });
 });

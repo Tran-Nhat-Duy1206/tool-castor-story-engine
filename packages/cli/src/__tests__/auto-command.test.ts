@@ -44,7 +44,7 @@ vi.mock("../localization.js", () => ({
 function chapterResult(chapterNumber: number, status = "ready-for-review") {
   return {
     chapterNumber,
-    title: `第${chapterNumber}章`,
+    title: `test_mock${chapterNumber}test_mock`,
     wordCount: 3000,
     auditResult: { passed: true, issues: [], summary: "ok" },
     revised: false,

@@ -77,7 +77,7 @@ describe("ArchitectAgent", () => {
     const messages = chat.mock.calls[0]?.[0] as Array<{ role: string; content: string }>;
     expect(messages[0]?.content).toContain("MUST be written in English");
     expect(messages[1]?.content).toContain("Generate the complete foundation");
-    expect(messages[1]?.content).not.toContain("请从中反向推导");
+    expect(messages[1]?.content).not.toContain("mock_text");
   });
 
   it("does not embed Chinese section headings in imported English foundation prompts", async () => {
@@ -145,8 +145,8 @@ describe("ArchitectAgent", () => {
     // import prompt must not slip Chinese section headers into the system text.
     expect(messages[0]?.content).toContain("story_frame");
     expect(messages[0]?.content).toContain("volume_map");
-    expect(messages[0]?.content).not.toContain("## 01_世界观");
-    expect(messages[0]?.content).not.toContain("## 叙事视角");
+    expect(messages[0]?.content).not.toContain("## 01_mock_text");
+    expect(messages[0]?.content).not.toContain("## mock_text");
   });
 
   it("embeds reviewer feedback into original foundation regeneration prompts", async () => {
@@ -168,7 +168,7 @@ describe("ArchitectAgent", () => {
 
     const book: BookConfig = {
       id: "review-feedback-book",
-      title: "雾港回灯",
+      title: "mock_text",
       platform: "tomato",
       genre: "urban",
       status: "active",
@@ -183,10 +183,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
@@ -194,10 +194,10 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "# 待回收伏笔",
+          "# mock_text",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
@@ -205,13 +205,13 @@ describe("ArchitectAgent", () => {
     await agent.generateFoundation(
       book,
       undefined,
-      "请把核心冲突收紧，并明确新空间不是旧案重演。",
+      "mock_text，mock_text。",
     );
 
     const messages = chat.mock.calls[0]?.[0] as Array<{ role: string; content: string }>;
-    expect(messages[0]?.content).toContain("上一轮审核反馈");
-    expect(messages[0]?.content).toContain("请把核心冲突收紧");
-    expect(messages[0]?.content).toContain("明确新空间不是旧案重演");
+    expect(messages[0]?.content).toContain("mock_text");
+    expect(messages[0]?.content).toContain("mock_text");
+    expect(messages[0]?.content).toContain("mock_text");
   });
 
   it("embeds reviewer feedback into fanfic foundation regeneration prompts", async () => {
@@ -233,7 +233,7 @@ describe("ArchitectAgent", () => {
 
     const book: BookConfig = {
       id: "fanfic-review-feedback-book",
-      title: "三体：回声舱",
+      title: "mock_text：mock_text",
       platform: "tomato",
       genre: "other",
       status: "active",
@@ -248,10 +248,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
@@ -259,25 +259,25 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "# 待回收伏笔",
+          "# mock_text",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
     await agent.generateFanficFoundation(
       book,
-      "# 原作正典\n- 罗辑在面壁计划中留下了一处空档。",
+      "# mock_text\n- mock_text。",
       "canon",
-      "请明确分岔点，并用原创冲突替代原作重走。",
+      "mock_text，mock_text。",
     );
 
     const messages = chat.mock.calls[0]?.[0] as Array<{ role: string; content: string }>;
-    expect(messages[0]?.content).toContain("上一轮审核反馈");
-    expect(messages[0]?.content).toContain("请明确分岔点");
-    expect(messages[0]?.content).toContain("原创冲突替代原作重走");
+    expect(messages[0]?.content).toContain("mock_text");
+    expect(messages[0]?.content).toContain("mock_text");
+    expect(messages[0]?.content).toContain("mock_text");
   });
 
   it("strips assistant-style trailing coda from the final pending hooks section", async () => {
@@ -299,7 +299,7 @@ describe("ArchitectAgent", () => {
 
     const book: BookConfig = {
       id: "zh-book",
-      title: "雾港回灯",
+      title: "mock_text",
       platform: "other",
       genre: "other",
       status: "active",
@@ -314,10 +314,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
@@ -325,15 +325,15 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| H01 | 1 | 主线 | 未开启 | 无 | 10章 | 主线核心钩子 |",
+          "| H01 | 1 | mock_text | mock_text | mock_text | 10mock_text | mock_text |",
           "",
-          "如果你愿意，我下一步可以继续为这本《雾港回灯》输出：",
-          "1. 前10章逐章细纲",
+          "mock_text，mock_text《mock_text》mock_text：",
+          "1. mock_text10mock_text",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
@@ -343,10 +343,10 @@ describe("ArchitectAgent", () => {
     // Phase 7 + hotfixes 1/2: ledger renders extended columns — depends_on,
     // pays_off_in_arc, core_hook, half_life (empty when not specified), and
     // promoted (computed at architect time). This hook has no promotion rule
-    // firing (core=否, no depends_on, in-volume payoff) so 升级=否.
-    expect(result.pendingHooks).toContain("| H01 | 1 | 主线 | 未开启 | 0 | 10章 | 中程 | 无 |  | 否 |  | 否 | 主线核心钩子 |");
-    expect(result.pendingHooks).not.toContain("如果你愿意");
-    expect(result.pendingHooks).not.toContain("前10章逐章细纲");
+    // firing (core=mock_text, no depends_on, in-volume payoff) so mock_text=mock_text.
+    expect(result.pendingHooks).toContain("| H01 | 1 | mock_text | mock_text | 0 | 10mock_text | mock_text | mock_text |  | mock_text |  | mock_text | mock_text |");
+    expect(result.pendingHooks).not.toContain("mock_text");
+    expect(result.pendingHooks).not.toContain("mock_text10mock_text");
   });
 
   it("normalizes architect pending hooks into runtime-compatible numeric progress columns", async () => {
@@ -368,7 +368,7 @@ describe("ArchitectAgent", () => {
 
     const book: BookConfig = {
       id: "zh-book",
-      title: "凌晨三点的证词",
+      title: "mock_text",
       platform: "tomato",
       genre: "urban",
       status: "active",
@@ -383,10 +383,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
@@ -394,19 +394,19 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| H13 | 22 | 舆情操盘 | 待推进 | 一家自媒体公司在多个旧案节点同步接单 | 51-60章 | 庄蔓出场后逐步揭露 |",
+          "| H13 | 22 | mock_text | mock_text | mock_text | 51-60mock_text | mock_text |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
     const result = await agent.generateFoundation(book);
 
-    expect(result.pendingHooks).toContain("| H13 | 22 | 舆情操盘 | 待推进 | 0 | 51-60章 | 中程 | 无 |  | 否 |  | 否 | 庄蔓出场后逐步揭露（初始线索：一家自媒体公司在多个旧案节点同步接单） |");
+    expect(result.pendingHooks).toContain("| H13 | 22 | mock_text | mock_text | 0 | 51-60mock_text | mock_text | mock_text |  | mock_text |  | mock_text | mock_text（mock_text：mock_text） |");
   });
 
   it("keeps chapter-zero seed hooks dormant even when the model labels them open", async () => {
@@ -428,7 +428,7 @@ describe("ArchitectAgent", () => {
 
     const book: BookConfig = {
       id: "seed-book",
-      title: "地下站台",
+      title: "mock_text",
       platform: "tomato",
       genre: "urban",
       status: "active",
@@ -443,36 +443,36 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_frame ===",
-          "# 故事框架",
-          "主角在地下站台追查失踪案。",
+          "# mock_text",
+          "mock_text。",
           "",
           "=== SECTION: volume_map ===",
-          "# 卷纲",
-          "第一卷追出站台背后的旧案。",
+          "# mock_text",
+          "Chương mock_text。",
           "",
           "=== SECTION: roles ===",
           "---ROLE---",
           "tier: major",
-          "name: 林渡",
+          "name: mock_text",
           "---CONTENT---",
-          "## 当前现状",
-          "他在站台值夜班。",
+          "## mock_text",
+          "mock_text。",
           "",
           "=== SECTION: book_rules ===",
-          "## 主角",
-          "- 名字：林渡",
+          "## mock_text",
+          "- mock_text từ：mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 上游依赖 | 回收卷 | 核心 | 半衰期 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| H00 | 0 | 初始状态 | open | 0 | 终局揭开站台旧案 | 慢烧 | 无 | 终卷 | false |  | 站台广播会在无人时自动报出失踪者名字 |",
+          "| H00 | 0 | mock_text | open | 0 | mock_text | mock_text | mock_text | mock_text | false |  | mock_text từ |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
     const result = await agent.generateFoundation(book);
 
-    expect(result.pendingHooks).toContain("| H00 | 0 | 初始状态 | 暂缓 | 0 | 终局揭开站台旧案 | 慢烧 | 无 | 终卷 | 否 |  | 否 | 站台广播会在无人时自动报出失踪者名字 |");
+    expect(result.pendingHooks).toContain("| H00 | 0 | mock_text | tạm hoãn | 0 | mock_text | mock_text | mock_text | mock_text | mock_text |  | mock_text | mock_text từ |");
   });
 
   it("accepts section labels with spacing and punctuation drift from non-strict models", async () => {
@@ -494,7 +494,7 @@ describe("ArchitectAgent", () => {
 
     const book: BookConfig = {
       id: "format-drift-book",
-      title: "格式漂移测试",
+      title: "mock_textTest",
       platform: "other",
       genre: "other",
       status: "active",
@@ -509,10 +509,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== Section：Story Bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== section: Volume Outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book-rules ===",
           "---",
@@ -520,23 +520,23 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION : current state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| H01 | 1 | mystery | open | 0 | 10章 | 初始钩子 |",
+          "| H01 | 1 | mystery | open | 0 | 10mock_text | mock_text |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
     const result = await agent.generateFoundation(book);
 
-    expect(result.storyBible).toBe("# 故事圣经");
-    expect(result.volumeOutline).toBe("# 卷纲");
+    expect(result.storyBible).toBe("# mock_text");
+    expect(result.volumeOutline).toBe("# mock_text");
     expect(result.bookRules).toContain("version: \"1.0\"");
-    expect(result.currentState).toBe("# 当前状态");
-    expect(result.pendingHooks).toContain("| H01 | 1 | mystery | 暂缓 | 0 | 10章 | 中程 | 无 |  | 否 |  | 否 | 初始钩子 |");
+    expect(result.currentState).toBe("# mock_text");
+    expect(result.pendingHooks).toContain("| H01 | 1 | mystery | tạm hoãn | 0 | 10mock_text | mock_text | mock_text |  | mock_text |  | mock_text | mock_text |");
   });
 
   it("throws when a required foundation section is missing", async () => {
@@ -573,16 +573,16 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "# 伏笔池",
+          "# mock_text",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
@@ -624,10 +624,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
@@ -635,12 +635,12 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| H01 | 1 | mystery | open | 0 | 10章 | 初始钩子 |",
+          "| H01 | 1 | mystery | open | 0 | 10mock_text | mock_text |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
@@ -686,10 +686,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
@@ -697,17 +697,17 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| H01 | 1 | mystery | open | 0 | 10章 | 初始钩子 |",
+          "| H01 | 1 | mystery | open | 0 | 10mock_text | mock_text |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
-    await agent.generateFoundationFromImport(book, "第一章正文");
+    await agent.generateFoundationFromImport(book, "Chương mock_text");
 
     const options = chatSpy.mock.calls[0]?.[1] as { temperature?: number; maxTokens?: number } | undefined;
     expect(options).toEqual(expect.objectContaining({ temperature: 0.5 }));
@@ -748,10 +748,10 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_bible ===",
-          "# 故事圣经",
+          "# mock_text",
           "",
           "=== SECTION: volume_outline ===",
-          "# 卷纲",
+          "# mock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
@@ -759,29 +759,29 @@ describe("ArchitectAgent", () => {
           "---",
           "",
           "=== SECTION: current_state ===",
-          "# 当前状态",
+          "# mock_text",
           "",
           "=== SECTION: pending_hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| H01 | 1 | mystery | open | 0 | 10章 | 初始钩子 |",
+          "| H01 | 1 | mystery | open | 0 | 10mock_text | mock_text |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
-    await agent.generateFanficFoundation(book, "正典文本", "canon");
+    await agent.generateFanficFoundation(book, "mock_text", "canon");
 
     const options = chatSpy.mock.calls[0]?.[1] as { temperature?: number; maxTokens?: number } | undefined;
     expect(options).toEqual(expect.objectContaining({ temperature: 0.7 }));
     expect(options).not.toHaveProperty("maxTokens");
   });
 
-  // ---- Phase 5 段落式架构稿专项 ----
+  // ---- Phase 5 mock_text ----
 
-  // 测试 stub：chat 会被 vi.spyOn 拦截，client.defaults 运行时不会被读取。
-  // 故意不填 temperature / maxTokens 等数字——避免在测试里留下"推荐配置"的
-  // 错误示范（maxTokens 填错会误导后续抄到生产，触发 CLAUDE.md 禁止的
-  // maxTokens 回归）。只保留类型要求的身份字段。
+  // Test stub：chat mock_text vi.spyOn mock_text，client.defaults mock_text。
+  // mock_text temperature / maxTokens mock_text từ——mock_textTestmock_text"mock_text"mock_text
+  // mock_text（maxTokens mock_text，mock_text CLAUDE.md mock_text
+  // maxTokens mock_text）。mock_text từmock_text。
   const buildPhase5Agent = (): ArchitectAgent =>
     new ArchitectAgent({
       client: {
@@ -795,7 +795,7 @@ describe("ArchitectAgent", () => {
 
   const phase5Book = (): BookConfig => ({
     id: "phase5-book",
-    title: "测试书",
+    title: "Testmock_text",
     platform: "qidian",
     genre: "xuanhuan",
     status: "active",
@@ -814,53 +814,53 @@ describe("ArchitectAgent", () => {
       .mockResolvedValue({
         content: [
           "=== SECTION: story_frame ===",
-          "## 主题与基调",
-          "段落 1 主题段落。",
+          "## mock_text",
+          "mock_text 1 mock_text。",
           "",
-          "## 核心冲突",
-          "段落 2 冲突段落。",
+          "## mock_text",
+          "mock_text 2 mock_text。",
           "",
           "=== SECTION: volume_map ===",
-          "## 段 1",
-          "卷一段落。",
+          "## mock_text 1",
+          "mock_text。",
           "",
           "=== SECTION: roles ===",
           "---ROLE---",
           "tier: major",
-          "name: 林辞",
+          "name: mock_text",
           "---CONTENT---",
-          "## 核心标签",
-          "冷静、执着",
+          "## mock_text",
+          "mock_text、mock_text",
           "",
           "---ROLE---",
           "tier: minor",
-          "name: 配角A",
+          "name: mock_textA",
           "---CONTENT---",
-          "次要角色描写",
+          "minormock_text",
           "",
           "=== SECTION: book_rules ===",
           "---",
           "version: \"1.0\"",
           "protagonist:",
-          "  name: 林辞",
+          "  name: mock_text",
           "---",
           "",
           "=== SECTION: pending_hooks ===",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "|---|---|---|---|---|---|---|---|",
-          "| H001 | 1 | 主线 | open | 0 | 3 | 近期 | 初始线索 |",
+          "| H001 | 1 | mock_text | open | 0 | 3 | mock_text | mock_text |",
         ].join("\n"),
         usage: ZERO_USAGE,
       });
 
     const output = await agent.generateFoundation(book);
 
-    expect(output.storyFrame).toContain("主题与基调");
-    expect(output.volumeMap).toContain("段 1");
+    expect(output.storyFrame).toContain("mock_text");
+    expect(output.volumeMap).toContain("mock_text 1");
     expect(output.roles).toBeDefined();
     expect(output.roles!.length).toBe(2);
-    expect(output.roles![0]).toMatchObject({ tier: "major", name: "林辞" });
-    expect(output.roles![1]).toMatchObject({ tier: "minor", name: "配角A" });
+    expect(output.roles![0]).toMatchObject({ tier: "major", name: "mock_text" });
+    expect(output.roles![1]).toMatchObject({ tier: "minor", name: "mock_textA" });
   });
 
   it("writeFoundationFiles writes outline/ and roles/ when Phase 5 fields present", async () => {
@@ -877,19 +877,19 @@ describe("ArchitectAgent", () => {
         bookRules: "---\nversion: \"1.0\"\n---\n",
         currentState: "",
         pendingHooks: "| hook_id |",
-        storyFrame: "## 主题\n\n段落内容",
-        volumeMap: "## 卷一\n\n卷一段落",
+        storyFrame: "## mock_text\n\nmock_text",
+        volumeMap: "## mock_text\n\nmock_text",
         roles: [
-          { tier: "major", name: "林辞", content: "主角描写" },
-          { tier: "minor", name: "配角A", content: "配角描写" },
+          { tier: "major", name: "mock_text", content: "mock_text" },
+          { tier: "minor", name: "mock_textA", content: "mock_text" },
         ],
       }, false, "vi");
 
       await expect(access(join(tmpDir, "story", "outline", "story_frame.md"))).resolves.not.toThrow();
       await expect(access(join(tmpDir, "story", "outline", "volume_map.md"))).resolves.not.toThrow();
-      await expect(access(join(tmpDir, "story", "roles", "主要角色", "林辞.md"))).resolves.not.toThrow();
-      await expect(access(join(tmpDir, "story", "roles", "次要角色", "配角A.md"))).resolves.not.toThrow();
-      // Shim 文件也要在（向后兼容读取点用）
+      await expect(access(join(tmpDir, "story", "roles", "major", "mock_text.md"))).resolves.not.toThrow();
+      await expect(access(join(tmpDir, "story", "roles", "minor", "mock_textA.md"))).resolves.not.toThrow();
+      // Shim mock_text（mock_text）
       await expect(access(join(tmpDir, "story", "story_bible.md"))).resolves.not.toThrow();
       await expect(access(join(tmpDir, "story", "character_matrix.md"))).resolves.not.toThrow();
       await expect(access(join(tmpDir, "story", "book_rules.md"))).resolves.not.toThrow();
@@ -916,7 +916,7 @@ describe("ArchitectAgent", () => {
 
       const storyBible = await readFile(join(tmpDir, "story", "story_bible.md"), "utf-8");
       expect(storyBible).toContain("Legacy Story Bible");
-      // outline/ 目录是创建的但里面没 story_frame.md
+      // outline/ mock_text story_frame.md
       await expect(access(join(tmpDir, "story", "outline", "story_frame.md"))).rejects.toThrow();
     } finally {
       await rm(tmpDir, { recursive: true, force: true });

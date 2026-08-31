@@ -22,7 +22,7 @@ vi.mock("@actalk/castor-core", async () => {
     async writeNextChapter(_bookId: string) {
       return {
         chapterNumber: 1,
-        title: "雨夜",
+        title: "test_mock",
         wordCount: 1200,
         status: "ready-for-review",
       };
@@ -80,10 +80,10 @@ describe("tui agent session bridge", () => {
 
   it("runs agent chat and persists raw assistant output into the tui session", async () => {
     runAgentSessionMock.mockResolvedValue({
-      responseText: "这是 agent 直接返回的回复。",
+      responseText: "test_mock agent test_mock。",
       messages: [
-        { role: "user", content: "帮我整理这一章" },
-        { role: "assistant", content: "这是 agent 直接返回的回复。", thinking: "internal" },
+        { role: "user", content: "test_mock" },
+        { role: "assistant", content: "test_mock agent test_mock。", thinking: "internal" },
       ],
     });
 
@@ -92,14 +92,14 @@ describe("tui agent session bridge", () => {
       ...createProjectSession(projectRoot),
       activeBookId: "harbor",
       messages: [
-        { role: "user" as const, content: "旧问题", timestamp: 1 },
-        { role: "assistant" as const, content: "旧回答", timestamp: 2 },
+        { role: "user" as const, content: "test_mock", timestamp: 1 },
+        { role: "assistant" as const, content: "test_mock", timestamp: 2 },
       ],
     };
 
     const result = await processTuiAgentInput({
       projectRoot,
-      input: "帮我整理这一章",
+      input: "test_mock",
       session,
       activeBookId: "harbor",
     });
@@ -110,35 +110,35 @@ describe("tui agent session bridge", () => {
         bookId: "harbor",
         projectRoot,
       }),
-      "帮我整理这一章",
+      "test_mock",
       [
-        { role: "user", content: "旧问题" },
-        { role: "assistant", content: "旧回答" },
+        { role: "user", content: "test_mock" },
+        { role: "assistant", content: "test_mock" },
       ],
     );
-    expect(result.responseText).toBe("这是 agent 直接返回的回复。");
+    expect(result.responseText).toBe("test_mock agent test_mock。");
     expect(result.session.messages.at(-1)).toEqual(expect.objectContaining({
       role: "assistant",
-      content: "这是 agent 直接返回的回复。",
+      content: "test_mock agent test_mock。",
       thinking: "internal",
     }));
 
     const persisted = await loadProjectSession(projectRoot);
     expect(persisted.messages.at(-1)).toEqual(expect.objectContaining({
       role: "assistant",
-      content: "这是 agent 直接返回的回复。",
+      content: "test_mock agent test_mock。",
     }));
   });
 
   it("stores the created book from architect tool results as the active TUI book", async () => {
     runAgentSessionMock.mockResolvedValue({
-      responseText: "《夜港》已创建成功。",
+      responseText: "《test_mock》test_mock。",
       messages: [
         {
           role: "toolResult",
-          details: { kind: "book_created", bookId: "night-harbor", title: "夜港" },
+          details: { kind: "book_created", bookId: "night-harbor", title: "test_mock" },
         },
-        { role: "assistant", content: "《夜港》已创建成功。" },
+        { role: "assistant", content: "《test_mock》test_mock。" },
       ],
     });
 
@@ -147,7 +147,7 @@ describe("tui agent session bridge", () => {
 
     const result = await processTuiAgentInput({
       projectRoot,
-      input: "创建《夜港》",
+      input: "test_mock《test_mock》",
       session,
     });
 
@@ -158,9 +158,9 @@ describe("tui agent session bridge", () => {
 
   it("keeps ordinary creation language in chat so the agent can propose a confirmed action", async () => {
     runAgentSessionMock.mockResolvedValue({
-      responseText: "我理解你想创建《雾灯小巷》，请确认后我再建书。",
+      responseText: "test_mock《test_mock》，test_mock。",
       messages: [
-        { role: "assistant", content: "我理解你想创建《雾灯小巷》，请确认后我再建书。" },
+        { role: "assistant", content: "test_mock《test_mock》，test_mock。" },
       ],
     });
     const { processTuiAgentInput } = await import("../tui/agent-input.js");
@@ -168,7 +168,7 @@ describe("tui agent session bridge", () => {
 
     const result = await processTuiAgentInput({
       projectRoot,
-      input: "创建一本10章中文都市悬疑短篇，标题《雾灯小巷》，目标平台番茄，每章约1200字。信息足够，请直接建书。",
+      input: "test_mock10test_mockDo thiHuyen bitest_mock，test_mock《test_mock》，test_mock，test_mock1200 từ。test_mock，test_mock。",
       session,
     });
 
@@ -177,55 +177,55 @@ describe("tui agent session bridge", () => {
         sessionKind: "chat",
         actionSource: "free-text",
       }),
-      expect.stringContaining("雾灯小巷"),
+      expect.stringContaining("test_mock"),
       [],
     );
     expect(result.session.activeBookId).toBeUndefined();
-    expect(result.responseText).toContain("请确认");
+    expect(result.responseText).toContain("test_mock");
     const persisted = await loadProjectSession(projectRoot);
     expect(persisted.activeBookId).toBeUndefined();
   });
 
   it("uses explicit slash entries to select book, short, and play surfaces without parsing free text", async () => {
     runAgentSessionMock.mockResolvedValue({
-      responseText: "先讨论并确认方向。",
-      messages: [{ role: "assistant", content: "先讨论并确认方向。" }],
+      responseText: "test_mock。",
+      messages: [{ role: "assistant", content: "test_mock。" }],
     });
     const { processTuiAgentInput } = await import("../tui/agent-input.js");
 
     const withBook = { ...createProjectSession(projectRoot), activeBookId: "old-book" };
     const newBook = await processTuiAgentInput({
       projectRoot,
-      input: "/new 一部海港悬疑长篇",
+      input: "/new test_mockHuyen bitest_mock",
       session: withBook,
       activeBookId: "old-book",
     });
     expect(runAgentSessionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({ bookId: null, sessionKind: "book-create", actionSource: "slash" }),
-      "一部海港悬疑长篇",
+      "test_mockHuyen bitest_mock",
       [],
     );
     expect(newBook.session.activeBookId).toBeUndefined();
 
     await processTuiAgentInput({
       projectRoot,
-      input: "/short 婚姻背叛后的证据反杀",
+      input: "/short test_mock",
       session: createProjectSession(projectRoot),
     });
     expect(runAgentSessionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({ bookId: null, sessionKind: "short", actionSource: "slash" }),
-      "婚姻背叛后的证据反杀",
+      "test_mock",
       [],
     );
 
     await processTuiAgentInput({
       projectRoot,
-      input: "/play open 雨夜便利店里时间停止",
+      input: "/play open test_mock",
       session: createProjectSession(projectRoot),
     });
     expect(runAgentSessionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({ bookId: null, sessionKind: "play", playMode: "open" }),
-      "雨夜便利店里时间停止",
+      "test_mock",
       [],
     );
   });
@@ -239,13 +239,13 @@ describe("tui agent session bridge", () => {
           kind: "proposed_action",
           action: "interactive_film_create",
           targetSessionKind: "interactive-film",
-          title: "创建互动影游",
-          summary: "确认后生成项目。",
-          instruction: "把上传的故事改成三幕互动影游",
+          title: "test_mock",
+          summary: "test_mock。",
+          instruction: "test_mock",
           requestedSkills: ["interactive-film-authoring"],
           actionPayload: {
             interactiveFilmCreate: {
-              title: "回声航线",
+              title: "test_mock",
               sourcePath: ".castor/uploads/echo.md",
               episodeCount: 3,
             },
@@ -254,14 +254,14 @@ describe("tui agent session bridge", () => {
       }],
     });
     runAgentSessionMock.mockResolvedValueOnce({
-      responseText: "互动影游项目已生成。",
-      messages: [{ role: "assistant", content: "互动影游项目已生成。" }],
+      responseText: "test_mock。",
+      messages: [{ role: "assistant", content: "test_mock。" }],
     });
     const { processTuiAgentInput } = await import("../tui/agent-input.js");
 
     const proposed = await processTuiAgentInput({
       projectRoot,
-      input: "把这个故事做成互动影游",
+      input: "test_mock",
       session: createProjectSession(projectRoot),
     });
     expect(proposed.responseText).toContain("Nhập /confirm");
@@ -270,7 +270,7 @@ describe("tui agent session bridge", () => {
       targetSessionKind: "interactive-film",
       requestedSkills: ["interactive-film-authoring"],
       actionPayload: expect.objectContaining({
-        interactiveFilmCreate: expect.objectContaining({ title: "回声航线" }),
+        interactiveFilmCreate: expect.objectContaining({ title: "test_mock" }),
       }),
     }));
 
@@ -288,13 +288,13 @@ describe("tui agent session bridge", () => {
         requestedSkills: ["interactive-film-authoring"],
         actionPayload: {
           interactiveFilmCreate: {
-            title: "回声航线",
+            title: "test_mock",
             sourcePath: ".castor/uploads/echo.md",
             episodeCount: 3,
           },
         },
       }),
-      "把上传的故事改成三幕互动影游",
+      "test_mock",
       expect.any(Array),
     );
     expect(confirmed.session.pendingProposedAction).toBeUndefined();
@@ -302,13 +302,13 @@ describe("tui agent session bridge", () => {
 
   it("uses the per-session model override when resolving the model client", async () => {
     runAgentSessionMock.mockResolvedValue({
-      responseText: "已按当前模型回复。",
-      messages: [{ role: "assistant", content: "已按当前模型回复。" }],
+      responseText: "test_mock。",
+      messages: [{ role: "assistant", content: "test_mock。" }],
     });
     const { processTuiAgentInput } = await import("../tui/agent-input.js");
     await processTuiAgentInput({
       projectRoot,
-      input: "概括当前进度",
+      input: "test_mock",
       session: { ...createProjectSession(projectRoot), modelOverride: "deepseek-v4-pro" },
     });
 
@@ -348,7 +348,7 @@ describe("tui agent session bridge", () => {
       "Viết chương tiếp theo",
       [],
     );
-    expect(result.responseText).toContain("完成下一章");
+    expect(result.responseText).toContain("test_mock");
     const persisted = await loadProjectSession(projectRoot);
     expect(persisted.activeBookId).toBe("night-harbor");
   });

@@ -3,20 +3,20 @@ import { setAppLanguage } from "../lib/app-language";
 import { getGroupDescription, getGroupLabel, getGroupShortLabel } from "../constants/service-groups";
 import { getServiceQuickLinks } from "../components/ServiceQuickLinks";
 
-// 每条用例结束后恢复默认语言，避免污染其他测试。
+// mock_val，mock_valTest。
 afterEach(() => {
   setAppLanguage("vi");
 });
 
 describe("service-groups i18n", () => {
-  it("默认（vi）返回越南语标签", () => {
+  it("mock_val（vi）mock_val", () => {
     expect(getGroupLabel("overseas")).toBe("Nhà cung cấp quốc tế");
     expect(getGroupShortLabel("aggregator")).toBe("Tổng hợp");
     expect(getGroupDescription("aggregator")).toContain("một API Key");
     expect(getGroupDescription("overseas")).toBeNull();
   });
 
-  it("切换到 en 后返回英文标签", () => {
+  it("mock_val en mock_val", () => {
     setAppLanguage("en");
     expect(getGroupLabel("overseas")).toBe("International providers");
     expect(getGroupShortLabel("aggregator")).toBe("Aggregator");
@@ -25,7 +25,7 @@ describe("service-groups i18n", () => {
 });
 
 describe("service quick links i18n", () => {
-  it("默认（vi）返回越南语标签，en 分支返回英文标签，href 不变", () => {
+  it("mock_val（vi）mock_val，en mock_val，href mock_val", () => {
     const viLinks = getServiceQuickLinks("kkaiapi");
     expect(viLinks.map((l) => l.label)).toEqual(["Trang chủ", "Tài liệu API", "Mô hình & giá"]);
 

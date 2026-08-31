@@ -1,15 +1,9 @@
-/**
- * 无问芯穹 (Infini-AI / GenStudio)
- *
- * - 官网：https://cloud.infini-ai.com/
- * - 控制台 / API key：https://cloud.infini-ai.com/iam/secret
- * - API 文档：https://docs.infini-ai.com/
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const INFINIAI: ProviderEndpoint = {
   id: "infiniai",
-  label: "无问芯穹 InfiniAI",
+  label: "Infiniai InfiniAI",
   group: "aggregator",
   api: "openai-completions",
   baseUrl: "https://cloud.infini-ai.com/maas/v1",

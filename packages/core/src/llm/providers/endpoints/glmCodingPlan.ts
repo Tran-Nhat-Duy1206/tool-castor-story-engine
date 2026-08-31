@@ -1,9 +1,4 @@
-/**
- * 智谱 GLM CodingPlan
- *
- * - 官网：https://bigmodel.cn/coding-plan
- * - 订阅套餐，针对编程场景优化过的 GLM 变体。
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const GLM_CODING_PLAN: ProviderEndpoint = {

@@ -48,7 +48,7 @@ describe("castor write next review mode", () => {
     vi.clearAllMocks();
     writeNextChapterMock.mockResolvedValue({
       chapterNumber: 4,
-      title: "第四章",
+      title: "test_mock",
       wordCount: 3000,
       auditResult: { passed: true, issues: [], summary: "ok" },
       revised: false,

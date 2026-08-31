@@ -38,7 +38,7 @@ describe("getFanficDimensionConfig", () => {
     expect(config.severityOverrides.get(34)).toBe("info");
   });
 
-  it("cp mode: dim 36 (关系动态) is critical", () => {
+  it("cp mode: dim 36 (mock_text) is critical", () => {
     const config = getFanficDimensionConfig("cp");
     expect(config.severityOverrides.get(36)).toBe("critical");
   });

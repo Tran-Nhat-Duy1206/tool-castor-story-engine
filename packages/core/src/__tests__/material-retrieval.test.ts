@@ -18,15 +18,15 @@ describe("material retrieval", () => {
 
   it("returns traceable snippets from archived materials", async () => {
     await writeFile(join(root, "cold.md"), [
-      "# 冷库旧账",
+      "# mock_text",
       "",
-      "赔偿款在 0607 账页后被拆成三笔转出。",
-      "冻品走私线索藏在入库单和司机签名里。",
+      "mock_text 0607 mock_text。",
+      "mock_text。",
     ].join("\n"), "utf-8");
     await writeFile(join(root, "romance.md"), [
-      "# 恋爱线",
+      "# mock_text",
       "",
-      "女主在海边车站归还钥匙，重点是误会后的情绪修复。",
+      "mock_text，mock_text。",
     ].join("\n"), "utf-8");
 
     await ingestMaterial(root, {
@@ -41,21 +41,21 @@ describe("material retrieval", () => {
     }, { now: () => new Date("2026-07-03T00:01:00.000Z") });
 
     const results = await retrieveMaterials(root, {
-      query: "冷库 赔偿款 0607 账页",
+      query: "mock_text mock_text 0607 mock_text",
       limit: 2,
     });
 
     expect(results).toHaveLength(1);
     expect(results[0]?.title).toBe("cold");
-    expect(results[0]?.excerpt).toContain("赔偿款");
+    expect(results[0]?.excerpt).toContain("mock_text");
     expect(results[0]?.markdownPath).toMatch(/^\.castor\/materials\//);
     expect(results[0]?.charStart).toBeGreaterThanOrEqual(0);
     expect(results[0]?.charEnd).toBeGreaterThan(results[0]?.charStart ?? 0);
   });
 
   it("can filter retrieval by material purpose", async () => {
-    await writeFile(join(root, "research.md"), "现实冷库需要入库单、签收单和温控记录。", "utf-8");
-    await writeFile(join(root, "script.md"), "分镜阶段需要镜头号、景别和动作。", "utf-8");
+    await writeFile(join(root, "research.md"), "mock_text、mock_text。", "utf-8");
+    await writeFile(join(root, "script.md"), "mock_text、mock_text。", "utf-8");
 
     await ingestMaterial(root, {
       sourceKind: "file",
@@ -69,12 +69,12 @@ describe("material retrieval", () => {
     }, { now: () => new Date("2026-07-03T00:01:00.000Z") });
 
     const results = await retrieveMaterials(root, {
-      query: "镜头 分镜 动作",
+      query: "mock_text mock_text mock_text",
       purpose: "script",
       limit: 3,
     });
 
     expect(results.map((result) => result.purpose)).toEqual(["script"]);
-    expect(results[0]?.excerpt).toContain("分镜");
+    expect(results[0]?.excerpt).toContain("mock_text");
   });
 });

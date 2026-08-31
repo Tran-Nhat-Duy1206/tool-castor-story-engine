@@ -41,7 +41,7 @@ describe("interactive-film-authoring confirm flow (stubbed LLM)", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "帮我搭一个三幕结构",
+        instruction: "mock_val",
         activeBookId: bookId,
         sessionKind: "interactive-film-authoring",
         actionSource: "free-text",
@@ -51,17 +51,17 @@ describe("interactive-film-authoring confirm flow (stubbed LLM)", () => {
     expect(propose.status).toBe(200);
 
     // Step 2: confirm the proposed action → executeConfirmedProductionAction runs draft_structure
-    // stubChatCompletion returns STRUCTURE_JSON (4 nodes) when prompt mentions "骨架/nodes/结构"
+    // stubChatCompletion returns STRUCTURE_JSON (4 nodes) when prompt mentions "mock_val/nodes/mock_val"
     const confirm = await app.request("/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "搭建三幕分支结构",
+        instruction: "mock_valCau truc 3 hoi",
         activeBookId: bookId,
         sessionKind: "interactive-film-authoring",
         actionSource: "button",
         requestedIntent: "draft_structure",
-        actionPayload: { draftStructure: { instruction: "三幕分支结构", projectId: bookId } },
+        actionPayload: { draftStructure: { instruction: "Cau truc 3 hoi", projectId: bookId } },
         sessionId,
       }),
     });

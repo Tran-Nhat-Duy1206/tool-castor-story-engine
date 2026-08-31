@@ -248,7 +248,7 @@ function backfillEdges(container: unknown, eventId: string, labelToId: Map<strin
     if (!hasText(o.validFromEventId)) o.validFromEventId = eventId;
     if (!hasText(o.sourceEventId)) o.sourceEventId = eventId;
     // Relationship identity is host-owned when the model omits an id or emits a
-    // low-information fallback like "edge_持有". Otherwise multiple holdings in
+    // Core narrative engine processing.
     // one turn overwrite each other in file storage.
     if (isLowInformationEdgeId(o.id, o.type)) {
       o.id = edgeIdFromParts(o.fromId, o.type, o.toId, i);

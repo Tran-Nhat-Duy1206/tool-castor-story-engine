@@ -90,7 +90,7 @@ const BASE_RAW = {
     chapter: 15,
     facts: [
       { subject: "Elara", predicate: "age", object: "22", validFromChapter: 1, validUntilChapter: null, sourceChapter: 1 },
-      { subject: "protagonist", predicate: "当前位置", object: "东城公寓", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
+      { subject: "protagonist", predicate: "mock_text", object: "mock_text", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
     ],
   },
   hooks: { hooks: [] },
@@ -109,7 +109,7 @@ describe("computeCanonRevision (deterministic fingerprint)", () => {
       currentState: {
         facts: [
           { sourceChapter: 1, validUntilChapter: null, validFromChapter: 1, object: "22", predicate: "age", subject: "Elara" },
-          { sourceChapter: 11, validUntilChapter: null, validFromChapter: 11, object: "东城公寓", predicate: "当前位置", subject: "protagonist" },
+          { sourceChapter: 11, validUntilChapter: null, validFromChapter: 11, object: "mock_text", predicate: "mock_text", subject: "protagonist" },
         ],
         chapter: 15,
       },

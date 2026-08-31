@@ -21,8 +21,8 @@ function makeGraph(projectId: string, title: string) {
 }
 
 test.beforeAll(async () => {
-  await saveStoryGraph(E2E_ROOT, FILM_A_ID, makeGraph(FILM_A_ID, "Alpha 测试剧"));
-  await saveStoryGraph(E2E_ROOT, FILM_B_ID, makeGraph(FILM_B_ID, "Beta 测试剧"));
+  await saveStoryGraph(E2E_ROOT, FILM_A_ID, makeGraph(FILM_A_ID, "Alpha Testmock_val"));
+  await saveStoryGraph(E2E_ROOT, FILM_B_ID, makeGraph(FILM_B_ID, "Beta Testmock_val"));
 });
 
 test("sidebar lists film projects and clicking a project opens the wizard", async ({ page }) => {

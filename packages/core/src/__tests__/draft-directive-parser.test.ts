@@ -10,7 +10,7 @@ import {
 
 describe("parseDraftDirectives", () => {
   it("returns empty fields and full text when input has no directives", () => {
-    const raw = "# 欢迎\n\n这是一段普通的 markdown，没有任何表单标记。";
+    const raw = "# mock_text\n\nmock_text markdown，mock_text。";
     const result = parseDraftDirectives(raw);
 
     expect(result.fields).toEqual({});
@@ -25,20 +25,20 @@ describe("parseDraftDirectives", () => {
 
   it("extracts a single :::field block", () => {
     const raw = [
-      "请为你的小说起一个名字：",
+      "mock_text từ：",
       "",
-      ':::field{key="title" label="书名"}',
-      "星河彼岸",
+      ':::field{key="title" label="mock_text"}',
+      "mock_text",
       ":::",
       "",
-      "很好的名字！",
+      "mock_text từ！",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
 
-    expect(result.fields["title"]).toBe("星河彼岸");
+    expect(result.fields["title"]).toBe("mock_text");
     expect(result.textContent).toBe(
-      ["请为你的小说起一个名字：", "", "", "很好的名字！"].join("\n"),
+      ["mock_text từ：", "", "", "mock_text từ！"].join("\n"),
     );
     expect(result.raw).toBe(raw);
   });
@@ -49,32 +49,32 @@ describe("parseDraftDirectives", () => {
 
   it("extracts multiple fields of different types", () => {
     const raw = [
-      "以下是你的创作信息：",
+      "mock_text：",
       "",
-      ':::field{key="title" label="书名"}',
-      "星河彼岸",
+      ':::field{key="title" label="mock_text"}',
+      "mock_text",
       ":::",
       "",
-      ':::field{key="worldPremise" label="世界观" type="textarea"}',
-      "一个被星际战争撕裂的宇宙",
+      ':::field{key="worldPremise" label="mock_text" type="textarea"}',
+      "mock_text",
       ":::",
       "",
-      ':::pick{key="platform" label="目标平台"}',
-      "- 起点中文网",
-      "- 番茄小说",
-      "- 七猫",
+      ':::pick{key="platform" label="mock_text"}',
+      "- mock_text",
+      "- mock_text",
+      "- mock_text",
       ":::",
       "",
-      ':::number{key="targetChapters" label="目标章数"}',
+      ':::number{key="targetChapters" label="mock_text"}',
       "300",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
 
-    expect(result.fields["title"]).toBe("星河彼岸");
-    expect(result.fields["worldPremise"]).toBe("一个被星际战争撕裂的宇宙");
-    expect(result.fields["platform"]).toBe("起点中文网");
+    expect(result.fields["title"]).toBe("mock_text");
+    expect(result.fields["worldPremise"]).toBe("mock_text");
+    expect(result.fields["platform"]).toBe("mock_text");
     expect(result.fields["targetChapters"]).toBe("300");
   });
 
@@ -84,18 +84,18 @@ describe("parseDraftDirectives", () => {
 
   it("extracts fields nested inside a :::group", () => {
     const raw = [
-      "请确认篇幅设置：",
+      "mock_text：",
       "",
-      ':::group{label="篇幅"}',
-      ':::number{key="targetChapters" label="目标章数"}',
+      ':::group{label="mock_text"}',
+      ':::number{key="targetChapters" label="mock_text"}',
       "300",
       ":::",
-      ':::number{key="chapterLength" label="每章字数"}',
+      ':::number{key="chapterLength" label="mock_text từmock_text"}',
       "3000",
       ":::",
       ":::",
       "",
-      "确认无误！",
+      "mock_text！",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
@@ -104,7 +104,7 @@ describe("parseDraftDirectives", () => {
     expect(result.fields["chapterLength"]).toBe("3000");
     // group itself should not appear in textContent
     expect(result.textContent).toBe(
-      ["请确认篇幅设置：", "", "", "确认无误！"].join("\n"),
+      ["mock_text：", "", "", "mock_text！"].join("\n"),
     );
   });
 
@@ -114,33 +114,33 @@ describe("parseDraftDirectives", () => {
 
   it("handles mixed markdown and directives", () => {
     const raw = [
-      "# 创建新书",
+      "# mock_text",
       "",
-      "让我们开始吧。首先需要一个书名：",
+      "mock_text。mock_text：",
       "",
-      ':::field{key="title" label="书名"}',
-      "星河彼岸",
+      ':::field{key="title" label="mock_text"}',
+      "mock_text",
       ":::",
       "",
-      "好的！接下来设定你的世界观：",
+      "mock_text！mock_text：",
       "",
-      ':::field{key="worldPremise" label="世界观" type="textarea"}',
-      "宇宙分裂为光暗两域",
+      ':::field{key="worldPremise" label="mock_text" type="textarea"}',
+      "mock_text",
       ":::",
       "",
-      "让我们继续完善细节。",
+      "mock_text。",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
 
-    expect(result.fields["title"]).toBe("星河彼岸");
-    expect(result.fields["worldPremise"]).toBe("宇宙分裂为光暗两域");
-    expect(result.textContent).toContain("# 创建新书");
-    expect(result.textContent).toContain("让我们开始吧。首先需要一个书名：");
-    expect(result.textContent).toContain("好的！接下来设定你的世界观：");
-    expect(result.textContent).toContain("让我们继续完善细节。");
+    expect(result.fields["title"]).toBe("mock_text");
+    expect(result.fields["worldPremise"]).toBe("mock_text");
+    expect(result.textContent).toContain("# mock_text");
+    expect(result.textContent).toContain("mock_text。mock_text：");
+    expect(result.textContent).toContain("mock_text！mock_text：");
+    expect(result.textContent).toContain("mock_text。");
     expect(result.textContent).not.toContain(":::field");
-    expect(result.textContent).not.toContain("星河彼岸");
+    expect(result.textContent).not.toContain("mock_text");
   });
 
   // ---------------------------------------------------------------------------
@@ -149,20 +149,20 @@ describe("parseDraftDirectives", () => {
 
   it("extracts first option from :::pick as default value", () => {
     const raw = [
-      ':::pick{key="genre" label="题材"}',
-      "- 玄幻",
-      "- 仙侠",
-      "- 都市",
+      ':::pick{key="genre" label="mock_text"}',
+      "- mock_text",
+      "- mock_text",
+      "- mock_text",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
-    expect(result.fields["genre"]).toBe("玄幻");
+    expect(result.fields["genre"]).toBe("mock_text");
   });
 
   it("handles :::pick with no options gracefully", () => {
     const raw = [
-      ':::pick{key="genre" label="题材"}',
+      ':::pick{key="genre" label="mock_text"}',
       ":::",
     ].join("\n");
 
@@ -176,44 +176,44 @@ describe("parseDraftDirectives", () => {
 
   it("generates summary from field labels", () => {
     const raw = [
-      ':::field{key="title" label="书名"}',
-      "星河彼岸",
+      ':::field{key="title" label="mock_text"}',
+      "mock_text",
       ":::",
-      ':::field{key="worldPremise" label="世界观"}',
-      "一个宇宙",
+      ':::field{key="worldPremise" label="mock_text"}',
+      "mock_text",
       ":::",
-      ':::field{key="protagonist" label="主角"}',
-      "陈风",
+      ':::field{key="protagonist" label="mock_text"}',
+      "mock_text",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
-    expect(result.summary).toBe("确立了书名、世界观和主角");
+    expect(result.summary).toBe("mock_text、mock_text");
   });
 
   it("generates summary with single field", () => {
     const raw = [
-      ':::field{key="title" label="书名"}',
-      "星河彼岸",
+      ':::field{key="title" label="mock_text"}',
+      "mock_text",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
-    expect(result.summary).toBe("确立了书名");
+    expect(result.summary).toBe("mock_text");
   });
 
   it("generates summary with two fields", () => {
     const raw = [
-      ':::field{key="title" label="书名"}',
-      "星河彼岸",
+      ':::field{key="title" label="mock_text"}',
+      "mock_text",
       ":::",
-      ':::field{key="worldPremise" label="世界观"}',
-      "一个宇宙",
+      ':::field{key="worldPremise" label="mock_text"}',
+      "mock_text",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
-    expect(result.summary).toBe("确立了书名和世界观");
+    expect(result.summary).toBe("mock_text");
   });
 
   // ---------------------------------------------------------------------------
@@ -222,15 +222,15 @@ describe("parseDraftDirectives", () => {
 
   it("does not parse ::: inside fenced code blocks", () => {
     const raw = [
-      "下面是一个示例：",
+      "mock_text：",
       "",
       "```markdown",
-      ':::field{key="demo" label="示例"}',
-      "这不是真正的字段",
+      ':::field{key="demo" label="mock_text"}',
+      "mock_text từmock_text",
       ":::",
       "```",
       "",
-      "以上只是演示。",
+      "mock_text。",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
@@ -241,15 +241,15 @@ describe("parseDraftDirectives", () => {
 
   it("does not parse ::: inside indented code blocks with backtick fences", () => {
     const raw = [
-      "示例代码：",
+      "mock_text：",
       "",
       "````",
-      ':::field{key="demo" label="示例"}',
-      "不是字段",
+      ':::field{key="demo" label="mock_text"}',
+      "mock_text từmock_text",
       ":::",
       "````",
       "",
-      "结束。",
+      "mock_text。",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
@@ -263,16 +263,16 @@ describe("parseDraftDirectives", () => {
 
   it("extracts multi-line field value from textarea type", () => {
     const raw = [
-      ':::field{key="outline" label="大纲" type="textarea"}',
-      "第一卷：起源",
-      "第二卷：征途",
-      "第三卷：终局",
+      ':::field{key="outline" label="mock_text" type="textarea"}',
+      "Chương mock_text：mock_text",
+      "Chương mock_text：mock_text",
+      "Chương mock_text：mock_text",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
     expect(result.fields["outline"]).toBe(
-      "第一卷：起源\n第二卷：征途\n第三卷：终局",
+      "Chương mock_text：mock_text\nChương mock_text：mock_text\nChương mock_text：mock_text",
     );
   });
 
@@ -282,16 +282,16 @@ describe("parseDraftDirectives", () => {
 
   it("does not include group labels in summary (only leaf fields)", () => {
     const raw = [
-      ':::group{label="篇幅设置"}',
-      ':::number{key="chapterCount" label="总章数"}',
+      ':::group{label="mock_text"}',
+      ':::number{key="chapterCount" label="mock_text"}',
       "200",
       ":::",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
-    // summary should mention "总章数", not "篇幅设置"
-    expect(result.summary).toBe("确立了总章数");
+    // summary should mention "mock_text", not "mock_text"
+    expect(result.summary).toBe("mock_text");
   });
 
   // ---------------------------------------------------------------------------
@@ -300,24 +300,24 @@ describe("parseDraftDirectives", () => {
 
   it("handles single-quoted attributes", () => {
     const raw = [
-      ":::field{key='title' label='书名'}",
-      "星河彼岸",
+      ":::field{key='title' label='mock_text'}",
+      "mock_text",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
-    expect(result.fields["title"]).toBe("星河彼岸");
+    expect(result.fields["title"]).toBe("mock_text");
   });
 
   it("handles attributes with extra spaces", () => {
     const raw = [
-      ':::field{ key="title"  label="书名" }',
-      "星河彼岸",
+      ':::field{ key="title"  label="mock_text" }',
+      "mock_text",
       ":::",
     ].join("\n");
 
     const result = parseDraftDirectives(raw);
-    expect(result.fields["title"]).toBe("星河彼岸");
+    expect(result.fields["title"]).toBe("mock_text");
   });
 });
 
@@ -328,28 +328,28 @@ describe("parseDraftDirectives", () => {
 describe("createDirectiveStreamFilter", () => {
   it("passes through pure text unchanged", () => {
     const filter = createDirectiveStreamFilter();
-    expect(filter("你好世界")).toBe("你好世界");
-    expect(filter("第二段文字")).toBe("第二段文字");
+    expect(filter("mock_text")).toBe("mock_text");
+    expect(filter("Chương mock_text từ")).toBe("Chương mock_text từ");
   });
 
   it("filters out a complete directive block arriving in one chunk", () => {
     const filter = createDirectiveStreamFilter();
-    const chunk = ':::field{key="title" label="书名"}\n星河彼岸\n:::\n';
+    const chunk = ':::field{key="title" label="mock_text"}\nmock_text\n:::\n';
     expect(filter(chunk)).toBe("");
   });
 
   it("filters directive blocks arriving across multiple chunks", () => {
     const filter = createDirectiveStreamFilter();
 
-    const out1 = filter("欢迎！\n");
-    expect(out1).toBe("欢迎！\n");
+    const out1 = filter("mock_text！\n");
+    expect(out1).toBe("mock_text！\n");
 
     // directive opening arrives
-    const out2 = filter(':::field{key="title" label="书名"}\n');
+    const out2 = filter(':::field{key="title" label="mock_text"}\n');
     expect(out2).toBe("");
 
     // content inside directive
-    const out3 = filter("星河彼岸\n");
+    const out3 = filter("mock_text\n");
     expect(out3).toBe("");
 
     // directive close
@@ -357,20 +357,20 @@ describe("createDirectiveStreamFilter", () => {
     expect(out4).toBe("");
 
     // back to normal text
-    const out5 = filter("继续对话。\n");
-    expect(out5).toBe("继续对话。\n");
+    const out5 = filter("mock_text。\n");
+    expect(out5).toBe("mock_text。\n");
   });
 
   it("handles nested group directives in stream", () => {
     const filter = createDirectiveStreamFilter();
 
-    expect(filter("开始\n")).toBe("开始\n");
-    expect(filter(':::group{label="篇幅"}\n')).toBe("");
-    expect(filter(':::number{key="ch" label="章数"}\n')).toBe("");
+    expect(filter("mock_text\n")).toBe("mock_text\n");
+    expect(filter(':::group{label="mock_text"}\n')).toBe("");
+    expect(filter(':::number{key="ch" label="mock_text"}\n')).toBe("");
     expect(filter("300\n")).toBe("");
     expect(filter(":::\n")).toBe(""); // closes number
     expect(filter(":::\n")).toBe(""); // closes group
-    expect(filter("结束\n")).toBe("结束\n");
+    expect(filter("mock_text\n")).toBe("mock_text\n");
   });
 
   it("does not filter ::: inside code blocks during streaming", () => {

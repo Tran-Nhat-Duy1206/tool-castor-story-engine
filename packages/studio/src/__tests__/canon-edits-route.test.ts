@@ -55,10 +55,10 @@ const MANIFEST = {
 };
 
 const FACTS = [
-  { subject: "主角", predicate: "当前位置", object: "城南旧宅", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 },
-  { subject: "主角", predicate: "当前位置", object: "东城公寓", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
-  { subject: "主角", predicate: "主角状态", object: "带伤潜行，避开了监控网络", validFromChapter: 12, validUntilChapter: null, sourceChapter: 12 },
-  { subject: "林晚", predicate: "身份", object: "卧底记者", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val", validFromChapter: 1, validUntilChapter: 10, sourceChapter: 2 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val，mock_val", validFromChapter: 12, validUntilChapter: null, sourceChapter: 12 },
+  { subject: "mock_val", predicate: "mock_val", object: "mock_val", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 },
 ];
 
 async function seedBook(root: string, opts: { corruptState?: boolean } = {}): Promise<string> {
@@ -67,11 +67,11 @@ async function seedBook(root: string, opts: { corruptState?: boolean } = {}): Pr
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await writeFile(
     join(bookDir, "book.json"),
-    JSON.stringify({ id: BOOK_ID, title: "回声协议", language: "zh", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }),
+    JSON.stringify({ id: BOOK_ID, title: "mock_val", language: "zh", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }),
     "utf-8",
   );
   for (let chapter = 1; chapter <= 12; chapter += 1) {
-    await writeFile(join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_第${chapter}章.md`), `# 第${chapter}章\n\n正文。`, "utf-8");
+    await writeFile(join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_mock_val${chapter}mock_val.md`), `# mock_val${chapter}mock_val\n\nmock_val。`, "utf-8");
   }
   const currentState = { chapter: 12, facts: FACTS };
   const files: Record<string, unknown> = {
@@ -146,7 +146,7 @@ describe("POST /api/v1/books/:id/canon/current-state/preview", () => {
     const app = makeApp(root);
 
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/preview`, {
-      edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: "does-not-matter-for-preview",
     });
 
@@ -165,7 +165,7 @@ describe("POST /api/v1/books/:id/canon/current-state/preview", () => {
     const app = makeApp(root);
 
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/preview`, {
-      edits: [{ kind: "setFact", subject: "", predicate: "主角状态", object: "x" }],
+      edits: [{ kind: "setFact", subject: "", predicate: "mock_val", object: "x" }],
       expectedRevision: "0123456789abcdef",
     });
 
@@ -195,7 +195,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const app = makeApp(root);
 
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-      edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: revisionA,
     });
 
@@ -213,9 +213,9 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const live = JSON.parse(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8")) as {
       facts: Array<{ predicate: string; object: string; validFromChapter: number; validUntilChapter: number | null }>;
     };
-    const rows = live.facts.filter((f) => f.predicate === "主角状态");
-    expect(rows.some((r) => r.object === "伤愈复出" && r.validFromChapter === 13 && r.validUntilChapter === null)).toBe(true);
-    expect(rows.every((r) => r.object !== "带伤潜行，避开了监控网络" || r.validUntilChapter !== null)).toBe(true);
+    const rows = live.facts.filter((f) => f.predicate === "mock_val");
+    expect(rows.some((r) => r.object === "mock_val" && r.validFromChapter === 13 && r.validUntilChapter === null)).toBe(true);
+    expect(rows.every((r) => r.object !== "mock_val，mock_val" || r.validUntilChapter !== null)).toBe(true);
 
     // Head snapshot mirror refreshed inside the same transaction.
     const mirrored = await readFile(join(bookDir, "story", "snapshots", "12", "state", "current_state.json"), "utf-8");
@@ -233,8 +233,8 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     for (const bad of [
       { edits: [], expectedRevision: revisionA },
       { edits: [{ kind: "rewriteEverything" }], expectedRevision: revisionA },
-      { edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "x" }] },
-      { edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: 42 }], expectedRevision: revisionA },
+      { edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "x" }] },
+      { edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: 42 }], expectedRevision: revisionA },
     ]) {
       const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, bad);
       expect(res.status).toBe(400);
@@ -256,8 +256,8 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
 
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
       edits: [
-        { kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" },
-        { kind: "setFact", subject: "主角", predicate: "主角状态", object: "旧伤复发" },
+        { kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" },
+        { kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" },
       ],
       expectedRevision: revisionA,
     });
@@ -269,16 +269,16 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const live = JSON.parse(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8")) as {
       facts: Array<{ predicate: string; object: string; validUntilChapter: number | null }>;
     };
-    const openRows = live.facts.filter((f) => f.predicate === "主角状态" && f.validUntilChapter === null);
+    const openRows = live.facts.filter((f) => f.predicate === "mock_val" && f.validUntilChapter === null);
     expect(openRows).toHaveLength(1);
-    expect(openRows[0]?.object).toBe("旧伤复发");
+    expect(openRows[0]?.object).toBe("mock_val");
     expect(before).toBeDefined();
   });
 
   it("treats removeFact of an absent key as a pure semantic no-op (P3.1: A→A, appliedEdits=[], zero writes)", async () => {
     const app = makeApp(root);
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-      edits: [{ kind: "removeFact", subject: "不存在的人", predicate: "不存在的事" }],
+      edits: [{ kind: "removeFact", subject: "mock_val", predicate: "mock_val" }],
       expectedRevision: revisionA,
     });
     // P3.1 sequential no-op filtering: removing an unasserted key changes no
@@ -292,8 +292,8 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const live = JSON.parse(await readFile(join(bookDir, "story", "state", "current_state.json"), "utf-8")) as {
       facts: Array<{ subject?: string; predicate: string }>;
     };
-    expect(live.facts.filter((f) => f.predicate === "主角状态")).toHaveLength(1);
-    expect(live.facts.some((f) => f.subject === "不存在的人")).toBe(false);
+    expect(live.facts.filter((f) => f.predicate === "mock_val")).toHaveLength(1);
+    expect(live.facts.some((f) => f.subject === "mock_val")).toBe(false);
   });
 
   it("returns 404 book_not_found for an unknown book without creating files", async () => {
@@ -314,7 +314,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const app = makeApp(root);
 
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-      edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: "0123456789abcdef",
     });
 
@@ -329,7 +329,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
 
     // Advance the book OUTSIDE the route (simulating another writer).
     await coreCommitCanonEdits(bookDir, {
-      edits: [{ kind: "setFact", subject: "林晚", predicate: "身份", object: "自由记者" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: revisionA,
     });
     const getAfterExternal = (await app.request(`/api/v1/books/${BOOK_ID}/canon`)) as JsonRes<{ revision: string }>;
@@ -338,7 +338,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const beforeStale = await snapshotBookFiles(bookDir);
     await sleep(40);
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-      edits: [{ kind: "setFact", subject: "林晚", predicate: "身份", object: "曝光的记者" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: revisionA,
     });
 
@@ -367,7 +367,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     });
 
     const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-      edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: revisionA,
     });
 
@@ -402,7 +402,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
 
     try {
       const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-        edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+        edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
         expectedRevision: revisionA,
       });
 
@@ -416,7 +416,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
   it("serializes concurrent identical commits: exactly one wins, the other fails safely", async () => {
     const app = makeApp(root);
     const payload = {
-      edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: revisionA,
     };
 
@@ -436,7 +436,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
       facts: Array<{ predicate: string; object: string; validFromChapter: number; validUntilChapter: number | null }>;
     };
     const openWinnerRows = live.facts.filter(
-      (f) => f.predicate === "主角状态" && f.object === "伤愈复出" && f.validUntilChapter === null,
+      (f) => f.predicate === "mock_val" && f.object === "mock_val" && f.validUntilChapter === null,
     );
     expect(openWinnerRows).toHaveLength(1);
     expect(openWinnerRows[0]?.validFromChapter).toBe(13);
@@ -446,7 +446,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const app = makeApp(root);
     // First attempt conflicts (stale), second identical attempt succeeds.
     const stale = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-      edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: "0000000000000000",
     });
     expect(stale.status).toBe(409);
@@ -454,7 +454,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     const freshView = (await app.request(`/api/v1/books/${BOOK_ID}/canon`)) as JsonRes<{ revision: string }>;
     const freshRevision = ((await freshView.json()) as { revision: string }).revision;
     const retry = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-      edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+      edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
       expectedRevision: freshRevision,
     });
     expect(retry.status).toBe(200);
@@ -466,7 +466,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
     try {
       const app = makeApp(root);
       const res = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-        edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+        edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
         expectedRevision: revisionA,
       });
       expect(res.status).toBe(409);
@@ -476,7 +476,7 @@ describe("POST /api/v1/books/:id/canon/current-state/commit", () => {
       const before = await snapshotBookFiles(bookDir);
       await sleep(20);
       const previewWhileLocked = await post(app, `/api/v1/books/${BOOK_ID}/canon/current-state/commit`, {
-        edits: [{ kind: "setFact", subject: "主角", predicate: "主角状态", object: "伤愈复出" }],
+        edits: [{ kind: "setFact", subject: "mock_val", predicate: "mock_val", object: "mock_val" }],
         expectedRevision: revisionA,
       });
       expect(previewWhileLocked.status).toBe(409);

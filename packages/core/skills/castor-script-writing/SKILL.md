@@ -1,6 +1,6 @@
 ---
 name: castor-script-writing
-description: 小说、创意与大纲到可演剧本的改编方法。Used for confirmed script and short-drama production.
+description: Novel, concept, and outline adaptation into performable scripts. Used for confirmed script and short-drama production.
 ---
 # Script writing
 

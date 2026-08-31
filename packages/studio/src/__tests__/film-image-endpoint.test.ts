@@ -12,7 +12,7 @@ describe("POST /api/v1/projects/:id/nodes/:nodeId/image", () => {
   beforeEach(async () => {
     root = await mkdtemp(join(tmpdir(), "if-imgep-"));
     await mkdir(join(root, "interactive-films", "p"), { recursive: true });
-    await saveStoryGraph(root, "p", StoryGraphSchema.parse({ schemaVersion: 1, projectId: "p", title: "T", variables: [], nodes: [{ id: "s", type: "start", sceneDesc: "宫门前", choices: [] }], endings: [] }));
+    await saveStoryGraph(root, "p", StoryGraphSchema.parse({ schemaVersion: 1, projectId: "p", title: "T", variables: [], nodes: [{ id: "s", type: "start", sceneDesc: "Cong dien", choices: [] }], endings: [] }));
   });
   afterEach(async () => { await rm(root, { recursive: true, force: true }); });
 

@@ -1,6 +1,6 @@
 ---
 name: castor-story-cover
-description: 根据作品、平台与用户视觉要求设计或生成封面。Use for story-cover direction and confirmed cover generation.
+description: Visual asset and cover generation prompts and styling guidelines.
 ---
 # Story cover
 

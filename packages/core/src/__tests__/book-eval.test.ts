@@ -32,14 +32,14 @@ describe("evaluateBookQuality", () => {
     await state.saveBookConfig(book.id, book);
     await state.ensureControlDocuments(book.id);
     await state.saveChapterIndex(book.id, [
-      { number: 1, title: "第一章", status: "approved", wordCount: 1200, auditIssues: [], lengthWarnings: [], createdAt: now, updatedAt: now },
-      { number: 2, title: "第一章", status: "audit-failed", wordCount: 900, auditIssues: ["pov drift"], lengthWarnings: [], createdAt: now, updatedAt: now },
+      { number: 1, title: "Chương mock_text", status: "approved", wordCount: 1200, auditIssues: [], lengthWarnings: [], createdAt: now, updatedAt: now },
+      { number: 2, title: "Chương mock_text", status: "audit-failed", wordCount: 900, auditIssues: ["pov drift"], lengthWarnings: [], createdAt: now, updatedAt: now },
     ]);
     const bookDir = state.bookDir(book.id);
     await mkdir(join(bookDir, "chapters"), { recursive: true });
-    await writeFile(join(bookDir, "chapters", "0001_第一章.md"), "# 第一章\n\n他推开门，发现灯还亮着。", "utf-8");
-    await writeFile(join(bookDir, "chapters", "0002_第一章.md"), "# 第一章\n\n她沉默。\n\n然后转身。", "utf-8");
-    await writeFile(join(bookDir, "story", "pending_hooks.md"), "| 伏笔 | 状态 |\n| --- | --- |\n| 旧信 | 已回收 |\n", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0001_Chương mock_text.md"), "# Chương mock_text\n\nmock_text，mock_text。", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0002_Chương mock_text.md"), "# Chương mock_text\n\nmock_text。\n\nmock_text。", "utf-8");
+    await writeFile(join(bookDir, "story", "pending_hooks.md"), "| mock_text | mock_text |\n| --- | --- |\n| mock_text | mock_text |\n", "utf-8");
 
     const report = await evaluateBookQuality({ state, bookId: book.id });
 

@@ -13,11 +13,11 @@ import type { PlayReplayResult, PlayStepResult } from "../play/play-runner.js";
 import type { PlayGraphDB } from "../play/play-db-factory.js";
 
 const STEP_RESULT: PlayStepResult = {
-  sceneText: "你翻开账本，发现最后一页夹着一张旧船票。",
-  suggestedActions: ["藏起船票", "追问送账本的人"],
+  sceneText: "mock_text，mock_text。",
+  suggestedActions: ["mock_text", "mock_text"],
   action: {
     actionKind: "look",
-    intent: "查看账本",
+    intent: "mock_text",
     manner: "",
     risk: "",
     ambiguity: "",
@@ -27,7 +27,7 @@ const STEP_RESULT: PlayStepResult = {
     eventId: "evt-1",
     turn: 1,
     actionKind: "look",
-    summary: "玩家发现旧船票。",
+    summary: "mock_text。",
     entities: { upsert: [] },
     edges: { upsert: [], expire: [] },
     stateSlots: { upsert: [] },
@@ -40,9 +40,9 @@ const STEP_RESULT: PlayStepResult = {
 
 const REPLAY_RESULT: PlayReplayResult = {
   ...STEP_RESULT,
-  sceneText: "你重新翻开账本，这次先看见夹层里的红色印章。",
-  suggestedActions: ["取出红色印章", "对照账本末页"],
-  replayedInput: "我先检查账本夹层",
+  sceneText: "mock_text，mock_text。",
+  suggestedActions: ["mock_text", "mock_text"],
+  replayedInput: "mock_textKiem tra so sachmock_text",
   previousVariantId: "v-old",
   variantId: "v-new",
 };
@@ -55,8 +55,8 @@ function pipelineStub() {
 }
 
 function seedReadyGraph(db: PlayGraphDB): void {
-  db.upsertEntity({ id: "actor_player", type: "actor", label: "玩家", summary: "当前玩家。" });
-  db.upsertEntity({ id: "location_opening", type: "location", label: "开场地点", summary: "第一幕所在地点。" });
+  db.upsertEntity({ id: "actor_player", type: "actor", label: "mock_text", summary: "mock_text。" });
+  db.upsertEntity({ id: "location_opening", type: "location", label: "Mo daumock_text", summary: "Chương mock_text。" });
 }
 
 function readyRunnerFactory() {
@@ -68,7 +68,7 @@ function readyRunnerFactory() {
           eventId: "evt-0",
           turn: 0,
           actionKind: "look" as const,
-          summary: "播种开场状态。",
+          summary: "mock_textMo daumock_text。",
           entities: { upsert: [] },
           edges: { upsert: [], expire: [] },
           stateSlots: { upsert: [] },
@@ -109,11 +109,11 @@ describe("agent play tools", () => {
     const sessionId = "1700000000000-aaaa01";
     const tool = createReadyPlayStartTool(root, sessionId);
     const result = await tool.execute("tc-start", {
-      title: "雨夜茶馆",
-      premise: "玩家扮演欠债茶馆老板，雨夜有人带着账本上门。",
+      title: "mock_text",
+      premise: "mock_text，mock_text。",
       mode: "open",
-      initialScene: "雨一直下，柜台上的账本被敲了三下。",
-      suggestedActions: ["查看账本", "问来人是谁"],
+      initialScene: "mock_text，mock_text。",
+      suggestedActions: ["mock_text", "mock_text"],
     });
 
     // worldId is the sessionId — the world is bound 1:1 to this chat session.
@@ -121,51 +121,51 @@ describe("agent play tools", () => {
       kind: "play_world_started",
       worldId: sessionId,
       runId: "main",
-      title: "雨夜茶馆",
-      sceneText: "雨一直下，柜台上的账本被敲了三下。",
-      suggestedActions: ["查看账本", "问来人是谁"],
+      title: "mock_text",
+      sceneText: "mock_text，mock_text。",
+      suggestedActions: ["mock_text", "mock_text"],
     });
     const resultText = result.content[0]?.type === "text" ? result.content[0].text : "";
-    expect(resultText).toBe("雨一直下，柜台上的账本被敲了三下。");
+    expect(resultText).toBe("mock_text，mock_text。");
     expect(resultText).not.toContain("Interactive world");
     expect(resultText).not.toContain("Suggested actions");
-    expect(resultText).not.toContain("查看账本");
+    expect(resultText).not.toContain("mock_text");
 
     const store = new PlayStore(root);
     await expect(store.loadWorld(sessionId)).resolves.toMatchObject({
-      title: "雨夜茶馆",
+      title: "mock_text",
       mode: "open",
     });
     await expect(store.readTranscript(sessionId, "main")).resolves.toMatchObject([
-      { role: "assistant", content: "雨一直下，柜台上的账本被敲了三下。" },
+      { role: "assistant", content: "mock_text，mock_text。" },
     ]);
     await expect(store.readProjection(sessionId, "main", "projections/scene.md"))
-      .resolves.toContain("雨一直下");
+      .resolves.toContain("mock_text");
   });
 
   it("persists confirmed natural-language contracts from play_start", async () => {
     const sessionId = "1700000000000-contract";
     const tool = createReadyPlayStartTool(root, sessionId);
     const result = await tool.execute("tc-start-contract", {
-      title: "雾港修行录",
-      premise: "玩家是港口小宗门外门弟子，今晚要护送一只来历不明的铜匣。",
+      title: "mock_text",
+      premise: "mock_text，mock_text。",
       mode: "open",
-      worldContract: "装备只按用户定义的凡器/灵器/秘宝表达珍惜程度，不引入数值、战斗公式或游戏面板。关键角色会按自己的目标行动。",
-      visualContract: "珍惜程度通过材质、光泽、背景气氛和旁人反应体现，不要绿蓝紫橙边框。",
-      initialScene: "雨雾压着港口，铜匣在你怀里轻轻发热。",
-      suggestedActions: ["查看铜匣裂纹", "观察码头上的同门"],
+      worldContract: "mock_text/mock_text/mock_text，mock_text、mock_text。mock_text。",
+      visualContract: "mock_text、mock_text、mock_text，mock_text。",
+      initialScene: "mock_text，mock_text。",
+      suggestedActions: ["mock_text", "mock_text"],
     } as any);
 
     expect(result.details).toMatchObject({
       kind: "play_world_started",
-      worldContract: expect.stringContaining("不引入数值"),
-      visualContract: expect.stringContaining("不要绿蓝紫橙边框"),
+      worldContract: expect.stringContaining("mock_text"),
+      visualContract: expect.stringContaining("mock_text"),
     });
 
     const store = new PlayStore(root);
     await expect(store.loadWorld(sessionId)).resolves.toMatchObject({
-      worldContract: expect.stringContaining("关键角色会按自己的目标行动"),
-      visualContract: expect.stringContaining("材质、光泽"),
+      worldContract: expect.stringContaining("mock_text"),
+      visualContract: expect.stringContaining("mock_text、mock_text"),
     });
   });
 
@@ -174,29 +174,29 @@ describe("agent play tools", () => {
     const tool = createReadyPlayStartTool(root, sessionId, undefined, {
       actionPayload: {
         playStart: {
-          title: "确认卡世界",
-          premise: "确认卡里的世界设定。",
-          worldContract: "确认卡里的世界契约优先：NPC 会离场、误导和主动追问。",
-          visualContract: "确认卡里的视觉契约优先：线索可信度通过清晰度和环境危险性体现。",
-          initialScene: "确认卡里的开场。",
+          title: "mock_text",
+          premise: "mock_text。",
+          worldContract: "mock_text：NPC mock_text、mock_text。",
+          visualContract: "mock_text：mock_text。",
+          initialScene: "mock_textMo dau。",
         },
       } as any,
     });
 
     await tool.execute("tc-start-contract-payload", {
-      title: "模型临时标题",
-      premise: "模型临时设定。",
-      worldContract: "模型临时契约。",
-      visualContract: "模型临时视觉契约。",
-      initialScene: "模型临时开场。",
+      title: "mock_text",
+      premise: "mock_text。",
+      worldContract: "mock_text。",
+      visualContract: "mock_text。",
+      initialScene: "mock_textMo dau。",
     } as any);
 
     const store = new PlayStore(root);
     await expect(store.loadWorld(sessionId)).resolves.toMatchObject({
-      title: "确认卡世界",
-      premise: "确认卡里的世界设定。",
-      worldContract: expect.stringContaining("NPC 会离场"),
-      visualContract: expect.stringContaining("线索可信度"),
+      title: "mock_text",
+      premise: "mock_text。",
+      worldContract: expect.stringContaining("NPC mock_text"),
+      visualContract: expect.stringContaining("mock_text"),
     });
   });
 
@@ -204,18 +204,18 @@ describe("agent play tools", () => {
     const sessionId = "1700000000000-sug001";
     const tool = createReadyPlayStartTool(root, sessionId);
     const result = await tool.execute("tc-start-suggestions", {
-      title: "老邮局",
-      premise: "玩家在地下分拣室值夜班。",
-      initialScene: "传送带自己启动，吐出一个写着玩家姓名的旧包裹。",
+      title: "mock_text",
+      premise: "mock_text。",
+      initialScene: "mock_text，mock_text。",
       suggestedActions: [
-        { label: "拆开旧包裹", description: "检查里面到底装着什么" },
-        { action: "检查待销毁信件区的铁门" },
+        { label: "mock_text", description: "mock_text" },
+        { action: "mock_text" },
       ],
     });
 
     expect(result.details).toMatchObject({
       kind: "play_world_started",
-      suggestedActions: ["拆开旧包裹", "检查待销毁信件区的铁门"],
+      suggestedActions: ["mock_text", "mock_text"],
     });
   });
 
@@ -226,7 +226,7 @@ describe("agent play tools", () => {
         eventId: "evt-0",
         turn: 0,
         actionKind: "look" as const,
-        summary: "播种开场状态。",
+        summary: "mock_textMo daumock_text。",
         entities: { upsert: [] },
         edges: { upsert: [], expire: [] },
         stateSlots: { upsert: [] },
@@ -245,10 +245,10 @@ describe("agent play tools", () => {
     const tool = createPlayStartTool(pipelineStub(), root, sessionId, undefined, { runnerFactory });
 
     const result = await tool.execute("tc-start-seed", {
-      title: "雨夜档案",
-      premise: "玩家在县医院档案室值夜班。",
-      initialScene: "档案柜里只有一张无名婴儿照片。",
-      suggestedActions: ["检查照片背面"],
+      title: "mock_text",
+      premise: "mock_text。",
+      initialScene: "mock_text。",
+      suggestedActions: ["mock_text"],
     });
 
     expect(runnerFactory).toHaveBeenCalledWith(expect.objectContaining({
@@ -256,8 +256,8 @@ describe("agent play tools", () => {
       runId: "main",
     }));
     expect(seedOpening).toHaveBeenCalledWith({
-      sceneText: "档案柜里只有一张无名婴儿照片。",
-      suggestedActions: ["检查照片背面"],
+      sceneText: "mock_text。",
+      suggestedActions: ["mock_text"],
     });
     expect(result.details).toMatchObject({
       kind: "play_world_started",
@@ -270,9 +270,9 @@ describe("agent play tools", () => {
     const tool = createPlayStartTool(null, root, sessionId);
 
     await expect(tool.execute("tc-start-no-pipeline", {
-      title: "不能伪成功的世界",
-      premise: "没有模型管线时不应创建。",
-      initialScene: "这段文字不能被当成成功产物。",
+      title: "mock_text",
+      premise: "mock_text。",
+      initialScene: "mock_text từmock_text。",
     })).rejects.toThrow("pipeline");
     await expect(new PlayStore(root).loadWorld(sessionId)).resolves.toBeNull();
   });
@@ -286,7 +286,7 @@ describe("agent play tools", () => {
             eventId: "evt-0",
             turn: 0,
             actionKind: "look" as const,
-            summary: "模型没有提交任何实体。",
+            summary: "mock_text。",
             entities: { upsert: [] },
             edges: { upsert: [], expire: [] },
             stateSlots: { upsert: [] },
@@ -300,10 +300,10 @@ describe("agent play tools", () => {
     });
 
     await expect(tool.execute("tc-start-empty-graph", {
-      title: "空图谱世界",
-      premise: "播种失败不能广播成功。",
-      initialScene: "门外有人敲了三下。",
-    })).rejects.toThrow("没有生成可用的玩家与世界图谱");
+      title: "mock_text",
+      premise: "mock_text。",
+      initialScene: "mock_text。",
+    })).rejects.toThrow("mock_text");
     await expect(new PlayStore(root).loadWorld(sessionId)).resolves.toBeNull();
   });
 
@@ -332,9 +332,9 @@ describe("agent play tools", () => {
     });
 
     await tool.execute("tc-start-abort-scope", {
-      title: "雨夜档案",
-      premise: "玩家在县医院档案室值夜班。",
-      initialScene: "档案柜里只有一张无名婴儿照片。",
+      title: "mock_text",
+      premise: "mock_text。",
+      initialScene: "mock_text。",
     }, controller.signal);
 
     expect(runWithAgentContext).toHaveBeenCalledWith(
@@ -347,8 +347,8 @@ describe("agent play tools", () => {
     cancelled.abort();
     const cancelledTool = createPlayStartTool(pipeline as never, root, cancelledSessionId);
     await expect(cancelledTool.execute("tc-start-aborted", {
-      title: "不应创建",
-      premise: "这个世界不应在取消后落盘。",
+      title: "mock_text",
+      premise: "mock_text。",
     }, cancelled.signal)).rejects.toThrow();
     await expect(new PlayStore(root).loadWorld(cancelledSessionId)).resolves.toBeNull();
   });
@@ -358,18 +358,18 @@ describe("agent play tools", () => {
     const store = new PlayStore(root);
     await store.createWorld({
       id: sessionId,
-      title: "雨夜茶馆",
-      premise: "玩家扮演茶馆老板。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "open",
     });
     await store.ensureRun(sessionId, "main");
-    await store.writeProjection(sessionId, "main", "projections/scene.md", "柜台上有一本潮湿账本。\n");
+    await store.writeProjection(sessionId, "main", "projections/scene.md", "mock_text。\n");
 
     const runnerFactory = vi.fn(() => ({ step: vi.fn(async () => STEP_RESULT) }));
     const tool = createPlayStepTool(pipelineStub(), root, sessionId, { runnerFactory });
 
     const result = await tool.execute("tc-step", {
-      input: "我翻开账本看最后一页",
+      input: "mock_text",
     });
 
     expect(runnerFactory).toHaveBeenCalledWith(expect.objectContaining({
@@ -380,7 +380,7 @@ describe("agent play tools", () => {
       kind: "play_turn_advanced",
       worldId: sessionId,
       runId: "main",
-      sceneText: "你翻开账本，发现最后一页夹着一张旧船票。",
+      sceneText: "mock_text，mock_text。",
     });
   });
 
@@ -389,8 +389,8 @@ describe("agent play tools", () => {
     const store = new PlayStore(root);
     await store.createWorld({
       id: sessionId,
-      title: "雾港",
-      premise: "玩家追查失踪的引航员。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "open",
     });
     await store.ensureRun(sessionId, "main");
@@ -410,7 +410,7 @@ describe("agent play tools", () => {
       runnerFactory: () => ({ step: vi.fn(async () => STEP_RESULT) }),
     });
 
-    const result = await tool.execute("tc-step-skilled", { input: "检查码头绳结" });
+    const result = await tool.execute("tc-step-skilled", { input: "mock_text" });
 
     expect(pipeline.runWithAgentContext).toHaveBeenCalledWith(
       { signal: undefined, activatedSkills: [playSkill] },
@@ -427,8 +427,8 @@ describe("agent play tools", () => {
     const store = new PlayStore(root);
     await store.createWorld({
       id: sessionId,
-      title: "雨夜茶馆",
-      premise: "玩家扮演茶馆老板。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "open",
     });
     await store.ensureRun(sessionId, "main");
@@ -440,20 +440,20 @@ describe("agent play tools", () => {
 
     const result = await tool.execute("tc-revise", {
       action: "edit_last_input",
-      input: "我先检查账本夹层",
+      input: "mock_textKiem tra so sachmock_text",
     });
 
     expect(runnerFactory).toHaveBeenCalledWith(expect.objectContaining({
       worldId: sessionId,
       runId: "main",
     }));
-    expect(regenerateLastTurn).toHaveBeenCalledWith("我先检查账本夹层");
+    expect(regenerateLastTurn).toHaveBeenCalledWith("mock_textKiem tra so sachmock_text");
     expect(result.details).toMatchObject({
       kind: "play_turn_revised",
       worldId: sessionId,
       runId: "main",
-      sceneText: "你重新翻开账本，这次先看见夹层里的红色印章。",
-      replayedInput: "我先检查账本夹层",
+      sceneText: "mock_text，mock_text。",
+      replayedInput: "mock_textKiem tra so sachmock_text",
       previousVariantId: "v-old",
       variantId: "v-new",
     });
@@ -464,8 +464,8 @@ describe("agent play tools", () => {
     const store = new PlayStore(root);
     await store.createWorld({
       id: sessionId,
-      title: "雨夜茶馆",
-      premise: "玩家扮演茶馆老板。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "open",
     });
     await store.ensureRun(sessionId, "main");
@@ -474,7 +474,7 @@ describe("agent play tools", () => {
     const restoreVariant = vi.fn(async () => ({
       turn: 1,
       variantId: "v-old",
-      sceneText: "你切回旧版本：旧船票仍夹在账本末页。",
+      sceneText: "mock_text：mock_text。",
     }));
     const tool = createPlayReviseTool(pipelineStub(), root, sessionId, {
       runnerFactory: vi.fn(() => ({ regenerateLastTurn, restoreVariant })),
@@ -491,14 +491,14 @@ describe("agent play tools", () => {
       kind: "play_variant_restored",
       turn: 1,
       variantId: "v-old",
-      sceneText: "你切回旧版本：旧船票仍夹在账本末页。",
+      sceneText: "mock_text：mock_text。",
     });
   });
 
   it("uses the player-chosen playMode for the world, overriding the tool param", async () => {
     const sessionId = "1700000000000-cccc03";
     const tool = createReadyPlayStartTool(root, sessionId, "guided");
-    await tool.execute("tc-mode", { title: "选项局", initialScene: "开场。" });
+    await tool.execute("tc-mode", { title: "mock_text", initialScene: "Mo dau。" });
     const store = new PlayStore(root);
     await expect(store.loadWorld(sessionId)).resolves.toMatchObject({ mode: "guided" });
   });
@@ -512,18 +512,18 @@ describe("agent play tools", () => {
     const sessionB = "1700000000001-bbbbbb";
 
     await createReadyPlayStartTool(root, sessionA).execute("tc-a", {
-      title: "世界A",
-      initialScene: "A 的开场。",
+      title: "mock_textA",
+      initialScene: "A mock_textMo dau。",
     });
     // World B is created AFTER A, so it is the most-recently-updated world.
     await createReadyPlayStartTool(root, sessionB).execute("tc-b", {
-      title: "世界B",
-      initialScene: "B 的开场。",
+      title: "mock_textB",
+      initialScene: "B mock_textMo dau。",
     });
 
     const runnerFactory = vi.fn(() => ({ step: vi.fn(async () => STEP_RESULT) }));
     const tool = createPlayStepTool(pipelineStub(), root, sessionA, { runnerFactory });
-    const result = await tool.execute("tc-step-a", { input: "我在 A 世界行动" });
+    const result = await tool.execute("tc-step-a", { input: "mock_text A mock_text" });
 
     expect(runnerFactory).toHaveBeenCalledWith(expect.objectContaining({
       worldId: sessionA,

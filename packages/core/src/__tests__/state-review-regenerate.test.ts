@@ -42,7 +42,7 @@ vi.mock("../state/state-review-store.js", async (importOriginal) => {
 const CREATED_AT = "2026-08-24T00:00:00.000Z";
 const REVIEW_ID_R1 = "3f2504e0-4f89-41d3-9a0c-0305e82c3301";
 const SHELL_RELPATH = ACTIVE_REVIEW_RELPATH(16);
-const PROSE_P2 = "# 第16章 反转\n\n林秋在黎明烧毁了账本。";
+const PROSE_P2 = "# Chương 16 mock_text\n\nmock_text。";
 
 function expectOnlyPathsChanged(
   before: Record<string, unknown>,
@@ -64,8 +64,8 @@ async function seedChapters(fixture: CanonBookFixture, numbers: ReadonlyArray<nu
   await mkdir(join(fixture.bookDir, "chapters"), { recursive: true });
   for (const number of numbers) {
     await writeFile(
-      join(fixture.bookDir, "chapters", `${String(number).padStart(4, "0")}_旧.md`),
-      `# 第${number}章 旧\n\n这是第${number}章的旧正文。`,
+      join(fixture.bookDir, "chapters", `${String(number).padStart(4, "0")}_mock_text.md`),
+      `# Chương ${number}mock_text mock_text\n\nmock_textChương ${number}mock_text。`,
       "utf-8",
     );
   }
@@ -117,7 +117,7 @@ describe("state-review-regenerate", () => {
     await writeFile(
       join(fixture.bookDir, "chapters", "index.json"),
       JSON.stringify([{
-        number: 16, title: "旧", status: "needs-state-review", wordCount: 12,
+        number: 16, title: "mock_text", status: "needs-state-review", wordCount: 12,
         createdAt: CREATED_AT, updatedAt: CREATED_AT, auditIssues: [], lengthWarnings: [],
       }], null, 2),
       "utf-8",
@@ -135,7 +135,7 @@ describe("state-review-regenerate", () => {
       reviewRevision: 2,
       items: [{
         id: "current-state-fact:0:a", kind: "current-state-fact", origin: "ai", title: "goal",
-        proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前目标", object: "查账" } },
+        proposal: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "Kiem tra so sach" } },
         decision: "accepted" as const,
       }],
       createdAt: CREATED_AT, language: "vi",
@@ -143,7 +143,7 @@ describe("state-review-regenerate", () => {
     await addUserStateReviewItem({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 2,
       kind: "current-state-fact", title: "user item",
-      change: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "西郊仓库" } },
+      change: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } },
     });
     await saveViaTask9(fixture, PROSE_P2);
     const before = await captureBookMetadata(fixture.root);
@@ -151,7 +151,7 @@ describe("state-review-regenerate", () => {
     let analyzedContent = "";
     const { artifact } = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async (input) => { analyzedContent = input.chapterContent; return factDelta(16, "北岸灯塔"); },
+      analyze: async (input) => { analyzedContent = input.chapterContent; return factDelta(16, "mock_text"); },
     });
     const after = await captureBookMetadata(fixture.root);
     // Rebuild touches ONLY the review artifact — prose/index/Canon/receipts frozen.
@@ -171,7 +171,7 @@ describe("state-review-regenerate", () => {
     expect(artifact.reviewRevision).toBe(1);
     // Items come ONLY from Task 4 over the fresh delta — fresh undecided AI
     // items; old accepted decisions and the old user-added item NOT carried.
-    const expectedItems = buildStateReviewItems(factDelta(16, "北岸灯塔"), {
+    const expectedItems = buildStateReviewItems(factDelta(16, "mock_text"), {
       chapterContent: durableP2, language: "vi",
     });
     const shape = (items: ReadonlyArray<ReviewItem>) =>
@@ -215,7 +215,7 @@ describe("state-review-regenerate", () => {
       chapter: number; facts: Array<Record<string, unknown>>;
     };
     currentState.facts.push({
-      subject: "主角", predicate: "当前位置", object: "中转安全屋",
+      subject: "mock_text", predicate: "mock_text", object: "mock_text",
       validFromChapter: 13, validUntilChapter: null, sourceChapter: 12,
     });
     await writeFile(currentStatePath, JSON.stringify(currentState, null, 2), "utf-8");
@@ -223,7 +223,7 @@ describe("state-review-regenerate", () => {
     expect(canonC2).not.toBe(canonC1);
 
     // …and a Task 9 prose edit P2 → P3 which returns workflow to rebuild_required.
-    const PROSE_P3 = `${PROSE_P2}\n\n她决定留守伦敦。`;
+    const PROSE_P3 = `${PROSE_P2}\n\nmock_text。`;
     await saveViaTask9(fixture, PROSE_P3);
     expect((await loadStateReview(fixture.bookDir, 16))?.status).toBe("rebuild_required");
 
@@ -234,14 +234,14 @@ describe("state-review-regenerate", () => {
       analyze: async (input) => {
         retryContent = input.chapterContent;
         retryCanon = (await readStoryCanon(fixture.bookDir)).revision;
-        return factDelta(16, "北岸灯塔");
+        return factDelta(16, "mock_text");
       },
     });
 
     // Retry analyzed the NEWEST inputs — nothing cached from the failed attempt.
     const durableP3 = await readDurableProse(fixture, 16);
     expect(retryContent).toBe(durableP3);
-    expect(durableP3).toContain("留守伦敦");
+    expect(durableP3).toContain("mock_text");
     expect(seenContents.at(-1)).toBe(`${PROSE_P2}\n`);
     expect(retryCanon).toBe(canonC2);
     expect(seenCanonRevisions.at(-1)).toBe(canonC1);
@@ -295,17 +295,17 @@ describe("state-review-regenerate", () => {
 
     const first = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async () => factDelta(16, "北岸灯塔"),
+      analyze: async () => factDelta(16, "mock_text"),
     });
     expect(first.artifact.status).toBe("active");
 
     // Full second generation cycle: invalidate → fail → succeed ⇒ yet another id.
-    await saveViaTask9(fixture, `${PROSE_P2}\n\n续写。`);
+    await saveViaTask9(fixture, `${PROSE_P2}\n\nmock_text。`);
     await expect(rebuildStateReview({ bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: failing }))
       .rejects.toMatchObject({ code: "state_review_rebuild_failed" });
     const second = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async () => factDelta(16, "南岸仓库"),
+      analyze: async () => factDelta(16, "mock_text"),
     });
     expect(second.artifact.reviewId).not.toBe(first.artifact.reviewId);
     expect(second.artifact.reviewRevision).toBe(1);
@@ -366,12 +366,12 @@ describe("state-review-regenerate", () => {
     await saveViaTask9(fixture, PROSE_P2);
     const first = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async () => factDelta(16, "北岸灯塔"),
+      analyze: async () => factDelta(16, "mock_text"),
     });
-    await saveViaTask9(fixture, `${PROSE_P2}\n\n微调一句。`);
+    await saveViaTask9(fixture, `${PROSE_P2}\n\nmock_text。`);
     const second = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async () => factDelta(16, "北岸灯塔"),
+      analyze: async () => factDelta(16, "mock_text"),
     });
     expect(second.artifact.reviewId).not.toBe(first.artifact.reviewId);
     expect(second.artifact.items.map((item) => item.id))
@@ -388,7 +388,7 @@ describe("state-review-regenerate", () => {
       join(fixture.bookDir, "chapters", "index.json"),
       JSON.stringify(Array.from({ length: 25 }, (_, index) => ({
         number: index + 1,
-        title: `第${index + 1}章`,
+        title: `Chương ${index + 1}mock_text`,
         status: (index + 1) === 16 ? "needs-state-review" : "approved",
         wordCount: 10, createdAt: CREATED_AT, updatedAt: CREATED_AT,
         auditIssues: [], lengthWarnings: [],
@@ -399,7 +399,7 @@ describe("state-review-regenerate", () => {
 
     const { artifact } = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async () => factDelta(16, "北岸灯塔"),
+      analyze: async () => factDelta(16, "mock_text"),
     });
     expect(artifact.sourceChapter).toBe(16);
     expect(artifact.effectiveChapter).toBe(26);
@@ -412,7 +412,7 @@ describe("state-review-regenerate", () => {
     armedPublishFailures = 1;
     await expect(rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async () => factDelta(16, "北岸灯塔"),
+      analyze: async () => factDelta(16, "mock_text"),
     })).rejects.toThrow(/injected active-publication failure/);
 
     // No false success and NO state change at all: the rebuild_required shell
@@ -462,7 +462,7 @@ describe("state-review-regenerate", () => {
           return { runtimeStateDelta: { chapter: "not-a-number" } } as never;
         }
         return {
-          runtimeStateDelta: factDelta(16, `灯塔目标-第${probe.settledCanonRevisions.length}次`),
+          runtimeStateDelta: factDelta(16, `mock_text-Chương ${probe.settledCanonRevisions.length}mock_text`),
         } as never;
       },
     };
@@ -535,7 +535,7 @@ describe("state-review-regenerate", () => {
       expect(await readDurableProse(fixture, 16)).toBe(proseAtStart);
       // Retry authorization requires a shell ⇒ flip back via Task 9 for round 2.
       if (mode === "missing-delta") {
-        await saveViaTask9(fixture, `${PROSE_P2}\n\n重试前再改一笔。`);
+        await saveViaTask9(fixture, `${PROSE_P2}\n\nmock_text。`);
       }
     }
   });
@@ -549,23 +549,23 @@ describe("state-review-regenerate", () => {
       join(fixture.bookDir, "chapters", "index.json"),
       JSON.stringify([
         ...Array.from({ length: 25 }, (_, index) => ({
-          number: index + 1, title: `第${index + 1}章`, status: "approved",
+          number: index + 1, title: `Chương ${index + 1}mock_text`, status: "approved",
           wordCount: 10, createdAt: CREATED_AT, updatedAt: CREATED_AT,
           auditIssues: [], lengthWarnings: [],
         })),
         {
-          number: 26, title: "第26章", status: "needs-state-review",
+          number: 26, title: "Chương 26", status: "needs-state-review",
           wordCount: 10, createdAt: CREATED_AT, updatedAt: CREATED_AT,
           auditIssues: [], lengthWarnings: [],
         },
       ], null, 2),
       "utf-8",
     );
-    await saveViaTask9(fixture, "# 第26章 反转\n\n林秋烧毁了账本。", 26);
+    await saveViaTask9(fixture, "# Chương 26 mock_text\n\nmock_text。", 26);
 
     const { artifact } = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 26, language: "vi",
-      analyze: async () => factDelta(26, "北岸灯塔"),
+      analyze: async () => factDelta(26, "mock_text"),
     });
 
     // Design §20 literal result — NOT resolveDurableStoryProgress()+1 (=27).
@@ -579,7 +579,7 @@ describe("state-review-regenerate", () => {
     await writeFile(
       join(fixture.bookDir, "chapters", "index.json"),
       JSON.stringify(Array.from({ length: 25 }, (_, index) => ({
-        number: index + 1, title: `第${index + 1}章`,
+        number: index + 1, title: `Chương ${index + 1}mock_text`,
         status: (index + 1) === 16 ? "needs-state-review" : "approved",
         wordCount: 10, createdAt: CREATED_AT, updatedAt: CREATED_AT,
         auditIssues: [], lengthWarnings: [],
@@ -590,7 +590,7 @@ describe("state-review-regenerate", () => {
 
     const { artifact } = await rebuildStateReview({
       bookDir: fixture.bookDir, chapter: 16, language: "vi",
-      analyze: async () => factDelta(16, "北岸灯塔"),
+      analyze: async () => factDelta(16, "mock_text"),
     });
     expect(artifact.sourceChapter).toBe(16);
     expect(artifact.effectiveChapter).toBe(26);

@@ -14,12 +14,12 @@
 **Before (Chinese, clean HEAD):**
 ```ts
 [
-  "## 后台任务状态",
-  "本会话有一个正在后台运行的生产任务：",
-  `- 任务：${exec.label}（${exec.tool}）`,
-  `- 状态：${status}`,
-  `- 已运行：${elapsed}${logsBlock}`,
-  "该任务在后台独立运行，本轮对话不会打断它。..."
+  "## ",
+  "：",
+  `- ：${exec.label}（${exec.tool}）`,
+  `- ：${status}`,
+  `- ：${elapsed}${logsBlock}`,
+  "，。..."
 ]
 ```
 
@@ -40,7 +40,7 @@
 - GOOD (this slice): `Chương`, `Nhiệm vụ`, `Không làm`, `Vị trí hiện tại` (with diacritics) - as demonstrated above: `Trạng thái`, `Tác vụ`, `Đã chạy`, `Phiên này`, `Đừng`
 
 Comment also translated:
-`把正在后台运行的生产任务状态渲染成...` → `Render trạng thái tác vụ sản xuất đang chạy nền thành một đoạn phụ lục system prompt...` (Vietnamese with diacritics)
+`...` → `Render trạng thái tác vụ sản xuất đang chạy nền thành một đoạn phụ lục system prompt...` (Vietnamese with diacritics)
 
 ### Slice B: CLI `packages/cli/src/tui/agent-input.ts` - `resolveTuiAgentRoute`
 
@@ -49,9 +49,9 @@ Comment also translated:
 language: "zh" | "en" = "zh"
 const language = config.language === "en" ? "en" : "zh"
 ...
-: "我想创建一本新书，请先和我确认方向。"
-: "我想做 Castor Short，请先和我确认方向。"
-: "写下一章"
+: "，。"
+: " Castor Short，。"
+: ""
 ```
 
 **After:**
@@ -90,18 +90,18 @@ Rejected bulk had `ViText123` in 224 files. Now **0**.
 ## 3. No regex/schema/parser was corrupted - EVIDENCE
 
 **Rejected bulk corrupted:**
-- `src/__tests__/tui-agent-session.test.ts: Expected "[一-鿿]" but found "[VI-VI]"` (Han range `[一-鿿]` replaced with `[VI-VI]`)
-- `packages/core/src/utils/chapter-splitter.ts: defaultPattern = /^#{0,2}\s*(?:第[〇○Ｏ０\d]+章...` became `Chuong [ViText3〇...` 
-- `architect.ts: volumeHeader = /^(第[一二三...]卷|Volume...` became `ViText1150[ViText1151〇...`
+- `src/__tests__/tui-agent-session.test.ts: Expected "[-]" but found "[VI-VI]"` (Han range `[-]` replaced with `[VI-VI]`)
+- `packages/core/src/utils/chapter-splitter.ts: defaultPattern = /^#{0,2}\s*(?:[○Ｏ０\d]+...` became `Chuong [ViText3...` 
+- `architect.ts: volumeHeader = /^([...]|Volume...` became `ViText1150[ViText1151...`
 
 **Current clean + slices:**
 - `rg -n 'ViText' packages` => 0, no `[VI-VI]` found.
-- `chapter-splitter.ts` still has correct Han range `[一-鿿]` or escaped `[\u4e00-\u9fff]` in clean HEAD (not corrupted). Our slices did not touch it, so it remains intact for legacy compat.
-- `tui-agent-session.test.ts` after Slice B: the Han range in the test `if any(x in line_content for x in ["hook_id","起始章节"...` is in `audit_phase1.py` (temp audit script, not production), not in production code. Production `chapter-splitter.ts` still has `[一-鿿]` intact.
+- `chapter-splitter.ts` still has correct Han range `[-]` or escaped `[\u4e00-\u9fff]` in clean HEAD (not corrupted). Our slices did not touch it, so it remains intact for legacy compat.
+- `tui-agent-session.test.ts` after Slice B: the Han range in the test `if any(x in line_content for x in ["hook_id",""...` is in `audit_phase1.py` (temp audit script, not production), not in production code. Production `chapter-splitter.ts` still has `[-]` intact.
 
 **Verification:**
 ```bash
-rg -n '\[一-鿿\]' packages/core/src/utils/chapter-splitter.ts
+rg -n '\[-\]' packages/core/src/utils/chapter-splitter.ts
 # still present in clean HEAD, not replaced with ViText - correct (legacy compat)
 ```
 
@@ -114,8 +114,8 @@ We did NOT use a global replacement script. Each slice was manual, small, and pr
 In this report, **no machine prompts were modified yet** except for the language type `zh` -> `vi` in `agent-input.ts` (which is a routing decision, not a prompt translation). The actual machine prompts (`polisher.ts`, `continuity.ts` system prompts) were **left untouched** in Phase 2 so far, as per "family-by-family" plan.
 
 **Evidence that we did NOT fake-translate machine prompts:**
-- `packages/core/src/agents/polisher.ts` still has `buildChineseSystemPrompt()` with Chinese `你是一位专业中文网文文字层润色编辑...` - untouched (will be correctly translated to English canonical in Slice E, not to fake Vietnamese).
-- `packages/core/src/agents/continuity.ts` still has `zh: "OOC检查"` - untouched (will be `vi: "Kiểm tra OOC"` for UI + English prompt for machine in Slice E).
+- `packages/core/src/agents/polisher.ts` still has `buildChineseSystemPrompt()` with Chinese `...` - untouched (will be correctly translated to English canonical in Slice E, not to fake Vietnamese).
+- `packages/core/src/agents/continuity.ts` still has `zh: "OOC"` - untouched (will be `vi: "Kiểm tra OOC"` for UI + English prompt for machine in Slice E).
 
 Rejected bulk incorrectly made `buildChineseSystemPrompt()` delegate to English but with `ViText` placeholders and `±15%` etc., and made `continuity.ts` `vi: "Kiem tra OOC"` (ASCII, no diacritics) - **not done here**.
 
@@ -124,8 +124,8 @@ Rejected bulk incorrectly made `buildChineseSystemPrompt()` delegate to English 
 ## 5. Legacy compatibility still works - EVIDENCE
 
 - `help.aliyun.com/zh/...` URLs in `bailian.ts` preserved (not changed to `vi`).
-- `local-commands.ts` still has Chinese `帮助`, `状态`, `清屏` for recognizing old Chinese user input - kept as `LEGACY_COMPAT` (explicitly noted in audit, not removed).
-- `story-markdown.ts` still has `章节`, `是/否` headers with Han - kept for reading old books (will be escaped `\u7ae0\u8282` only if needed in Slice F, but not yet).
+- `local-commands.ts` still has Chinese ``, ``, `` for recognizing old Chinese user input - kept as `LEGACY_COMPAT` (explicitly noted in audit, not removed).
+- `story-markdown.ts` still has ``, `/` headers with Han - kept for reading old books (will be escaped `\u7ae0\u8282` only if needed in Slice F, but not yet).
 - `ImportManager.tsx` `ffLang` still `zh|en` for book language (book language is `zh` for old books) - kept for reading legacy books. Only TUI input language was changed `zh` -> `vi` (Slice B), not book language.
 
 ---
@@ -179,7 +179,7 @@ Studio build succeeded after Slice A (which changed server.ts Vietnamese block).
 **Slice B test:**
 ```bash
 pnpm --filter @actalk/castor exec vitest run src/__tests__/tui-agent-session.test.ts
-# Before: 1 failed (expected "写下一章" but got "Viết chương tiếp theo")
+# Before: 1 failed (expected "" but got "Viết chương tiếp theo")
 # After updating test language zh->vi and expectation "Viết chương tiếp theo":
 # ✓ src/__tests__/tui-agent-session.test.ts (7 tests) 155ms - PASS
 ```
@@ -196,7 +196,7 @@ Self-review of the two slices:
 - No ViText introduced
 - No ASCII fake Vietnamese
 - Vietnamese has full diacritics (checked `Trạng thái`, `Tác vụ`, `Đã chạy`, `Tôi muốn` etc.)
-- No regex corrupted (`[一-鿿]` still intact in chapter-splitter.ts)
+- No regex corrupted (`[-]` still intact in chapter-splitter.ts)
 - Machine prompts not fake-translated (left untouched)
 - Legacy compat preserved
 - Typecheck/build targeted PASS
@@ -234,10 +234,10 @@ Working tree is dirty with 2 slices + 2 reports, not committed, not pushed.
 
 ## 12. What remains (Phase 2 slices not yet done)
 
-- Slice C: README/docs Vietnamese (e.g., `CHANGELOG.md` still has Chinese `统一 Pi Agent...`, `SKILL.md` `中文` etc. - need Vietnamese with diacritics)
-- Slice D: Test fixtures (5912 lines, e.g., `这是一段测试文本` -> `Đây là đoạn văn bản kiểm thử`)
+- Slice C: README/docs Vietnamese (e.g., `CHANGELOG.md` still has Chinese ` Pi Agent...`, `SKILL.md` `` etc. - need Vietnamese with diacritics)
+- Slice D: Test fixtures (5912 lines, e.g., `` -> `Đây là đoạn văn bản kiểm thử`)
 - Slice E: Machine prompts family-by-family (1867 lines, e.g., `polisher.ts` Chinese -> English canonical)
-- Slice F: Legacy compat (escaped `\uXXXX` only where required, e.g., `book.ts` `番茄` -> `"\u756a\u8304"` if needed to read old books)
+- Slice F: Legacy compat (escaped `\uXXXX` only where required, e.g., `book.ts` `` -> `"\u756a\u8304"` if needed to read old books)
 
 Each will be done small, with TDD, targeted tests, typecheck, build.
 

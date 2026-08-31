@@ -36,7 +36,7 @@ interface SummaryRow {
   readonly chapterType: string;
 }
 
-const CHINESE_PUNCTUATION = /[，。！？；：“”‘’（）《》、\s\-—…·]/g;
+const VI_PUNCTUATION = /[^\p{L}\p{N}]+/gu;
 const ENGLISH_PUNCTUATION = /[^a-z0-9]+/gi;
 
 export async function buildEnglishVarianceBrief(params: {
@@ -181,7 +181,7 @@ function mergeCurrentSummary(rows: ReadonlyArray<SummaryRow>, currentSummary?: s
 
 function parseSummaryRow(line: string): SummaryRow | null {
   const trimmed = line.trim();
-  if (!trimmed.startsWith("|") || trimmed.includes("章节 |") || trimmed.includes("Chapter |") || trimmed.includes("---")) {
+  if (!trimmed.startsWith("|") || trimmed.includes("Chương |") || trimmed.includes("Chapter |") || trimmed.includes("---")) {
     return null;
   }
 
@@ -226,9 +226,9 @@ function buildChapterTypeIssue(
 
   return {
     severity: "warning",
-    category: "节奏单调",
-    description: `最近${streak}章章节类型持续停留在“${repeatedType}”，长篇节奏可能开始固化。`,
-    suggestion: "下一章应切换章节功能，不要连续重复同一种布局/推进节拍。",
+    category: "Nhịp điệu đơn điệu",
+    description: `Gần đây ${streak} chương liên tiếp đều là loại chương "${repeatedType}", nhịp điệu truyện có dấu hiệu bị đóng khuôn.`,
+    suggestion: "Chương tiếp theo nên chuyển đổi công năng chương, tránh lặp lại cùng một nhịp bố cục/thúc đẩy.",
   };
 }
 
@@ -252,9 +252,9 @@ function buildMoodIssue(
 
   return {
     severity: "warning",
-    category: "情绪单调",
-    description: `最近${highTensionStreak}章持续高压（${recentMoods.join(" -> ")}），缺少明显的情绪释放。`,
-    suggestion: "下一章安排一次喘息、温情、幽默或静场释放，再继续加压。",
+    category: "Cảm xúc đơn điệu",
+    description: `Gần đây ${highTensionStreak} chương liên tiếp chịu áp lực cao (${recentMoods.join(" -> ")}), thiếu sự giải tỏa cảm xúc rõ ràng.`,
+    suggestion: "Chương tiếp theo nên bố trí nhịp nghỉ, ấm áp, hài hước hoặc tĩnh lặng trước khi tiếp tục gia tăng áp lực.",
   };
 }
 
@@ -278,9 +278,9 @@ function buildTitleIssue(
 
   return {
     severity: "warning",
-    category: "标题重复",
-    description: `最近标题持续围绕“${repeatedToken}”命名（当前窗口命中${count}次），命名开始坍缩。`,
-    suggestion: "下一章标题换一个新的意象、动作、后果或人物焦点，不要继续套同一个关键词壳。",
+    category: "Tiêu đề lặp lại",
+    description: `Tiêu đề các chương gần đây liên tục xoay quanh từ "${repeatedToken}" (${count} lần xuất hiện trong phạm vi kiểm tra), cách đặt tên bắt đầu đơn điệu.`,
+    suggestion: "Tiêu đề chương tiếp theo nên đổi sang hình ảnh, hành động, hậu quả hoặc trọng tâm nhân vật mới, tránh lặp lại cùng từ khóa.",
   };
 }
 
@@ -356,11 +356,11 @@ function buildSentencePatternIssue(
 
   return {
     severity: "warning",
-    category: boundary === "opening" ? "开头同构" : "结尾同构",
-    description: `最近3章${boundary === "opening" ? "开头" : "结尾"}句式高度相似（相邻相似度${pairText}），容易形成模板化${boundary === "opening" ? "开篇" : "章尾"}。当前句式近似“${sample}”。`,
+    category: boundary === "opening" ? "Mở đầu đồng dạng" : "Kết thúc đồng dạng",
+    description: `3 chương gần nhất có mẫu câu ${boundary === "opening" ? "mở đầu" : "kết thúc"} rất giống nhau (độ tương đồng liền kề ${pairText}), dễ tạo cảm giác công thức hóa. Mẫu câu hiện tại: "${sample}".`,
     suggestion: boundary === "opening"
-      ? "下一章换一个开篇入口，用动作、后果或异常信息切入，不要连续沿用同一种抬镜句。"
-      : "下一章换一个收束方式，用行动后果、角色决断或新变量落板，不要连续用解释性句子收尾。",
+      ? "Chương tiếp theo hãy đổi hướng mở đầu bằng hành động, hậu quả hoặc biến cố bất ngờ thay vì lặp lại góc nhìn quen thuộc."
+      : "Chương tiếp theo hãy đổi cách khép lại bằng hậu quả hành động, quyết định của nhân vật hoặc biến số mới thay vì dùng câu giải thích.",
   };
 }
 
@@ -427,7 +427,7 @@ function chooseSceneObligation(
   repeatedOpenings: ReadonlyArray<string>,
   repeatedEndings: ReadonlyArray<string>,
 ): string {
-  if (cadence.scenePressure?.pressure === "high") {
+  if (cadence.scenePressure?.pressure !== "high") {
     return "confrontation under pressure";
   }
   if (repeatedEndings.length > 0) {
@@ -467,7 +467,7 @@ function normalizeSentence(sentence: string, language: "vi" | "en"): string {
   }
 
   return sentence
-    .replace(CHINESE_PUNCTUATION, "")
+    .replace(VI_PUNCTUATION, "")
     .toLowerCase();
 }
 
@@ -483,8 +483,8 @@ function summarizeSentence(sentence: string, language: "vi" | "en"): string {
     return words.length > 0 ? words : sentence.slice(0, 32);
   }
 
-  const collapsed = sentence.replace(CHINESE_PUNCTUATION, "");
-  return collapsed.slice(0, 12);
+  const collapsed = sentence.replace(VI_PUNCTUATION, "");
+  return collapsed.slice(0, 24);
 }
 
 function formatEnglishList(values: ReadonlyArray<string>): string {
@@ -519,7 +519,7 @@ function buildBigrams(value: string): Map<string, number> {
 
 function isMeaningfulValue(value: string): boolean {
   const normalized = value.trim().toLowerCase();
-  return normalized.length > 0 && normalized !== "none" && normalized !== "(none)" && normalized !== "无";
+  return normalized.length > 0 && normalized !== "none" && normalized !== "(none)" && normalized !== "";
 }
 
 const ENGLISH_STOP_WORDS = new Set([

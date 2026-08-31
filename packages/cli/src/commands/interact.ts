@@ -84,7 +84,7 @@ export function createInteractCommand(hooks: InteractCommandHooks = {}): Command
         sessionKind,
         actionSource,
         requestedIntent,
-        language: config.language ?? "zh",
+        language: config.language ?? "vi",
         pipeline,
         projectRoot,
         model: client._piModel

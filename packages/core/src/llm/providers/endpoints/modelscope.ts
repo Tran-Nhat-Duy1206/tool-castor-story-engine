@@ -1,15 +1,9 @@
-/**
- * ModelScope (魔搭)
- *
- * - 官网：https://www.modelscope.cn/
- * - 控制台 / API key：https://www.modelscope.cn/my/myaccesstoken
- * - API 文档：https://www.modelscope.cn/docs/model-service/API-Inference/intro
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const MODELSCOPE: ProviderEndpoint = {
   id: "modelscope",
-  label: "魔搭社区 ModelScope",
+  label: " ModelScope",
   group: "aggregator",
   api: "openai-completions",
   baseUrl: "https://api-inference.modelscope.cn/v1",

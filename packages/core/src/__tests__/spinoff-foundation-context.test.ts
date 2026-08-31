@@ -1,30 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { buildSpinoffFoundationContext } from "../pipeline/runner.js";
 
-const PARENT_CANON = "## 角色\n林深：记忆债诊所的医生。\n## 世界\n触碰濒死者能读到其记忆。";
+const PARENT_CANON = "## mock_text\nLin Shen：mock_text。\n## mock_text\nmock_text。";
 
-describe("buildSpinoffFoundationContext (番外 framing)", () => {
+describe("buildSpinoffFoundationContext (mock_text framing)", () => {
   it("frames the work as an independent side-story that must not advance the parent main line", () => {
-    const ctx = buildSpinoffFoundationContext(PARENT_CANON, "讲林深学生时代的一段往事", "vi");
-    expect(ctx).toContain("这是一部番外");
-    expect(ctx).toContain("独立");
-    expect(ctx).toContain("不要推进或违背正传的主线剧情");
+    const ctx = buildSpinoffFoundationContext(PARENT_CANON, "mock_textLin Shenmock_text", "vi");
+    expect(ctx).toContain("mock_text");
+    expect(ctx).toContain("mock_text");
+    expect(ctx).toContain("mock_text");
   });
 
   it("embeds the parent canon so the architect reuses its cast and world", () => {
     const ctx = buildSpinoffFoundationContext(PARENT_CANON, undefined, "vi");
-    expect(ctx).toContain("正传正典");
-    expect(ctx).toContain("林深");
-    expect(ctx).toContain("触碰濒死者能读到其记忆");
+    expect(ctx).toContain("mock_text");
+    expect(ctx).toContain("Lin Shen");
+    expect(ctx).toContain("mock_text");
   });
 
   it("includes the user's side-story direction when provided, omits the section when blank", () => {
-    const withDir = buildSpinoffFoundationContext(PARENT_CANON, "番外聚焦配角的视角", "vi");
-    expect(withDir).toContain("番外方向");
-    expect(withDir).toContain("番外聚焦配角的视角");
+    const withDir = buildSpinoffFoundationContext(PARENT_CANON, "mock_text", "vi");
+    expect(withDir).toContain("mock_text");
+    expect(withDir).toContain("mock_text");
 
     const noDir = buildSpinoffFoundationContext(PARENT_CANON, "   ", "vi");
-    expect(noDir).not.toContain("番外方向");
+    expect(noDir).not.toContain("mock_text");
   });
 
   it("produces an English framing for en books", () => {

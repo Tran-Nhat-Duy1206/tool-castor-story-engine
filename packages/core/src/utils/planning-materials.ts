@@ -38,7 +38,7 @@ async function readFileOrDefault(path: string): Promise<string> {
   try {
     return await readFile(path, "utf-8");
   } catch {
-    return "(文件尚未创建)";
+    return "(file not created yet)";
   }
 }
 
@@ -98,7 +98,7 @@ export async function loadPlanningSeedMaterials(params: {
 
   // Phase 5: prefer the new prose outline files (outline/story_frame.md +
   // outline/volume_map.md). Fall back to the legacy files transparently.
-  const placeholder = "(文件尚未创建)";
+  const placeholder = "(file not created yet)";
 
   const [
     authorIntent,

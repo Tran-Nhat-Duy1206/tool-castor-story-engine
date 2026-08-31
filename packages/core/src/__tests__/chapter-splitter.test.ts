@@ -2,64 +2,64 @@ import { describe, expect, it } from "vitest";
 import { splitChapters } from "../utils/chapter-splitter.js";
 
 describe("splitChapters", () => {
-  it("splits classical Chinese chapter headings with 第X回 by default", () => {
+  it("splits Vietnamese chapter headings with Chương X by default", () => {
     const input = [
-      "第一回：宴桃園豪傑三結義，斬黃巾英雄首立功",
+      "Chương 1: Yến tiệc vườn đào ba anh hùng kết nghĩa, chém tướng Khăn Vàng lập công đầu",
       "",
-      "滾滾長江東逝水，浪花淘盡英雄。",
+      "Sông Trường Giang cuồn cuộn chảy về đông, sóng vỗ tan hết anh hùng.",
       "",
-      "第二回：張翼德怒鞭督郵，何國舅謀誅宦豎",
+      "Chương 2: Trương Phi giận đánh quan đốc, Hà Quốc Cữu mưu giết hoạn quan",
       "",
-      "且說董卓專權，朝野震動。",
+      "Lại nói Đổng Trác chuyên quyền, triều đình chấn động.",
     ].join("\n");
 
     const chapters = splitChapters(input);
 
     expect(chapters).toHaveLength(2);
     expect(chapters[0]).toEqual({
-      title: "宴桃園豪傑三結義，斬黃巾英雄首立功",
-      content: "滾滾長江東逝水，浪花淘盡英雄。",
+      title: "Yến tiệc vườn đào ba anh hùng kết nghĩa, chém tướng Khăn Vàng lập công đầu",
+      content: "Sông Trường Giang cuồn cuộn chảy về đông, sóng vỗ tan hết anh hùng.",
     });
     expect(chapters[1]).toEqual({
-      title: "張翼德怒鞭督郵，何國舅謀誅宦豎",
-      content: "且說董卓專權，朝野震動。",
+      title: "Trương Phi giận đánh quan đốc, Hà Quốc Cữu mưu giết hoạn quan",
+      content: "Lại nói Đổng Trác chuyên quyền, triều đình chấn động.",
     });
   });
 
-  it("uses a 第N回 fallback title when a classical Chinese heading has no title text", () => {
+  it("uses a Chương N fallback title when a Vietnamese heading has no title text", () => {
     const input = [
-      "第一回",
+      "Chương 1",
       "",
-      "天下大勢，分久必合，合久必分。",
+      "Thiên hạ đại thế, phân lâu ắt hợp, hợp lâu ắt phân.",
     ].join("\n");
 
     const chapters = splitChapters(input);
 
     expect(chapters).toHaveLength(1);
-    expect(chapters[0]?.title).toBe("第1回");
+    expect(chapters[0]?.title).toBe("Chương 1");
   });
 
-  it("splits classical Chinese headings that use the round-zero numeral form", () => {
+  it("splits Vietnamese headings with Arabic numerals", () => {
     const input = [
-      "第九十九回：孔明秋雨退魏兵",
+      "Chương 99: Khổng Minh mưa thu lui quân Ngụy",
       "",
-      "未知孔明怎生破魏，且看下文分解。",
+      "Chưa biết Khổng Minh phá Ngụy thế nào, xem hồi sau phân giải.",
       "",
-      "第一○○回：漢兵劫寨破曹真，武侯鬥陣辱仲達",
+      "Chương 100: Quân Hán cướp trại phá Tào Chân, Vũ Hầu đấu trận nhục Trọng Đạt",
       "",
-      "卻說眾將聞孔明不追魏兵，俱入帳告曰。",
+      "Lại nói các tướng nghe Khổng Minh không đuổi quân Ngụy, đều vào trướng bẩm rằng.",
     ].join("\n");
 
     const chapters = splitChapters(input);
 
     expect(chapters).toHaveLength(2);
     expect(chapters[0]).toEqual({
-      title: "孔明秋雨退魏兵",
-      content: "未知孔明怎生破魏，且看下文分解。",
+      title: "Khổng Minh mưa thu lui quân Ngụy",
+      content: "Chưa biết Khổng Minh phá Ngụy thế nào, xem hồi sau phân giải.",
     });
     expect(chapters[1]).toEqual({
-      title: "漢兵劫寨破曹真，武侯鬥陣辱仲達",
-      content: "卻說眾將聞孔明不追魏兵，俱入帳告曰。",
+      title: "Quân Hán cướp trại phá Tào Chân, Vũ Hầu đấu trận nhục Trọng Đạt",
+      content: "Lại nói các tướng nghe Khổng Minh không đuổi quân Ngụy, đều vào trướng bẩm rằng.",
     });
   });
 

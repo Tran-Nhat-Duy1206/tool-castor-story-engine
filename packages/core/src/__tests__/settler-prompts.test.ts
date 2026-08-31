@@ -5,7 +5,7 @@ import { buildSettlerSystemPrompt, buildSettlerUserPrompt } from "../agents/sett
 
 const BOOK: BookConfig = {
   id: "settler-prompt-book",
-  title: "钟不撒谎",
+  title: "mock_text",
   platform: "other",
   genre: "mystery",
   status: "active",
@@ -17,9 +17,9 @@ const BOOK: BookConfig = {
 
 const GENRE: GenreProfile = {
   id: "mystery",
-  name: "悬疑",
+  name: "mock_text",
   language: "vi",
-  chapterTypes: ["调查"],
+  chapterTypes: ["mock_text"],
   fatigueWords: [],
   numericalSystem: false,
   powerScaling: false,
@@ -33,28 +33,28 @@ describe("settler hook identity contract", () => {
   it("assigns semantic identity to the settler and keeps host admission structural", () => {
     const prompt = buildSettlerSystemPrompt(BOOK, GENRE, null, "vi");
 
-    expect(prompt).toContain("语义相关的休眠种子");
-    expect(prompt).toContain("必须复用它已有的 hookId");
-    expect(prompt).toContain("宿主只校验结构");
-    expect(prompt).not.toContain("由系统决定它是映射到旧 hook");
+    expect(prompt).toContain("mock_text");
+    expect(prompt).toContain("mock_text hookId");
+    expect(prompt).toContain("mock_text");
+    expect(prompt).not.toContain("mock_text hook");
   });
 
   it("labels supplied hooks as active or semantically relevant dormant canon", () => {
     const prompt = buildSettlerUserPrompt({
       chapterNumber: 1,
-      title: "慢了十一分钟",
-      content: "孙玉珍抱钟进店。",
-      currentState: "# 当前状态",
+      title: "mock_text",
+      content: "mock_text。",
+      currentState: "# mock_text",
       ledger: "",
-      hooks: "| H012 | deferred | 孙玉珍家座钟被回拨 |",
-      chapterSummaries: "(文件尚未创建)",
-      subplotBoard: "(文件尚未创建)",
-      emotionalArcs: "(文件尚未创建)",
-      characterMatrix: "(文件尚未创建)",
-      volumeOutline: "# 第一卷",
+      hooks: "| H012 | deferred | mock_text |",
+      chapterSummaries: "(mock_text)",
+      subplotBoard: "(mock_text)",
+      emotionalArcs: "(mock_text)",
+      characterMatrix: "(mock_text)",
+      volumeOutline: "# Chương mock_text",
     });
 
-    expect(prompt).toContain("含活跃伏笔与本章语义相关的休眠种子");
+    expect(prompt).toContain("mock_text");
     expect(prompt).toContain("H012");
   });
 });

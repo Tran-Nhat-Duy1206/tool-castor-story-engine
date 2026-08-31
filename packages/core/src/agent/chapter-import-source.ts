@@ -16,7 +16,7 @@ export function compareChapterSourceNames(left: string, right: string): number {
  *
  * - Directory mode: each `.md`/`.txt` file becomes one chapter, in filename
  *   natural numeric order. The chapter title is the filename without its extension and
- *   without a leading numeric prefix (e.g. `03_风暴.md` → `风暴`).
+ *   without a leading numeric prefix (e.g. `03_storm.md` -> `storm`).
  * - Single-file mode: the file is split into chapters with `splitChapters`,
  *   using `splitPattern` as a custom heading regex when provided.
  *
@@ -54,7 +54,7 @@ export async function loadChaptersFromPath(
   if (chapters.length === 0) {
     throw new Error(
       `No chapters found in ${sourcePath}. ` +
-      `The default pattern matches "第X章/第X回" and "Chapter N" heading lines. ` +
+      `The default pattern matches "Chương X" and "Chapter N" heading lines. ` +
       `Pass splitPattern with a custom regex if the source uses a different heading style.`,
     );
   }

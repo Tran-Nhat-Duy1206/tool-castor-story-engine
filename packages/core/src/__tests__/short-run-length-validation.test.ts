@@ -45,7 +45,7 @@ describe("short_run charsPerChapter validation (envelope layer)", () => {
 
   it("rejects a Chinese charsPerChapter in the en word range (zh+650)", () => {
     const parsed = ShortRunActionPayloadSchema.safeParse({
-      direction: "女频短篇 婚姻背叛 证据反杀",
+      direction: "mock_text mock_text mock_text",
       language: "vi",
       charsPerChapter: 650,
     });
@@ -60,7 +60,7 @@ describe("short_run charsPerChapter validation (envelope layer)", () => {
       charsPerChapter: 700,
     }).success).toBe(true);
     expect(ShortRunActionPayloadSchema.safeParse({
-      direction: "女频短篇 婚姻背叛 证据反杀",
+      direction: "mock_text mock_text mock_text",
       language: "vi",
       charsPerChapter: 1000,
     }).success).toBe(true);
@@ -88,7 +88,7 @@ describe("short_run charsPerChapter validation (propose_action)", () => {
   it("rejects en+1100 when the model proposes the confirmation card", async () => {
     await expect(createProposeActionTool("vi").execute("propose-short-en-1100", {
       action: "short_run",
-      instruction: "用户要求写一篇英文短篇，每章 1100",
+      instruction: "mock_text，mock_text 1100",
       shortRun: {
         direction: "an English office suspense story",
         language: "en",

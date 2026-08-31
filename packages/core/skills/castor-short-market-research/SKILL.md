@@ -1,6 +1,6 @@
 ---
 name: castor-short-market-research
-description: 商业短篇市场、平台样本、标题与移动端阅读趋势研究。Use for evidence-based short-fiction market research.
+description: Commercial short fiction market, platform samples, titles, and mobile reading trend research. Use for evidence-based short-fiction market research.
 ---
 # Short-fiction market research
 

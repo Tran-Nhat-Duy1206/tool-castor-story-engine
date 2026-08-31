@@ -29,8 +29,8 @@ async function setupLegacyBook() {
   const proseA = "World setting description.\nAtmosphere details.\n";
   await writeFile(join(bookDir, "story", "outline", "sf-world-setting.md"), proseA, "utf-8");
   await writeUnitManifest(bookDir, { unitId: "sf-world-setting", kind: "story_frame", importance: "required", status: "draft", locator: { contentKind: "whole_file", sourceRelPath: "story/outline/sf-world-setting.md" }, contentHash: governedContentHash(proseA), contentRevision: 1, dependencies: [] });
-  await writeFile(join(bookDir, "chapters", "0001_第一章.md"), "# 第一章\n\nlegacy prose chapter 1");
-  await writeFile(join(bookDir, "chapters", "0002_第二章.md"), "# 第二章\n\nlegacy prose chapter 2");
+  await writeFile(join(bookDir, "chapters", "0001_Chương mock_text.md"), "# Chương mock_text\n\nlegacy prose chapter 1");
+  await writeFile(join(bookDir, "chapters", "0002_Chương mock_text.md"), "# Chương mock_text\n\nlegacy prose chapter 2");
   await writeFile(join(bookDir, "story", "state", "manifest.json"), JSON.stringify({ schemaVersion: 2, language: "vi", lastAppliedChapter: 2, projectionVersion: 1, migrationWarnings: [] }, null, 2));
   await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ chapter: 2, facts: [{ subject: "hero", predicate: "alive", object: "true", validFromChapter: 1, validUntilChapter: null, sourceChapter: 1 }] }, null, 2));
 }
@@ -43,7 +43,7 @@ describe("Scenario A — Legacy book remains usable without V2", () => {
     const sm = new StateManager(root);
     const book = await sm.loadBookConfig(bookId);
     expect(book.id).toBe(bookId);
-    const ch1 = await readFile(join(bookDir, "chapters", "0001_第一章.md"), "utf-8");
+    const ch1 = await readFile(join(bookDir, "chapters", "0001_Chương mock_text.md"), "utf-8");
     expect(ch1).toContain("legacy prose chapter 1");
     const manifest = JSON.parse(await readFile(join(bookDir, "story", "state", "manifest.json"), "utf-8"));
     expect(manifest.lastAppliedChapter).toBe(2);
@@ -59,7 +59,7 @@ describe("Scenario A — Legacy book remains usable without V2", () => {
   });
 
   it("Phase 4 State Review remains functional", async () => {
-    const ch1HashBefore = sha256(await readFile(join(bookDir, "chapters", "0001_第一章.md")));
+    const ch1HashBefore = sha256(await readFile(join(bookDir, "chapters", "0001_Chương mock_text.md")));
     expect(ch1HashBefore).toBeDefined();
   });
 });
@@ -84,7 +84,7 @@ describe("Scenario B — Opt-in Foundation V2 upgrade (Task 8/9)", () => {
   });
 
   it("historical chapter prose and Canon remain byte-identical after upgrade", async () => {
-    const ch1Before = await readFile(join(bookDir, "chapters", "0001_第一章.md"));
+    const ch1Before = await readFile(join(bookDir, "chapters", "0001_Chương mock_text.md"));
     const canonBefore = await readFile(join(bookDir, "story", "state", "current_state.json"));
     const h1 = sha256(ch1Before);
     const hc = sha256(canonBefore);
@@ -93,7 +93,7 @@ describe("Scenario B — Opt-in Foundation V2 upgrade (Task 8/9)", () => {
     await saveFoundationUnitDraft(bookDir, revisionId, "sf-world-setting", prose);
     await approveFoundationUnit(bookDir, revisionId, "sf-world-setting", "human-a");
     await publishFoundation({ bookDir, revisionId, humanActor: "human-a", expectedBaseFoundationVersion: 0, expectedBaseCanonRevision: 2 });
-    const ch1After = await readFile(join(bookDir, "chapters", "0001_第一章.md"));
+    const ch1After = await readFile(join(bookDir, "chapters", "0001_Chương mock_text.md"));
     const canonAfter = await readFile(join(bookDir, "story", "state", "current_state.json"));
     expect(sha256(ch1After)).toBe(h1);
     expect(sha256(canonAfter)).toBe(hc);

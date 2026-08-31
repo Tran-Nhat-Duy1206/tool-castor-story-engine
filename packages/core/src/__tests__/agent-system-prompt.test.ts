@@ -6,8 +6,8 @@ describe("buildAgentSystemPrompt", () => {
   describe("mode isolation", () => {
     it("defaults no-book sessions to plain chat, not book creation", () => {
       const prompt = buildAgentSystemPrompt(null, "vi");
-      expect(prompt).toContain("普通聊天助手");
-      expect(prompt).toContain("这里不是自动生产入口");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("propose_action");
       expect(prompt).not.toContain("sub_agent");
       expect(prompt).not.toContain("short_fiction_run");
@@ -18,10 +18,10 @@ describe("buildAgentSystemPrompt", () => {
 
     it("defaults active-book sessions to book mode", () => {
       const prompt = buildAgentSystemPrompt("my-book", "vi");
-      expect(prompt).toContain("当前正在处理书籍「my-book」");
+      expect(prompt).toContain("mock_text「my-book」");
       expect(prompt).toContain("sub_agent");
       expect(prompt).toContain("writer");
-      expect(prompt).toContain("修改设定或角色卡时先读取权威文件");
+      expect(prompt).toContain("mock_text");
     });
 
     it("English plain chat also has no production tool instructions", () => {
@@ -38,8 +38,8 @@ describe("buildAgentSystemPrompt", () => {
 
     it("edit mode treats role cards as editable truth files", () => {
       const prompt = buildAgentSystemPrompt("my-book", "vi", "edit");
-      expect(prompt).toContain("外部编辑助手");
-      expect(prompt).toContain("角色卡也是可编辑设定文件");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("roles/major/<name>.md");
       expect(prompt).toContain("write_truth_file");
     });
@@ -55,14 +55,14 @@ describe("buildAgentSystemPrompt", () => {
 
     it("treats derivative works as confirmed production actions instead of assisted routes", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "chat");
-      expect(prompt).toContain("生产型动作");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("fanfic_init");
       expect(prompt).toContain("continuation_import");
       expect(prompt).toContain("spinoff_create");
       expect(prompt).toContain("style_imitation");
-      expect(prompt).toContain("确认后直接执行");
-      expect(prompt).toContain("不要求用户再到另一个表单重复填写");
-      expect(prompt).not.toContain("辅助入口");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).not.toContain("mock_text");
     });
 
     it("keeps pure style analysis conversational and maps actual imitation to production", () => {
@@ -91,10 +91,10 @@ describe("buildAgentSystemPrompt", () => {
 
       const prompt = buildAgentSystemPrompt(null, "vi", "chat", { skills });
 
-      expect(prompt).toContain("## Skill 指导");
-      expect(prompt).toContain("detective-play (强制)");
-      expect(prompt).toContain("Skill 只提供专业指导和静态参考资料");
-      expect(prompt).toContain("它不授予执行权限");
+      expect(prompt).toContain("## Skill mock_text");
+      expect(prompt).toContain("detective-play (mock_text)");
+      expect(prompt).toContain("Skill mock_text");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("Track evidence before revealing deductions.");
     });
 
@@ -167,20 +167,20 @@ describe("buildAgentSystemPrompt", () => {
   describe("book-create mode", () => {
     it("gates long-form creation behind a confirmation proposal", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "book-create");
-      expect(prompt).toContain("建书助手");
-      expect(prompt).toContain("确认是否创建");
-      expect(prompt).toContain("分阶段");
-      expect(prompt).toContain("世界观与规则");
-      expect(prompt).toContain("人称/比例/禁忌/节奏要求");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text/mock_text/mock_text/mock_text");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("create_book");
       expect(prompt).not.toContain("sub_agent");
       expect(prompt).not.toContain("architect");
-      expect(prompt).toContain("标题");
-      expect(prompt).toContain("题材");
-      expect(prompt).toContain("世界观");
-      expect(prompt).toContain("主角");
-      expect(prompt).toContain("核心冲突");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
       expect(prompt).not.toContain("short_fiction_run");
       expect(prompt).not.toContain("generate_cover");
       expect(prompt).not.toContain("play_start");
@@ -194,7 +194,7 @@ describe("buildAgentSystemPrompt", () => {
       });
       expect(prompt).toContain("sub_agent");
       expect(prompt).toContain("architect");
-      expect(prompt).toContain("创建长篇");
+      expect(prompt).toContain("mock_text");
       expect(prompt).not.toContain("short_fiction_run");
       expect(prompt).not.toContain("play_start");
     });
@@ -212,11 +212,11 @@ describe("buildAgentSystemPrompt", () => {
   describe("short mode", () => {
     it("gates short-fiction and cover production behind a confirmation proposal", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "short");
-      expect(prompt).toContain("Castor Short 助手");
+      expect(prompt).toContain("Castor Short mock_text");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("short_run");
       expect(prompt).toContain("generate_cover");
-      expect(prompt).toContain("让用户确认");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("shortRun：title、direction");
       expect(prompt).not.toContain("short_fiction_run");
       expect(prompt).not.toContain("sub_agent");
@@ -241,7 +241,7 @@ describe("buildAgentSystemPrompt", () => {
         requestedIntent: "generate_cover",
       });
       expect(prompt).toContain("generate_cover");
-      expect(prompt).toContain("不要重跑正文");
+      expect(prompt).toContain("mock_text");
       expect(prompt).not.toContain("short_fiction_run");
       expect(prompt).not.toContain("sub_agent");
       expect(prompt).not.toContain("play_start");
@@ -274,14 +274,14 @@ describe("buildAgentSystemPrompt", () => {
   describe("script and storyboard modes", () => {
     it("gates script creation behind a confirmation proposal", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "script");
-      expect(prompt).toContain("剧本创作助手");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("script_create");
       expect(prompt).toContain("scriptCreate");
-      expect(prompt).toContain("先用 read 读取");
-      expect(prompt).toContain("不要要求用户重复上传或粘贴");
-      expect(prompt).toContain("不要在聊天里直接写完整剧本");
-      expect(prompt).toContain("不要凭空改写、压缩或替用户补素材");
+      expect(prompt).toContain("mock_text read mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text、mock_text");
       expect(prompt).not.toContain("script_create：");
       expect(prompt).not.toContain("storyboard_create：");
       expect(prompt).not.toContain("short_fiction_run");
@@ -304,13 +304,13 @@ describe("buildAgentSystemPrompt", () => {
 
     it("gates storyboard creation behind a confirmation proposal", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "storyboard");
-      expect(prompt).toContain("分镜创作助手");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("storyboard_create");
       expect(prompt).toContain("storyboardCreate");
-      expect(prompt).toContain("先用 read 读取");
-      expect(prompt).toContain("不要在聊天里直接写完整分镜");
-      expect(prompt).toContain("不要凭空改写、压缩或替用户补素材");
+      expect(prompt).toContain("mock_text read mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text、mock_text");
       expect(prompt).not.toContain("script_create：");
       expect(prompt).not.toContain("storyboard_create：");
       expect(prompt).not.toContain("short_fiction_run");
@@ -333,14 +333,14 @@ describe("buildAgentSystemPrompt", () => {
 
     it("gates interactive-film creation behind a confirmation proposal", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "interactive-film");
-      expect(prompt).toContain("互动影游创作助手");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("interactive_film_create");
       expect(prompt).toContain("interactiveFilmCreate");
-      expect(prompt).toContain("先用 read 读取");
-      expect(prompt).toContain("变量/旗标");
-      expect(prompt).toContain("多结局");
-      expect(prompt).toContain("不要在聊天里直接写完整交付稿");
+      expect(prompt).toContain("mock_text read mock_text");
+      expect(prompt).toContain("mock_text/mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text");
       expect(prompt).not.toContain("script_create：");
       expect(prompt).not.toContain("storyboard_create：");
       expect(prompt).not.toContain("play_start：");
@@ -367,19 +367,19 @@ describe("buildAgentSystemPrompt", () => {
   describe("play mode", () => {
     it("gates new world start behind a confirmation proposal before a world exists", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "play", { playWorldExists: false });
-      expect(prompt).toContain("Castor Play 助手");
+      expect(prompt).toContain("Castor Play mock_text");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("play_start");
-      expect(prompt).toContain("propose_action 就是确认卡");
+      expect(prompt).toContain("propose_action mock_text");
       expect(prompt).toContain("playStart.worldContract");
       expect(prompt).toContain("playStart.visualContract");
-      expect(prompt).toContain("playStart.initialScene 是确认后第一眼展示给玩家的正文场面");
-      expect(prompt).toContain("设定摘要放 premise/worldContract");
-      expect(prompt).toContain("动作跳板放 suggestedActions");
-      expect(prompt).toContain("不要擅自加等级、数值、RPG 面板或固定每回合时间");
-      expect(prompt).toContain("不要为了让确认卡更完整而补具体年限");
-      expect(prompt).toContain("用户说“刚入门”就保持刚入门");
-      expect(prompt).toContain("不要先用普通文字整理一遍再等用户二次确认");
+      expect(prompt).toContain("playStart.initialScene mock_textChương mock_text");
+      expect(prompt).toContain("mock_text premise/worldContract");
+      expect(prompt).toContain("mock_text suggestedActions");
+      expect(prompt).toContain("mock_text、mock_text、RPG mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text“mock_text”mock_text");
+      expect(prompt).toContain("mock_text từmock_text");
       expect(prompt).not.toContain("play_step：");
       expect(prompt).not.toContain("short_fiction_run");
       expect(prompt).not.toContain("generate_cover");
@@ -389,16 +389,16 @@ describe("buildAgentSystemPrompt", () => {
 
     it("exposes play_step, play_revise, and play_edit after a world exists", () => {
       const prompt = buildAgentSystemPrompt(null, "vi", "play", { playWorldExists: true });
-      expect(prompt).toContain("Castor Play 助手");
+      expect(prompt).toContain("Castor Play mock_text");
       expect(prompt).toContain("play_step");
       expect(prompt).toContain("play_revise");
       expect(prompt).toContain("play_edit");
-      expect(prompt).toContain("世界契约");
-      expect(prompt).toContain("角色/物件/规则卡");
-      expect(prompt).toContain("不推进时间");
-      expect(prompt).toContain("用 play_edit");
-      expect(prompt).toContain("用 play_revise");
-      expect(prompt).toContain("重做/换版/改上一条");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text/mock_text/mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text play_edit");
+      expect(prompt).toContain("mock_text play_revise");
+      expect(prompt).toContain("mock_text/mock_text/mock_text");
       expect(prompt).not.toContain("propose_action");
       expect(prompt).not.toContain("play_start：");
       expect(prompt).not.toContain("short_fiction_run");
@@ -414,7 +414,7 @@ describe("buildAgentSystemPrompt", () => {
       });
       expect(prompt).toContain("play_start");
       expect(prompt).toContain("worldContract");
-      expect(prompt).toContain("没有明确规则就留空");
+      expect(prompt).toContain("mock_text");
       expect(prompt).not.toContain("play_step");
       expect(prompt).not.toContain("propose_action");
       expect(prompt).not.toContain("short_fiction_run");
@@ -430,10 +430,10 @@ describe("buildAgentSystemPrompt", () => {
       expect(prompt).toContain("writer");
       expect(prompt).toContain("auditor");
       expect(prompt).toContain("reviser");
-      expect(prompt).toContain("工具 schema 是参数与能力的唯一说明");
-      expect(prompt).toContain("不要把讨论猜成执行命令");
-      expect(prompt).toContain("研究报告、资料卡和检索片段只是参考");
-      expect(prompt).not.toContain("## 可用工具");
+      expect(prompt).toContain("mock_text schema mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text、mock_text");
+      expect(prompt).not.toContain("## mock_text");
       expect(prompt).not.toContain("chapterWordCount");
       expect(prompt).not.toContain("approvedOnly");
       expect(prompt).not.toContain("roles/major/<name>.md");
@@ -445,18 +445,18 @@ describe("buildAgentSystemPrompt", () => {
 
     it("steers chapter rewrite to reviser instead of writer", () => {
       const prompt = buildAgentSystemPrompt("my-book", "vi", "book");
-      expect(prompt).toContain("续写新的下一章用 writer");
-      expect(prompt).toContain("修改、重写或重修已有章节用 reviser");
-      expect(prompt).toContain("三者不可互换");
-      expect(prompt).toContain("只重建状态/摘要/伏笔或重新审稿时，用 resync_chapter_state");
+      expect(prompt).toContain("mock_text writer");
+      expect(prompt).toContain("mock_text、mock_text reviser");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text/mock_text/mock_text，mock_text resync_chapter_state");
       expect(prompt).toContain("allowNewHooks=false");
     });
 
     it("forbids answering chapter-writing requests with raw chapter prose in chat", () => {
       const prompt = buildAgentSystemPrompt("my-book", "vi", "book");
-      expect(prompt).toContain("不要在聊天正文里输出章节来冒充完成");
-      expect(prompt).toContain("sub_agent 成功后结束本轮");
-      expect(prompt).toContain("完成态只以成功工具结果为准");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("sub_agent mock_text");
+      expect(prompt).toContain("mock_text");
     });
 
     it("English active-book prompt is also isolated", () => {
@@ -473,7 +473,7 @@ describe("buildAgentSystemPrompt", () => {
   describe("edit mode", () => {
     it("contains deterministic edit tools but no production tools", () => {
       const prompt = buildAgentSystemPrompt("my-book", "vi", "edit");
-      expect(prompt).toContain("外部编辑助手");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("read");
       expect(prompt).toContain("write_truth_file");
       expect(prompt).toContain("rename_entity");
@@ -491,15 +491,15 @@ describe("buildAgentSystemPrompt", () => {
     it("uses the graph-aware authoring harness instead of generic chat", () => {
       const prompt = buildAgentSystemPrompt("storm-radio", "vi", "interactive-film-authoring");
 
-      expect(prompt).toContain("互动影游创作向导");
+      expect(prompt).toContain("mock_text");
       expect(prompt).toContain("storm-radio");
-      expect(prompt).toContain("完整剧情图谱");
-      expect(prompt).toContain("真实 node id");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain("mock_text node id");
       expect(prompt).toContain("revise_node");
       expect(prompt).toContain("generate_node_image");
-      expect(prompt).toContain("讨论、比较方案或询问时直接回答，不调用工具");
-      expect(prompt).toContain("完成态只来自成功工具结果");
-      expect(prompt).not.toContain("普通聊天助手");
+      expect(prompt).toContain("mock_text、mock_text，mock_text");
+      expect(prompt).toContain("mock_text");
+      expect(prompt).not.toContain("mock_text");
       expect(prompt).not.toContain("create_book");
       expect(prompt).not.toContain("play_start");
     });

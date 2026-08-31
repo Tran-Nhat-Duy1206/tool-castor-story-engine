@@ -344,7 +344,7 @@ export const doctorCommand = new Command("doctor")
           detail: connected ? detectedDetail : lastError.split("\n")[0]!,
         });
 
-        if (!connected && /\b(?:401|403|429)\b|unauthorized|forbidden|quota|balance|insufficient|exceeded|额度|余额|配额/i.test(lastError)) {
+        if (!connected && /\b(?:401|403|429)\b|unauthorized|forbidden|quota|balance|insufficient|exceeded|||/i.test(lastError)) {
           checks.push({
             name: "  Hint",
             ok: false,

@@ -46,8 +46,8 @@ class TwoStepWorker extends BaseAgent {
   get name(): string { return "two-step"; }
 
   async run(): Promise<void> {
-    await this.chat([{ role: "user", content: "第一步" }]);
-    await this.chat([{ role: "user", content: "第二步" }]);
+    await this.chat([{ role: "user", content: "Chương mock_text" }]);
+    await this.chat([{ role: "user", content: "Chương mock_text" }]);
   }
 }
 
@@ -63,24 +63,24 @@ describe("Pi worker harness", () => {
 
   it("runs worker messages through the Castor provider boundary", async () => {
     chatCompletionMock.mockResolvedValue({
-      content: "完成",
+      content: "mock_text",
       usage: { promptTokens: 12, completionTokens: 3, totalTokens: 15 },
     });
 
     const result = await runWorkerAgent(client(), "deepseek-v4-pro", [
-      { role: "system", content: "你是审稿员" },
-      { role: "user", content: "检查第一章" },
+      { role: "system", content: "mock_text" },
+      { role: "user", content: "mock_textChương mock_text" },
     ], { temperature: 0.2, maxTokens: 8000 });
 
     expect(result).toEqual({
-      content: "完成",
+      content: "mock_text",
       usage: { promptTokens: 12, completionTokens: 3, totalTokens: 15 },
     });
     expect(chatCompletionMock).toHaveBeenCalledTimes(1);
     expect(chatCompletionMock.mock.calls[0]?.[1]).toBe("deepseek-v4-pro");
     expect(chatCompletionMock.mock.calls[0]?.[2]).toEqual([
-      { role: "system", content: "你是审稿员" },
-      { role: "user", content: "检查第一章" },
+      { role: "system", content: "mock_text" },
+      { role: "user", content: "mock_textChương mock_text" },
     ]);
     expect(chatCompletionMock.mock.calls[0]?.[3]).toMatchObject({
       temperature: 0.2,
@@ -92,19 +92,19 @@ describe("Pi worker harness", () => {
     chatCompletionMock.mockRejectedValue(new Error("upstream unavailable"));
 
     await expect(runWorkerAgent(client(), "deepseek-v4-flash", [
-      { role: "user", content: "写作" },
+      { role: "user", content: "mock_text" },
     ])).rejects.toThrow("upstream unavailable");
   });
 
   it("keeps provider defaults implicit and tolerates missing usage telemetry", async () => {
-    chatCompletionMock.mockResolvedValue({ content: "完成" });
+    chatCompletionMock.mockResolvedValue({ content: "mock_text" });
 
     const result = await runWorkerAgent(client(), "deepseek-v4-flash", [
-      { role: "user", content: "写作" },
+      { role: "user", content: "mock_text" },
     ]);
 
     expect(result).toEqual({
-      content: "完成",
+      content: "mock_text",
       usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
     });
     expect(chatCompletionMock.mock.calls[0]?.[3]).not.toHaveProperty("maxTokens");
@@ -146,7 +146,7 @@ describe("Pi worker harness", () => {
           type: "toolCall" as const,
           id: "state-1",
           name: "submit_state",
-          arguments: { label: "母亲", status: "等待退烧药" },
+          arguments: { label: "mock_text", status: "mock_text" },
         }],
         api: model?.api ?? "openai-completions",
         provider: model?.provider ?? "openai",
@@ -170,11 +170,11 @@ describe("Pi worker harness", () => {
     const result = await runWorkerAgentTool(
       client(),
       "deepseek-v4-flash",
-      [{ role: "user", content: "登记当前角色状态" }],
+      [{ role: "user", content: "mock_text" }],
       {
         name: "submit_state",
-        label: "提交状态",
-        description: "提交角色状态。",
+        label: "mock_text",
+        description: "mock_text。",
         parameters: Type.Object({
           label: Type.String(),
           status: Type.String(),
@@ -182,7 +182,7 @@ describe("Pi worker harness", () => {
       },
     );
 
-    expect(result).toEqual({ label: "母亲", status: "等待退烧药" });
+    expect(result).toEqual({ label: "mock_text", status: "mock_text" });
     expect(guardedPiStreamMock).toHaveBeenCalledTimes(1);
   });
 });

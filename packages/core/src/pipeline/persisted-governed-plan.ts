@@ -145,12 +145,12 @@ function renderPersistedPlanMarkdown(
 
 function renderMemoMarkdown(memo: PlanChapterOutput["memo"]): string {
   return [
-    `# 第 ${memo.chapter} 章 memo`,
+    `# Chapter ${memo.chapter} Memo`,
     "",
-    "## 本章目标",
+    "## Chapter goal",
     memo.goal,
     "",
-    "## 关联线索",
+    "## Related threads",
     renderList(memo.threadRefs),
     "",
     memo.body.trim(),
@@ -181,8 +181,8 @@ function readOptionalField(markdown: string, label: string): string | undefined 
 function readBooleanField(markdown: string, label: string): boolean | undefined {
   const value = readField(markdown, label);
   if (!value) return undefined;
-  if (/^(yes|true|是)$/i.test(value)) return true;
-  if (/^(no|false|否)$/i.test(value)) return false;
+  if (/^(yes|true)$/i.test(value)) return true;
+  if (/^(no|false)$/i.test(value)) return false;
   return undefined;
 }
 

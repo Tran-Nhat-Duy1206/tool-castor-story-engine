@@ -1,15 +1,9 @@
-/**
- * 书生浦语 (InternLM)
- *
- * - 官网：https://internlm.intern-ai.org.cn/
- * - 控制台 / API key：https://internlm.intern-ai.org.cn/api/document
- * - 开源仓库：https://github.com/InternLM/InternLM
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const INTERNLM: ProviderEndpoint = {
   id: "internlm",
-  label: "书生浦语 (InternLM)",
+  label: "InternLM (InternLM)",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://chat.intern-ai.org.cn/api/v1",

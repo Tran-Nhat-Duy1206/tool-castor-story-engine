@@ -169,11 +169,11 @@ describe("Phase 4 Final Confirm remains the sole Canon/consumption boundary", ()
     const fixture = await createCanonBook({ chapterCount: 1 });
     try {
       const chapter = 2;
-      const prose = "# 第2章 身份揭示\n\n主角在灯塔公开真实身份。\n";
-      await writeFile(join(fixture.bookDir, "chapters", "0002_身份揭示.md"), prose);
+      const prose = "# Chương 2 mock_text\n\nmock_textCong khaimock_text。\n";
+      await writeFile(join(fixture.bookDir, "chapters", "0002_mock_text.md"), prose);
       await writeFile(join(fixture.bookDir, "chapters", "index.json"), JSON.stringify([
-        { number: 1, title: "第1章", status: "approved", wordCount: 10, createdAt: "2026-08-27T00:00:00.000Z", updatedAt: "2026-08-27T00:00:00.000Z", auditIssues: [], lengthWarnings: [] },
-        { number: 2, title: "身份揭示", status: "needs-state-review", wordCount: 10, createdAt: "2026-08-27T00:00:00.000Z", updatedAt: "2026-08-27T00:00:00.000Z", auditIssues: [], lengthWarnings: [] },
+        { number: 1, title: "Chương 1", status: "approved", wordCount: 10, createdAt: "2026-08-27T00:00:00.000Z", updatedAt: "2026-08-27T00:00:00.000Z", auditIssues: [], lengthWarnings: [] },
+        { number: 2, title: "mock_text", status: "needs-state-review", wordCount: 10, createdAt: "2026-08-27T00:00:00.000Z", updatedAt: "2026-08-27T00:00:00.000Z", auditIssues: [], lengthWarnings: [] },
       ], null, 2));
       const pending = await createAuthorization(fixture.bookDir, { decisionKind: "identity_reveal", scope: { kind: "exact_chapter", chapterNumber: 2 }, consumption: "one_time" });
       const active = await confirmAuthorization(fixture.bookDir, pending.authorizationId, "human-author");
@@ -181,7 +181,7 @@ describe("Phase 4 Final Confirm remains the sole Canon/consumption boundary", ()
       const reviewId = "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa";
       await publishActiveProposal(fixture.bookDir, {
         schemaVersion: 1, status: "active", reviewId, sourceChapter: 2, effectiveChapter: 2, language: "vi", createdAt: "2026-08-27T00:00:00.000Z", proseRevision: computeProseRevision(prose), baseCanonRevision: canon.revision, reviewRevision: 1,
-        items: [{ id: "identity-fact", kind: "current-state-fact", origin: "ai", title: "Identity reveal", proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "北岸灯塔" } }, evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "公开真实身份" }, decision: "accepted" }],
+        items: [{ id: "identity-fact", kind: "current-state-fact", origin: "ai", title: "Identity reveal", proposal: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } }, evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "Cong khaimock_text" }, decision: "accepted" }],
       });
       expect((await loadAuthorization(fixture.bookDir, active.authorizationId))?.lifecycle).toBe("active");
       expect((await readStoryCanon(fixture.bookDir)).manifest.lastAppliedChapter).toBe(1);

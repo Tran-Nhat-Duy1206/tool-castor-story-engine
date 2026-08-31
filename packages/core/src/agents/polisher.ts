@@ -35,23 +35,14 @@ export class PolisherAgent extends BaseAgent {
   }
 
   async polishChapter(input: PolishChapterInput): Promise<PolishChapterOutput> {
-    const language = input.language ?? "vi";
-    const isEnglish = language === "en";
-    const isVietnamese = language === "vi";
-
     const memoBlock = input.chapterMemo
-      ? isEnglish || isVietnamese
-        ? `\n\n## Chapter Memo (do NOT let polish drift from this goal)\nGoal: ${input.chapterMemo.goal}\n\n${input.chapterMemo.body}`
-        : `\n\n## 章节备忘（润色不得偏离此目标）\ngoal：${input.chapterMemo.goal}\n\n${input.chapterMemo.body}`
+      ? `\n\n## Chapter Memo (do NOT let polish drift from this goal)\nGoal: ${input.chapterMemo.goal}\n\n${input.chapterMemo.body}`
       : "";
 
-    const systemPrompt = isEnglish || isVietnamese
-      ? buildEnglishSystemPrompt()
-      : buildChineseSystemPrompt();
+    const outputLanguage = input.language === "en" ? "English" : "Vietnamese";
+    const systemPrompt = buildSystemPrompt(outputLanguage);
 
-    const userPrompt = isEnglish || isVietnamese
-      ? `Polish chapter ${input.chapterNumber}. Return the polished chapter in full, nothing else — no JSON, no headers, no commentary.${memoBlock}\n\n## Chapter Under Polish\n${input.chapterContent}`
-      : `请润色第${input.chapterNumber}章。只返回完整的润色后正文，不要 JSON、不要标题、不要解释。${memoBlock}\n\n## 待润色章节\n${input.chapterContent}`;
+    const userPrompt = `Polish Chapter ${input.chapterNumber}. Output the polished prose in ${outputLanguage}. Return the polished chapter in full, nothing else — no JSON, no headers, no commentary.${memoBlock}\n\n## Chapter Under Polish\n${input.chapterContent}`;
 
     const response = await this.chat(
       [
@@ -79,12 +70,10 @@ function stripWrappingFence(text: string): string {
   return fence?.[1]?.trim() ?? text;
 }
 
-function buildChineseSystemPrompt(): string {
-  return buildEnglishSystemPrompt();
-}
+function buildSystemPrompt(outputLanguage: "English" | "Vietnamese"): string {
+  return `You are a professional web-fiction prose polisher.
 
-function buildEnglishSystemPrompt(): string {
-  return `You are a professional English web-fiction prose polisher.
+Output all polished prose and any [polisher-note] text in ${outputLanguage}. Preserve names, facts, and required literal markers exactly.
 
 ## Polisher Scope (hard constraints)
 

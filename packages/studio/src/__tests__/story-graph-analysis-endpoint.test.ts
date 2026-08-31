@@ -17,7 +17,7 @@ describe("GET /api/v1/projects/:id/story-graph/analysis", () => {
         { id: "s", type: "start", choices: [{ id: "a", text: "A", targetNodeId: "e1" }, { id: "b", text: "B", targetNodeId: "e2" }] },
         { id: "e1", type: "ending", choices: [] }, { id: "e2", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好", type: "good" }, { id: "b1", nodeId: "e2", title: "坏", type: "bad" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_val", type: "good" }, { id: "b1", nodeId: "e2", title: "mock_val", type: "bad" }],
     }));
     const app = createStudioServer({} as never, root);
     const res = await app.request("/api/v1/projects/p/story-graph/analysis");

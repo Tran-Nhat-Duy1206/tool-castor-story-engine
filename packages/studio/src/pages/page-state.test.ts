@@ -57,9 +57,9 @@ describe("book create form", () => {
   it("requires title, genre, brief, and positive numeric targets before creating", () => {
     const ready = {
       ...defaultBookCreateForm("vi"),
-      title: "夜港账本",
-      genre: "都市悬疑",
-      brief: "近未来港口城，主角查账洗白。",
+      title: "mock_val",
+      genre: "mock_val",
+      brief: "mock_val，mock_valKiem tra so sachmock_val。",
     };
 
     expect(isBookCreateFormReady(ready)).toBe(true);
@@ -70,20 +70,20 @@ describe("book create form", () => {
 
   it("builds a direct create payload without dropping the story brief", () => {
     expect(buildBookCreatePayload({
-      title: " 夜港账本 ",
-      genre: " 都市悬疑 ",
+      title: " mock_val ",
+      genre: " mock_val ",
       platform: "qidian",
       targetChapters: "120",
       chapterWordCount: "2600",
-      brief: " 主角查账洗白，旧案回潮。 ",
+      brief: " mock_valKiem tra so sachmock_val，mock_val。 ",
     }, "zh")).toEqual({
-      title: "夜港账本",
-      genre: "都市悬疑",
+      title: "mock_val",
+      genre: "mock_val",
       platform: "qidian",
       language: "zh",
       targetChapters: 120,
       chapterWordCount: 2600,
-      blurb: "主角查账洗白，旧案回潮。",
+      blurb: "mock_valKiem tra so sachmock_val，mock_val。",
     });
   });
 });
@@ -151,8 +151,8 @@ describe("waitForBookReady", () => {
 
 describe("resolveDraftInstruction", () => {
   it("keeps the user's first ideation turn untouched", () => {
-    expect(resolveDraftInstruction("我想写个港风商战悬疑", false)).toBe("我想写个港风商战悬疑");
-    expect(resolveDraftInstruction("把世界观改成近未来港口城", true)).toBe("把世界观改成近未来港口城");
+    expect(resolveDraftInstruction("mock_val", false)).toBe("mock_val");
+    expect(resolveDraftInstruction("mock_val", true)).toBe("mock_val");
   });
 });
 
@@ -208,7 +208,7 @@ describe("book create agent session", () => {
 describe("canCreateFromDraft", () => {
   it("does not let readyToCreate bypass the staged creation minimum", () => {
     expect(canCreateFromDraft({
-      concept: "港风商战悬疑",
+      concept: "mock_val",
       readyToCreate: true,
       missingFields: [],
     })).toBe(false);
@@ -216,15 +216,15 @@ describe("canCreateFromDraft", () => {
 
   it("accepts drafts that already have the staged creation minimum", () => {
     expect(canCreateFromDraft({
-      concept: "港风商战悬疑",
-      title: "夜港账本",
+      concept: "mock_val",
+      title: "mock_val",
       genre: "urban",
       platform: "tomato",
       targetChapters: 120,
       chapterWordCount: 2800,
-      worldPremise: "近未来港口城，账本牵出多方势力。",
-      protagonist: "林砚，水货账房出身，擅长记账和看人。",
-      conflictCore: "洗白与旧债回潮的对撞。",
+      worldPremise: "mock_val，mock_val。",
+      protagonist: "mock_val，mock_valPhong so sachmock_val，mock_val。",
+      conflictCore: "mock_val。",
       readyToCreate: false,
       missingFields: [],
     })).toBe(true);
@@ -233,13 +233,13 @@ describe("canCreateFromDraft", () => {
   it("creates from the six story-core fields without requiring length", () => {
     // Length is a run parameter with editable defaults — its absence must not block.
     expect(canCreateFromDraft({
-      concept: "港风商战悬疑",
-      title: "夜港账本",
+      concept: "mock_val",
+      title: "mock_val",
       genre: "urban",
       platform: "tomato",
-      worldPremise: "近未来港口城，账本牵出多方势力。",
-      protagonist: "林砚，水货账房出身，擅长记账和看人。",
-      conflictCore: "洗白与旧债回潮的对撞。",
+      worldPremise: "mock_val，mock_val。",
+      protagonist: "mock_val，mock_valPhong so sachmock_val，mock_val。",
+      conflictCore: "mock_val。",
       readyToCreate: false,
       missingFields: [],
     })).toBe(true);
@@ -247,8 +247,8 @@ describe("canCreateFromDraft", () => {
 
   it("rejects incomplete drafts", () => {
     expect(canCreateFromDraft({
-      concept: "港风商战悬疑",
-      title: "夜港账本",
+      concept: "mock_val",
+      title: "mock_val",
       readyToCreate: false,
       missingFields: ["genre", "targetChapters"],
     })).toBe(false);
@@ -258,17 +258,17 @@ describe("canCreateFromDraft", () => {
 describe("buildCreationDraftSummary", () => {
   it("groups the draft by creation stages so users do not create from a mixed blob", () => {
     const stages = buildCreationDraftStages({
-      concept: "港风商战悬疑，主角从灰产洗白。",
-      title: "夜港账本",
+      concept: "mock_val，mock_val。",
+      title: "mock_val",
       genre: "urban",
       platform: "tomato",
       targetChapters: 120,
       chapterWordCount: 2800,
-      worldPremise: "近未来港口城，账本牵出多方势力。",
-      settingNotes: "账本、港口、灰产规则都要服务洗白压力。",
-      protagonist: "林砚，水货账房出身，擅长记账和看人。",
-      conflictCore: "洗白与旧债回潮的对撞。",
-      volumeOutline: "卷一先查账，再暴露港口旧案。",
+      worldPremise: "mock_val，mock_val。",
+      settingNotes: "mock_val、mock_val、mock_val。",
+      protagonist: "mock_val，mock_valPhong so sachmock_val，mock_val。",
+      conflictCore: "mock_val。",
+      volumeOutline: "mock_valKiem tra so sach，mock_val。",
       missingFields: ["supportingCast"],
       readyToCreate: false,
     }, "vi");
@@ -320,24 +320,24 @@ describe("buildCreationDraftSummary", () => {
 
   it("surfaces the shared foundation draft in a user-facing order", () => {
     expect(buildCreationDraftSummary({
-      concept: "港风商战悬疑，主角从灰产洗白。",
-      title: "夜港账本",
-      worldPremise: "近未来港口城，账本牵出多方势力。",
-      protagonist: "林砚，水货账房出身，擅长记账和看人。",
-      conflictCore: "洗白与旧债回潮的对撞。",
-      volumeOutline: "卷一先查账，再暴露港口旧案。",
-      blurb: "一个做灰产生意的人，准备在夜港洗白，却先被旧账拖回去。",
-      nextQuestion: "卷一先查账还是先砸场？",
+      concept: "mock_val，mock_val。",
+      title: "mock_val",
+      worldPremise: "mock_val，mock_val。",
+      protagonist: "mock_val，mock_valPhong so sachmock_val，mock_val。",
+      conflictCore: "mock_val。",
+      volumeOutline: "mock_valKiem tra so sach，mock_val。",
+      blurb: "mock_val，mock_val，mock_val。",
+      nextQuestion: "mock_valKiem tra so sachmock_val？",
       missingFields: ["targetChapters"],
       readyToCreate: false,
     }, "vi")).toEqual([
-      { key: "title", label: "Tên sách", value: "夜港账本" },
-      { key: "worldPremise", label: "Thế giới quan", value: "近未来港口城，账本牵出多方势力。" },
-      { key: "protagonist", label: "Nhân vật chính", value: "林砚，水货账房出身，擅长记账和看人。" },
-      { key: "conflictCore", label: "Xung đột cốt lõi", value: "洗白与旧债回潮的对撞。" },
-      { key: "volumeOutline", label: "Hướng dàn ý tập", value: "卷一先查账，再暴露港口旧案。" },
-      { key: "blurb", label: "Tóm tắt", value: "一个做灰产生意的人，准备在夜港洗白，却先被旧账拖回去。" },
-      { key: "nextQuestion", label: "Bước tiếp theo", value: "卷一先查账还是先砸场？" },
+      { key: "title", label: "Tên sách", value: "mock_val" },
+      { key: "worldPremise", label: "Thế giới quan", value: "mock_val，mock_val。" },
+      { key: "protagonist", label: "Nhân vật chính", value: "mock_val，mock_valPhong so sachmock_val，mock_val。" },
+      { key: "conflictCore", label: "Xung đột cốt lõi", value: "mock_val。" },
+      { key: "volumeOutline", label: "Hướng dàn ý tập", value: "mock_valKiem tra so sach，mock_val。" },
+      { key: "blurb", label: "Tóm tắt", value: "mock_val，mock_val，mock_val。" },
+      { key: "nextQuestion", label: "Bước tiếp theo", value: "mock_valKiem tra so sachmock_val？" },
     ]);
   });
 });

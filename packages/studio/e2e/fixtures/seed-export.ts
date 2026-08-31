@@ -39,27 +39,27 @@ export async function seedExport(): Promise<void> {
     StoryGraphSchema.parse({
       schemaVersion: 1,
       projectId: E2E_EXPORT_ID,
-      title: "E2E 导出样例",
+      title: "E2E mock_val",
       variables: [],
       nodes: [
         {
           id: "start",
           type: "start",
-          title: "开场白",
-          sceneDesc: "古老宫殿门前，主角站在石阶上。",
+          title: "Mo daumock_val",
+          sceneDesc: "mock_val，mock_val。",
           dialogue: [
-            { speaker: "主角", text: "是时候做出选择了。", emotion: "坚定" },
+            { speaker: "mock_val", text: "mock_val。", emotion: "kien dinh" },
           ],
-          imageSlot: { prompt: "宫殿入口", assetRef },
+          imageSlot: { prompt: "mock_val", assetRef },
           choices: [
-            { id: "c1", text: "踏入宫殿", targetNodeId: "end" },
+            { id: "c1", text: "mock_val", targetNodeId: "end" },
           ],
         },
         {
           id: "end",
           type: "ending",
-          title: "命运已定",
-          sceneDesc: "一切尘埃落定。",
+          title: "mock_val",
+          sceneDesc: "mock_val。",
           dialogue: [],
           choices: [],
         },
@@ -68,9 +68,9 @@ export async function seedExport(): Promise<void> {
         {
           id: "eg1",
           nodeId: "end",
-          title: "命运已定",
+          title: "mock_val",
           type: "good",
-          description: "主角踏入宫殿，迎接命运。",
+          description: "mock_val，mock_val。",
         },
       ],
     }),

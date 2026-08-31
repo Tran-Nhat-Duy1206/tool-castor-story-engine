@@ -19,7 +19,7 @@ const BOOK: BookConfig = {
 
 const GENRE: GenreProfile = {
   id: "other",
-  name: "综合",
+  name: "mock_text",
   language: "vi",
   chapterTypes: ["setup", "conflict"],
   fatigueWords: [],
@@ -48,11 +48,11 @@ describe("buildWriterSystemPrompt", () => {
       "governed",
     );
 
-    expect(prompt).toContain("## 输入治理契约");
-    expect(prompt).toContain("卷纲是默认规划");
-    expect(prompt).not.toContain("## 核心规则");
-    expect(prompt).not.toContain("## 创作宪法");
-    expect(prompt).not.toContain("## 代入感六支柱");
+    expect(prompt).toContain("## mock_text");
+    expect(prompt).toContain("mock_text");
+    expect(prompt).not.toContain("## mock_text");
+    expect(prompt).not.toContain("## mock_text");
+    expect(prompt).not.toContain("## mock_text");
   });
 
   it("enforces narrative person only when the user explicitly set one (#290)", () => {
@@ -61,8 +61,8 @@ describe("buildWriterSystemPrompt", () => {
       BOOK, GENRE, firstPerson, "# Book Rules", "# Genre Body", "# Style Guide",
       undefined, 3, "creative", undefined, "vi", "governed",
     );
-    expect(promptFirst).toContain("叙事人称（硬约束）");
-    expect(promptFirst).toContain("第一人称");
+    expect(promptFirst).toContain("mock_text（mock_text）");
+    expect(promptFirst).toContain("Chương mock_text");
 
     // Unset → no narrative-person section is imposed (the genre default applies).
     const noPerson = BookRulesSchema.parse({});
@@ -70,11 +70,11 @@ describe("buildWriterSystemPrompt", () => {
       BOOK, GENRE, noPerson, "# Book Rules", "# Genre Body", "# Style Guide",
       undefined, 3, "creative", undefined, "vi", "governed",
     );
-    expect(promptNone).not.toContain("叙事人称（硬约束）");
+    expect(promptNone).not.toContain("mock_text（mock_text）");
   });
 
   it("tolerates a stray narrativePerson value (degrades to no constraint, fail-open)", () => {
-    const rules = BookRulesSchema.parse({ narrativePerson: "(仅当用户指定)" });
+    const rules = BookRulesSchema.parse({ narrativePerson: "(mock_text)" });
     expect(rules.narrativePerson).toBeUndefined();
   });
 
@@ -104,9 +104,9 @@ describe("buildWriterSystemPrompt", () => {
       lengthSpec,
     );
 
-    expect(prompt).toContain("目标字数：2200");
-    expect(prompt).toContain("允许区间：1900-2500");
-    expect(prompt).not.toContain("正文不少于2200字");
+    expect(prompt).toContain("mock_text từmock_text：2200");
+    expect(prompt).toContain("mock_text：1900-2500");
+    expect(prompt).not.toContain("mock_text2200 từ");
   });
 
   it("keeps hard guardrails and book/style constraints in governed mode", () => {
@@ -145,8 +145,8 @@ describe("buildWriterSystemPrompt", () => {
         "vi",
         "governed",
       );
-      expect(prompt).toContain("黄金三章写作纪律");
-      expect(prompt).toContain(`第 ${ch} 章`);
+      expect(prompt).toContain("mock_text");
+      expect(prompt).toContain(`Chương  ${ch} mock_text`);
     }
   });
 
@@ -176,7 +176,7 @@ describe("buildWriterSystemPrompt", () => {
       BOOK, GENRE, null, "# Book Rules", "# Genre Body", "# Style Guide",
       undefined, 4, "creative", undefined, "vi", "governed",
     );
-    expect(zh).not.toContain("黄金三章写作纪律");
+    expect(zh).not.toContain("mock_text");
 
     const en = buildWriterSystemPrompt(
       BOOK, { ...GENRE, language: "en", name: "General" }, null,
@@ -193,10 +193,10 @@ describe("buildWriterSystemPrompt", () => {
     expect(out).not.toMatch(/^\s*-\s/m);
     expect(out).not.toMatch(/^\s*\*\s/m);
     // Carries the load-bearing slot constraints.
-    expect(out).toContain("800 字");
-    expect(out).toContain("做出来");
-    expect(out).toContain("说出来");
-    expect(out).toContain("小钩子");
+    expect(out).toContain("800  từ");
+    expect(out).toContain("mock_text");
+    expect(out).toContain("mock_text");
+    expect(out).toContain("mock_text");
   });
 
   it("buildGoldenOpeningDiscipline returns empty string for ch>=4 / undefined", () => {

@@ -475,7 +475,7 @@ export type FoundationContentLocator =
 // Two DIFFERENT identities for the `rule` locator (implementation-discovered):
 //   unitId = SafeGovernanceId  — stable, Windows/path-safe governed identity.
 //   ruleId = FoundationSourceKey — bounded selector for the EXISTING Markdown H2
-//     heading text (e.g. "数值/资源规则" CONTAINS "/" because the real book_rules
+//     heading text (e.g. "/" CONTAINS "/" because the real book_rules
 //     card heading does). ruleId is NEVER used as a filesystem path component and
 //     is NOT SafeGovernanceId; the manifest unitId remains path-safe.
 

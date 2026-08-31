@@ -11,38 +11,38 @@ describe("spot-fix patches", () => {
       "=== PATCHES ===",
       "--- PATCH 1 ---",
       "TARGET_TEXT:",
-      "原句一。",
+      "mock_text。",
       "REPLACEMENT_TEXT:",
-      "新句一。",
+      "mock_text。",
       "--- END PATCH ---",
       "--- PATCH 2 ---",
       "TARGET_TEXT:",
-      "原句二。",
+      "mock_text。",
       "REPLACEMENT_TEXT:",
-      "新句二。",
+      "mock_text。",
       "--- END PATCH ---",
     ].join("\n"));
 
     expect(patches).toEqual<SpotFixPatch[]>([
-      { targetText: "原句一。", replacementText: "新句一。" },
-      { targetText: "原句二。", replacementText: "新句二。" },
+      { targetText: "mock_text。", replacementText: "mock_text。" },
+      { targetText: "mock_text。", replacementText: "mock_text。" },
     ]);
   });
 
   it("applies a uniquely targeted patch while preserving untouched text", () => {
     const original = [
-      "门轴轻轻响了一下。",
-      "林越没有立刻进去。",
+      "mock_text。",
+      "mock_text。",
       "",
-      "巷子尽头的风还在吹。",
-      "他把手按在潮冷的门框上，没有出声。",
-      "更远处传来极轻的脚步回响，又很快断掉。",
+      "mock_text。",
+      "mock_text，mock_text。",
+      "mock_text，mock_text。",
     ].join("\n");
 
     const result = applySpotFixPatches(original, [
       {
-        targetText: "林越没有立刻进去。",
-        replacementText: "林越先停在门槛外，侧耳听了一息。",
+        targetText: "mock_text。",
+        replacementText: "mock_text，mock_text。",
       },
     ]);
 
@@ -50,50 +50,50 @@ describe("spot-fix patches", () => {
     expect(result.appliedPatchCount).toBe(1);
     expect(result.skippedPatchCount).toBe(0);
     expect(result.revisedContent).toBe([
-      "门轴轻轻响了一下。",
-      "林越先停在门槛外，侧耳听了一息。",
+      "mock_text。",
+      "mock_text，mock_text。",
       "",
-      "巷子尽头的风还在吹。",
-      "他把手按在潮冷的门框上，没有出声。",
-      "更远处传来极轻的脚步回响，又很快断掉。",
+      "mock_text。",
+      "mock_text，mock_text。",
+      "mock_text，mock_text。",
     ].join("\n"));
   });
 
   it("skips non-unique patches instead of rejecting all", () => {
-    const original = "他停了一下。\n门里的人也停了一下。\n窗外很静。";
+    const original = "mock_text。\nmock_text。\nmock_text。";
 
     const result = applySpotFixPatches(original, [
-      { targetText: "停了一下", replacementText: "顿了顿" },
-      { targetText: "窗外很静。", replacementText: "窗外传来虫鸣。" },
+      { targetText: "mock_text", replacementText: "mock_text" },
+      { targetText: "mock_text。", replacementText: "mock_text。" },
     ]);
 
     expect(result.applied).toBe(true);
     expect(result.appliedPatchCount).toBe(1);
     expect(result.skippedPatchCount).toBe(1);
-    expect(result.revisedContent).toContain("窗外传来虫鸣。");
-    expect(result.revisedContent).toContain("停了一下"); // unchanged — patch was skipped
+    expect(result.revisedContent).toContain("mock_text。");
+    expect(result.revisedContent).toContain("mock_text"); // unchanged — patch was skipped
   });
 
   it("applies patches via fuzzy match when whitespace differs", () => {
-    const original = "他慢慢站起来，   看了一眼\n远处的山。";
+    const original = "mock_text，   mock_text\nmock_text。";
 
     const result = applySpotFixPatches(original, [
       {
-        targetText: "他慢慢站起来， 看了一眼 远处的山。",
-        replacementText: "他猛地起身，盯着远山。",
+        targetText: "mock_text， mock_text mock_text。",
+        replacementText: "mock_text，mock_text。",
       },
     ]);
 
     expect(result.applied).toBe(true);
     expect(result.appliedPatchCount).toBe(1);
-    expect(result.revisedContent).toBe("他猛地起身，盯着远山。");
+    expect(result.revisedContent).toBe("mock_text，mock_text。");
   });
 
   it("reports all skipped when no patches can be matched", () => {
-    const original = "完全不相关的内容。";
+    const original = "mock_text。";
 
     const result = applySpotFixPatches(original, [
-      { targetText: "这段不存在", replacementText: "替换" },
+      { targetText: "mock_text", replacementText: "mock_text" },
     ]);
 
     expect(result.applied).toBe(false);

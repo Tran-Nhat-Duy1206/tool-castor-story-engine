@@ -9,7 +9,7 @@ function hook(overrides: Partial<StoredHook>): StoredHook {
   return {
     hookId: "H01",
     startChapter: 1,
-    type: "主线",
+    type: "mock_text",
     status: "open",
     lastAdvancedChapter: 0,
     expectedPayoff: "",
@@ -103,7 +103,7 @@ describe("computeHookDiagnostics — Phase 7 stale / blocked detection", () => {
   });
 
   it("renderHookDiagnosticMarker formats zh / en markers correctly", () => {
-    // Hotfix 3: marker now embeds blocked distance (已阻 N 章 / blocked N chapters)
+    // Hotfix 3: marker now embeds blocked distance (mock_text N mock_text / blocked N chapters)
     // so the reviewer can apply the 5/6-chapter threshold directly.
     const diag = {
       stale: true,
@@ -114,7 +114,7 @@ describe("computeHookDiagnostics — Phase 7 stale / blocked detection", () => {
       blockedDistance: 7,
     } as const;
     expect(renderHookDiagnosticMarker(diag, "vi")).toBe(
-      "过期 (距=20/半衰=10); 受阻于 H-up (已阻 7 章)",
+      "mock_text (mock_text=20/mock_text=10); mock_text H-up (mock_text 7 mock_text)",
     );
     expect(renderHookDiagnosticMarker(diag, "en")).toBe(
       "stale (d=20/half=10); blocked on H-up (blocked 7 chapters)",

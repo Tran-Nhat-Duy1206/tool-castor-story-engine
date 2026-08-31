@@ -140,10 +140,10 @@ describe("PlatformSchema", () => {
 
   it("normalizes platform ids and human-facing aliases", () => {
     expect(normalizePlatformId("tomato")).toBe("tomato");
-    expect(normalizePlatformId("番茄小说")).toBe("tomato");
+    expect(normalizePlatformId("mock_text")).toBe("tomato");
     expect(normalizePlatformId("fanqie-novel")).toBe("tomato");
-    expect(normalizePlatformId("起点中文网")).toBe("qidian");
-    expect(normalizePlatformId("飞卢")).toBe("feilu");
+    expect(normalizePlatformId("mock_text")).toBe("qidian");
+    expect(normalizePlatformId("mock_text")).toBe("feilu");
     expect(normalizePlatformId("royal-road")).toBe("other");
     expect(normalizePlatformId("Kindle Unlimited")).toBe("other");
     expect(normalizePlatformId("")).toBeUndefined();
@@ -564,22 +564,22 @@ describe("ChapterMemoSchema", () => {
   it("accepts a memo with prose body and threadRefs", () => {
     const result = ChapterMemoSchema.parse({
       chapter: 12,
-      goal: "把七号门被动过手脚钉成现场实证",
+      goal: "mock_text",
       isGoldenOpening: true,
-      body: "## 当前任务\n主角进入七号门……\n## 不要做\n不要让对手降智。",
+      body: "## Nhiệm vụ hiện tại\nmock_text……\n## Không làm\nmock_text。",
       threadRefs: ["H019", "S004"],
     });
 
     expect(result.isGoldenOpening).toBe(true);
-    expect(result.body).toContain("当前任务");
+    expect(result.body).toContain("Nhiệm vụ hiện tại");
     expect(result.threadRefs).toEqual(["H019", "S004"]);
   });
 
   it("defaults isGoldenOpening and threadRefs when omitted", () => {
     const result = ChapterMemoSchema.parse({
       chapter: 3,
-      goal: "让主角做下第一次不可逆选择",
-      body: "## 当前任务\n主角落下决定。",
+      goal: "mock_textChương mock_text",
+      body: "## Nhiệm vụ hiện tại\nmock_text。",
     });
 
     expect(result.isGoldenOpening).toBe(false);
@@ -591,7 +591,7 @@ describe("ChapterMemoSchema", () => {
       ChapterMemoSchema.parse({
         chapter: 1,
         goal: "a".repeat(51),
-        body: "## 当前任务\nx",
+        body: "## Nhiệm vụ hiện tại\nx",
       }),
     ).toThrow();
   });

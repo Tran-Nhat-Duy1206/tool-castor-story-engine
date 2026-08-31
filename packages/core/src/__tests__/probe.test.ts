@@ -12,7 +12,7 @@ describe("probeModelsFromUpstream", () => {
     globalThis.fetch = origFetch;
   });
 
-  it("正常响应返回 ProbedModel 数组", async () => {
+  it("mock_text ProbedModel mock_text", async () => {
     (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({ data: [{ id: "gpt-4" }, { id: "gpt-3.5" }] }),
@@ -24,19 +24,19 @@ describe("probeModelsFromUpstream", () => {
     ]);
   });
 
-  it("非 2xx 返回空数组", async () => {
+  it("mock_text 2xx mock_text", async () => {
     (globalThis.fetch as any).mockResolvedValue({ ok: false });
     const result = await probeModelsFromUpstream("https://api.example.com/v1", "sk-test");
     expect(result).toEqual([]);
   });
 
-  it("fetch 抛错返回空数组", async () => {
+  it("fetch mock_text", async () => {
     (globalThis.fetch as any).mockRejectedValue(new Error("network down"));
     const result = await probeModelsFromUpstream("https://api.example.com/v1", "sk-test");
     expect(result).toEqual([]);
   });
 
-  it("响应 json.data 不是数组返回空数组", async () => {
+  it("mock_text json.data mock_text", async () => {
     (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({ data: "not-an-array" }),
@@ -45,13 +45,13 @@ describe("probeModelsFromUpstream", () => {
     expect(result).toEqual([]);
   });
 
-  it("baseUrl 空直接返回空数组,不发请求", async () => {
+  it("baseUrl mock_text,mock_text", async () => {
     const r1 = await probeModelsFromUpstream("", "sk-test");
     expect(r1).toEqual([]);
     expect(globalThis.fetch).not.toHaveBeenCalled();
   });
 
-  it("apiKey 空时仍可探测不需要鉴权的本地模型端点", async () => {
+  it("apiKey mock_text", async () => {
     (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({ data: [{ id: "qwen3.6:35b-a3b" }] }),
@@ -66,7 +66,7 @@ describe("probeModelsFromUpstream", () => {
     );
   });
 
-  it("过滤掉 id 非字符串的 entry", async () => {
+  it("mock_text id mock_text từmock_text entry", async () => {
     (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({ data: [{ id: "valid" }, { id: null }, { id: 123 }, {}] }),

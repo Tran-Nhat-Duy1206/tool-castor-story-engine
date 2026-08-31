@@ -455,7 +455,7 @@ function assertModelBelongsToService(entry: ServiceConfigEntry | undefined, mode
   const endpoint = getEndpoint(entry.service);
   if (!endpoint) return;
   if (!modelBelongsToService(entry, model)) {
-    throw new Error(`模型 ${model} 不属于 ${entry.service} 服务，请切换服务或选择该服务下的模型。`);
+    throw new Error(` ${model}  ${entry.service} ，。`);
   }
 }
 
@@ -481,17 +481,7 @@ function normalizeModelIds(value: readonly unknown[]): string[] {
   return models;
 }
 
-/**
- * 这些服务的可用模型清单是动态的，静态 bank 必然滞后，
- * 所以用户显式配置的模型 id 直接透传，不做 bank 白名单校验（issue #300）：
- * - ollama：本地装了什么模型就有什么模型
- * - lmstudio：本地装了什么模型就有什么模型
- * - openrouter：聚合 350+ 上游模型，上游随时增删，bank 只列常用子集
- * - newapi：自建中转网关，模型清单由部署方自定义，bank 为空
- * - kkaiapi：多家大模型的 OpenAI 兼容中转站，上游清单随时变化
- * - ppio：聚合平台，每周都有新模型 id，bank 只维护主流子集
- * - siliconcloud：聚合平台，新模型上架频繁，bank 只维护主流子集
- */
+// Core narrative engine processing.
 const SERVICES_WITH_DYNAMIC_MODELS: ReadonlySet<string> = new Set([
   "ollama",
   "lmstudio",
@@ -518,7 +508,7 @@ function deriveProviderFromService(service: string): "anthropic" | "openai" | "c
 function warnIfStudioIgnoresEnv(layers: LLMEnvLayers, diagnostics: MutableDiagnostics): void {
   const ignored = studioIgnoredEnv(layers);
   if (Object.keys(ignored).some((key) => key.startsWith("CASTOR_LLM_"))) {
-    diagnostics.warnings.push("Studio 运行时不会使用 env 中的 CASTOR_LLM_* 配置；请在服务配置页保存 Studio 配置。");
+    diagnostics.warnings.push("Studio  env  CASTOR_LLM_* ； Studio 。");
   }
 }
 
@@ -529,7 +519,7 @@ function warnIfStaleTopLevel(
 ): void {
   if (services.length === 0) return;
   if (["provider", "baseUrl", "model", "apiKey"].some((key) => typeof llm[key] === "string" && (llm[key] as string).length > 0)) {
-    diagnostics.warnings.push("检测到旧顶层 LLM 配置；Studio 模式以选中的 service/defaultModel/secrets 为准。");
+    diagnostics.warnings.push(" LLM ；Studio  service/defaultModel/secrets 。");
   }
 }
 

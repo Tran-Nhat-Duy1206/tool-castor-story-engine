@@ -99,14 +99,14 @@ describe("StateManager", () => {
       const bookDir = manager.bookDir("rebuild-book");
       await mkdir(join(bookDir, "chapters"), { recursive: true });
       await writeFile(join(bookDir, "chapters", "index.json"), "[]", "utf-8");
-      await writeFile(join(bookDir, "chapters", "0001_雨棚.md"), "# 第1章 雨棚\n\n正文。", "utf-8");
-      await writeFile(join(bookDir, "chapters", "0002_账页.md"), "# 第2章 账页\n\n正文。", "utf-8");
+      await writeFile(join(bookDir, "chapters", "0001_mock_text.md"), "# Chương 1 mock_text\n\nmock_text。", "utf-8");
+      await writeFile(join(bookDir, "chapters", "0002_mock_text.md"), "# Chương 2 mock_text\n\nmock_text。", "utf-8");
 
       const loaded = await manager.loadChapterIndex("rebuild-book");
 
       expect(loaded.map((chapter) => chapter.number)).toEqual([1, 2]);
       expect(loaded[0]).toMatchObject({
-        title: "雨棚",
+        title: "mock_text",
         status: "ready-for-review",
       });
     });
@@ -114,14 +114,14 @@ describe("StateManager", () => {
     it("does not save an empty chapter index over existing chapter files", async () => {
       const bookDir = manager.bookDir("protect-empty-index");
       await mkdir(join(bookDir, "chapters"), { recursive: true });
-      await writeFile(join(bookDir, "chapters", "0001_雨棚.md"), "# 第1章 雨棚\n\n正文。", "utf-8");
+      await writeFile(join(bookDir, "chapters", "0001_mock_text.md"), "# Chương 1 mock_text\n\nmock_text。", "utf-8");
 
       await manager.saveChapterIndex("protect-empty-index", []);
 
       const raw = await readFile(join(bookDir, "chapters", "index.json"), "utf-8");
       const parsed = JSON.parse(raw) as Array<{ number: number; title: string }>;
       expect(parsed.map((chapter) => chapter.number)).toEqual([1]);
-      expect(parsed[0]?.title).toBe("雨棚");
+      expect(parsed[0]?.title).toBe("mock_text");
     });
 
     it("creates the chapters directory on save", async () => {
@@ -316,7 +316,7 @@ describe("StateManager", () => {
           [
             "| hook_id | start_chapter | type | status | last_advanced | expected_payoff | notes |",
             "| --- | --- | --- | --- | --- | --- | --- |",
-            "| H001 | 1 | mystery | progressing | 《三体》游戏内第141号文明继续展开 | Reveal the true enemy | Narrative text must not drive chapter progress |",
+            "| H001 | 1 | mystery | progressing | 《mock_text》mock_textChương 141mock_text | Reveal the true enemy | Narrative text must not drive chapter progress |",
             "",
           ].join("\n"),
           "utf-8",
@@ -877,8 +877,8 @@ describe("StateManager", () => {
 
       const storyDir = join(manager.bookDir("phase5-book"), "story");
       const outlineStat = await stat(join(storyDir, "outline"));
-      const rolesMajorStat = await stat(join(storyDir, "roles", "主要角色"));
-      const rolesMinorStat = await stat(join(storyDir, "roles", "次要角色"));
+      const rolesMajorStat = await stat(join(storyDir, "roles", "major"));
+      const rolesMinorStat = await stat(join(storyDir, "roles", "minor"));
 
       expect(outlineStat.isDirectory()).toBe(true);
       expect(rolesMajorStat.isDirectory()).toBe(true);
@@ -904,7 +904,7 @@ describe("StateManager", () => {
     it("creates localized Chinese defaults for Chinese books", async () => {
       await manager.saveBookConfig("zh-book", {
         id: "zh-book",
-        title: "中文书",
+        title: "mock_text",
         platform: "tomato",
         genre: "other",
         status: "outlining",
@@ -927,8 +927,8 @@ describe("StateManager", () => {
         "utf-8",
       );
 
-      expect(authorIntent).toContain("# 作者意图");
-      expect(currentFocus).toContain("# 当前聚焦");
+      expect(authorIntent).toContain("# mock_text");
+      expect(currentFocus).toContain("# mock_text");
       expect(currentFocus).not.toContain("# Current Focus");
     });
 
@@ -1054,7 +1054,7 @@ describe("StateManager", () => {
           [
             "| hook_id | start_chapter | type | status | last_advanced | expected_payoff | notes |",
             "| --- | --- | --- | --- | --- | --- | --- |",
-            "| H001 | 1 | mystery | progressing | 《三体》游戏内第141号文明展开到墨子时代 | Reveal the threat | Narrative prose, not chapter metadata |",
+            "| H001 | 1 | mystery | progressing | 《mock_text》mock_textChương 141mock_text | Reveal the threat | Narrative prose, not chapter metadata |",
             "",
           ].join("\n"),
           "utf-8",

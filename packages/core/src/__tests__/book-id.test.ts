@@ -3,11 +3,11 @@ import { assertSafeBookId, deriveBookIdFromTitle, isSafeBookId } from "../utils/
 
 describe("book id safety", () => {
   it("accepts ids produced by Castor title derivation", () => {
-    expect(deriveBookIdFromTitle("夜港账本")).toBe("夜港账本");
+    expect(deriveBookIdFromTitle("mock_text")).toBe("mock_text");
     expect(deriveBookIdFromTitle(" Harbor: Ledger! ")).toBe("harbor-ledger");
     expect(isSafeBookId("harbor-ledger")).toBe(true);
-    expect(isSafeBookId("夜港账本")).toBe(true);
-    expect(isSafeBookId("天机破诡：仙帝重生救苍生")).toBe(true);
+    expect(isSafeBookId("mock_text")).toBe(true);
+    expect(isSafeBookId("mock_text：mock_text")).toBe(true);
   });
 
   it("rejects prompt injection and path traversal shapes", () => {

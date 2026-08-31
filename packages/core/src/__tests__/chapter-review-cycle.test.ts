@@ -97,12 +97,12 @@ describe("runChapterReviewCycle v9", () => {
       passed: false,
       overallScore: 0,
       parseFailed: true,
-      summary: "审稿输出解析失败",
+      summary: "mock_text",
       issues: [{
         severity: "critical",
-        category: "系统错误",
-        description: "审稿输出格式异常，无法解析为 JSON",
-        suggestion: "检查模型输出格式",
+        category: "mock_text",
+        description: "mock_text，mock_text JSON",
+        suggestion: "mock_text",
       }],
     }));
     const reviseChapter = vi.fn().mockResolvedValue({
@@ -133,8 +133,8 @@ describe("runChapterReviewCycle v9", () => {
   });
 
   it("turns hard-range drift into an explicit reviser issue and only passes after repair", async () => {
-    const shortDraft = "短".repeat(80);
-    const repairedDraft = "修".repeat(220);
+    const shortDraft = "mock_text".repeat(80);
+    const repairedDraft = "mock_text".repeat(220);
     const auditChapter = vi.fn().mockResolvedValue(createAuditResult({ passed: true, overallScore: 90 }));
     const reviseChapter = vi.fn().mockResolvedValue({
       revisedContent: repairedDraft,
@@ -338,7 +338,7 @@ describe("runChapterReviewCycle v9", () => {
     const auditChapter = vi.fn()
       .mockResolvedValue(createAuditResult({ overallScore: 90, passed: true }));
     const reviseChapter = vi.fn();
-    const unsafe = `${"雨".repeat(100)}——${"夜".repeat(98)}`;
+    const unsafe = `${"mock_text".repeat(100)}——${"mock_text".repeat(98)}`;
 
     const result = await runChapterReviewCycle({
       ...baseParams,
@@ -352,7 +352,7 @@ describe("runChapterReviewCycle v9", () => {
       normalizePostWriteSurface: (content) => content.replace(/——+/g, "，"),
       runPostWriteChecks: (content) =>
         content.includes("——")
-          ? [{ severity: "critical" as const, category: "禁止破折号", description: "出现了破折号", suggestion: "用逗号断句" }]
+          ? [{ severity: "critical" as const, category: "mock_text", description: "mock_text", suggestion: "mock_text" }]
           : [],
     });
 

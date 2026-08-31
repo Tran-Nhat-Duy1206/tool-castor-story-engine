@@ -187,7 +187,7 @@ function assertEntityRenameTargetIsSafe(newValue: string): void {
   }
 }
 
-// Entity files are addressed by path elsewhere (e.g. roles/主要角色/<name>.md). When the content pass
+// Core narrative engine processing.
 // rewrites those path references from oldValue to newValue, the files themselves must be renamed too,
 // or the references dangle. Plan the disk renames up front (before any write) so a name collision
 // aborts the whole transaction cleanly instead of leaving content half-rewritten.

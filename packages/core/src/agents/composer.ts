@@ -391,157 +391,66 @@ export class ComposerAgent extends BaseAgent {
   }
 
   async selectOutlineSections(request: OutlineSectionSelectionRequest): Promise<ReadonlyArray<string>> {
-    if (request.candidates.length <= 1) {
-      return request.candidates.map((candidate) => candidate.source);
-    }
-    const isEn = request.language === "en";
+    if (request.candidates.length <= 1) return request.candidates.map((candidate) => candidate.source);
+    const outputLanguage = request.language === "en" ? "English" : "Vietnamese";
     const candidates = request.candidates.map((candidate, index) => [
-      `#${index + 1} ${candidate.source}`,
-      `heading: ${candidate.heading}`,
-      candidate.excerpt,
+      `#${index + 1} ${candidate.source}`, `heading: ${candidate.heading}`, candidate.excerpt,
     ].join("\n")).join("\n\n");
-    const system = isEn
-      ? [
-          "You are Castor's semantic outline-section selector.",
-          "Select only the outline sections needed for the current chapter. Prefer semantic relevance over keyword overlap.",
-          "Return strict JSON only: {\"selectedSources\":[\"...\"]}. Use exact source ids from the candidates. If uncertain, include the safest relevant anchors rather than inventing ids.",
-        ].join("\n")
-      : [
-          "你是 Castor 的语义大纲选段器。",
-          "只选择当前章节真正需要的大纲段落。按语义相关性判断，不要按关键词重合机械选择。",
-          "只返回严格 JSON：{\"selectedSources\":[\"...\"]}。必须使用候选里的精确 source id；不确定时选最安全的相关锚点，不要编造 id。",
-        ].join("\n");
-    const user = isEn
-      ? [
-          `File: ${request.fileName}`,
-          `Chapter: ${request.chapterNumber}`,
-          `Goal: ${request.goal}`,
-          `Outline node: ${request.outlineNode}`,
-          "",
-          "Candidates:",
-          candidates,
-        ].join("\n")
-      : [
-          `文件：${request.fileName}`,
-          `章节：第${request.chapterNumber}章`,
-          `目标：${request.goal}`,
-          `大纲节点：${request.outlineNode}`,
-          "",
-          "候选段落：",
-          candidates,
-        ].join("\n");
     const response = await this.chat([
-      { role: "system", content: system },
-      { role: "user", content: user },
-    ], {
-      temperature: 0.1,
-      maxTokens: 1024,
-    });
+      { role: "system", content: [
+        "You are Castor's semantic outline-section selector.",
+        "Select only sections needed for the current chapter. Prefer semantic relevance over keyword overlap.",
+        "Return strict JSON only: {\"selectedSources\":[\"...\"]}. Use exact candidate source ids and never invent ids.",
+        `The requested story output language is ${outputLanguage}; this selection response remains machine JSON.`,
+      ].join("\n") },
+      { role: "user", content: [
+        `File: ${request.fileName}`, `Chapter: ${request.chapterNumber}`, `Goal: ${request.goal}`,
+        `Outline node: ${request.outlineNode}`, "", "Candidates:", candidates,
+      ].join("\n") },
+    ], { temperature: 0.1, maxTokens: 1024 });
     const allowed = new Set(request.candidates.map((candidate) => candidate.source));
     return parseSelectedSources(response.content).filter((source) => allowed.has(source));
   }
-
   async selectReferenceSections(request: ReferenceSectionSelectionRequest): Promise<ReadonlyArray<string>> {
-    const isEn = request.language === "en";
+    const outputLanguage = request.language === "en" ? "English" : "Vietnamese";
     const candidates = request.candidates.map((candidate, index) => [
-      `#${index + 1} ${candidate.source}`,
-      `title: ${candidate.title}`,
-      `heading: ${candidate.heading}`,
-      `user-defined uses: ${candidate.uses.join("; ")}`,
-      candidate.note ? `user note: ${candidate.note}` : undefined,
+      `#${index + 1} ${candidate.source}`, `title: ${candidate.title}`, `heading: ${candidate.heading}`,
+      `user-defined uses: ${candidate.uses.join("; ")}`, candidate.note ? `user note: ${candidate.note}` : undefined,
     ].filter(Boolean).join("\n")).join("\n\n");
-    const system = isEn
-      ? [
-          "You are Castor's semantic reference-section selector.",
-          "The user explicitly bound these reference assets to this book and described how each may be used.",
-          "Select only sections useful for the current chapter task. References are creative guidance, never canon and never stronger than author intent or established facts.",
-          "Return strict JSON only: {\"selectedSources\":[\"...\"]}. Use exact candidate source ids. An empty list is valid when no section is relevant.",
-        ].join("\n")
-      : [
-          "你是 Castor 的参考资产语义选段器。",
-          "用户已把这些参考资产绑定到本书，并明确说明每份资料可以借鉴什么。",
-          "只选择当前章节任务真正需要的段落。参考资料只是创作借鉴，不能成为正典，也不能压过作者意图和既成事实。",
-          "只返回严格 JSON：{\"selectedSources\":[\"...\"]}。必须使用候选中的精确 source id；没有相关段落时可以返回空数组。",
-        ].join("\n");
-    const user = isEn
-      ? [
-          `Chapter: ${request.chapterNumber}`,
-          `Goal: ${request.goal}`,
-          `Outline node: ${request.outlineNode}`,
-          `Must keep: ${request.mustKeep.join("; ") || "(none)"}`,
-          "",
-          "Candidates (headings only; selected sections will be loaded verbatim by the host):",
-          candidates,
-        ].join("\n")
-      : [
-          `章节：第${request.chapterNumber}章`,
-          `目标：${request.goal}`,
-          `大纲节点：${request.outlineNode}`,
-          `必须保留：${request.mustKeep.join("；") || "（无）"}`,
-          "",
-          "候选段落（这里只给标题；宿主会把选中的段落原文完整载入）：",
-          candidates,
-        ].join("\n");
     const response = await this.chat([
-      { role: "system", content: system },
-      { role: "user", content: user },
-    ], {
-      temperature: 0.1,
-      maxTokens: 2048,
-    });
+      { role: "system", content: [
+        "You are Castor's semantic reference-section selector.",
+        "Select only sections useful for the current task. References are creative guidance, never canon or stronger than author intent.",
+        "Return strict JSON only: {\"selectedSources\":[\"...\"]}. Use exact ids; an empty list is valid.",
+        `The requested story output language is ${outputLanguage}; this selection response remains machine JSON.`,
+      ].join("\n") },
+      { role: "user", content: [
+        `Chapter: ${request.chapterNumber}`, `Goal: ${request.goal}`, `Outline node: ${request.outlineNode}`,
+        `Must keep: ${request.mustKeep.join("; ") || "(none)"}`, "", "Candidates:", candidates,
+      ].join("\n") },
+    ], { temperature: 0.1, maxTokens: 2048 });
     const allowed = new Set(request.candidates.map((candidate) => candidate.source));
     return parseSelectedSources(response.content).filter((source) => allowed.has(source));
   }
-
   async compileCompressibleContext(request: CompressibleContextCompileRequest): Promise<string> {
-    const isEn = request.language === "en";
+    const outputLanguage = request.language === "en" ? "English" : "Vietnamese";
     const protectedBlock = renderContextEntries(request.protectedEntries);
     const compressibleBlock = renderContextEntries(request.compressibleEntries);
-    const system = isEn
-      ? [
-          "You are Castor's semantic context compiler.",
-          "Only compile the COMPRESSIBLE CONTEXT. The PROTECTED CONTEXT is binding reference material and must not be rewritten, summarized as a substitute, or weakened.",
-          "Output concise Markdown with source pointers. Preserve names, unresolved promises, evidence, timing, and constraints that may affect the next chapter. Drop low-relevance noise.",
-        ].join("\n")
-      : [
-          "你是 Castor 的语义上下文编译器。",
-          "只能编译【可压缩上下文】。【受保护上下文】是绑定参照，不得改写、不得替代总结、不得削弱。",
-          "输出简洁 Markdown，保留来源指针。保留会影响下一章的人名、未兑现承诺、证据、时间点和约束，丢弃低相关噪声。",
-        ].join("\n");
-    const user = isEn
-      ? [
-          `Chapter: ${request.chapterNumber}`,
-          `Goal: ${request.goal}`,
-          `Target budget for compiled context: <= ${request.maxInputTokens} estimated input tokens`,
-          "",
-          "## Protected Context (reference only, do not compile)",
-          protectedBlock || "(none)",
-          "",
-          "## Compressible Context (compile this)",
-          compressibleBlock || "(none)",
-        ].join("\n")
-      : [
-          `章节：第${request.chapterNumber}章`,
-          `目标：${request.goal}`,
-          `压缩后目标预算：不超过 ${request.maxInputTokens} 估算输入 tokens`,
-          "",
-          "## 受保护上下文（只作为参照，不要编译它）",
-          protectedBlock || "（无）",
-          "",
-          "## 可压缩上下文（只编译这一部分）",
-          compressibleBlock || "（无）",
-        ].join("\n");
-
     const response = await this.chat([
-      { role: "system", content: system },
-      { role: "user", content: user },
-    ], {
-      temperature: 0.2,
-      maxTokens: Math.min(8192, Math.max(512, request.maxInputTokens)),
-    });
+      { role: "system", content: [
+        "You are Castor's semantic context compiler.",
+        "Compile only COMPRESSIBLE CONTEXT. PROTECTED CONTEXT is binding reference material and must not be rewritten, substituted, or weakened.",
+        `Output concise Markdown in ${outputLanguage} with source pointers. Preserve names, unresolved promises, evidence, timing, and constraints; drop low-relevance noise. Do not use Chinese.`,
+      ].join("\n") },
+      { role: "user", content: [
+        `Chapter: ${request.chapterNumber}`, `Goal: ${request.goal}`,
+        `Target budget: <= ${request.maxInputTokens} estimated input tokens`, "",
+        "## Protected Context (reference only)", protectedBlock || "(none)", "",
+        "## Compressible Context (compile this)", compressibleBlock || "(none)",
+      ].join("\n") },
+    ], { temperature: 0.2, maxTokens: Math.min(8192, Math.max(512, request.maxInputTokens)) });
     return response.content.trim();
-  }
-}
+  }}
 
 async function loadReferenceContext(input: ComposeChapterInput): Promise<BookReferenceContextSelection> {
   if (!input.referenceContextProvider) return { entries: [], notes: [] };
@@ -723,7 +632,7 @@ async function buildRecentChapterTrailEntries(
   chapterNumber: number,
 ): Promise<ContextPackage["selectedContext"]> {
     const content = await readFileOrDefault(join(storyDir, "chapter_summaries.md"));
-    if (!content || content === "(文件尚未创建)") {
+    if (!content || content === "()") {
       return [];
     }
 
@@ -841,8 +750,8 @@ async function buildHookDebtEntries(
 
       const seedSummary = findHookSummary(summaries, hook.hookId, hook.startChapter, "seed");
       const latestSummary = findHookSummary(summaries, hook.hookId, hook.lastAdvancedChapter, "latest");
-      const role = language === "en" ? "memo-referenced debt" : "备忘引用旧债";
-      const promise = hook.expectedPayoff || (language === "en" ? "(unspecified)" : "（未写明）");
+      const role = language === "en" ? "memo-referenced debt" : "";
+      const promise = hook.expectedPayoff || (language === "en" ? "(unspecified)" : "（）");
       const seedBeat = seedSummary
         ? renderHookDebtBeat(seedSummary)
         : (hook.notes || promise);
@@ -855,7 +764,7 @@ async function buildHookDebtEntries(
         source: `runtime/hook_debt#${hook.hookId}`,
         reason: language === "en"
           ? "Narrative debt brief with original seed text for this hook agenda target."
-          : "含原始种子文本的叙事债务简报。",
+          : "。",
         excerpt: language === "en"
           ? [
               `${hook.hookId} (${hook.type}, ${role}, open ${age} chapters)`,
@@ -864,10 +773,10 @@ async function buildHookDebtEntries(
               latestBeat ? `latest turn (ch${hook.lastAdvancedChapter}): ${latestBeat}` : undefined,
             ].filter(Boolean).join(" | ")
           : [
-              `${hook.hookId}（${hook.type}，${role}，已开${age}章）`,
-              `读者承诺：${promise}`,
-              `种于第${hook.startChapter}章：${seedBeat}`,
-              latestBeat ? `推进于第${hook.lastAdvancedChapter}章：${latestBeat}` : undefined,
+              `${hook.hookId}（${hook.type}，${role}，${age}）`,
+              `：${promise}`,
+              `Chương ${hook.startChapter}：${seedBeat}`,
+              latestBeat ? `Chương ${hook.lastAdvancedChapter}：${latestBeat}` : undefined,
             ].filter(Boolean).join(" | "),
       }];
     });
@@ -882,21 +791,21 @@ async function maybeContextSource(
     let content = await readFileOrDefault(path);
     let resolvedFileName = fileName;
 
-    if ((!content || content === "(文件尚未创建)")) {
+    if ((!content || content === "()")) {
       // Phase 5 back-compat: the new outline/ files may be absent on legacy
       // books. Fall back to the deprecated paths transparently.
       const legacyFallback = outlineFallback(fileName);
       if (legacyFallback) {
         const legacyPath = join(storyDir, legacyFallback);
         const legacyContent = await readFileOrDefault(legacyPath);
-        if (legacyContent && legacyContent !== "(文件尚未创建)") {
+        if (legacyContent && legacyContent !== "()") {
           content = legacyContent;
           resolvedFileName = legacyFallback;
         }
       }
     }
 
-    if (!content || content === "(文件尚未创建)") return null;
+    if (!content || content === "()") return null;
 
     return {
       source: `story/${resolvedFileName}`,
@@ -917,11 +826,11 @@ async function maybeOutlineSectionSources(
     const path = join(storyDir, fileName);
     const content = await readFileOrDefault(path);
 
-    if (!content || content === "(文件尚未创建)") {
+    if (!content || content === "()") {
       const legacyFallback = outlineFallback(fileName);
       if (!legacyFallback) return [];
       const legacyContent = await readFileOrDefault(join(storyDir, legacyFallback));
-      if (!legacyContent || legacyContent === "(文件尚未创建)") return [];
+      if (!legacyContent || legacyContent === "()") return [];
       return await selectOutlineSectionEntries({
         fileName: legacyFallback,
         content: legacyContent,
@@ -1062,12 +971,12 @@ function isRelevantStoryFrameSection(section: MarkdownSection, hints: ReadonlyAr
     const heading = normalizeForMatch(section.heading);
     const sectionText = normalizeForMatch(section.raw);
     const hardHeadingSignals = [
-      "世界观",
-      "底色",
-      "铁律",
-      "规则",
-      "核心冲突",
-      "终局",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
       "world",
       "tonal",
       "rule",
@@ -1139,7 +1048,7 @@ function headingMentionsChapter(normalizedHeading: string, chapterNumber: number
       || normalizedHeading.includes(`chapter${chapterNumber}`)
       || normalizedHeading.includes(`ch.${chapterNumber}`)
       || normalizedHeading.includes(`ch${chapterNumber}`)
-      || normalizedHeading.includes(`第${chapterNumber}章`);
+      || normalizedHeading.includes(`Chương ${chapterNumber}`);
 }
 
 function slugifyAnchor(value: string): string {
@@ -1179,7 +1088,7 @@ async function readFileOrDefault(path: string): Promise<string> {
   try {
     return await readFile(path, "utf-8");
   } catch {
-    return "(文件尚未创建)";
+    return "()";
   }
 }
 

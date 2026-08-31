@@ -272,7 +272,7 @@ describe("prepare-not-commit", () => {
     const json = JSON.stringify(read);
     expect(json).not.toContain('"content"');
     expect(json).not.toContain('"prose"');
-    expect(json).not.toContain("主题段落");
+    expect(json).not.toContain("mock_text");
   });
 });
 

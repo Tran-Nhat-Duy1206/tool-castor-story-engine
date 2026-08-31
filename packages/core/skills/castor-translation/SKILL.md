@@ -1,6 +1,6 @@
 ---
 name: castor-translation
-description: 长文任意语言互译、术语一致性、分段续跑与章节审校方法。Used by Castor translation workers.
+description: Context-aware multilingual narrative translation and localization.
 ---
 # Long-form translation
 

@@ -7,21 +7,19 @@ import type { GenreProfile } from "../models/genre-profile.js";
  * The Reflector phase will merge observations into truth files with cross-validation.
  */
 export function buildObserverSystemPrompt(
-  book: BookConfig,
+  _book: BookConfig,
   genreProfile: GenreProfile,
   language?: "vi" | "en",
 ): string {
-  const isEnglish = (language ?? genreProfile.language) === "en";
+  const outputLanguage = (language ?? genreProfile.language) === "en" ? "English" : "Vietnamese";
 
-  const langPrefix = isEnglish
-    ? "【LANGUAGE OVERRIDE】ALL output MUST be in English.\n\n"
-    : "";
+  return `You are a fact extraction specialist. Read the chapter text and extract every observable fact change.
 
-  return `${langPrefix}${isEnglish ? "You are" : "你是"}${isEnglish ? " a fact extraction specialist" : "一个事实提取专家"}。${isEnglish ? "Read the chapter text and extract EVERY observable fact change." : "阅读章节正文，提取每一个可观察到的事实变化。"}
+Output all natural-language content in ${outputLanguage}. Keep the === OBSERVATIONS === marker and bracketed category tags exactly as specified in English.
 
-${isEnglish ? "## Extraction Categories" : "## 提取类别"}
+## Extraction Categories
 
-${isEnglish ? `1. **Character actions**: Who did what, to whom, why
+1. **Character actions**: Who did what, to whom, why
 2. **Location changes**: Who moved where, from where
 3. **Resource changes**: Items gained, lost, consumed, quantities
 4. **Relationship changes**: New encounters, trust/distrust shifts, alliances, betrayals
@@ -29,33 +27,21 @@ ${isEnglish ? `1. **Character actions**: Who did what, to whom, why
 6. **Information flow**: Who learned what, who is still unaware
 7. **Plot threads**: New mysteries planted, existing threads advanced, threads resolved
 8. **Time progression**: How much time passed, time markers mentioned
-9. **Physical state**: Injuries, healing, fatigue, power changes` : `1. **角色行为**：谁做了什么，对谁，为什么
-2. **位置变化**：谁去了哪里，从哪里来
-3. **资源变化**：获得、失去、消耗了什么，具体数量
-4. **关系变化**：新相遇、信任/不信任转变、结盟、背叛
-5. **情绪变化**：角色情绪从X到Y，触发事件是什么
-6. **信息流动**：谁知道了什么新信息，谁仍然不知情
-7. **剧情线索**：新埋下的悬念、已有线索的推进、线索的解答
-8. **时间推进**：过了多少时间，提到的时间标记
-9. **身体状态**：受伤、恢复、疲劳、战力变化`}
+9. **Physical state**: Injuries, healing, fatigue, power changes
 
-${isEnglish ? "## Rules" : "## 规则"}
+## Rules
 
-${isEnglish ? `- Extract from the TEXT ONLY — do not infer what might happen
+- Extract from the TEXT ONLY — do not infer what might happen
 - Over-extract: if unsure whether something is significant, include it
-- Be specific: "Lin Chen's left arm fractured" not "Lin Chen got hurt"
+- Be specific: "the character's left arm fractured" rather than "the character got hurt"
 - Include chapter-internal time markers
-- Note which characters are present in each scene` : `- 只从正文提取——不推测可能发生的事
-- 宁多勿少：不确定是否重要时也要记录
-- 具体化："陆承烬左肩旧伤开裂" 而非 "陆承烬受伤了"
-- 记录章节内的时间标记
-- 标注每个场景中在场的角色`}
+- Note which characters are present in each scene
 
-${isEnglish ? "## Output Format" : "## 输出格式"}
+## Output Format
 
 === OBSERVATIONS ===
 
-${isEnglish ? `[CHARACTERS]
+[CHARACTERS]
 - <name>: <action/state change> (scene: <location>)
 
 [LOCATIONS]
@@ -83,35 +69,7 @@ ${isEnglish ? `[CHARACTERS]
 - <time markers, duration>
 
 [PHYSICAL_STATE]
-- <character>: <injury/healing/fatigue/power change>` : `[角色行为]
-- <角色名>: <行为/状态变化> (场景: <地点>)
-
-[位置变化]
-- <角色> 从 <A> 到 <B>
-
-[资源变化]
-- <角色> 获得/失去 <物品> (数量: <n>)
-
-[关系变化]
-- <角色A> → <角色B>: <变化描述>
-
-[情绪变化]
-- <角色>: <之前> → <之后> (触发: <事件>)
-
-[信息流动]
-- <角色> 得知: <事实> (来源: <途径>)
-- <角色> 仍不知: <事实>
-
-[剧情线索]
-- 新埋: <描述>
-- 推进: <已有线索> — <进展>
-- 回收: <线索> — <解答>
-
-[时间]
-- <时间标记、时长>
-
-[身体状态]
-- <角色>: <受伤/恢复/疲劳/战力变化>`}`;
+- <character>: <injury/healing/fatigue/power change>`;
 }
 
 export function buildObserverUserPrompt(
@@ -120,8 +78,6 @@ export function buildObserverUserPrompt(
   content: string,
   language?: "vi" | "en",
 ): string {
-  const isEnglish = language === "en";
-  return isEnglish
-    ? `Extract all facts from Chapter ${chapterNumber} "${title}":\n\n${content}`
-    : `请提取第${chapterNumber}章「${title}」中的所有事实：\n\n${content}`;
+  const outputLanguage = language === "en" ? "English" : "Vietnamese";
+  return `Extract all facts from Chapter ${chapterNumber} "${title}". Output natural-language content in ${outputLanguage}.\n\n${content}`;
 }

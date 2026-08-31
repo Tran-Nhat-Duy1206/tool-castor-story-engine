@@ -18,9 +18,9 @@ export interface ServicePreset {
 
 export const SERVICE_PRESETS: Record<string, ServicePreset> = {
   openai:      { providerFamily: "openai",    api: "openai-responses",   baseUrl: "https://api.openai.com/v1",                          label: "OpenAI",          temperatureRange: [0, 2], defaultTemperature: 1.0, writingTemperature: 1.0 },
-  anthropic:   { providerFamily: "anthropic", api: "anthropic-messages", baseUrl: "https://api.anthropic.com",                          label: "Anthropic",       temperatureRange: [0, 1], defaultTemperature: 1.0, writingTemperature: 1.0, temperatureHint: "不要同时改 temperature 和 top_p" },
-  deepseek:    { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.deepseek.com",                           label: "DeepSeek",        temperatureRange: [0, 2], defaultTemperature: 1.0, writingTemperature: 1.5, temperatureHint: "创意写作推荐 1.5" },
-  moonshot:    { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.moonshot.cn/v1",                         label: "Moonshot (Kimi)", temperatureRange: [0, 1], defaultTemperature: 0.3, writingTemperature: 1.0, temperatureHint: "kimi-k2.5 推荐 temperature=1.0" },
+  anthropic:   { providerFamily: "anthropic", api: "anthropic-messages", baseUrl: "https://api.anthropic.com",                          label: "Anthropic",       temperatureRange: [0, 1], defaultTemperature: 1.0, writingTemperature: 1.0, temperatureHint: "Do not modify temperature and top_p simultaneously" },
+  deepseek:    { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.deepseek.com",                           label: "DeepSeek",        temperatureRange: [0, 2], defaultTemperature: 1.0, writingTemperature: 1.5, temperatureHint: "Recommended 1.5 for creative writing" },
+  moonshot:    { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.moonshot.cn/v1",                         label: "Moonshot (Kimi)", temperatureRange: [0, 1], defaultTemperature: 0.3, writingTemperature: 1.0, temperatureHint: "kimi-k2.5 recommended temperature=1.0" },
   minimax:     {
     providerFamily: "openai",
     api: "openai-completions",
@@ -35,20 +35,20 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     providerFamily: "anthropic",
     api: "anthropic-messages",
     baseUrl: "https://dashscope.aliyuncs.com/apps/anthropic",
-    label: "百炼 (通义千问)",
+    label: "Bailian (Qwen)",
     temperatureRange: [0, 2],
     defaultTemperature: 0.7,
     writingTemperature: 1.0,
     piProvider: "anthropic",
   },
-  zhipu:       { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://open.bigmodel.cn/api/paas/v4",               label: "智谱 GLM",        temperatureRange: [0, 1], defaultTemperature: 0.95, writingTemperature: 0.95, piProvider: "zai" },
-  siliconflow: { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.siliconflow.cn/v1",                      label: "硅基流动" },
+  zhipu:       { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://open.bigmodel.cn/api/paas/v4",               label: "Zhipu GLM",        temperatureRange: [0, 1], defaultTemperature: 0.95, writingTemperature: 0.95, piProvider: "zai" },
+  siliconflow: { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.siliconflow.cn/v1",                      label: "SiliconFlow" },
   ppio:        { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.ppinfra.com/v3/openai",                  label: "PPIO" },
   openrouter:  { providerFamily: "openai",    api: "openai-responses",   baseUrl: "https://openrouter.ai/api/v1",                       label: "OpenRouter",      piProvider: "openrouter" },
   kkaiapi:     { providerFamily: "openai",    api: "openai-completions", baseUrl: "https://api.kkaiapi.com/v1",                         label: "kkaiapi",         modelsBaseUrl: "https://api.kkaiapi.com/v1" },
-  ollama:      { providerFamily: "openai",    api: "openai-completions", baseUrl: "http://localhost:11434/v1",                          label: "Ollama (本地)" },
-  lmstudio:    { providerFamily: "openai",    api: "openai-completions", baseUrl: "http://localhost:1234/v1",                           label: "LM Studio (本地)", modelsBaseUrl: "http://localhost:1234/v1" },
-  custom:      { providerFamily: "openai",    api: "openai-completions", baseUrl: "",                                                    label: "自定义端点" },
+  ollama:      { providerFamily: "openai",    api: "openai-completions", baseUrl: "http://localhost:11434/v1",                          label: "Ollama (local)" },
+  lmstudio:    { providerFamily: "openai",    api: "openai-completions", baseUrl: "http://localhost:1234/v1",                           label: "LM Studio (local)", modelsBaseUrl: "http://localhost:1234/v1" },
+  custom:      { providerFamily: "openai",    api: "openai-completions", baseUrl: "",                                                    label: "Custom endpoint" },
 };
 
 export function resolveServicePreset(service: string): ServicePreset | undefined {
@@ -74,7 +74,7 @@ export function resolveServicePreset(service: string): ServicePreset | undefined
       ? { temperatureHint: provider?.temperatureHint ?? legacy?.temperatureHint }
       : {}),
     ...(legacy?.knownModels ? { knownModels: legacy.knownModels } : {}),
-    // piProvider 字段已从 ProviderEndpoint 移除（走 provider-to-pi-ai adapter），这里只保留 legacy fallback
+    // piProvider field removed from ProviderEndpoint (migrated to provider-to-pi-ai adapter), legacy fallback retained
     ...(legacy?.piProvider ? { piProvider: legacy.piProvider } : {}),
     ...((provider ? provider.modelsBaseUrl : legacy?.modelsBaseUrl)
       ? { modelsBaseUrl: provider ? provider.modelsBaseUrl : legacy?.modelsBaseUrl }
@@ -135,7 +135,7 @@ export interface ModelInfo {
   readonly id: string;
   readonly name: string;
   readonly contextWindow: number;
-  /** 模型输出上限（来自 providers bank 或 live /models 补充） */
+  /** Model max output tokens (from providers bank or live /models) */
   readonly maxOutput?: number;
 }
 
@@ -149,13 +149,13 @@ function toModelInfo(providerModel: { id: string; maxOutput: number; contextWind
 }
 
 /**
- * listModelsForService（R4 精修）：
- * - 先试 live /models probe（如果 baseUrl + apiKey 具备）
- * - probe 失败或无 apiKey：fallback 到 provider.models（castor bank）
- * - 不再做 CASTOR_LLM_MODEL env 补丁（会污染跨 service 菜单；bank 已足够全）
+ * listModelsForService:
+ * - Try live /models probe first (if baseUrl + apiKey are available)
+ * - On probe failure or missing apiKey: fallback to provider.models (castor bank)
+ * - CASTOR_LLM_MODEL env patching omitted (bank is comprehensive)
  *
- * custom / newapi / higress 等 baseUrl 空的 gateway provider：
- *   必须传 liveBaseUrl 才能做 probe；否则只依赖 bank。
+ * Gateway providers with empty default baseUrl:
+ *   Must provide liveBaseUrl to perform probe; otherwise relies on bank.
  */
 export async function listModelsForService(
   service: string,
@@ -168,7 +168,7 @@ export async function listModelsForService(
 
   const byId = new Map<string, ModelInfo>();
 
-  // 1) 先试 live /models probe
+  // 1) Try live /models probe
   const probeBaseUrl = liveBaseUrl || provider?.modelsBaseUrl || provider?.baseUrl || resolveServiceModelsBaseUrl(service);
   const providerFamily = preset?.providerFamily ?? (provider?.api.startsWith("anthropic") ? "anthropic" : "openai");
   const canProbeWithoutApiKey = isApiKeyOptionalForEndpoint({ provider: providerFamily, baseUrl: probeBaseUrl });
@@ -183,7 +183,7 @@ export async function listModelsForService(
     }
   }
 
-  // 2) provider bank fallback / 补充
+  // 2) Provider bank fallback
   if (provider) {
     for (const m of provider.models) {
       if (m.enabled === false) continue;
@@ -192,7 +192,7 @@ export async function listModelsForService(
     }
   }
 
-  // 3) 旧 knownModels fallback
+  // 3) Legacy knownModels fallback
   if (byId.size === 0 && preset?.knownModels) {
     for (const id of preset.knownModels) {
       byId.set(id, { id, name: id, contextWindow: 0 });

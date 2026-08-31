@@ -52,13 +52,13 @@ describe("rehydrateServiceConnectionStatus", () => {
 describe("matchServiceConfigEntryForDetail", () => {
   const entries = [
     { service: "moonshot", temperature: 0.5 },
-    { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1" },
-    { service: "custom", name: "本地Ollama", baseUrl: "http://localhost:11434/v1" },
+    { service: "custom", name: "mock_valGPT", baseUrl: "https://llm.internal.corp/v1" },
+    { service: "custom", name: "mock_valOllama", baseUrl: "http://localhost:11434/v1" },
   ];
 
   it("matches concrete custom services without treating bare custom as an existing config", () => {
     expect(matchServiceConfigEntryForDetail(entries, "custom")).toBeUndefined();
-    expect(matchServiceConfigEntryForDetail(entries, "custom:内网GPT")).toEqual(entries[1]);
+    expect(matchServiceConfigEntryForDetail(entries, "custom:mock_valGPT")).toEqual(entries[1]);
   });
 
   it("matches non-custom services by service id", () => {

@@ -48,8 +48,8 @@ describe("import_chapters agent tool", () => {
   it("imports a directory of .md/.txt files in filename order with prefix-stripped titles", async () => {
     const sourceDir = join(root, "source-dir");
     await mkdir(sourceDir, { recursive: true });
-    await writeFile(join(sourceDir, "02_风暴.txt"), "码头的雨下了一夜。", "utf-8");
-    await writeFile(join(sourceDir, "01_序章.md"), "林月守着玉印。", "utf-8");
+    await writeFile(join(sourceDir, "02_mock_text.txt"), "mock_text。", "utf-8");
+    await writeFile(join(sourceDir, "01_mock_text.md"), "mock_text。", "utf-8");
     await writeFile(join(sourceDir, "notes.pdf"), "ignored", "utf-8");
 
     const pipeline = mockPipeline();
@@ -61,8 +61,8 @@ describe("import_chapters agent tool", () => {
     expect(pipeline.importChapters).toHaveBeenCalledWith({
       bookId: "harbor",
       chapters: [
-        { title: "序章", content: "林月守着玉印。" },
-        { title: "风暴", content: "码头的雨下了一夜。" },
+        { title: "mock_text", content: "mock_text。" },
+        { title: "mock_text", content: "mock_text。" },
       ],
       resumeFrom: undefined,
       importMode: undefined,
@@ -85,7 +85,7 @@ describe("import_chapters agent tool", () => {
   it("runs import inside the tool AbortSignal scope", async () => {
     const sourceDir = join(root, "abort-source-dir");
     await mkdir(sourceDir, { recursive: true });
-    await writeFile(join(sourceDir, "01_序章.md"), "林月守着玉印。", "utf-8");
+    await writeFile(join(sourceDir, "01_mock_text.md"), "mock_text。", "utf-8");
     const controller = new AbortController();
     const pipeline = mockPipeline();
     const tool = createImportChaptersTool(pipeline as never, "harbor", root);
@@ -103,7 +103,7 @@ describe("import_chapters agent tool", () => {
     await mkdir(join(root, ".castor", "uploads", "s1"), { recursive: true });
     await writeFile(
       join(root, ".castor", "uploads", "s1", "novel.txt"),
-      "第一章 开局\n\n他在码头醒来。\n\n第二章 反转\n\n账本不见了。\n",
+      "Chương mock_text mock_text\n\nmock_text。\n\nChương mock_text mock_text\n\nmock_text。\n",
       "utf-8",
     );
 
@@ -115,8 +115,8 @@ describe("import_chapters agent tool", () => {
     expect(pipeline.importChapters).toHaveBeenCalledWith({
       bookId: "harbor",
       chapters: [
-        { title: "开局", content: "他在码头醒来。" },
-        { title: "反转", content: "账本不见了。" },
+        { title: "mock_text", content: "mock_text。" },
+        { title: "mock_text", content: "mock_text。" },
       ],
       resumeFrom: undefined,
       importMode: undefined,
@@ -125,7 +125,7 @@ describe("import_chapters agent tool", () => {
 
   it("splits a single file with a custom splitPattern", async () => {
     const sourceFile = join(root, "novel-custom.txt");
-    await writeFile(sourceFile, "Part 序幕\n雨夜。\nPart 终局\n天亮。\n", "utf-8");
+    await writeFile(sourceFile, "Part mock_text\nmock_text。\nPart mock_text\nmock_text。\n", "utf-8");
 
     const pipeline = mockPipeline();
     const tool = createImportChaptersTool(pipeline as never, "harbor", root);
@@ -138,8 +138,8 @@ describe("import_chapters agent tool", () => {
     expect(pipeline.importChapters).toHaveBeenCalledWith({
       bookId: "harbor",
       chapters: [
-        { title: "序幕", content: "雨夜。" },
-        { title: "终局", content: "天亮。" },
+        { title: "mock_text", content: "mock_text。" },
+        { title: "mock_text", content: "mock_text。" },
       ],
       resumeFrom: undefined,
       importMode: undefined,
@@ -148,7 +148,7 @@ describe("import_chapters agent tool", () => {
 
   it("throws when the single file yields no chapters", async () => {
     const sourceFile = join(root, "no-headings.txt");
-    await writeFile(sourceFile, "只有正文，没有任何章节标题。", "utf-8");
+    await writeFile(sourceFile, "mock_text，mock_text。", "utf-8");
 
     const pipeline = mockPipeline();
     const tool = createImportChaptersTool(pipeline as never, "harbor", root);
@@ -161,13 +161,13 @@ describe("import_chapters agent tool", () => {
   it("throws when the book already has chapters and resumeFrom is missing", async () => {
     await mkdir(join(state.bookDir("harbor"), "chapters"), { recursive: true });
     await writeFile(
-      join(state.bookDir("harbor"), "chapters", "0001_旧章.md"),
-      "# 第1章 旧章\n\n已有正文。\n",
+      join(state.bookDir("harbor"), "chapters", "0001_mock_text.md"),
+      "# Chương 1 mock_text\n\nmock_text。\n",
       "utf-8",
     );
     await state.saveChapterIndex("harbor", [{
       number: 1,
-      title: "旧章",
+      title: "mock_text",
       status: "imported",
       wordCount: 10,
       createdAt: "2026-07-07T00:00:00.000Z",
@@ -178,7 +178,7 @@ describe("import_chapters agent tool", () => {
 
     const sourceDir = join(root, "source-dir");
     await mkdir(sourceDir, { recursive: true });
-    await writeFile(join(sourceDir, "01_新章.md"), "新的正文。", "utf-8");
+    await writeFile(join(sourceDir, "01_mock_text.md"), "mock_text。", "utf-8");
 
     const pipeline = mockPipeline();
     const tool = createImportChaptersTool(pipeline as never, "harbor", root);
@@ -191,13 +191,13 @@ describe("import_chapters agent tool", () => {
   it("passes resumeFrom and importMode through to pipeline.importChapters", async () => {
     await mkdir(join(state.bookDir("harbor"), "chapters"), { recursive: true });
     await writeFile(
-      join(state.bookDir("harbor"), "chapters", "0001_旧章.md"),
-      "# 第1章 旧章\n\n已有正文。\n",
+      join(state.bookDir("harbor"), "chapters", "0001_mock_text.md"),
+      "# Chương 1 mock_text\n\nmock_text。\n",
       "utf-8",
     );
     await state.saveChapterIndex("harbor", [{
       number: 1,
-      title: "旧章",
+      title: "mock_text",
       status: "imported",
       wordCount: 10,
       createdAt: "2026-07-07T00:00:00.000Z",
@@ -208,8 +208,8 @@ describe("import_chapters agent tool", () => {
 
     const sourceDir = join(root, "source-dir");
     await mkdir(sourceDir, { recursive: true });
-    await writeFile(join(sourceDir, "01_旧章.md"), "已有正文。", "utf-8");
-    await writeFile(join(sourceDir, "02_新章.md"), "新的正文。", "utf-8");
+    await writeFile(join(sourceDir, "01_mock_text.md"), "mock_text。", "utf-8");
+    await writeFile(join(sourceDir, "02_mock_text.md"), "mock_text。", "utf-8");
 
     const pipeline = mockPipeline();
     const tool = createImportChaptersTool(pipeline as never, "harbor", root);
@@ -223,8 +223,8 @@ describe("import_chapters agent tool", () => {
     expect(pipeline.importChapters).toHaveBeenCalledWith({
       bookId: "harbor",
       chapters: [
-        { title: "旧章", content: "已有正文。" },
-        { title: "新章", content: "新的正文。" },
+        { title: "mock_text", content: "mock_text。" },
+        { title: "mock_text", content: "mock_text。" },
       ],
       resumeFrom: 2,
       importMode: "series",

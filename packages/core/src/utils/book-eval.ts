@@ -71,9 +71,9 @@ function computeHookResolveRate(content: string): number {
   let resolvedHooks = 0;
   for (const line of content.split("\n")) {
     if (!/^\|.*\|.*\|/.test(line)) continue;
-    if (line.includes("---") || /hook|伏笔/i.test(line)) continue;
+    if (line.includes("---") || /hook|/i.test(line)) continue;
     totalHooks += 1;
-    if (/resolved|已回收|已解决/i.test(line)) resolvedHooks += 1;
+    if (/resolved||/i.test(line)) resolvedHooks += 1;
   }
   return totalHooks > 0 ? Math.round((resolvedHooks / totalHooks) * 100) : 0;
 }

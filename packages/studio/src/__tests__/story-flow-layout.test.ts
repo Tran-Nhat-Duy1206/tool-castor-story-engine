@@ -5,9 +5,9 @@ import { StoryGraphSchema } from "@actalk/castor-core";
 const g = StoryGraphSchema.parse({
   schemaVersion: 1, projectId: "p", title: "T", variables: [],
   nodes: [
-    { id: "s", type: "start", title: "开场", choices: [{ id: "c1", text: "A", targetNodeId: "m" }, { id: "c2", text: "B", targetNodeId: "ghost" }] },
-    { id: "m", type: "branch", title: "中段", choices: [{ id: "c3", text: "go", targetNodeId: "e" }] },
-    { id: "e", type: "ending", title: "结局", choices: [] },
+    { id: "s", type: "start", title: "Mo dau", choices: [{ id: "c1", text: "A", targetNodeId: "m" }, { id: "c2", text: "B", targetNodeId: "ghost" }] },
+    { id: "m", type: "branch", title: "mock_val", choices: [{ id: "c3", text: "go", targetNodeId: "e" }] },
+    { id: "e", type: "ending", title: "mock_val", choices: [] },
   ],
   endings: [{ id: "g1", nodeId: "e", title: "end", type: "good" }],
 });
@@ -31,10 +31,10 @@ describe("layoutStoryGraph", () => {
   it("carries node type + label in data", () => {
     const nodes = layoutStoryGraph(g).nodes;
     expect(nodes.find((n) => n.id === "e")?.data.nodeType).toBe("ending");
-    expect(nodes.find((n) => n.id === "s")?.data.label).toBe("开场");
+    expect(nodes.find((n) => n.id === "s")?.data.label).toBe("Mo dau");
   });
   it("places an unreachable node at a deeper column than reachable ones", () => {
-    const g2 = StoryGraphSchema.parse({ ...g, nodes: [...g.nodes, { id: "island", type: "normal", title: "孤岛", choices: [] }] });
+    const g2 = StoryGraphSchema.parse({ ...g, nodes: [...g.nodes, { id: "island", type: "normal", title: "mock_val", choices: [] }] });
     const byId = Object.fromEntries(layoutStoryGraph(g2).nodes.map((n) => [n.id, n]));
     expect(byId.island.position.x).toBeGreaterThanOrEqual(byId.e.position.x);
   });

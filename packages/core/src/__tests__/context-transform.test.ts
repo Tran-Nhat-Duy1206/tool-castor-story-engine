@@ -37,7 +37,7 @@ describe("createBookContextTransform", () => {
   it("prepends a user message with truth file contents", async () => {
     const transform = createBookContextTransform(bookId, projectRoot);
     const original = [
-      { role: "user" as const, content: "写下一章", timestamp: Date.now() },
+      { role: "user" as const, content: "mock_text", timestamp: Date.now() },
     ];
     const result = await transform(original);
 
@@ -58,25 +58,25 @@ describe("createBookContextTransform", () => {
       join(storyDir, "story_bible.md"),
       [
         "# Story Bible",
-        "## 关键设定",
-        "| 状态 | 条目 |",
-        "| active | 主角正在追查码头旧案 |",
+        "## mock_text",
+        "| mock_text | mock_text |",
+        "| active | mock_text |",
         "UNBOUNDED_BODY_SHOULD_NOT_BE_INJECTED ".repeat(500),
       ].join("\n"),
     );
 
     const transform = createBookContextTransform(bookId, projectRoot);
     const result = await transform([
-      { role: "user" as const, content: "讨论下一章", timestamp: Date.now() },
+      { role: "user" as const, content: "mock_text", timestamp: Date.now() },
     ]);
     const content = (result[0] as { content: string }).content;
 
-    expect(content).toContain("上下文压缩包");
+    expect(content).toContain("mock_text");
     expect(content).toContain("story_bible.md");
-    expect(content).toContain("## 关键设定");
-    expect(content).toContain("Markdown 目录索引");
-    expect(content).not.toContain("| active | 主角正在追查码头旧案 |");
-    expect(content).toContain("未全文注入");
+    expect(content).toContain("## mock_text");
+    expect(content).toContain("Markdown mock_text");
+    expect(content).not.toContain("| active | mock_text |");
+    expect(content).toContain("mock_text");
     expect(content).not.toContain("UNBOUNDED_BODY_SHOULD_NOT_BE_INJECTED");
   });
 
@@ -86,8 +86,8 @@ describe("createBookContextTransform", () => {
       join(storyDir, "story_bible.md"),
       [
         "# Story Bible",
-        "## 活跃设定",
-        "当前目标：继续追查旧案。",
+        "## mock_text",
+        "mock_text：mock_text。",
         "UNBOUNDED_BODY_SHOULD_NOT_BE_INJECTED ".repeat(500),
       ].join("\n"),
     );
@@ -97,7 +97,7 @@ describe("createBookContextTransform", () => {
       onContextCompression: (event) => events.push(event),
     });
     await transform([
-      { role: "user" as const, content: "讨论下一章", timestamp: Date.now() },
+      { role: "user" as const, content: "mock_text", timestamp: Date.now() },
     ]);
 
     expect(events.map((event) => [event.category, event.phase])).toEqual([
@@ -143,45 +143,45 @@ describe("createBookContextTransform", () => {
   it("injects upgrade hint when book is legacy layout (no outline/story_frame.md)", async () => {
     const transform = createBookContextTransform(bookId, projectRoot);
     const result = await transform([
-      { role: "user" as const, content: "写下一章", timestamp: Date.now() },
+      { role: "user" as const, content: "mock_text", timestamp: Date.now() },
     ]);
 
     const injected = result[0] as { role: string; content: string };
-    expect(injected.content).toContain("旧的条目式格式");
+    expect(injected.content).toContain("mock_text");
     expect(injected.content).toContain("sub_agent(architect, { revise: true");
   });
 
   it("does NOT inject upgrade hint when book is Phase 5 layout", async () => {
     const outlineDir = join(projectRoot, "books", bookId, "story", "outline");
     await mkdir(outlineDir, { recursive: true });
-    await writeFile(join(outlineDir, "story_frame.md"), "## 主题\n段落式内容");
+    await writeFile(join(outlineDir, "story_frame.md"), "## mock_text\nmock_text");
 
     const transform = createBookContextTransform(bookId, projectRoot);
     const result = await transform([
-      { role: "user" as const, content: "写下一章", timestamp: Date.now() },
+      { role: "user" as const, content: "mock_text", timestamp: Date.now() },
     ]);
 
     const injected = result[0] as { role: string; content: string };
-    expect(injected.content).not.toContain("旧的条目式格式");
+    expect(injected.content).not.toContain("mock_text");
     expect(injected.content).not.toContain("revise: true");
   });
 
   it("injects authoritative new-layout outline files into active-book chat context", async () => {
     const outlineDir = join(projectRoot, "books", bookId, "story", "outline");
     await mkdir(outlineDir, { recursive: true });
-    await writeFile(join(outlineDir, "story_frame.md"), "## 故事基石\n主角以第一人称调查物业黑账。");
-    await writeFile(join(outlineDir, "volume_map.md"), "## 第一卷\n暴雨夜发现电表账单异常。");
+    await writeFile(join(outlineDir, "story_frame.md"), "## mock_text\nmock_textChương mock_text。");
+    await writeFile(join(outlineDir, "volume_map.md"), "## Chương mock_text\nmock_text。");
 
     const transform = createBookContextTransform(bookId, projectRoot);
     const result = await transform([
-      { role: "user" as const, content: "继续讨论第一章", timestamp: Date.now() },
+      { role: "user" as const, content: "mock_textChương mock_text", timestamp: Date.now() },
     ]);
 
     const injected = result[0] as { role: string; content: string };
     expect(injected.content).toContain("outline/story_frame.md");
-    expect(injected.content).toContain("主角以第一人称调查物业黑账。");
+    expect(injected.content).toContain("mock_textChương mock_text。");
     expect(injected.content).toContain("outline/volume_map.md");
-    expect(injected.content).toContain("暴雨夜发现电表账单异常。");
+    expect(injected.content).toContain("mock_text。");
   });
 });
 
@@ -200,41 +200,41 @@ describe("createInteractiveFilmContextTransform", () => {
     const base = StoryGraphSchema.parse({
       schemaVersion: 1,
       projectId: "storm-radio",
-      title: "风眼旧频率",
-      variables: [{ name: "团伙已警觉", type: "flag", default: false }],
+      title: "mock_text",
+      variables: [{ name: "mock_text", type: "flag", default: false }],
       nodes: [
         {
           id: "node_1",
           type: "branch",
-          title: "公开呼叫",
-          choices: [{ id: "choice_signal", text: "用暗号试探", targetNodeId: "node_6" }],
+          title: "Cong khaimock_text",
+          choices: [{ id: "choice_signal", text: "mock_text", targetNodeId: "node_6" }],
         },
-        { id: "node_6", type: "ending", title: "风眼之外", choices: [] },
+        { id: "node_6", type: "ending", title: "mock_text", choices: [] },
       ],
-      endings: [{ id: "ending_c", nodeId: "node_6", title: "风眼之外", type: "secret" }],
+      endings: [{ id: "ending_c", nodeId: "node_6", title: "mock_text", type: "secret" }],
     });
     await saveStoryGraph(projectRoot, "storm-radio", base);
 
     const transform = createInteractiveFilmContextTransform("storm-radio", projectRoot);
-    const original = [{ role: "user" as const, content: "讨论节点1", timestamp: Date.now() }];
+    const original = [{ role: "user" as const, content: "mock_text1", timestamp: Date.now() }];
     const first = await transform(original);
     const firstContext = (first[0] as { content: string }).content;
 
-    expect(firstContext).toContain("完整权威剧情图谱");
+    expect(firstContext).toContain("mock_text");
     expect(firstContext).toContain('"id":"node_1"');
     expect(firstContext).toContain('"targetNodeId":"node_6"');
-    expect(firstContext).toContain('"name":"团伙已警觉"');
-    expect(firstContext).not.toContain("旧的条目式格式");
+    expect(firstContext).toContain('"name":"mock_text"');
+    expect(firstContext).not.toContain("mock_text");
     expect(first[1]).toBe(original[0]);
 
     await saveStoryGraph(projectRoot, "storm-radio", StoryGraphSchema.parse({
       ...base,
       nodes: base.nodes.map((node) => node.id === "node_1"
-        ? { ...node, title: "暗号试探" }
+        ? { ...node, title: "mock_text" }
         : node),
     }));
     const second = await transform(original);
-    expect((second[0] as { content: string }).content).toContain('"title":"暗号试探"');
+    expect((second[0] as { content: string }).content).toContain('"title":"mock_text"');
   });
 
   it("leaves messages unchanged before a graph has been created", async () => {

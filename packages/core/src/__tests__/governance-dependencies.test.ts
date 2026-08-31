@@ -17,7 +17,7 @@ async function setupBook(units: ReadonlyArray<FoundationUnitManifest>): Promise<
   root = await mkdtemp(join(tmpdir(), "castor-deps-"));
   bookDir = join(root, "books", "deps-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
-  await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "## 主题与基调\nA\n\n## 核心冲突\nB\n\n## 世界观底色\nC\n\n## 终局方向\nD\n", "utf-8");
+  await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "## mock_text\nA\n\n## mock_text\nB\n\n## mock_text\nC\n\n## mock_text\nD\n", "utf-8");
   for (const unit of units) {
     await writeUnitManifest(bookDir, unit);
   }

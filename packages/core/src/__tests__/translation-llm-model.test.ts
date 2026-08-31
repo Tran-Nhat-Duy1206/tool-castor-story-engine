@@ -38,16 +38,16 @@ describe("LLM translation model", () => {
     });
 
     const request = {
-      sourceLanguage: "中文",
+      sourceLanguage: "mock_text",
       targetLanguage: "English",
-      chapterTitle: "雨夜",
+      chapterTitle: "mock_text",
       glossary: [],
-      segments: [{ index: 1, source: "雨落下来。" }],
+      segments: [{ index: 1, source: "mock_text。" }],
     };
     await model.translateSegments(request);
     await model.reviewChapter?.({
       ...request,
-      segments: [{ index: 1, source: "雨落下来。", target: "The rain fell." }],
+      segments: [{ index: 1, source: "mock_text。", target: "The rain fell." }],
     });
 
     expect(chatCompletionMock).toHaveBeenCalledTimes(2);

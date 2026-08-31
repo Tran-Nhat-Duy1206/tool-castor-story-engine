@@ -91,9 +91,9 @@ export async function detectAndRewrite(
       chapterNumber,
       [{
         severity: "warning",
-        category: "AIGC检测",
-        description: `AI检测分数 ${finalScore.toFixed(2)} 超过阈值 ${config.threshold}`,
-        suggestion: "降低AI生成痕迹：增加段落长度差异、减少套话、用口语化表达替代书面语",
+        category: "AIGC",
+        description: `AI ${finalScore.toFixed(2)}  ${config.threshold}`,
+        suggestion: "AI：、、",
       }],
       "anti-detect",
       genre,

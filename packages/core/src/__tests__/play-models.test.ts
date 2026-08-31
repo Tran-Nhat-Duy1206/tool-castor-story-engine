@@ -20,15 +20,15 @@ describe("play models", () => {
     const entity = PlayEntitySchema.parse({
       id: "evidence_car_address_stats",
       type: "evidence",
-      label: "车机常用地址统计",
-      summary: "显示新城花园出现 187 次。",
+      label: "mock_text",
+      summary: "mock_text 187 mock_text。",
       status: "seen",
       createdEventId: "event-0001",
       updatedEventId: "event-0001",
     });
 
     expect(entity.type).toBe("evidence");
-    expect(entity.label).toContain("车机");
+    expect(entity.label).toContain("mock_text");
 
     expect(() => PlayEntitySchema.parse({
       id: "bad",
@@ -65,7 +65,7 @@ describe("play models", () => {
     const slot = PlayStateSlotSchema.parse({
       id: "slot_husband_suspicion",
       kind: "pressure",
-      label: "丈夫警觉",
+      label: "mock_text",
       ownerEntityId: "actor_xu_jinan",
       value: { current: 35, min: 0, max: 100 },
       updatedEventId: "event-0001",
@@ -80,19 +80,19 @@ describe("play models", () => {
       eventId: "evt-2",
       turn: 2,
       actionKind: "wait",
-      summary: "玩家屏息等待。",
+      summary: "mock_text。",
       time: {
-        duration: "几息",
-        worldTime: "仍在库房门外那次停顿里",
-        reason: "玩家没有离开库房，只是听门外动静。",
-        worldChanges: "门外的人也停住脚步，铜匣热意更明显。",
+        duration: "mock_text",
+        worldTime: "mock_text",
+        reason: "mock_text，mock_text。",
+        worldChanges: "mock_text，mock_text。",
       },
     });
 
-    expect(mutation.timeAdvance?.elapsed).toBe("几息");
-    expect(mutation.timeAdvance?.anchor).toBe("仍在库房门外那次停顿里");
-    expect(mutation.timeAdvance?.rationale).toContain("库房");
-    expect(mutation.timeAdvance?.synchronized).toEqual(["门外的人也停住脚步，铜匣热意更明显。"]);
+    expect(mutation.timeAdvance?.elapsed).toBe("mock_text");
+    expect(mutation.timeAdvance?.anchor).toBe("mock_text");
+    expect(mutation.timeAdvance?.rationale).toContain("mock_text");
+    expect(mutation.timeAdvance?.synchronized).toEqual(["mock_text，mock_text。"]);
   });
 
   it("models clue and evidence lifecycle explicitly", () => {
@@ -111,11 +111,11 @@ describe("play models", () => {
   it("accepts action intent with one primary action and secondary notes", () => {
     const intent = PlayActionIntentSchema.parse({
       actionKind: "say",
-      targetEntityLabel: "徐晋安",
-      intent: "逼问他刚才删了什么",
-      manner: "试探但带压迫",
-      risk: "提高对方警觉",
-      secondaryActions: ["look: 盯着手机屏幕"],
+      targetEntityLabel: "Xu Jinan",
+      intent: "mock_text",
+      manner: "mock_text",
+      risk: "mock_text",
+      secondaryActions: ["look: mock_text"],
     });
 
     expect(intent.actionKind).toBe("say");
@@ -125,12 +125,12 @@ describe("play models", () => {
   it("normalizes null/empty target labels to undefined (no-target actions must not crash)", () => {
     const intent = PlayActionIntentSchema.parse({
       actionKind: "look",
-      targetEntityLabel: "枪",
+      targetEntityLabel: "mock_text",
       targetLocationLabel: null,
-      intent: "查看枪上有没有编号",
+      intent: "mock_text",
     });
     expect(intent.targetLocationLabel).toBeUndefined();
-    expect(intent.targetEntityLabel).toBe("枪");
+    expect(intent.targetEntityLabel).toBe("mock_text");
 
     const empty = PlayActionIntentSchema.parse({ actionKind: "wait", targetEntityLabel: "" });
     expect(empty.targetEntityLabel).toBeUndefined();
@@ -139,15 +139,15 @@ describe("play models", () => {
   it("coerces non-string action fields, falls back on bad enums, and drops object-shaped items", () => {
     const intent = PlayActionIntentSchema.parse({
       actionKind: "investigate", // not in the enum -> falls back to "do" instead of throwing
-      intent: "查看尸体",
+      intent: "mock_text",
       risk: 3,                    // number -> "3"
       ambiguity: 0,               // number -> "0"
-      secondaryActions: ["看尸体", { actionKind: "look" }, 5], // object/number dropped, string kept
+      secondaryActions: ["mock_text", { actionKind: "look" }, 5], // object/number dropped, string kept
     });
     expect(intent.actionKind).toBe("do");
     expect(intent.risk).toBe("3");
     expect(intent.ambiguity).toBe("0");
-    expect(intent.secondaryActions).toEqual(["看尸体"]);
+    expect(intent.secondaryActions).toEqual(["mock_text"]);
   });
 
   it("accepts a mutation envelope for world changes", () => {
@@ -155,12 +155,12 @@ describe("play models", () => {
       eventId: "event-0002",
       turn: 2,
       actionKind: "look",
-      summary: "宋词看见车机地址统计。",
+      summary: "mock_text。",
       entities: {
         upsert: [{
           id: "evidence_car_address_stats",
           type: "evidence",
-          label: "车机常用地址统计",
+          label: "mock_text",
           status: "seen",
           updatedEventId: "event-0002",
         }],
@@ -182,7 +182,7 @@ describe("play models", () => {
           id: "slot_husband_suspicion",
           ownerEntityId: "actor_husband",
           kind: "pressure",
-          label: "丈夫警觉",
+          label: "mock_text",
           value: { current: 45, min: 0, max: 100 },
           updatedEventId: "event-0002",
         }],
@@ -192,10 +192,10 @@ describe("play models", () => {
           entityId: "evidence_car_address_stats",
           from: "unknown",
           to: "seen",
-          reason: "玩家看见常用地址统计。",
+          reason: "mock_text。",
         }],
       },
-      notes: ["look 动作只暴露信息，不强推高潮。"],
+      notes: ["look mock_text，mock_text。"],
     });
 
     expect(mutation.entities.upsert).toHaveLength(1);
@@ -208,7 +208,7 @@ describe("play models", () => {
       turn: 3,
       actionKind: "look",
       summary: null,
-      entities: [{ id: "ev_x", type: "evidence", label: "线索", status: "seen", updatedEventId: "evt-3" }],
+      entities: [{ id: "ev_x", type: "evidence", label: "mock_text", status: "seen", updatedEventId: "evt-3" }],
       edges: [],
       blockedReason: null,
     });
@@ -224,7 +224,7 @@ describe("play models", () => {
       turn: 4,
       actionKind: "look",
       entities: [
-        { id: "ent_good", type: "evidence", label: "好线索", status: "seen", updatedEventId: "evt-4" },
+        { id: "ent_good", type: "evidence", label: "mock_text", status: "seen", updatedEventId: "evt-4" },
         { type: "evidence" }, // missing id/label — must be dropped, not crash the turn
       ],
       edges: [
@@ -244,19 +244,19 @@ describe("play models", () => {
       turn: 9,
       actionKind: "say",
       entities: [
-        { id: "actor_zhouye", type: "actor", label: "周野", status: "警觉", updatedEventId: "evt-9" },
-        { type: "actor", label: "账房先生", status: "心虚", updatedEventId: "evt-9" }, // id backfilled
+        { id: "actor_zhouye", type: "actor", label: "Zhou Ye", status: "mock_text", updatedEventId: "evt-9" },
+        { type: "actor", label: "Phong so sachmock_text", status: "mock_text", updatedEventId: "evt-9" }, // id backfilled
       ],
       // Model used the common alias keys + referenced endpoints by NAME, not id.
       edges: [
-        { from: "周野", relation: "怀疑", to: "账房先生" },
+        { from: "Zhou Ye", relation: "mock_text", to: "Phong so sachmock_text" },
       ],
     });
     expect(mutation.edges.upsert).toHaveLength(1);
     const edge = mutation.edges.upsert[0];
-    expect(edge?.type).toBe("怀疑");
+    expect(edge?.type).toBe("mock_text");
     expect(edge?.fromId).toBe("actor_zhouye");           // name -> existing id
-    expect(edge?.toId).toBe("ent_账房先生");              // name -> backfilled id
+    expect(edge?.toId).toBe("ent_Phong so sachmock_text");              // name -> backfilled id
     expect(edge?.validFromEventId).toBe("evt-9");         // temporal fields backfilled
   });
 
@@ -266,13 +266,13 @@ describe("play models", () => {
       turn: 10,
       actionKind: "look",
       entities: [
-        { id: "actor_player", type: "actor", label: "玩家", updatedEventId: "evt-10" },
-        { id: "old_ticket", type: "evidence", label: "旧票", updatedEventId: "evt-10" },
-        { id: "ticket_fragment", type: "evidence", label: "残片", updatedEventId: "evt-10" },
+        { id: "actor_player", type: "actor", label: "mock_text", updatedEventId: "evt-10" },
+        { id: "old_ticket", type: "evidence", label: "mock_text", updatedEventId: "evt-10" },
+        { id: "ticket_fragment", type: "evidence", label: "mock_text", updatedEventId: "evt-10" },
       ],
       edges: [
-        { from: "玩家", relation: "持有", to: "旧票" },
-        { from: "玩家", relation: "持有", to: "残片" },
+        { from: "mock_text", relation: "mock_text", to: "mock_text" },
+        { from: "mock_text", relation: "mock_text", to: "mock_text" },
       ],
     });
 
@@ -286,11 +286,11 @@ describe("play models", () => {
       turn: 12,
       actionKind: "say",
       entities: [
-        { id: "actor_a", type: "actor", label: "甲", updatedEventId: "evt-12" },
-        { id: "actor_b", type: "actor", label: "乙", updatedEventId: "evt-12" },
+        { id: "actor_a", type: "actor", label: "mock_text", updatedEventId: "evt-12" },
+        { id: "actor_b", type: "actor", label: "mock_text", updatedEventId: "evt-12" },
       ],
       edges: [
-        { from: "甲", relation: "试探", to: "乙" },
+        { from: "mock_text", relation: "mock_text", to: "mock_text" },
       ],
     });
 
@@ -306,14 +306,14 @@ describe("play models", () => {
       actionKind: "look",
       // Model wrote a complete entity/slot but forgot the boilerplate id — must be kept, not dropped.
       entities: [
-        { type: "evidence", label: "半张船票", summary: "死者攥着", status: "seen", updatedEventId: "evt-7" },
+        { type: "evidence", label: "mock_text", summary: "mock_text", status: "seen", updatedEventId: "evt-7" },
       ],
       stateSlots: [
-        { kind: "timer", label: "结案倒计时", value: 3, updatedEventId: "evt-7" },
+        { kind: "timer", label: "mock_text", value: 3, updatedEventId: "evt-7" },
       ],
     });
     expect(mutation.entities.upsert).toHaveLength(1);
-    expect(mutation.entities.upsert[0]?.label).toBe("半张船票");
+    expect(mutation.entities.upsert[0]?.label).toBe("mock_text");
     expect(mutation.entities.upsert[0]?.id).toContain("ent_");
     expect(mutation.stateSlots.upsert).toHaveLength(1);
     expect(mutation.stateSlots.upsert[0]?.id).toContain("slot_");

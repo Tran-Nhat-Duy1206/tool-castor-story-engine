@@ -1,10 +1,7 @@
 import type { ProviderModel } from "./types.js";
 import { getAllEndpoints, getEndpoint } from "./index.js";
 
-/**
- * provider id 优先级。Layer 2 全局扫时同 id 多条匹配按这个顺序取第一条，
- * 保证结果确定性。白名单外的 provider 视同 999（排最后）。
- */
+// LLM provider configuration and endpoints.
 const PROVIDER_PRIORITY: readonly string[] = [
   "anthropic", "openai", "google", "deepseek", "bailian", "moonshot", "kimicode",
   "zhipu", "minimax", "xai",
@@ -12,15 +9,7 @@ const PROVIDER_PRIORITY: readonly string[] = [
   "openrouter", "aihubmix", "novita",
 ];
 
-/**
- * 两层 lookup：
- * - Layer 1: 已知 provider 精确查（整串比较，不拆斜线）
- * - Layer 2: 全局扫所有 provider 的 models，按 provider id 优先级取第一条
- * - 都 miss: 返回 undefined，调用方走保守默认
- *
- * 不做斜线前缀拆分。lobe 的 processModelList 证实了"靠调用入口带 provider 消歧"
- * 是对的做法，斜线拆分对 PPIO / SiliconCloud 原生命名会误匹配。
- */
+// LLM provider configuration and endpoints.
 export function lookupModel(
   serviceId: string,
   modelId: string,
@@ -48,7 +37,7 @@ export function lookupModel(
   return matches[0].model;
 }
 
-/** 某 service 下可用（enabled !== false）的模型列表 */
+// LLM provider configuration and endpoints.
 export function listEnabledModels(serviceId: string): ProviderModel[] {
   const provider = getEndpoint(serviceId);
   if (!provider) return [];

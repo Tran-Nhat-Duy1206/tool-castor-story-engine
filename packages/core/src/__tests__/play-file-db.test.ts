@@ -17,8 +17,8 @@ describe("PlayFileDB", () => {
 
   it("persists graph state across instances", () => {
     const db = new PlayFileDB(dir);
-    db.upsertEntity({ id: "player", type: "actor", label: "宋词" });
-    db.upsertEntity({ id: "claim-hidden-home", type: "claim", label: "隐瞒同居地点" });
+    db.upsertEntity({ id: "player", type: "actor", label: "mock_text" });
+    db.upsertEntity({ id: "claim-hidden-home", type: "claim", label: "Giau giemmock_text" });
     db.upsertEdge({
       id: "edge-player-claim",
       fromId: "player",
@@ -31,7 +31,7 @@ describe("PlayFileDB", () => {
       id: "pressure-player-risk",
       ownerEntityId: "player",
       kind: "pressure",
-      label: "暴露风险",
+      label: "mock_text",
       value: { current: 20, min: 0, max: 100 },
       updatedEventId: "evt-1",
     });
@@ -39,15 +39,15 @@ describe("PlayFileDB", () => {
       id: "evt-1",
       turn: 1,
       actionKind: "look",
-      rawInput: "看导航",
-      outcomeSummary: "发现地址统计",
+      rawInput: "mock_text",
+      outcomeSummary: "mock_text",
       createdAt: "2026-05-28T00:00:00.000Z",
     });
     db.close();
 
     const reopened = new PlayFileDB(dir);
-    expect(reopened.getEntity("player")?.label).toBe("宋词");
-    expect(reopened.getEvent("evt-1")?.rawInput).toBe("看导航");
+    expect(reopened.getEntity("player")?.label).toBe("mock_text");
+    expect(reopened.getEvent("evt-1")?.rawInput).toBe("mock_text");
     expect(reopened.snapshot()).toMatchObject({
       entities: [expect.objectContaining({ id: "claim-hidden-home" }), expect.objectContaining({ id: "player" })],
       edges: [expect.objectContaining({ id: "edge-player-claim" })],
@@ -60,7 +60,7 @@ describe("PlayFileDB", () => {
     const db = new PlayFileDB(dir);
 
     expect(() => db.transaction(() => {
-      db.upsertEntity({ id: "temp", type: "actor", label: "临时角色" });
+      db.upsertEntity({ id: "temp", type: "actor", label: "mock_text" });
       throw new Error("fail");
     })).toThrow("fail");
 

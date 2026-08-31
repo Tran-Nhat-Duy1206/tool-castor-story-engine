@@ -1,17 +1,4 @@
-/**
- * Phase 5 (v13) path resolution — prefer the new prose outline files, fall
- * back to legacy paths so older books keep working during transition.
- *
- * Maps:
- *   story/outline/story_frame.md  →  preferred replacement for story_bible.md
- *   story/outline/volume_map.md   →  preferred replacement for volume_outline.md
- *   story/roles/主要角色/*.md +
- *   story/roles/次要角色/*.md    →  preferred replacement for character_matrix.md
- *
- * All helpers accept a bookDir (path to a book root, containing `story/`)
- * and return a string — either the new-file content when it exists, or the
- * legacy file content, or an empty default placeholder.
- */
+// Core narrative engine processing.
 
 import { readFile, readdir, access } from "node:fs/promises";
 import { join } from "node:path";
@@ -61,12 +48,12 @@ export async function isBookFoundationComplete(bookDir: string): Promise<boolean
   // (readCharacterContext falls back to it). The architect routinely persists
   // roles to character_matrix.md, so requiring the roles/ dir alone falsely
   // reported a complete book as "missing".
-  for (const tier of ["主要角色", "major", "次要角色", "minor"]) {
+  for (const tier of ["major", "minor", "", ""]) {
     try {
       const entries = await readdir(join(bookDir, "story", "roles", tier));
       if (entries.some((file) => file.endsWith(".md"))) return true;
     } catch {
-      // Try the next locale/tier directory.
+      // Try the next directory.
     }
   }
   try {
@@ -83,15 +70,15 @@ function hasLegacyCharacterMatrixRoles(content: string): boolean {
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean)
-    .filter((line) => !line.includes("兼容提示"))
+    .filter((line) => !line.includes(""))
     .filter((line) => !line.includes("story/roles/"))
-    .filter((line) => !/^\(?(?:none|无|暂无)\)?$/i.test(line));
+    .filter((line) => !/^\(?(?:none||Chưa có|không)\)?$/i.test(line));
 
   return normalized.some((line) => {
     const match = /^#{2,}\s+(.+)$/.exec(line);
     if (!match) return false;
     const title = match[1].trim().replace(/[*`#]/g, "");
-    return !/^(主要角色|次要角色|major roles?|minor roles?|characters?|角色矩阵)$/i.test(title);
+    return !/^(||major roles?|minor roles?|characters?|nhân vật chính|nhân vật phụ|bảng nhân vật)$/i.test(title);
   });
 }
 
@@ -131,14 +118,14 @@ export async function readVolumeMap(
   return readOr(legacyPath, fallbackPlaceholder);
 }
 
-/** Read the rhythm principles file (zh or en variant). */
+/** Read the rhythm principles file (en or vi variant). */
 export async function readRhythmPrinciples(bookDir: string): Promise<string> {
-  const zhPath = join(bookDir, "story", "outline", "节奏原则.md");
   const enPath = join(bookDir, "story", "outline", "rhythm_principles.md");
+  const zhPath = join(bookDir, "story", "outline", ".md");
 
-  const zh = await readOr(zhPath, "");
-  if (zh.trim()) return zh;
-  return readOr(enPath, "");
+  const en = await readOr(enPath, "");
+  if (en.trim()) return en;
+  return readOr(zhPath, "");
 }
 
 export interface RoleCard {
@@ -153,17 +140,17 @@ export interface RoleCard {
  */
 export async function readRoleCards(bookDir: string): Promise<ReadonlyArray<RoleCard>> {
   const rolesRoot = join(bookDir, "story", "roles");
-  const majorDirZh = join(rolesRoot, "主要角色");
-  const minorDirZh = join(rolesRoot, "次要角色");
   const majorDirEn = join(rolesRoot, "major");
   const minorDirEn = join(rolesRoot, "minor");
+  const majorDirZh = join(rolesRoot, "");
+  const minorDirZh = join(rolesRoot, "");
 
   const cards: RoleCard[] = [];
   await Promise.all([
-    collectRoleDir(majorDirZh, "major", cards),
-    collectRoleDir(minorDirZh, "minor", cards),
     collectRoleDir(majorDirEn, "major", cards),
     collectRoleDir(minorDirEn, "minor", cards),
+    collectRoleDir(majorDirZh, "major", cards),
+    collectRoleDir(minorDirZh, "minor", cards),
   ]);
   return cards;
 }
@@ -214,8 +201,8 @@ export async function readCharacterContext(
     };
 
     const blocks = [
-      render(groups.major, "主要角色 / Major characters"),
-      render(groups.minor, "次要角色 / Minor characters"),
+      render(groups.major, "Major Characters / Nhân vật chính"),
+      render(groups.minor, "Minor Characters / Nhân vật phụ"),
     ].filter(Boolean);
 
     return blocks.join("\n\n");
@@ -228,15 +215,6 @@ export async function readCharacterContext(
 
 // ---------------------------------------------------------------------------
 // Phase 5 consolidation: current_state.md initial fallback
-//
-// After architect consolidation (7→5 sections), current_state.md is seeded
-// with a tiny placeholder at book creation. Real content only arrives once
-// the consolidator has appended output from chapter 1 onward. Readers that
-// previously relied on architect-provided initial state (writer phase-1
-// creative prompt, continuity, chapter-analyzer, reviser, composer) should
-// substitute a derived initial-state block when the seed placeholder is all
-// that's on disk — otherwise the "## 当前状态卡" block in prompts degenerates
-// into a meta note about runtime append behaviour.
 // ---------------------------------------------------------------------------
 
 /**
@@ -244,8 +222,9 @@ export async function readCharacterContext(
  * current_state.md. Its presence is how readers detect "nothing real yet".
  */
 const CURRENT_STATE_SEED_MARKERS = [
-  "建书时占位",
   "Seeded at book creation",
+  "Khởi tạo khi tạo sách",
+  "",
 ];
 
 export function isCurrentStateSeedPlaceholder(raw: string): boolean {
@@ -257,8 +236,7 @@ export function isCurrentStateSeedPlaceholder(raw: string): boolean {
 }
 
 function extractCurrentStateFromRole(content: string): string | null {
-  // Accept both zh (`## 当前现状`) and en (`## Current_State` / `## Current State`).
-  const pattern = /^##\s*(?:当前现状|Current[_\s]?State)[^\n]*$/im;
+  const pattern = /^##\s*(?:Current[_\s]?State|Trạng[_\s]?thái[_\s]?hiện[_\s]?tại|)[^\n]*$/im;
   const match = content.match(pattern);
   if (!match || match.index === undefined) return null;
   const after = content.slice(match.index + match[0].length);
@@ -316,8 +294,8 @@ export async function readCurrentStateWithFallback(
     .map((card) => {
       const state = extractCurrentStateFromRole(card.content);
       if (!state) return null;
-      const tierLabel = card.tier === "major" ? "主要" : "次要";
-      return `- ${card.name}（${tierLabel}）：${state.replace(/\s+/g, " ")}`;
+      const tierLabel = card.tier === "major" ? "Chính" : "Phụ";
+      return `- ${card.name} (${tierLabel}): ${state.replace(/\s+/g, " ")}`;
     })
     .filter((line): line is string => line !== null);
 
@@ -327,13 +305,13 @@ export async function readCurrentStateWithFallback(
     return raw.trim() ? raw : fallbackPlaceholder;
   }
 
-  const parts: string[] = ["# 初始状态（第 0 章，由 roles + 种子伏笔派生）"];
+  const parts: string[] = ["# Initial State (Chapter 0 / Khởi tạo)"];
   if (roleLines.length > 0) {
-    parts.push("\n## 角色初始位置 / 处境");
+    parts.push("\n## Character Initial Positions / Tình trạng ban đầu nhân vật");
     parts.push(...roleLines);
   }
   if (hookLines.length > 0) {
-    parts.push("\n## 种子伏笔（startChapter = 0）");
+    parts.push("\n## Seed Hooks / Manh mối khởi tạo (startChapter = 0)");
     parts.push(...hookLines.map((line) => `- ${line}`));
   }
   return parts.join("\n");

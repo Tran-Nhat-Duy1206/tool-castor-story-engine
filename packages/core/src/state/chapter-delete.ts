@@ -93,7 +93,7 @@ export async function deleteLatestChapter(
   return {
     bookId,
     deletedChapter: latest,
-    title: entry?.title ?? `第${latest}章`,
+    title: entry?.title ?? `Chương ${latest}`,
     trashedFiles,
     rolledBackTo: rollbackTarget,
     discarded,

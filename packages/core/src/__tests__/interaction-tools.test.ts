@@ -331,13 +331,13 @@ describe("interaction tools", () => {
       platform: "tomato",
       chapterWordCount: 2800,
       targetChapters: 120,
-      blurb: "一个做灰产生意的人，准备在夜港洗白，却先被旧账拖回去。",
-      worldPremise: "近未来架空香港，港口账本牵出多方势力。",
-      protagonist: "林砚，水货账房出身，聪明克制，不轻易信人。",
-      conflictCore: "洗白与旧债回潮的对撞。",
-      volumeOutline: "卷一先查账，再暴露港口旧案。",
-      authorIntent: "# 作者意图\n\n写成冷硬、克制、利益驱动的商战悬疑。\n",
-      currentFocus: "# 当前聚焦\n\n先把旧账线和港口势力网立住。\n",
+      blurb: "mock_text，mock_text，mock_text。",
+      worldPremise: "mock_text，mock_text。",
+      protagonist: "mock_text，mock_textPhong so sachmock_text，mock_text，mock_text。",
+      conflictCore: "mock_text。",
+      volumeOutline: "mock_textKiem tra so sach，mock_text。",
+      authorIntent: "# mock_text\n\nmock_text、mock_text、mock_text。\n",
+      currentFocus: "# mock_text\n\nmock_text。\n",
     });
 
     expect(pipeline.initBook).toHaveBeenCalledWith(
@@ -349,9 +349,9 @@ describe("interaction tools", () => {
         chapterWordCount: 2800,
       }),
       expect.objectContaining({
-        externalContext: expect.stringContaining("近未来架空香港"),
-        authorIntent: expect.stringContaining("冷硬、克制"),
-        currentFocus: expect.stringContaining("旧账线"),
+        externalContext: expect.stringContaining("mock_text"),
+        authorIntent: expect.stringContaining("mock_text、mock_text"),
+        currentFocus: expect.stringContaining("mock_text"),
       }),
     );
   });
@@ -374,14 +374,14 @@ describe("interaction tools", () => {
 
     const tools = createInteractionToolsFromDeps(pipeline, state);
     await tools.createBook?.({
-      title: "测试书",
+      title: "Testmock_text",
       genre: "urban",
-      platform: "番茄小说",
+      platform: "mock_text",
     });
 
     expect(pipeline.initBook).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: "测试书",
+        id: "Testmock_text",
         platform: "tomato",
       }),
       expect.any(Object),

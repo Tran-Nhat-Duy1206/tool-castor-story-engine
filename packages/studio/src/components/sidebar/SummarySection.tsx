@@ -40,11 +40,11 @@ function parseStoryBible(content: string): LegacySummary {
   let cast = "";
 
   for (const section of sections) {
-    if (/^0?1[_\s]|世界观|world/i.test(section)) {
+    if (/^0?1[_\s]||world/i.test(section)) {
       world = section.replace(/^[^\n]+\n/, "").trim().split("\n\n")[0] ?? "";
-    } else if (/^0?2[_\s]|主角|protagonist/i.test(section)) {
+    } else if (/^0?2[_\s]||protagonist/i.test(section)) {
       protagonist = section.replace(/^[^\n]+\n/, "").trim().split("\n\n")[0] ?? "";
-    } else if (/^0?3[_\s]|配角|supporting|cast/i.test(section)) {
+    } else if (/^0?3[_\s]||supporting|cast/i.test(section)) {
       cast = section.replace(/^[^\n]+\n/, "").trim().split("\n\n")[0] ?? "";
     }
   }

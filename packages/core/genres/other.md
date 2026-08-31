@@ -15,10 +15,10 @@ auditDimensions: [1,2,3,6,7,8,9,10,13,14,15,16,17,18,19,24,25,26]
 
 - Trùng hợp vô logic thúc đẩy cốt truyện
 - Vai phụ hạ trí phối hợp với nhân vật chính
-- Cao trào không có铺垫
+- Cao trào không có bước đệm chuẩn bị
 
 ## Chỉ dẫn tự sự
 
 Căn cứ thể loại cụ thể để điều chỉnh trọng tâm tự sự.
-Giữ chuỗi logic nhân quả完整.
+Giữ chuỗi logic nhân quả hoàn chỉnh.
 Hành vi nhân vật do động cơ thúc đẩy, không do nhu cầu cốt truyện thúc đẩy.

@@ -16,11 +16,11 @@ describe("translation runner", () => {
     root = await mkdtemp(join(tmpdir(), "castor-translation-runner-"));
     await mkdir(join(root, "inputs"), { recursive: true });
     await writeFile(join(root, "inputs", "book.md"), [
-      "# 第一章 雨夜",
+      "# Chương mock_text mock_text",
       "",
-      "第一段。",
+      "Chương mock_text。",
       "",
-      "第二段。",
+      "Chương mock_text。",
     ].join("\n"));
   });
 
@@ -39,7 +39,7 @@ describe("translation runner", () => {
         index: segment.index,
         target: `EN:${segment.source}`,
       })),
-      glossary: [{ source: "雨夜", target: "rainy night", note: "chapter tone" }],
+      glossary: [{ source: "mock_text", target: "rainy night", note: "chapter tone" }],
     }));
     const reviewChapter = vi.fn<NonNullable<TranslationModelPort["reviewChapter"]>>(async () => ({
       passed: true,
@@ -57,7 +57,7 @@ describe("translation runner", () => {
 
     const report = await readFile(join(root, first.reportPath), "utf-8");
     expect(report).toContain("ok");
-    expect(report).toContain("雨夜");
+    expect(report).toContain("mock_text");
 
     const second = await runTranslationProject(root, created.manifest.id, {
       model: { translateSegments, reviewChapter },
@@ -68,8 +68,8 @@ describe("translation runner", () => {
 
     const exported = await writeTranslationExport(root, created.manifest.id, { format: "md" });
     const markdown = await readFile(exported.outputPath, "utf-8");
-    expect(markdown).toContain("EN:第一段。");
-    expect(markdown).toContain("EN:第二段。");
-    expect(markdown).not.toContain("\n第一段。\n");
+    expect(markdown).toContain("EN:Chương mock_text。");
+    expect(markdown).toContain("EN:Chương mock_text。");
+    expect(markdown).not.toContain("\nChương mock_text。\n");
   });
 });

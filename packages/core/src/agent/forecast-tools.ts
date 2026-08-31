@@ -67,7 +67,7 @@ const ForecastCreateParams = Type.Object({
     description: "All forecast tools: book id to forecast. Defaults to the active book; must match it when both are present.",
   })),
   divergence: Type.String({
-    description: "Required divergence point: the open decision or fork the author wants to compare, e.g. 主角接受还是拒绝对手的合作提议. Include the competing options when known.",
+    description: "Required divergence point: the open decision or fork the author wants to compare, e.g. whether the protagonist accepts or rejects the partnership proposal. Include the competing options when known.",
   }),
   branchCount: Type.Optional(Type.Number({
     description: "create_narrative_forecast only: number of mutually isolated candidate branches, integer 2-5. Default 3.",

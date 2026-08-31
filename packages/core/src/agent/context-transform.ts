@@ -23,10 +23,7 @@ const MAX_INDEX_HEADINGS_PER_FILE = 80;
 const MAX_INDEX_HEADING_CHARS = 220;
 
 const UPGRADE_HINT =
-  "[提示] 当前这本书的架构稿是旧的条目式格式（story_bible.md / volume_outline.md / character_matrix.md）。" +
-  "如果作者有意愿升级成段落式架构稿 + 一人一卡的角色目录（outline/story_frame.md + outline/volume_map.md + roles/），" +
-  "可以调用 `sub_agent(architect, { revise: true, bookId, feedback: \"把架构稿从条目式升级成段落式架构稿，并把角色矩阵拆成 roles 目录一人一卡\" })`。" +
-  "升级只改架构稿，不动已写的章节。在作者没明确同意前不要主动触发。";
+  "[Notice] The story architecture is in legacy format. If the author wants to upgrade to section format, sub_agent(architect, { revise: true }) can be used.";
 
 export function createBookContextTransform(
   bookId: string | null,
@@ -59,7 +56,7 @@ export function createBookContextTransform(
     }
 
     const body =
-      "[以下是当前书籍的上下文压缩包，每次对话时自动从磁盘读取生成。请基于这些内容进行创作和判断；需要完整原文时再按文件读取。]" +
+      "[The following is the context package for the current book, automatically generated from disk. Use these contents for reasoning and drafting; read individual files when full text is required.]" +
       hintBlock + "\n\n" +
       sections.map(renderContextSection).join("\n\n");
 
@@ -97,7 +94,7 @@ export function createInteractiveFilmContextTransform(
     const injected: UserMessage = {
       role: "user",
       content: [
-        "[以下是当前互动影游的完整权威剧情图谱，每轮从磁盘重新读取。编辑时必须使用其中真实的 node id、choice id、变量和结局 id；不要凭空臆造。]",
+        "[The following is the authoritative story graph for this interactive game. Always use valid node IDs, choice IDs, variables, and ending IDs.]",
         JSON.stringify(graph),
       ].join("\n"),
       timestamp: Date.now(),
@@ -119,11 +116,11 @@ function renderContextSection(section: TruthFileSection): string {
   const index = buildMarkdownFileIndex(section.content);
   return [
     `=== ${section.name} ===`,
-    `[未全文注入：原文件 ${section.content.length} 字符 / ${index.totalLines} 行。以下为 Markdown 目录索引；避免让旧设定原文淹没当前用户指令。]`,
+    `[Partial injection: original file ${section.content.length} chars / ${index.totalLines} lines. Below is Markdown table of contents.]`,
     index.lines.length > 0
       ? index.lines.join("\n")
-      : "[未检测到 Markdown 标题；需要内容时按文件读取完整内容。]",
-    index.omittedHeadings > 0 ? `[未注入标题数：${index.omittedHeadings}。]` : "",
+      : "[No Markdown headings detected; read complete file when needed.]",
+    index.omittedHeadings > 0 ? `[Omitted headings count: ${index.omittedHeadings}.]` : "",
   ].filter(Boolean).join("\n");
 }
 

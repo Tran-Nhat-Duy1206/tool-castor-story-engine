@@ -10,11 +10,11 @@ describe("reviewStoryGraph new rules", () => {
     const graph = g({
       variables: [{ name: "trust", type: "counter", default: 0, desc: "" }],
       nodes: [
-        { id: "s", type: "start", choices: [{ id: "a", text: "走", targetNodeId: "e2" }, { id: "b", text: "门", targetNodeId: "e1", condition: { var: "trust", op: ">=", value: 9 } }] },
+        { id: "s", type: "start", choices: [{ id: "a", text: "mock_text", targetNodeId: "e2" }, { id: "b", text: "mock_text", targetNodeId: "e1", condition: { var: "trust", op: ">=", value: 9 } }] },
         { id: "e1", type: "ending", choices: [] }, // gated by trust>=9, never reachable (trust starts 0, never written)
         { id: "e2", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好", type: "good" }, { id: "b1", nodeId: "e2", title: "坏", type: "bad" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_text", type: "good" }, { id: "b1", nodeId: "e2", title: "mock_text", type: "bad" }],
     });
     expect(codes(graph)).toContain("ENDING_UNREACHABLE");
   });
@@ -27,7 +27,7 @@ describe("reviewStoryGraph new rules", () => {
         { id: "n2", type: "normal", choices: [{ id: "c3", text: "end", targetNodeId: "e" }] },
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }],
     });
     expect(codes(graph)).toContain("LINEAR_GRAPH");
   });
@@ -39,7 +39,7 @@ describe("reviewStoryGraph new rules", () => {
         { id: "e", type: "ending", choices: [] },
         { id: "orphan", type: "normal", choices: [] }, // nothing points to it
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }],
     });
     const report = reviewStoryGraph(graph);
     const c = report.issues.map((i) => i.code);
@@ -53,11 +53,11 @@ describe("reviewStoryGraph new rules", () => {
     const graph = g({
       variables: [{ name: "trust", type: "counter", default: 0, desc: "" }],
       nodes: [
-        { id: "s", type: "start", choices: [{ id: "a", text: "走", targetNodeId: "e2" }, { id: "b", text: "门", targetNodeId: "e1", condition: { var: "trust", op: ">=", value: 9 } }] },
+        { id: "s", type: "start", choices: [{ id: "a", text: "mock_text", targetNodeId: "e2" }, { id: "b", text: "mock_text", targetNodeId: "e1", condition: { var: "trust", op: ">=", value: 9 } }] },
         { id: "e1", type: "ending", choices: [] }, // gated by trust>=9, never reachable
         { id: "e2", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好", type: "good" }, { id: "b1", nodeId: "e2", title: "坏", type: "bad" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_text", type: "good" }, { id: "b1", nodeId: "e2", title: "mock_text", type: "bad" }],
     });
     const c = codes(graph);
     expect(c).toContain("ENDING_UNREACHABLE");
@@ -77,7 +77,7 @@ describe("reviewStoryGraph new rules", () => {
         { id: "locked", type: "normal", choices: [{ id: "d", text: "end", targetNodeId: "e" }] }, // trust never written → never reachable at runtime
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }],
     });
     const c = codes(graph);
     expect(c).toContain("GATED_UNREACHABLE");
@@ -89,12 +89,12 @@ describe("reviewStoryGraph new rules", () => {
       nodes: [
         { id: "s", type: "start", choices: [{ id: "c", text: "go", targetNodeId: "branch" }] },
         { id: "branch", type: "normal", choices: [
-          { id: "c1", text: "选A", targetNodeId: "e" },
-          { id: "c2", text: "选B", targetNodeId: "e" }, // same target, no effects
+          { id: "c1", text: "mock_textA", targetNodeId: "e" },
+          { id: "c2", text: "mock_textB", targetNodeId: "e" }, // same target, no effects
         ] },
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }],
     });
     expect(codes(graph)).toContain("ILLUSORY_BRANCH");
   });
@@ -110,7 +110,7 @@ describe("reviewStoryGraph new rules", () => {
         { id: "n5", type: "normal", choices: [{ id: "c5", text: "end", targetNodeId: "e" }] },
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }],
     });
     expect(codes(graph)).toContain("LONG_LINEAR_CHAIN");
   });
@@ -125,7 +125,7 @@ describe("reviewStoryGraph new rules", () => {
         { id: "n4", type: "normal", choices: [{ id: "c4", text: "end", targetNodeId: "e" }] },
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }],
     });
     expect(codes(graph)).not.toContain("LONG_LINEAR_CHAIN");
   });
@@ -150,7 +150,7 @@ describe("reviewStoryGraph new rules", () => {
         ...branchNodes,
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "end1", nodeId: "e", title: "結局", type: "good" }],
+      endings: [{ id: "end1", nodeId: "e", title: "mock_text", type: "good" }],
     });
 
     // Confirm enumeration truncates
@@ -169,7 +169,7 @@ describe("reviewStoryGraph new rules", () => {
         { id: "s", type: "start", imageSlot: { prompt: "p", assetRef: "x" }, choices: [{ id: "a", text: "A", targetNodeId: "e1" }, { id: "b", text: "B", targetNodeId: "e2" }] },
         { id: "e1", type: "ending", choices: [] }, { id: "e2", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好", type: "good" }, { id: "b1", nodeId: "e2", title: "坏", type: "bad" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_text", type: "good" }, { id: "b1", nodeId: "e2", title: "mock_text", type: "bad" }],
     });
     const c = codes(graph);
     for (const code of ["GATED_UNREACHABLE","ENDING_UNREACHABLE","ILLUSORY_BRANCH","LINEAR_GRAPH","ISOLATED_NODE","LONG_LINEAR_CHAIN"]) {

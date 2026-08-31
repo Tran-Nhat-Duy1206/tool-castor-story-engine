@@ -244,7 +244,7 @@ function applyGraphChanges(db: PlayReducerDB, mutation: ReturnType<typeof PlayMu
       id: evidenceStatusSlotId(transition.entityId),
       ownerEntityId: transition.entityId,
       kind: "evidence",
-      label: "证据状态",
+      label: "Evidence State",
       value: {
         previous: currentEvidenceStatus(db, transition.entityId),
         status: transition.to,

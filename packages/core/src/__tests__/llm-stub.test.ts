@@ -18,8 +18,8 @@ describe("llm-stub", () => {
   it("stubChatCompletion returns a valid structure JSON for a structure prompt", () => {
     const res = stubChatCompletion(
       [
-        { role: "system", content: "生成分支骨架 JSON：{nodes:[...]}" },
-        { role: "user", content: "三幕" },
+        { role: "system", content: "mock_text JSON：{nodes:[...]}" },
+        { role: "user", content: "mock_text" },
       ],
       "stub-model",
     );

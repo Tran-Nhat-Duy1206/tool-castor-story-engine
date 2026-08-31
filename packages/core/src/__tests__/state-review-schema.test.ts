@@ -202,12 +202,12 @@ describe("review items", () => {
   });
 
   it("enforces the real ChapterSummaryRowSchema for summary proposals", () => {
-    const row = ChapterSummaryRowSchema.parse({ chapter: 13, title: "夜航" });
+    const row = ChapterSummaryRowSchema.parse({ chapter: 13, title: "mock_text" });
     expect(() =>
       ProposalChangeSchema.parse({ type: "chapter-summary", row }),
     ).not.toThrow();
     expect(() =>
-      ProposalChangeSchema.parse({ type: "chapter-summary", row: { title: "缺章节号" } }),
+      ProposalChangeSchema.parse({ type: "chapter-summary", row: { title: "mock_text" } }),
     ).toThrow();
   });
 });
@@ -294,17 +294,17 @@ describe("stable review item ids", () => {
     const a = stateReviewItemId("current-state-fact", 0, {
       subject: "protagonist",
       predicate: "location",
-      object: "东城公寓",
+      object: "mock_text",
     });
     const b = stateReviewItemId("current-state-fact", 0, {
       subject: "protagonist",
       predicate: "location",
-      object: "东城公寓",
+      object: "mock_text",
     });
     const c = stateReviewItemId("current-state-fact", 0, {
       subject: "protagonist",
       predicate: "location",
-      object: "西城公寓",
+      object: "mock_text",
     });
     expect(a).toBe(b);
     expect(a).not.toBe(c);
@@ -325,12 +325,12 @@ describe("fnv1a8", () => {
   });
 
   it("is deterministic for non-ASCII (CJK) input", () => {
-    expect(fnv1a8("状态审查")).toMatch(/^[0-9a-f]{8}$/);
-    expect(fnv1a8("状态审查")).toBe(fnv1a8("状态审查"));
+    expect(fnv1a8("mock_text")).toMatch(/^[0-9a-f]{8}$/);
+    expect(fnv1a8("mock_text")).toBe(fnv1a8("mock_text"));
   });
 
   it("distinguishes visually similar non-ASCII strings", () => {
-    expect(fnv1a8("状态审查")).not.toBe(fnv1a8("状态審查"));
+    expect(fnv1a8("mock_text")).not.toBe(fnv1a8("mock_text"));
   });
 });
 
@@ -399,7 +399,7 @@ describe("receipt evidence preservation (spec §7/§23)", () => {
       evidence: {
         claimedLevel: "explicit",
         verifiedLevel: "explicit",
-        quote: "他推开了临街的木门。",
+        quote: "mock_text。",
       },
     };
     const parsed = ResolvedReviewReceiptSchema.parse({ ...receiptBase(), evidence: [entry] });

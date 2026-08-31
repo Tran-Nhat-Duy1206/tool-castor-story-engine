@@ -59,13 +59,13 @@ describe("CLI progress text", () => {
     expect(formatImportResumeLine("vi", 8)).toBe("Tiếp tục nhập từ chương 8.");
     expect(formatImportCompletionLines("vi", {
       importedCount: 12,
-      totalCountLabel: "24000字",
+      totalCountLabel: "24000 từ",
       nextChapter: 13,
       bookId: "demo-book",
     })).toEqual([
       "Nhập chương hoàn tất:",
       "  Đã nhập chương: 12",
-      "  Tổng độ dài: 24000字",
+      "  Tổng độ dài: 24000 từ",
       "  Số chương tiếp theo: 13",
       "",
       'Chạy "castor write next demo-book" để tiếp tục viết.',

@@ -19,10 +19,7 @@ export interface VerifyResult {
   } | null;
 }
 
-/**
- * Step 1: 用 apikey 调 /models endpoint 探测。
- * 返回 models 条数 + ok 标志；失败原因落到 error 字段。
- */
+// LLM provider configuration and endpoints.
 async function probe(
   service: string,
   apiKey: string,
@@ -32,7 +29,7 @@ async function probe(
   const provider = getEndpoint(service);
   const probeBaseUrl = baseUrl || provider?.modelsBaseUrl || provider?.baseUrl || resolveServiceModelsBaseUrl(service);
   if (!probeBaseUrl) {
-    return { ok: false, models: 0, error: "无 baseUrl 可探测（custom / newapi / higress 需要用户填）" };
+    return { ok: false, models: 0, error: " baseUrl （custom / newapi / higress ）" };
   }
   try {
     const url = probeBaseUrl.replace(/\/$/, "") + "/models";
@@ -55,11 +52,7 @@ async function probe(
   }
 }
 
-/**
- * verifyService: 两步验证。
- * Step 1 probe /models。
- * Step 2 chat hello 到 checkModel（命中 provider.checkModel 才做；custom / newapi / higress 没有 checkModel，chat 字段返回 null）。
- */
+// LLM provider configuration and endpoints.
 export async function verifyService(
   service: string,
   apiKey: string,

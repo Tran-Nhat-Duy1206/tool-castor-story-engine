@@ -261,7 +261,7 @@ export function computeRecyclableHooks(
 }
 
 function isRecycleTerminalStatus(status: string): boolean {
-  return /^(resolved|closed|done|已回收|已解决|deferred|paused|hold|延后|延期|搁置|暂缓)$/i.test(status.trim());
+  return /^(resolved|closed|done|||deferred|paused|hold||||)$/i.test(status.trim());
 }
 
 function hookSilence(hook: StoredHook, chapterNumber: number): number {
@@ -272,7 +272,7 @@ function hookSilence(hook: StoredHook, chapterNumber: number): number {
 
 function recycleThreshold(hook: StoredHook): number {
   const status = hook.status.trim().toLowerCase();
-  if (/pressured|near[_\s-]?payoff|progressing|重大推进|持续推进/.test(status)) return 5;
+  if (/pressured|near[_\s-]?payoff|progressing||/.test(status)) return 5;
   if (hook.coreHook === true) return 8;
   return 10;
 }
@@ -388,7 +388,7 @@ function parseVolumeSummariesMarkdown(markdown: string): VolumeSummarySelection[
 }
 
 function isUnresolvedHook(status: string): boolean {
-  return status.trim().length === 0 || /open|待定|推进|active|progressing/i.test(status);
+  return status.trim().length === 0 || /open|||active|progressing/i.test(status);
 }
 
 function selectRelevantSummaries(
@@ -465,12 +465,12 @@ function selectRelevantFacts(
   rankScores: ReadonlyMap<string, number>,
 ): Fact[] {
   const prioritizedPredicates = [
-    ["当前冲突", "current conflict"],
-    ["当前目标", "current goal"],
-    ["主角状态", "protagonist state"],
-    ["当前限制", "current constraint"],
-    ["当前位置", "current location"],
-    ["当前敌我", "current alliances", "current relationships"],
+    ["Xung đột hiện tại", "current conflict"],
+    ["Mục tiêu hiện tại", "current goal"],
+    ["Trạng thái nhân vật chính", "protagonist state"],
+    ["Ràng buộc hiện tại", "current constraint"],
+    ["Vị trí hiện tại", "current location"],
+    ["Quan hệ hiện tại", "current alliances", "current relationships"],
   ];
 
   return facts
@@ -521,7 +521,7 @@ function slugifyAnchor(value: string): string {
   return value
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-")
+    .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     || "volume-summary";
 }

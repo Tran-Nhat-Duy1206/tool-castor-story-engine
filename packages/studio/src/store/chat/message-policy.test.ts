@@ -26,8 +26,8 @@ describe("isConfirmedProductionSend", () => {
   });
 
   it("treats quick-action write-next as a production send", () => {
-    // 写下一章由快捷按钮触发（actionSource=quick-action），服务端把它作为
-    // 后台生产任务执行；这轮发送不是聊天轮，期间用户可以继续聊天。
+    // mock_val（actionSource=quick-action），mock_val
+    // mock_val；mock_val，mock_val。
     expect(isConfirmedProductionSend("quick-action", "write_next")).toBe(true);
     expect(isConfirmedProductionSend("button", "write_next")).toBe(true);
   });

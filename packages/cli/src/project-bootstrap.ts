@@ -3,7 +3,7 @@ import { basename, join } from "node:path";
 import { GLOBAL_ENV_PATH, resolveGlobalEnvPath } from "./utils.js";
 
 export interface ProjectBootstrapOptions {
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly overwriteSupportFiles?: boolean;
 }
 
@@ -61,7 +61,7 @@ export async function ensureProjectGitignore(projectDir: string): Promise<void> 
   await writeFile(path, `${existing}${separator}${missing.join("\n")}\n`, "utf-8");
 }
 
-function buildProjectConfig(projectDir: string, language: "zh" | "en") {
+function buildProjectConfig(projectDir: string, language: "vi" | "en") {
   return {
     name: basename(projectDir),
     version: "0.1.0" as const,
@@ -125,7 +125,7 @@ export async function initializeProjectDirectory(
   projectDir: string,
   options: ProjectBootstrapOptions = {},
 ): Promise<void> {
-  const language = options.language ?? "zh";
+  const language = options.language ?? "vi";
   const overwriteSupportFiles = options.overwriteSupportFiles ?? true;
   const configPath = join(projectDir, "castor.json");
 

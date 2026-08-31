@@ -32,8 +32,8 @@ function evidenceItem(): ReviewItem {
     kind: "current-state-fact",
     origin: "ai",
     title: "Location change",
-    proposal: { type: "fact", change: { action: "set", subject: "protagonist", predicate: "current-location", object: "东城公寓" } },
-    evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "他推开了门" },
+    proposal: { type: "fact", change: { action: "set", subject: "protagonist", predicate: "current-location", object: "mock_text" } },
+    evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" },
     decision: "undecided",
   };
 }
@@ -78,7 +78,7 @@ function receiptFixture(overrides: Record<string, unknown> = {}) {
     proposals: [],
     decisions: [],
     effectiveChanges: [],
-    evidence: [{ itemId: "current-state-fact:0:test", evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "他推开了门" } }],
+    evidence: [{ itemId: "current-state-fact:0:test", evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" } }],
     resolvedAt: "2026-08-24T01:00:00.000Z",
     resolution: "confirmed-changes",
     ...overrides,
@@ -146,7 +146,7 @@ describe("state-review-store", () => {
       expect((loaded as ActiveStateReviewArtifact).items[0]?.evidence).toEqual({
         claimedLevel: "explicit",
         verifiedLevel: "explicit",
-        quote: "他推开了门",
+        quote: "mock_text",
       });
     });
 
@@ -392,7 +392,7 @@ describe("state-review-store", () => {
       expect(found).not.toBeNull();
       expect(found?.resolution).toBe("confirmed-changes");
       expect(found?.evidence).toEqual([
-        { itemId: "current-state-fact:0:test", evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "他推开了门" } },
+        { itemId: "current-state-fact:0:test", evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_text" } },
       ]);
     });
 

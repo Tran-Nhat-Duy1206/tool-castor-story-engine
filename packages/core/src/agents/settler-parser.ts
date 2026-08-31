@@ -25,11 +25,11 @@ export function parseSettlementOutput(
 
   return {
     postSettlement: extract("POST_SETTLEMENT"),
-    updatedState: extract("UPDATED_STATE") || "(状态卡未更新)",
+    updatedState: extract("UPDATED_STATE") || "(state card not updated)",
     updatedLedger: genreProfile.numericalSystem
-      ? (extract("UPDATED_LEDGER") || "(账本未更新)")
+      ? (extract("UPDATED_LEDGER") || "(ledger not updated)")
       : "",
-    updatedHooks: extract("UPDATED_HOOKS") || "(伏笔池未更新)",
+    updatedHooks: extract("UPDATED_HOOKS") || "(hook pool not updated)",
     chapterSummary: extract("CHAPTER_SUMMARY"),
     updatedSubplots: extract("UPDATED_SUBPLOTS"),
     updatedEmotionalArcs: extract("UPDATED_EMOTIONAL_ARCS"),

@@ -3,13 +3,13 @@ import { buildPlayableHtml } from "../interactive-film/export-html.js";
 import { StoryGraphSchema } from "../interactive-film/graph-schema.js";
 
 const graph = StoryGraphSchema.parse({
-  schemaVersion: 1, projectId: "p", title: "可玩样例", variables: [{ name: "trust", type: "counter", default: 0, desc: "" }],
+  schemaVersion: 1, projectId: "p", title: "mock_text", variables: [{ name: "trust", type: "counter", default: 0, desc: "" }],
   nodes: [
-    { id: "s", type: "start", title: "开场", sceneDesc: "宫门前", imageSlot: { prompt: "宫门", assetRef: "interactive-films/p/assets/nodes/s.png" },
-      choices: [{ id: "c", text: "去查", targetNodeId: "e", effects: [{ var: "trust", op: "add", value: 1 }] }] },
-    { id: "e", type: "ending", title: "真相", choices: [] },
+    { id: "s", type: "start", title: "Mo dau", sceneDesc: "Cong dien", imageSlot: { prompt: "mock_text", assetRef: "interactive-films/p/assets/nodes/s.png" },
+      choices: [{ id: "c", text: "mock_text", targetNodeId: "e", effects: [{ var: "trust", op: "add", value: 1 }] }] },
+    { id: "e", type: "ending", title: "Su that", choices: [] },
   ],
-  endings: [{ id: "g1", nodeId: "e", title: "真相", type: "good" }],
+  endings: [{ id: "g1", nodeId: "e", title: "Su that", type: "good" }],
 });
 
 describe("buildPlayableHtml", () => {
@@ -21,7 +21,7 @@ describe("buildPlayableHtml", () => {
   });
   it("embeds the graph and a player marker", () => {
     const html = buildPlayableHtml(graph);
-    expect(html).toContain("可玩样例");
+    expect(html).toContain("mock_text");
     expect(html).toContain("trust"); // graph embedded
     expect(html).toMatch(/data-if-player|id="if-player"/); // player root marker
   });

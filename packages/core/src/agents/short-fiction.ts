@@ -352,7 +352,7 @@ export function renderShortFictionDraftMarkdown(
   draft: ShortFictionBatchDraft,
   language: ShortFictionLanguage = "vi",
 ): string {
-  const hookHeading = language === "en" ? "## Opening Hook" : "## 开篇钩子";
+  const hookHeading = language === "en" ? "## Opening Hook" : "## Opening Hook";
   return [
     `# ${draft.storyTitle}`,
     draft.openingHook ? `${hookHeading}\n\n${draft.openingHook}` : "",
@@ -364,7 +364,7 @@ export function renderShortFictionDraftMarkdown(
   ].filter(Boolean).join("\n\n");
 }
 
-export function parseShortFictionSalesPackage(rawContent: string, fallbackTitle = "未命名短篇"): ShortFictionSalesPackage {
+export function parseShortFictionSalesPackage(rawContent: string, fallbackTitle = "Untitled Short Story"): ShortFictionSalesPackage {
   const title = normalizeTitle(
     extractTaggedBlock(rawContent, "SHORT_FICTION_PACKAGE_TITLE")
     || extractTaggedBlock(rawContent, "SHORT_FICTION_TITLE")
@@ -432,9 +432,9 @@ function extractMarkdownChapterContent(raw: string, number: number): string {
   return pattern.exec(raw)?.[1]?.trim() ?? "";
 }
 
-// Matches a zh "第N章" or en "Chapter N" heading prefix inside markdown fallbacks.
+// Short fiction prompt and parser.
 function markdownChapterPrefixPattern(number: number): string {
-  return `第\\s*${number}\\s*章\\s*|Chapter\\s*${number}\\s*[:：.\\-–—]?\\s*`;
+  return `Chương \\s*${number}\\s*\\s*|Chapter\\s*${number}\\s*[:：.\\-–—]?\\s*`;
 }
 
 function extractDuplicateTitleTaggedChapterContent(raw: string, number: number): string {
@@ -470,7 +470,7 @@ function normalizeTitle(raw: string): string {
 function normalizeChapterTitle(raw: string, number: number, language: ShortFictionLanguage = "vi"): string {
   const prefixPattern = language === "en"
     ? new RegExp(`^Chapter\\s*${number}\\s*[:：.\\-–—]?\\s*`, "i")
-    : new RegExp(`^第\\s*${number}\\s*章\\s*`);
+    : new RegExp(`^Chương \\s*${number}\\s*`);
   const title = normalizeTitle(raw).replace(prefixPattern, "").trim();
   return title || fallbackChapterTitle(number, language);
 }
@@ -486,16 +486,16 @@ export function formatShortFictionChapterHeading(
     if (new RegExp(`^Chapter\\s*${number}\\b`, "i").test(trimmed)) return trimmed;
     return `Chapter ${number}: ${trimmed}`;
   }
-  if (new RegExp(`^第\\s*${number}\\s*章`).test(trimmed)) return trimmed;
-  return `第${number}章 ${trimmed}`;
+  if (new RegExp(`^Chương \\s*${number}`).test(trimmed)) return trimmed;
+  return `Chương ${number}: ${trimmed}`;
 }
 
 function untitledShortTitle(language: ShortFictionLanguage): string {
-  return language === "en" ? "Untitled Short Story" : "未命名短篇";
+  return language === "en" ? "Untitled Short Story" : "Truyện ngắn chưa đặt tên";
 }
 
 function fallbackChapterTitle(number: number, language: ShortFictionLanguage): string {
-  return language === "en" ? `Chapter ${number}` : `第${number}章`;
+  return `Chương ${number}`;
 }
 
 // charsPerChapter is the language's native unit (zh chars / en words). The 2.2

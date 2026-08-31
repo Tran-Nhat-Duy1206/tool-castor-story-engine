@@ -110,7 +110,7 @@ configCommand
   .option("--max-tokens <n>", "Max output tokens")
   .option("--thinking-budget <n>", "Anthropic thinking budget")
   .option("--api-format <format>", "API format (chat / responses)")
-  .option("--lang <language>", "Default writing language: zh (Chinese) or en (English)")
+  .option("--lang <language>", "Default writing language: vi (Vietnamese) or en (English)")
   .action(async (opts) => {
     try {
       await mkdir(join(await resolveGlobalEnvPath(), ".."), { recursive: true });
@@ -304,7 +304,7 @@ configCommand
     }
   });
 
-// B17: list-models 命令 —— 列出指定 service 的可用模型（含元数据）
+// Config command.
 configCommand
   .command("list-models <service>")
   .description("List available models for a service (with maxOutput / contextWindow / abilities)")

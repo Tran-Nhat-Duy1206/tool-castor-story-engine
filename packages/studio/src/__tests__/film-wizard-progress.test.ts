@@ -5,13 +5,13 @@ import { StoryGraphSchema } from "@actalk/castor-core";
 const empty = StoryGraphSchema.parse({ schemaVersion: 1, projectId: "p", title: "", variables: [], nodes: [], endings: [] });
 const full = StoryGraphSchema.parse({
   schemaVersion: 1, projectId: "p", title: "T",
-  worldAnchor: { storyCore: "核心", theme: "信任", genre: "宫斗", worldRules: "", durationMinutes: 20 },
-  characters: [{ id: "mei", name: "阿梅" }], variables: [],
+  worldAnchor: { storyCore: "mock_val", theme: "mock_val", genre: "mock_val", worldRules: "", durationMinutes: 20 },
+  characters: [{ id: "mei", name: "A Mei" }], variables: [],
   nodes: [
-    { id: "s", type: "start", title: "开场", sceneDesc: "宫门", choices: [{ id: "c", text: "去", targetNodeId: "e" }] },
-    { id: "e", type: "ending", title: "结局", choices: [] },
+    { id: "s", type: "start", title: "Mo dau", sceneDesc: "mock_val", choices: [{ id: "c", text: "mock_val", targetNodeId: "e" }] },
+    { id: "e", type: "ending", title: "mock_val", choices: [] },
   ],
-  endings: [{ id: "g", nodeId: "e", title: "好", type: "good" }],
+  endings: [{ id: "g", nodeId: "e", title: "mock_val", type: "good" }],
 });
 
 describe("computePhaseProgress", () => {

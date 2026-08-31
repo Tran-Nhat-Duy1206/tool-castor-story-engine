@@ -21,15 +21,15 @@ describe("StoryGraph schema phase-2 extensions", () => {
   it("parses worldAnchor and characters with voiceProfile", () => {
     const g = StoryGraphSchema.parse({
       ...phase1Graph,
-      worldAnchor: { storyCore: "复仇", theme: "信任", genre: "宫斗", worldRules: "无魔法", durationMinutes: 30 },
-      characters: [{ id: "mei", name: "阿梅", role: "protagonist", motivation: "查账", voiceProfile: { speakingRhythm: "短促", vocabulary: "市井", sampleLines: ["账不能错"] } }],
+      worldAnchor: { storyCore: "mock_text", theme: "mock_text", genre: "mock_text", worldRules: "mock_text", durationMinutes: 30 },
+      characters: [{ id: "mei", name: "A Mei", role: "protagonist", motivation: "Kiem tra so sach", voiceProfile: { speakingRhythm: "mock_text", vocabulary: "mock_text", sampleLines: ["mock_text"] } }],
     });
-    expect(g.worldAnchor?.storyCore).toBe("复仇");
-    expect(g.characters[0].voiceProfile?.sampleLines).toEqual(["账不能错"]);
+    expect(g.worldAnchor?.storyCore).toBe("mock_text");
+    expect(g.characters[0].voiceProfile?.sampleLines).toEqual(["mock_text"]);
   });
 
   it("Character defaults role to other and voiceProfile fields", () => {
-    const c = CharacterSchema.parse({ id: "x", name: "路人" });
+    const c = CharacterSchema.parse({ id: "x", name: "mock_text" });
     expect(c.role).toBe("other");
     expect(c.motivation).toBe("");
   });

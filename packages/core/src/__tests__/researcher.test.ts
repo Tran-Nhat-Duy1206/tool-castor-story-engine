@@ -5,30 +5,30 @@ describe("ResearcherAgent", () => {
   it("builds a traceable research report without mutating story state", async () => {
     const report = await runResearchReport(
       {
-        topic: "宋代县衙巡检职责",
+        topic: "mock_text",
         purpose: "worldbuilding",
         depth: "quick",
       },
       {
         search: async (query, maxResults) => {
-          expect(query).toContain("宋代县衙巡检职责");
+          expect(query).toContain("mock_text");
           expect(maxResults).toBeGreaterThan(0);
           return [
             {
-              title: "宋代地方治安资料",
+              title: "mock_text",
               url: "https://example.com/song-policing",
-              snippet: "巡检负责地方治安、缉捕盗贼，并与县衙形成协作关系。",
+              snippet: "mock_text、mock_text，mock_text。",
             },
           ];
         },
         fetch: async (url) => {
           expect(url).toBe("https://example.com/song-policing");
-          return "巡检司常设于要冲，职责包括巡逻、缉盗、盘查交通要道。";
+          return "mock_text，mock_text、mock_text、mock_text。";
         },
       },
     );
 
-    expect(report.summary).toContain("宋代县衙巡检职责");
+    expect(report.summary).toContain("mock_text");
     expect(report.sources).toEqual([
       expect.objectContaining({ id: "S1", url: "https://example.com/song-policing" }),
     ]);
@@ -36,7 +36,7 @@ describe("ResearcherAgent", () => {
       sourceIds: ["S1"],
       confidence: "medium",
     });
-    expect(report.queryLog[0]).toContain("宋代县衙巡检职责");
+    expect(report.queryLog[0]).toContain("mock_text");
     expect(report.markdown).toContain("## Claims");
     expect(report.markdown).toContain("[S1]");
     expect(report.markdown).toContain("## Creative implications");

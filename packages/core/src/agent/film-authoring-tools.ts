@@ -229,7 +229,7 @@ const FillNodeParams = Type.Object({
 
 export type FilmAuthoringLanguage = "vi" | "en";
 
-const NODE_SYSTEM_ZH = `你是互动影游编剧。根据当前图上下文和指令，写出指定节点的完整场景、对白、选项和配图方向。choices[].targetNodeId 必须指向已存在的节点 id。完成后调用 submit_story_node。`;
+const NODE_SYSTEM_ZH = `You are an interactive-film screenwriter. Based on current graph context and instructions, draft the node's complete scene, dialogue, choices, and illustration direction. choices[].targetNodeId must point to an existing node ID. When finished, call submit_story_node.`;
 const NODE_SYSTEM_EN = `You are an interactive film scriptwriter. Using the current graph context and the instruction, write the requested node's complete scene, dialogue, choices, and image direction. Every choices[].targetNodeId must point to an existing node id. Finish by calling submit_story_node.`;
 
 function nodeSystemPrompt(language: FilmAuthoringLanguage): string {
@@ -265,7 +265,7 @@ export function createFillNodeTool(
       });
       const userPrompt = language === "en"
         ? `${context}\n\nNode id to fill: ${params.nodeId}\nInstruction: ${params.instruction}`
-        : `${context}\n\n要填的节点 id：${params.nodeId}\n指令：${params.instruction}`;
+        : `${context}\n\nTarget node ID: ${params.nodeId}\nInstruction: ${params.instruction}`;
       const node = await deps.submitNode(systemPrompt, userPrompt, params.nodeId, signal);
       const { rev } = await applyGraphDelta({
         projectRoot,
@@ -301,7 +301,7 @@ export function createReviseNodeTool(
       });
       const userPrompt = language === "en"
         ? `${context}\n\nNode id to revise: ${params.nodeId}\nCurrent content: ${JSON.stringify(current ?? {})}\nRevision instruction: ${params.instruction}`
-        : `${context}\n\n要修改的节点 id：${params.nodeId}\n现有内容：${JSON.stringify(current ?? {})}\n修改指令：${params.instruction}`;
+        : `${context}\n\nNode ID to modify: ${params.nodeId}\nCurrent content: ${JSON.stringify(current ?? {})}\nInstruction: ${params.instruction}`;
       const node = await deps.submitNode(systemPrompt, userPrompt, params.nodeId, signal);
       const { rev } = await applyGraphDelta({
         projectRoot,
@@ -336,7 +336,7 @@ const DraftStructureParams = Type.Object({
   instruction: Type.String({ description: "what skeleton to draft (acts, branch points, endings)" }),
 });
 
-const STRUCT_SYSTEM_ZH = `你是互动影游编剧。根据上下文与指令设计分支骨架。恰好 1 个 type=start，至少 2 个 branch，至少 2 个差异化 ending 节点；每条路径都能到某个 ending。完成后调用 submit_story_structure。`;
+const STRUCT_SYSTEM_ZH = `You are an interactive-film screenwriter. Design a branching structure with exactly 1 start node, at least 2 branch nodes, and at least 2 endings. When finished, call submit_story_structure.`;
 const STRUCT_SYSTEM_EN = `You are an interactive film scriptwriter. Using the context and the instruction, design the branching skeleton. Include exactly 1 node with type=start, at least 2 branch nodes, and at least 2 clearly differentiated ending nodes; every path must reach an ending. Finish by calling submit_story_structure.`;
 
 export function createDraftStructureTool(
@@ -359,7 +359,7 @@ export function createDraftStructureTool(
       });
       const userPrompt = language === "en"
         ? `${context}\n\nSkeleton instruction: ${params.instruction}`
-        : `${context}\n\n骨架指令：${params.instruction}`;
+        : `${context}\n\nStructure instruction: ${params.instruction}`;
       const nodes = await deps.submitStructure(systemPrompt, userPrompt, signal);
       const { graph: next, rev } = await applyGraphDelta({
         projectRoot,

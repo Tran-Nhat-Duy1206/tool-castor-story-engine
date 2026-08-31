@@ -58,7 +58,7 @@ describe("reviewStoryGraph", () => {
         { id: "e1", type: "ending", choices: [] },
         { id: "e2", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好1", type: "good" }, { id: "g2", nodeId: "e2", title: "好2", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_text1", type: "good" }, { id: "g2", nodeId: "e2", title: "mock_text2", type: "good" }],
     });
     expect(codes(graph)).toContain("ENDING_VARIETY");
   });
@@ -82,7 +82,7 @@ describe("reviewStoryGraph", () => {
         { id: "s", type: "start", imageSlot: { prompt: "p", assetRef: "x" }, choices: [{ id: "c", text: "go", targetNodeId: "e", effects: [{ var: "trust", op: "add", value: 1 }] }] },
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }, { id: "b1", nodeId: "e", title: "坏", type: "bad" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }, { id: "b1", nodeId: "e", title: "mock_text", type: "bad" }],
     });
     // trust is written; but never read -> VARIABLE_UNREAD would fire. To be truly clean, add a condition reading it:
     const graph2 = StoryGraphSchema.parse({ ...graph, nodes: [

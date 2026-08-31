@@ -16,10 +16,7 @@ import {
 } from "./session-transcript-legacy.js";
 import { deriveBookSessionFromTranscript } from "./session-transcript-restore.js";
 
-/**
- * 从 messages 数组里取第一条 user 消息，裁剪成 ≤20 字的单行字符串。
- * 用于把用户首条提问作为会话标题。
- */
+// Core narrative engine processing.
 export function extractFirstUserMessageTitle(messages: unknown): string | null {
   if (!Array.isArray(messages)) return null;
   for (const message of messages) {
@@ -233,7 +230,7 @@ export async function createAndPersistBookSession(
   sessionKind?: SessionKind,
   options?: { readonly playMode?: PlayMode },
 ): Promise<BookSession> {
-  // 如果指定了 sessionId 且对应文件已存在，视为幂等操作直接返回（支持"用户发消息时才持久化 draft"流程）
+  // Core narrative engine processing.
   if (sessionId) {
     const existing = await loadBookSession(projectRoot, sessionId);
     if (existing) {

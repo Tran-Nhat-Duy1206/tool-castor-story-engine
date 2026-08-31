@@ -162,7 +162,7 @@ describe("CLI integration", () => {
         const output = run(["init", englishDir, "--lang", "en"]);
         expect(output).toContain("Project initialized");
         expect(output).toContain("castor book create --title 'My Novel'");
-        expect(output).not.toContain("我的小说");
+        expect(output).not.toContain("test_mock");
       } finally {
         await rm(englishDir, { recursive: true, force: true });
       }
@@ -218,7 +218,7 @@ describe("CLI integration", () => {
           Object.entries(failingLlmEnv).map(([key, value]) => `${key}=${value}`).join("\n"),
           "utf-8",
         );
-        const output = run(["interact", "--json", "--message", "切换到全自动"]);
+        const output = run(["interact", "--json", "--message", "test_mock"]);
         const data = JSON.parse(output);
 
         expect(data.request).toBeUndefined();
@@ -391,7 +391,7 @@ describe("CLI integration", () => {
 
       const output = run(["status", "english-status", "--chapters"]);
       expect(output).toContain('Ch.1 "A Quiet Sky" | 7 words | ready-for-review');
-      expect(output).not.toContain("7字");
+      expect(output).not.toContain("7 từ");
     });
 
     it("shows degraded chapter counts and issues explicitly", async () => {
@@ -431,7 +431,7 @@ describe("CLI integration", () => {
 
       const output = run(["status", "degraded-status", "--chapters"]);
       expect(output).toContain("Degraded: 1");
-      expect(output).toContain('Ch.1 "Broken State" | 1800字 | state-degraded');
+      expect(output).toContain('Ch.1 "Broken State" | 1800 từ | state-degraded');
       expect(output).toContain("[warning] state validation still failed after retry");
 
       const json = JSON.parse(run(["status", "degraded-status", "--json"]));
@@ -489,7 +489,7 @@ describe("CLI integration", () => {
         }, null, 2),
         "utf-8",
       );
-      await writeFile(join(chaptersDir, "0001_First.md"), "# 第1章 First\n\nOnly persisted chapter.", "utf-8");
+      await writeFile(join(chaptersDir, "0001_First.md"), "# Chương 1 First\n\nOnly persisted chapter.", "utf-8");
       await writeFile(
         join(chaptersDir, "index.json"),
         JSON.stringify([
@@ -902,7 +902,7 @@ describe("CLI integration", () => {
         "- none",
         "",
         "## Chapter Brief",
-        "- chapterType: 推进",
+        "- chapterType: test_mock",
         "- isGoldenOpening: false",
         "",
         "### Beat Outline",
@@ -1005,7 +1005,7 @@ describe("CLI integration", () => {
       );
       await writeFile(
         join(bookDir, "chapters", "0001_Dawn_Ledger.md"),
-        "# 第1章 Dawn Ledger\n\n正文。\n",
+        "# Chương 1 Dawn Ledger\n\ntest_mock。\n",
         "utf-8",
       );
     });

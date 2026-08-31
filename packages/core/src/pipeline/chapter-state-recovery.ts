@@ -38,7 +38,7 @@ export interface SettlementRetryParams {
   readonly oldHooks: string;
   readonly originalValidation: ValidationResult;
   readonly language: LengthLanguage;
-  readonly logWarn?: (message: { zh: string; en: string }) => void;
+  readonly logWarn?: (message: { vi: string; en: string }) => void;
   readonly logger?: Pick<Logger, "warn">;
 }
 
@@ -57,7 +57,7 @@ export async function retrySettlementAfterValidationFailure(
   params: SettlementRetryParams,
 ): Promise<SettlementRetryResult> {
   params.logWarn?.({
-    zh: `状态校验失败，正在仅重试结算层（第${params.chapterNumber}章）`,
+    vi: `Xác thực trạng thái thất bại; đang thử lại riêng bước kết toán cho chương ${params.chapterNumber}`,
     en: `State validation failed; retrying settlement only for chapter ${params.chapterNumber}`,
   });
 
@@ -97,7 +97,7 @@ export async function retrySettlementAfterValidationFailure(
 
   if (retryValidation.warnings.length > 0) {
     params.logWarn?.({
-      zh: `状态校验重试后，第${params.chapterNumber}章仍有 ${retryValidation.warnings.length} 条警告`,
+      vi: `Sau khi thử lại xác thực trạng thái, chương ${params.chapterNumber} vẫn có ${retryValidation.warnings.length} cảnh báo`,
       en: `State validation retry still reports ${retryValidation.warnings.length} warning(s) for chapter ${params.chapterNumber}`,
     });
     for (const warning of retryValidation.warnings) {
@@ -123,21 +123,13 @@ export function buildStateValidationFeedback(
   warnings: ReadonlyArray<ValidationWarning>,
   language: LengthLanguage,
 ): string {
+  void language;
   if (warnings.length === 0) {
-    return language === "en"
-      ? "The previous settlement contradicted the chapter text. Reconcile truth files strictly to the body."
-      : "上一次状态结算与正文矛盾。请严格以正文为准修正 truth files。";
-  }
-
-  if (language === "en") {
-    return [
-      "The previous settlement failed validation. Fix these contradictions against the chapter body:",
-      ...warnings.map((warning) => `- [${warning.category}] ${warning.description}`),
-    ].join("\n");
+    return "The previous settlement contradicted the chapter text. Reconcile truth files strictly to the body.";
   }
 
   return [
-    "上一次状态结算未通过校验。请对照正文修正以下矛盾：",
+    "The previous settlement failed validation. Fix these contradictions against the chapter body:",
     ...warnings.map((warning) => `- [${warning.category}] ${warning.description}`),
   ].join("\n");
 }
@@ -153,7 +145,7 @@ export function buildStateDegradedIssues(
       description: warning.description,
       suggestion: language === "en"
         ? "Repair chapter state from the persisted body before continuing."
-        : "请先基于已保存正文修复本章 state，再继续后续章节。",
+        : "Hãy sửa trạng thái chương dựa trên nội dung đã lưu trước khi tiếp tục.",
     }));
   }
 
@@ -162,10 +154,10 @@ export function buildStateDegradedIssues(
     category: "state-validation",
     description: language === "en"
       ? "State validation still failed after settlement retry."
-      : "状态结算重试后仍未通过校验。",
+      : "Xác thực trạng thái vẫn thất bại sau khi thử lại bước kết toán.",
     suggestion: language === "en"
       ? "Repair chapter state from the persisted body before continuing."
-      : "请先基于已保存正文修复本章 state，再继续后续章节。",
+      : "Hãy sửa trạng thái chương dựa trên nội dung đã lưu trước khi tiếp tục.",
   }];
 }
 

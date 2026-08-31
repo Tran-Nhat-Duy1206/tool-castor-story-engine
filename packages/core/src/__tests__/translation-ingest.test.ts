@@ -9,7 +9,7 @@ import { segmentTranslationText } from "../translation/text.js";
 vi.mock("unpdf", () => ({
   getDocumentProxy: vi.fn(async () => ({ fake: true })),
   extractText: vi.fn(async () => ({
-    text: "# 第一章 雪线\n\nPDF 第一段。\n\nPDF 第二段。",
+    text: "# Chương mock_text mock_text\n\nPDF Chương mock_text。\n\nPDF Chương mock_text。",
     totalPages: 2,
   })),
 }));
@@ -35,7 +35,7 @@ async function writeMinimalEpub(path: string): Promise<void> {
     [
       `<?xml version="1.0"?>`,
       `<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid" version="2.0">`,
-      `<metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>星门译本</dc:title></metadata>`,
+      `<metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>mock_text</dc:title></metadata>`,
       `<manifest>`,
       `<item id="c1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>`,
       `<item id="c2" href="chapter2.xhtml" media-type="application/xhtml+xml"/>`,
@@ -68,12 +68,12 @@ describe("translation ingestion", () => {
     expect(englishSegments.join(" ").replace(/\s+/g, " ")).toBe(english);
     expect(englishSegments.every((segment) => !/\w$/.test(segment) || segment.endsWith("name"))).toBe(true);
 
-    const chinese = "林秋先核对门禁记录。她随后把账页夹进档案袋。走廊尽头的脚步声越来越近。";
+    const chinese = "mock_text。mock_text。mock_text。";
     const chineseSegments = segmentTranslationText(chinese, 16);
     expect(chineseSegments).toEqual([
-      "林秋先核对门禁记录。",
-      "她随后把账页夹进档案袋。",
-      "走廊尽头的脚步声越来越近。",
+      "mock_text。",
+      "mock_text。",
+      "mock_text。",
     ]);
     expect(chineseSegments.join("")).toBe(chinese);
   });
@@ -82,15 +82,15 @@ describe("translation ingestion", () => {
     await writeFile(
       join(root, "inputs", "source.md"),
       [
-        "# 第一章 雨夜",
+        "# Chương mock_text mock_text",
         "",
-        "第一段很短。",
+        "Chương mock_text。",
         "",
-        "第二段需要翻译。",
+        "Chương mock_text。",
         "",
-        "# 第二章 清晨",
+        "# Chương mock_text mock_text",
         "",
-        "第三段继续。",
+        "Chương mock_text。",
       ].join("\n"),
     );
 
@@ -114,17 +114,17 @@ describe("translation ingestion", () => {
       title: string;
       segments: Array<{ index: number; source: string }>;
     }>(join(root, created.manifest.chapters[0]!.sourcePath));
-    expect(firstChapter.title).toBe("雨夜");
-    expect(firstChapter.segments.map((segment) => segment.source)).toContain("第一段很短。");
+    expect(firstChapter.title).toBe("mock_text");
+    expect(firstChapter.segments.map((segment) => segment.source)).toContain("Chương mock_text。");
   });
 
   it("creates a translation project from plain TXT", async () => {
     await writeFile(
       join(root, "inputs", "source.txt"),
       [
-        "第一段没有 Markdown 标题。",
+        "Chương mock_text Markdown mock_text。",
         "",
-        "第二段仍然需要作为翻译段落保留。",
+        "Chương mock_text。",
       ].join("\n"),
     );
 
@@ -141,7 +141,7 @@ describe("translation ingestion", () => {
     const chapter = await readJson<{ segments: Array<{ source: string }> }>(
       join(root, created.manifest.chapters[0]!.sourcePath),
     );
-    expect(chapter.segments.map((segment) => segment.source)).toContain("第二段仍然需要作为翻译段落保留。");
+    expect(chapter.segments.map((segment) => segment.source)).toContain("Chương mock_text。");
   });
 
   it("extracts PDF text and records page count", async () => {
@@ -155,7 +155,7 @@ describe("translation ingestion", () => {
 
     expect(created.manifest.source.kind).toBe("pdf");
     expect(created.manifest.source.totalPages).toBe(2);
-    expect(created.manifest.chapters[0]?.title).toBe("雪线");
+    expect(created.manifest.chapters[0]?.title).toBe("mock_text");
   });
 
   it("reads EPUB chapters in spine order", async () => {
@@ -167,7 +167,7 @@ describe("translation ingestion", () => {
       targetLanguage: "zh",
     });
 
-    expect(created.manifest.title).toBe("星门译本");
+    expect(created.manifest.title).toBe("mock_text");
     expect(created.manifest.source.kind).toBe("epub");
     expect(created.manifest.chapters.map((chapter) => chapter.title)).toEqual(["Chapter One", "Chapter Two"]);
   });

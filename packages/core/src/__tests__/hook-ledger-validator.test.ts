@@ -4,25 +4,25 @@ import {
   validateHookLedger,
 } from "../utils/hook-ledger-validator.js";
 
-const ZH_MEMO = `## 当前任务
-林秋潜入账房取回账册。
+const ZH_MEMO = `## Nhiệm vụ hiện tại
+mock_textPhong so sachmock_text。
 
-## 本章 hook 账
+## Sổ hook chương này
 open:
-- [new] 旧港眼线盯梢 || 理由：留给下一卷
+- [new] mock_text || mock_text：mock_text
 
 advance:
-- H007 "胖虎借条" → planted → pressured
-- H012 "雷架焦痕" → pressured → near_payoff
+- H007 "mock_text" → planted → pressured
+- H012 "mock_text" → pressured → near_payoff
 
 resolve:
-- H003 "杂役腰牌" → 林秋主动摘下
+- H003 "mock_text" → mock_text
 
 defer:
-- H009 "守拙诀来历" → 本章不动
+- H009 "mock_text" → mock_text
 
-## 不要做
-- 不要点破母亲身份`;
+## Không làm
+- mock_text`;
 
 const EN_MEMO = `## Current task
 Lin Qiu lifts the ledger from the Old Port accounting hall.
@@ -57,13 +57,13 @@ describe("parseHookLedger", () => {
     const ledger = parseHookLedger(ZH_MEMO);
     const h007 = ledger.advance[0]!;
     expect(h007.id).toBe("H007");
-    expect(h007.descriptor).toContain("胖虎借条");
-    expect(h007.keywords).toContain("胖虎");
-    expect(h007.keywords).toContain("借条");
+    expect(h007.descriptor).toContain("mock_text");
+    expect(h007.keywords).toContain("mock_text");
+    expect(h007.keywords).toContain("mock_text");
 
     const h003 = ledger.resolve[0]!;
-    expect(h003.keywords).toContain("杂役");
-    expect(h003.keywords).toContain("腰牌");
+    expect(h003.keywords).toContain("mock_text");
+    expect(h003.keywords).toContain("mock_text");
   });
 
   it("extracts all four sub-lists from an en memo", () => {
@@ -74,15 +74,15 @@ describe("parseHookLedger", () => {
   });
 
   it("returns empty lists when no ledger section is present", () => {
-    const ledger = parseHookLedger("## 当前任务\n正文\n\n## 不要做\n- 无");
+    const ledger = parseHookLedger("## Nhiệm vụ hiện tại\nmock_text\n\n## Không làm\n- mock_text");
     expect(ledger).toEqual({ open: [], advance: [], resolve: [], defer: [], newOpenCount: 0 });
   });
 
   it("counts [new] placeholder lines under open as new hooks opened", () => {
-    const memo = `## 本章 hook 账
+    const memo = `## Sổ hook chương này
 open:
-- [new] 下一卷伏笔 || 理由
-- [new] 第二条埋点 || 理由
+- [new] mock_text || mock_text
+- [new] Chương mock_text || mock_text
 advance:
 - H001 "x" → y
 `;
@@ -92,25 +92,25 @@ advance:
   });
 
   it("stops at the next H2 heading and does not pollute across sections", () => {
-    const memo = `## 本章 hook 账
+    const memo = `## Sổ hook chương này
 advance:
 - H007 "xxx" → ...
 
-## 不要做
+## Không làm
 - H999 looks-like-a-hook-but-its-under-do-not`;
     const ledger = parseHookLedger(memo);
     expect(ledger.advance.map((e) => e.id)).toEqual(["H007"]);
     expect(ledger.defer).toEqual([]);
   });
 
-  it("ignores placeholder tokens like 无 / none / n/a under empty slots", () => {
-    const memo = `## 本章 hook 账
+  it("ignores placeholder tokens like mock_text / none / n/a under empty slots", () => {
+    const memo = `## Sổ hook chương này
 advance:
-- 无
+- mock_text
 - none
-- H007 "真的钩子" → planted
+- H007 "mock_text" → planted
 resolve:
-- 暂无
+- Chua co
 defer:
 - n/a
 `;
@@ -123,16 +123,16 @@ defer:
 
 describe("validateHookLedger", () => {
   it("passes when draft echoes keyword from each committed ledger entry", () => {
-    // Draft mentions 胖虎/借条 (→H007), 雷架 or 焦痕 (→H012), 杂役 or 腰牌 (→H003).
+    // Draft mentions mock_text/mock_text (→H007), mock_text or mock_text (→H012), mock_text or mock_text (→H003).
     const draft =
-      "林秋在账房找到胖虎借条，又在后巷被雷架焦痕刮到眼角。他摘下杂役腰牌后退入暗处。";
+      "mock_textPhong so sachmock_text，mock_text。mock_text。";
     const violations = validateHookLedger(ZH_MEMO, draft);
     expect(violations).toEqual([]);
   });
 
   it("flags a warning for each un-echoed advance/resolve entry", () => {
-    // Only 胖虎 (H007) present; 雷架/焦痕 (H012) and 杂役/腰牌 (H003) missing.
-    const draft = "林秋只摸出胖虎借条，其他都没写。";
+    // Only mock_text (H007) present; mock_text/mock_text (H012) and mock_text/mock_text (H003) missing.
+    const draft = "mock_text，mock_text。";
     const violations = validateHookLedger(ZH_MEMO, draft);
     expect(violations).toHaveLength(2);
     expect(violations.every((v) => v.severity === "warning")).toBe(true);
@@ -141,48 +141,48 @@ describe("validateHookLedger", () => {
   });
 
   it("does not turn semantic near-misses into critical failures", () => {
-    const memo = `## 本章 hook 账
+    const memo = `## Sổ hook chương này
 advance:
-- H002 "读数差额" → 主角找到抄表本撕页残留和数字342
+- H002 "mock_text" → mock_text từ342
 `;
-    const draft = "我在配电房地板上拨开碎纸屑，背面露出一排数字的下半截：342。旁边还有抄表本撕下来的毛边。";
+    const draft = "mock_text，mock_text từmock_text：342。mock_text。";
     const violations = validateHookLedger(memo, draft);
     expect(violations).toHaveLength(1);
     expect(violations[0]!.severity).toBe("warning");
-    expect(violations[0]!.category).toContain("语义复核");
+    expect(violations[0]!.category).toContain("mock_text");
   });
 
   it("does NOT flag hooks that are only under defer", () => {
-    // H009 is deferred — keyword 守拙诀 absence is fine.
-    const draft = "林秋翻出胖虎借条与雷架焦痕推进情节，随后摘下杂役腰牌。";
+    // H009 is deferred — keyword mock_text absence is fine.
+    const draft = "mock_text，mock_text。";
     const violations = validateHookLedger(ZH_MEMO, draft);
     expect(violations).toEqual([]);
   });
 
   it("does NOT flag [new] open entries (they have no pre-existing id)", () => {
-    const memo = `## 本章 hook 账
+    const memo = `## Sổ hook chương này
 open:
-- [new] 新钩子 || 理由
+- [new] mock_text || mock_text
 advance:
-- H001 "测试项" → x
+- H001 "Testmock_text" → x
 `;
-    const draft = "正文提到测试项的细节。";
+    const draft = "mock_textTestmock_text。";
     const violations = validateHookLedger(memo, draft);
     expect(violations).toEqual([]);
   });
 
   it("returns empty array when memo has no ledger section at all", () => {
-    const violations = validateHookLedger("## 别的东西\n正文", "draft");
+    const violations = validateHookLedger("## mock_text\nmock_text", "draft");
     expect(violations).toEqual([]);
   });
 
   it("falls back to strict ID match when ledger line has no descriptor", () => {
-    const memo = `## 本章 hook 账
+    const memo = `## Sổ hook chương này
 advance:
 - H1
 `;
     // Draft contains H12 — must NOT accidentally satisfy H1 commitment.
-    const draft = "剧情涉及 H12 和 H123。";
+    const draft = "mock_text H12 mock_text H123。";
     const violations = validateHookLedger(memo, draft);
     expect(violations).toHaveLength(1);
     expect(violations[0]!.severity).toBe("warning");
@@ -196,53 +196,53 @@ advance:
     expect(violations).toEqual([]);
   });
 
-  it("flags 揭 1 埋 1 violation when a chapter resolves hooks without opening any", () => {
-    const memo = `## 本章 hook 账
+  it("flags mock_text 1 mock_text 1 violation when a chapter resolves hooks without opening any", () => {
+    const memo = `## Sổ hook chương này
 advance:
-- H007 "胖虎借条" → planted
+- H007 "mock_text" → planted
 resolve:
-- H003 "杂役腰牌" → 林秋主动摘下
+- H003 "mock_text" → mock_text
 `;
-    const draft = "林秋翻看胖虎借条，随后摘下杂役腰牌。";
+    const draft = "mock_text，mock_text。";
     const violations = validateHookLedger(memo, draft);
     expect(violations).toHaveLength(1);
-    expect(violations[0]!.category).toContain("揭 1 埋 1");
+    expect(violations[0]!.category).toContain("mock_text 1 mock_text 1");
   });
 
-  it("accepts 揭 1 埋 1 floor when a [new] line balances the resolved hook", () => {
-    const memo = `## 本章 hook 账
+  it("accepts mock_text 1 mock_text 1 floor when a [new] line balances the resolved hook", () => {
+    const memo = `## Sổ hook chương này
 open:
-- [new] 母亲留下的半枚玉佩 || 理由：下一卷线索
+- [new] mock_text || mock_text：mock_text
 advance:
-- H007 "胖虎借条" → planted
+- H007 "mock_text" → planted
 resolve:
-- H003 "杂役腰牌" → 林秋主动摘下
+- H003 "mock_text" → mock_text
 `;
-    const draft = "林秋翻看胖虎借条，随后摘下杂役腰牌。";
+    const draft = "mock_text，mock_text。";
     const violations = validateHookLedger(memo, draft);
     expect(violations).toEqual([]);
   });
 
-  it("does not let placeholder 无 raise a false critical", () => {
-    const memo = `## 本章 hook 账
+  it("does not let placeholder mock_text raise a false critical", () => {
+    const memo = `## Sổ hook chương này
 open:
-- [new] 下一卷伏笔 || 理由
+- [new] mock_text || mock_text
 advance:
-- 无
+- mock_text
 resolve:
-- H005 "通行印验号" → ok
+- H005 "mock_text" → ok
 `;
-    const draft = "主峰的通行印验号按部就班完成。";
+    const draft = "mock_text。";
     const violations = validateHookLedger(memo, draft);
     expect(violations).toEqual([]);
   });
 
   it("accepts middle keywords from a longer Chinese hook name", () => {
-    const memo = `## 本章 hook 账
+    const memo = `## Sổ hook chương này
 advance:
-- H007 "被定位的安全威胁" → evoked → pressured
+- H007 "mock_text" → evoked → pressured
 `;
-    const draft = "旧手机弹出定位结果，林知夏发现店外有人盯梢，安全空间塌了。";
+    const draft = "mock_text，mock_text，mock_text。";
     const violations = validateHookLedger(memo, draft);
     expect(violations).toEqual([]);
   });

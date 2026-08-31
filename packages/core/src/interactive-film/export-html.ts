@@ -15,16 +15,16 @@ const PLAYER_JS = String.raw`
   var root = document.getElementById("if-player");
   function hud(){ var s = Object.keys(vars).map(function(k){ return h(k)+": "+h(String(vars[k])); }).join("  ·  "); return s ? '<div class="hud">'+s+'</div>' : ''; }
   function render(node){
-    if(!node){ root.innerHTML = "<p>节点缺失</p>"; return; }
+    if(!node){ root.innerHTML = "<p>Nút không tồn tại</p>"; return; }
     var html = hud();
     if(node.imageSlot && node.imageSlot.assetRef && ASSETS[node.imageSlot.assetRef]) html += '<img class="scene" src="'+ASSETS[node.imageSlot.assetRef]+'" alt=""/>';
     if(node.title) html += '<h2>'+h(node.title)+'</h2>';
     if(node.sceneDesc) html += '<p class="scene-desc">'+h(node.sceneDesc)+'</p>';
-    (node.dialogue||[]).forEach(function(d){ html += '<p class="line"><b>'+h(d.speaker)+'：</b>'+h(d.text)+'</p>'; });
+    (node.dialogue||[]).forEach(function(d){ html += '<p class="line"><b>'+h(d.speaker)+': </b>'+h(d.text)+'</p>'; });
     var end = endingByNode[node.id] || node.type==="ending";
     if(end){ var e = endingByNode[node.id];
-      html += '<div class="ending"><div class="ending-type">'+h(e?e.type:"ending")+'</div><div class="ending-title">'+h(e?e.title:(node.title||"结局"))+'</div></div>';
-      html += '<button class="restart">重新开始</button>';
+      html += '<div class="ending"><div class="ending-type">'+h(e?e.type:"ending")+'</div><div class="ending-title">'+h(e?e.title:(node.title||"Kết thúc"))+'</div></div>';
+      html += '<button class="restart">Chơi lại</button>';
       root.innerHTML = html;
       root.querySelector(".restart").onclick = function(){ start(); };
       return;
@@ -33,7 +33,7 @@ const PLAYER_JS = String.raw`
     html += '<div class="choices">';
     vis.forEach(function(c,i){ html += '<button class="choice" data-i="'+i+'">'+h(c.text)+'</button>'; });
     html += '</div>';
-    if(vis.length===0) html += '<p class="deadend">（没有可走的选项）</p>';
+    if(vis.length===0) html += '<p class="deadend">(Không có lựa chọn khả dụng)</p>';
     root.innerHTML = html;
     Array.prototype.forEach.call(root.querySelectorAll(".choice"), function(btn){
       btn.onclick = function(){ var c = vis[parseInt(btn.getAttribute("data-i"),10)]; applyEffects(c.effects); render(nodeById[c.targetNodeId]); };
@@ -45,7 +45,7 @@ const PLAYER_JS = String.raw`
 `;
 
 const CSS = String.raw`
-  body{font-family:system-ui,'PingFang SC',sans-serif;background:#14110f;color:#eee;margin:0;display:flex;justify-content:center;}
+  body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#14110f;color:#eee;margin:0;display:flex;justify-content:center;}
   #wrap{max-width:680px;width:100%;padding:24px;}
   h1{font-size:18px;color:#caa;}
   #if-player .scene{width:100%;border-radius:10px;margin-bottom:12px;}

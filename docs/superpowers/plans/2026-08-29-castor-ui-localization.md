@@ -35,7 +35,7 @@ Scan active code/docs:
 
 ```powershell
 rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' '[\p{Han}]' packages README*.md docs scripts
-rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' '中文|zh-CN|\bzh\b' packages README*.md docs scripts
+rg -n --hidden --glob '!node_modules' --glob '!dist' --glob '!.git' '|zh-CN|\bzh\b' packages README*.md docs scripts
 ```
 
 Classify strings into:

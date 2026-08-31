@@ -100,12 +100,12 @@ import {
 } from "../execution/attempt.js";
 
 const SEQUENCE_LEVEL_CATEGORIES = new Set([
-  "Pacing Monotony", "节奏单调",
-  "Mood Monotony", "情绪单调",
-  "Title Collapse", "标题重复",
-  "Title Clustering", "标题聚集",
-  "Opening Pattern Repetition", "开头同构",
-  "Ending Pattern Repetition", "结尾同构",
+  "Pacing Monotony", "",
+  "Mood Monotony", "",
+  "Title Collapse", "",
+  "Title Clustering", "",
+  "Opening Pattern Repetition", "",
+  "Ending Pattern Repetition", "",
 ]);
 
 function isSequenceLevelCategory(category: string): boolean {
@@ -147,7 +147,7 @@ function formatImportedChapter(
 ): string {
   return language === "en"
     ? `Chapter ${index + 1}: ${chapter.title}\n\n${content}`
-    : `第${index + 1}章 ${chapter.title}\n\n${content}`;
+    : `Chương ${index + 1} ${chapter.title}\n\n${content}`;
 }
 
 function estimateImportFullTextLength(
@@ -184,15 +184,11 @@ function buildTitleCatalog(
   return chapters.map((chapter, index) =>
     language === "en"
       ? `- Chapter ${index + 1}: ${chapter.title} (${chapter.content.length} chars)`
-      : `- 第${index + 1}章：${chapter.title}（${chapter.content.length}字）`,
+      : `- Chương ${index + 1}：${chapter.title}（${chapter.content.length} từ）`,
   ).join("\n");
 }
 
-/**
- * Build the architect external-context for a side-story (番外) foundation: frame
- * it as a companion work that reuses the parent canon's cast/world but tells an
- * independent side plot, and attach the parent canon as reference material.
- */
+// Core narrative engine processing.
 export function buildSpinoffFoundationContext(
   parentCanon: string,
   direction: string | undefined,
@@ -201,17 +197,17 @@ export function buildSpinoffFoundationContext(
   const dir = direction?.trim();
   if (language === "en") {
     return [
-      "## This is a SIDE-STORY (番外)",
+      "## This is a SIDE-STORY ()",
       "Reuse the established characters, world, and rules from the parent canon below. Tell an INDEPENDENT side plot — a bonus arc, a character backstory, or a what-if — that does NOT advance or contradict the parent work's main storyline.",
       dir ? `\n## Side-story direction\n${dir}` : "",
       `\n## Parent canon (reuse these characters and settings)\n${parentCanon}`,
     ].filter(Boolean).join("\n");
   }
   return [
-    "## 这是一部番外",
-    "复用下方正传正典里已确立的角色、世界观与规则。讲一个独立的侧篇故事——支线、角色前传或 what-if——不要推进或违背正传的主线剧情。",
-    dir ? `\n## 番外方向\n${dir}` : "",
-    `\n## 正传正典（复用以下角色与设定）\n${parentCanon}`,
+    "## ",
+    "、。——、 what-if——。",
+    dir ? `\n## \n${dir}` : "",
+    `\n## （）\n${parentCanon}`,
   ].filter(Boolean).join("\n");
 }
 
@@ -236,12 +232,12 @@ export function buildImportFoundationSource(
         `The imported book has ${chapters.length} chapters. This package selects complete opening chapters, the ending/continuation point, and complete middle anchors. It also keeps the full title catalog. Unselected chapters will be replayed sequentially after foundation generation to rebuild truth files.`,
       ].join("\n")
     : [
-        "## 导入基础设定压缩资料包",
+        "## ",
         "",
-        `本次导入共 ${chapters.length} 章。这里选取完整的开篇章节、结尾续写点和中段锚点，并保留完整标题目录；未选章节将在后续顺序回放中逐章分析并沉淀 truth files。`,
+        ` ${chapters.length} 。、，； truth files。`,
       ].join("\n");
-  const catalogTitle = language === "en" ? "## Complete chapter title catalog" : "## 完整章节标题目录";
-  const anchorsTitle = language === "en" ? "## Complete source chapters selected for architecture" : "## 用于反推基础设定的完整锚点章节";
+  const catalogTitle = language === "en" ? "## Complete chapter title catalog" : "## ";
+  const anchorsTitle = language === "en" ? "## Complete source chapters selected for architecture" : "## ";
   const anchorText = anchorIndexes
     .map((index) => {
       const chapter = chapters[index]!;
@@ -560,7 +556,7 @@ export class PipelineRunner {
       const resolvedLanguage = language ?? await this.resolveBookLanguageById(bookId);
       const detail = error instanceof Error ? error.message : String(error);
       this.logWarn(resolvedLanguage, {
-        vi: `风格指纹提取失败，已跳过：${detail}`,
+        vi: `failed，：${detail}`,
         en: `Style fingerprint extraction failed and was skipped: ${detail}`,
       });
     }
@@ -582,7 +578,7 @@ export class PipelineRunner {
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       this.logStage(params.stageLanguage, {
-        vi: `审核基础设定（第${attempt + 1}轮）`,
+        vi: `（Chương ${attempt + 1}）`,
         en: `reviewing foundation (round ${attempt + 1})`,
       });
 
@@ -599,7 +595,7 @@ export class PipelineRunner {
       } catch (error) {
         if (!(error instanceof FoundationReviewParseError)) throw error;
         this.logWarn(params.stageLanguage, {
-          vi: `基础设定审核输出无法解析，已保留当前版本且不会自动重生成：${error.message}`,
+          vi: `，：${error.message}`,
           en: `Foundation review output could not be parsed; keeping the current version without automatic regeneration: ${error.message}`,
         });
         return foundation;
@@ -617,7 +613,7 @@ export class PipelineRunner {
       }
 
       this.logWarn(params.stageLanguage, {
-        vi: `基础设定未通过审核（${review.totalScore}分），正在重新生成...`,
+        vi: `（${review.totalScore}），...`,
         en: `Foundation rejected (${review.totalScore}/100), regenerating...`,
       });
 
@@ -638,7 +634,7 @@ export class PipelineRunner {
     } catch (error) {
       if (!(error instanceof FoundationReviewParseError)) throw error;
       this.logWarn(params.stageLanguage, {
-        vi: `基础设定最终审核输出无法解析，已保留当前版本：${error.message}`,
+        vi: `，：${error.message}`,
         en: `Final foundation review output could not be parsed; keeping the current version: ${error.message}`,
       });
       return foundation;
@@ -665,7 +661,7 @@ export class PipelineRunner {
       .map((dimension) => (
         language === "en"
           ? `- ${dimension.name} [${dimension.score}]: ${dimension.feedback}`
-          : `- ${dimension.name}（${dimension.score}分）：${dimension.feedback}`
+          : `- ${dimension.name}（${dimension.score}）：${dimension.feedback}`
       ))
       .join("\n");
 
@@ -678,11 +674,11 @@ export class PipelineRunner {
           dimensionLines || "- none",
         ].join("\n")
       : [
-          "## 总评",
+          "## ",
           review.overallFeedback,
           "",
-          "## 分项问题",
-          dimensionLines || "- 无",
+          "## ",
+          dimensionLines || "- ",
         ].join("\n");
   }
 
@@ -950,8 +946,8 @@ export class PipelineRunner {
 
     const outlineDir = join(storyDir, "outline");
     await mkdir(outlineDir, { recursive: true });
-    await mkdir(join(storyDir, "roles", "主要角色"), { recursive: true });
-    await mkdir(join(storyDir, "roles", "次要角色"), { recursive: true });
+    await mkdir(join(storyDir, "roles", ""), { recursive: true });
+    await mkdir(join(storyDir, "roles", ""), { recursive: true });
 
     const { profile: gp } = await this.loadGenreProfile(book.genre);
     await architect.writeFoundationFiles(
@@ -1082,13 +1078,7 @@ export class PipelineRunner {
     await this.state.snapshotState(book.id, 0);
   }
 
-  /**
-   * Create a side-story (番外) book: a standalone companion that inherits a
-   * parent book's world/characters via parent_canon.md, but tells an INDEPENDENT
-   * side plot that does not advance or contradict the parent's main-line state.
-   * Reuses importCanon (which already builds the parent-canon reference for
-   * side-story writing) + the standard original-foundation architect path.
-   */
+  // Core narrative engine processing.
   async initSpinoffBook(book: BookConfig, parentBookId: string, direction?: string): Promise<void> {
     const bookDir = this.state.bookDir(book.id);
     const stageLanguage = await this.resolveBookLanguage(book);
@@ -1127,14 +1117,7 @@ export class PipelineRunner {
     await this.state.snapshotState(book.id, 0);
   }
 
-  /**
-   * Create an imitation (仿写) book: an ORIGINAL story whose prose imitates the
-   * voice of a reference work. The architect builds an original foundation from
-   * the user's story idea; the reference text becomes the book's style_guide.md
-   * so the writer mimics its style. The style guide is mandatory here (imitation
-   * is the whole point), so a failure to generate it surfaces rather than being
-   * silently skipped.
-   */
+  // Core narrative engine processing.
   async initImitationBook(
     book: BookConfig,
     referenceText: string,
@@ -1296,7 +1279,7 @@ export class PipelineRunner {
     const bookDir = this.state.bookDir(bookId);
     const chapterNumber = await this.state.getNextChapterNumber(bookId);
     const stageLanguage = await this.resolveBookLanguage(book);
-    this.logStage(stageLanguage, { vi: "组装章节运行时上下文", en: "composing chapter runtime context" });
+    this.logStage(stageLanguage, { vi: "", en: "composing chapter runtime context" });
     const { plan, composed } = await this.createGovernedArtifacts(
       book,
       bookDir,
@@ -1331,7 +1314,7 @@ export class PipelineRunner {
     const { profile: gp } = await this.loadGenreProfile(book.genre);
     const language = book.language ?? gp.language;
     this.logStage(language, {
-      vi: `审计第${targetChapter}章`,
+      vi: `Chương ${targetChapter}`,
       en: `auditing chapter ${targetChapter}`,
     });
     const evaluation = await this.evaluateMergedAudit({
@@ -1391,7 +1374,7 @@ export class PipelineRunner {
       const stageLanguage = await this.resolveBookLanguage(book);
       // Read the current audit issues from index
       this.logStage(stageLanguage, {
-        vi: `加载第${targetChapter}章修订上下文`,
+        vi: `Chương ${targetChapter}`,
         en: `loading revision context for chapter ${targetChapter}`,
       });
       const index = await this.state.loadChapterIndex(bookId);
@@ -1478,7 +1461,7 @@ export class PipelineRunner {
 
       const reviser = new ReviserAgent(this.agentCtxFor("reviser", bookId));
       this.logStage(stageLanguage, {
-        vi: `修订第${targetChapter}章`,
+        vi: `Chương ${targetChapter}`,
         en: `revising chapter ${targetChapter}`,
       });
       const reviseOutput = await reviser.reviseChapter(
@@ -1681,7 +1664,7 @@ export class PipelineRunner {
 
       // Save revised chapter file
       this.logStage(stageLanguage, {
-        vi: `落盘第${targetChapter}章修订结果`,
+        vi: `Chương ${targetChapter}`,
         en: `persisting revision for chapter ${targetChapter}`,
       });
       const chaptersDir = join(bookDir, "chapters");
@@ -1695,7 +1678,7 @@ export class PipelineRunner {
       const reviseLang = book.language ?? gp.language;
       const reviseHeading = reviseLang === "en"
         ? `# Chapter ${targetChapter}: ${chapterMeta.title}`
-        : `# 第${targetChapter}章 ${chapterMeta.title}`;
+        : `# Chương ${targetChapter} ${chapterMeta.title}`;
 
       // Only the latest chapter owns current truth. Reworking an older chapter
       // invalidates its descendants, but must not rewind the live story state.
@@ -1714,7 +1697,7 @@ export class PipelineRunner {
       // Update index
       const downstreamRevisionNotice = language === "en"
         ? `[warning] Chapter ${targetChapter} changed; re-review this downstream chapter for continuity.`
-        : `[warning] 第${targetChapter}章已重写，请重新检查本章与前文的连续性。`;
+        : `[warning] Chương ${targetChapter}，。`;
       const updatedIndex = index.map((ch) => {
         if (ch.number === targetChapter) {
           return {
@@ -1733,7 +1716,7 @@ export class PipelineRunner {
             status: "needs-revision" as ChapterMeta["status"],
             updatedAt: new Date().toISOString(),
             auditIssues: [
-              ...(ch.auditIssues ?? []).filter((issue) => !issue.includes("re-review this downstream chapter") && !issue.includes("请重新检查本章与前文")),
+              ...(ch.auditIssues ?? []).filter((issue) => !issue.includes("re-review this downstream chapter") && !issue.includes("")),
               downstreamRevisionNotice,
             ],
           };
@@ -1754,7 +1737,7 @@ export class PipelineRunner {
 
       // Re-snapshot
       this.logStage(stageLanguage, {
-        vi: `更新第${targetChapter}章索引与快照`,
+        vi: `Chương ${targetChapter}`,
         en: `updating chapter index and snapshots for chapter ${targetChapter}`,
       });
       if (isLatestChapter) {
@@ -1795,14 +1778,14 @@ export class PipelineRunner {
       try {
         return await readFile(path, "utf-8");
       } catch {
-        return "(文件不存在)";
+        return "()";
       }
     };
 
     // Phase 5: prefer the new prose outline files; fall back to legacy paths.
     const readOutline = async (newRel: string, legacyRel: string): Promise<string> => {
       const preferred = await readSafe(join(storyDir, newRel));
-      if (preferred.trim() && preferred !== "(文件不存在)") return preferred;
+      if (preferred.trim() && preferred !== "()") return preferred;
       return readSafe(join(storyDir, legacyRel));
     };
 
@@ -1902,7 +1885,7 @@ export class PipelineRunner {
     // ad hoc from markdown headings.
     const index = await this.state.loadChapterIndex(bookId);
     const title = index.find((entry) => entry.number === chapterNumber)?.title
-      ?? `第${chapterNumber}章`;
+      ?? `Chương ${chapterNumber}`;
     return rebuildStateReview({
       bookDir,
       chapter: chapterNumber,
@@ -2272,7 +2255,7 @@ export class PipelineRunner {
           issues: [],
           summary: pipelineLang === "en"
             ? "Not reviewed yet (manual mode: stopped after writing — run review when ready)."
-            : "尚未审查（手动模式：写完即停，需要时点“审查”）。",
+            : "（：，“”）。",
         };
       } else {
         const auditor = new ContinuityAuditor(this.agentCtxFor("auditor", bookId));
@@ -2402,7 +2385,7 @@ export class PipelineRunner {
           issues: [],
           summary: pipelineLang === "en"
             ? "Not reviewed yet (manual mode: stopped after writing — run review when ready)."
-            : "尚未审查（手动模式：写完即停，需要时点“审查”）。",
+            : "（：，“”）。",
         };
       } else {
         const auditor = new ContinuityAuditor(this.agentCtxFor("auditor", bookId));
@@ -2514,7 +2497,7 @@ export class PipelineRunner {
     if (persistenceOutput.title !== output.title) {
       const description = pipelineLang === "en"
         ? `Chapter title "${output.title}" was auto-adjusted to "${persistenceOutput.title}".`
-        : `章节标题"${output.title}"已自动调整为"${persistenceOutput.title}"。`;
+        : `"${output.title}""${persistenceOutput.title}"。`;
       this.config.logger?.warn(`[title] ${description}`);
       auditResult = {
         ...auditResult,
@@ -2524,7 +2507,7 @@ export class PipelineRunner {
           description,
           suggestion: pipelineLang === "en"
             ? "If the auto-renamed title is weak, revise the chapter title manually."
-            : "如果自动改名不理想，可以在后续手动修订章节标题。",
+            : "，Chỉnh sửa chương。",
         }],
       };
     }
@@ -2801,13 +2784,13 @@ export class PipelineRunner {
         : auditResult.passed ? "✅" : "⚠️";
       const chapterLength = formatLengthCount(finalWordCount, lengthSpec.countingMode);
       await dispatchNotification(this.config.notifyChannels, {
-        title: `${statusEmoji} ${book.title} 第${chapterNumber}章`,
+        title: `${statusEmoji} ${book.title} Chương ${chapterNumber}`,
         body: [
           `**${persistenceOutput.title}** | ${chapterLength}`,
-          revised ? "📝 已自动修正" : "",
+          revised ? "📝 " : "",
           resolvedStatus === "state-degraded"
-            ? "状态结算: 已降级保存，需先修复 state 再继续"
-            : `审稿: ${auditResult.passed ? "通过" : "需人工审核"}`,
+            ? ": ， state "
+            : `: ${auditResult.passed ? "" : ""}`,
           ...auditResult.issues
             .filter((i) => i.severity !== "info")
             .map((i) => `- [${i.severity}] ${i.description}`),
@@ -3157,7 +3140,7 @@ export class PipelineRunner {
         language: lang,
         reason: lang === "en"
           ? `The sample is short (${sample.length} chars), so this guide uses the statistical fingerprint instead of LLM qualitative extraction.`
-          : `样本文本较短（${sample.length}字），本次先使用统计指纹生成文风指南，不强行调用 LLM 做定性拆解。`,
+          : `（${sample.length} từ），， LLM 。`,
       });
     } else {
       try {
@@ -3191,37 +3174,37 @@ Output format (Markdown):
 (any personal writing habits worth imitating)
 
 Base the analysis on the text's actual features, not generalities. Support each section with 1-2 quoted lines from the original.`
-          : `你是一位文学风格分析专家。分析参考文本的写作风格，提取可供模仿的定性特征。
+          : `。，。
 
-输出格式（Markdown）：
-## 叙事声音与语气
-（冷峻/热烈/讽刺/温情/...，附1-2个原文例句）
+（Markdown）：
+## 
+（////...，1-2）
 
-## 对话风格
-（角色说话的共性特征：句子长短、口头禅倾向、方言痕迹、对话节奏）
+## 
+（：、、、）
 
-## 场景描写特征
-（五感偏好、意象选择、描写密度、环境与情绪的关联方式）
+## 
+（、、、）
 
-## 转折与衔接手法
-（场景如何切换、时间跳跃的处理方式、段落间的过渡特征）
+## 
+（、、）
 
-## 节奏特征
-（长短句分布、段落长度偏好、高潮/舒缓的交替方式）
+## 
+（、、/）
 
-## 词汇偏好
-（高频特色用词、比喻/修辞倾向、口语化程度）
+## 
+（、/、）
 
-## 情绪表达方式
-（直白抒情 vs 动作外化、内心独白的频率和风格）
+## 
+（ vs 、）
 
-## 独特习惯
-（任何值得模仿的个人写作习惯）
+## 
+（）
 
-分析必须基于原文实际特征，不要泛泛而谈。每个部分用1-2个原文例句佐证。`;
+，。1-2。`;
         const styleUserPrompt = lang === "en"
           ? `Analyze the writing style of the following reference text:\n\n${sample}`
-          : `分析以下参考文本的写作风格：\n\n${sample}`;
+          : `：\n\n${sample}`;
         const response = await runWorkerAgent(this.config.client, this.config.model, appendActivatedSkillGuidance([
           { role: "system", content: styleSystemPrompt },
           { role: "user", content: styleUserPrompt },
@@ -3232,14 +3215,14 @@ Base the analysis on the text's actual features, not generalities. Support each 
               language: lang,
               reason: lang === "en"
                 ? "The LLM returned empty style analysis; using the statistical fingerprint fallback."
-                : "LLM 未返回有效文风分析，本次使用统计指纹兜底生成文风指南。",
+                : "LLM valid，。",
             });
       } catch (error) {
         qualitativeGuide = this.buildDeterministicStyleGuide(profile, {
           language: lang,
           reason: lang === "en"
             ? `LLM qualitative extraction failed: ${error instanceof Error ? error.message : String(error)}. Using the statistical fingerprint fallback.`
-            : `LLM 定性拆解失败：${error instanceof Error ? error.message : String(error)}。本次使用统计指纹兜底生成文风指南。`,
+            : `LLM failed：${error instanceof Error ? error.message : String(error)}。。`,
         });
       }
     }
@@ -3285,23 +3268,23 @@ Base the analysis on the text's actual features, not generalities. Support each 
     }
 
     return [
-      "# 文风指南",
+      "# ",
       "",
       `> ${options.reason}`,
       "",
-      "## 统计风格指纹",
-      `- 来源：${profile.sourceName ?? "unknown"}`,
-      `- 平均句长：${profile.avgSentenceLength}`,
-      `- 句长波动：${profile.sentenceLengthStdDev}`,
-      `- 平均段落长度：${profile.avgParagraphLength}`,
-      `- 词汇多样性：${Math.round(profile.vocabularyDiversity * 100)}%`,
-      profile.topPatterns.length > 0 ? `- 高频句首/模式：${profile.topPatterns.join("、")}` : "- 高频句首/模式：样本内不明显",
-      profile.rhetoricalFeatures.length > 0 ? `- 修辞特征：${profile.rhetoricalFeatures.join("、")}` : "- 修辞特征：样本内不明显",
+      "## ",
+      `- ：${profile.sourceName ?? "unknown"}`,
+      `- ：${profile.avgSentenceLength}`,
+      `- ：${profile.sentenceLengthStdDev}`,
+      `- ：${profile.avgParagraphLength}`,
+      `- ：${Math.round(profile.vocabularyDiversity * 100)}%`,
+      profile.topPatterns.length > 0 ? `- /：${profile.topPatterns.join("、")}` : "- /：",
+      profile.rhetoricalFeatures.length > 0 ? `- ：${profile.rhetoricalFeatures.join("、")}` : "- ：",
       "",
-      "## 使用方式",
-      "- 这是一份轻量文风指纹，不是完整仿写圣经。",
-      "- 后续写作优先参考句长、段落长度、节奏波动和可见修辞。",
-      "- 如果想得到更稳定的定性拆解，后续可以导入更长片段覆盖本文件。",
+      "## ",
+      "- ，。",
+      "- 、、。",
+      "- ，。",
     ].join("\n");
   }
 
@@ -3325,7 +3308,7 @@ Base the analysis on the text's actual features, not generalities. Support each 
     await mkdir(storyDir, { recursive: true });
 
     const readSafe = async (path: string): Promise<string> => {
-      try { return await readFile(path, "utf-8"); } catch { return "(无)"; }
+      try { return await readFile(path, "utf-8"); } catch { return "()"; }
     };
 
     const parentBook = await this.state.loadBookConfig(parentBookId);
@@ -3333,7 +3316,7 @@ Base the analysis on the text's actual features, not generalities. Support each 
     // Phase 5: parent book may be on the new prose layout; prefer outline/.
     const readParentOutline = async (newRel: string, legacyRel: string): Promise<string> => {
       const preferred = await readSafe(join(parentDir, "story", newRel));
-      if (preferred.trim() && preferred !== "(无)") return preferred;
+      if (preferred.trim() && preferred !== "()") return preferred;
       return readSafe(join(parentDir, "story", legacyRel));
     };
 
@@ -3352,80 +3335,80 @@ Base the analysis on the text's actual features, not generalities. Support each 
     const response = await runWorkerAgent(this.config.client, this.config.model, appendActivatedSkillGuidance([
       {
         role: "system",
-        content: `你是一位网络小说架构师。基于正传的全部设定和状态文件，生成一份完整的"正传正典参照"文档，供番外写作和审计使用。
+        content: `。，""，。
 
-输出格式（Markdown）：
-# 正传正典（《{正传书名}》）
+（Markdown）：
+# （《{}》）
 
-## 世界规则（完整，来自正传设定）
-（力量体系、地理设定、阵营关系、核心规则——完整复制，不压缩）
+## （，）
+（、、、——，）
 
-## 正典约束（不可违反的事实）
-| 约束ID | 类型 | 约束内容 | 严重性 |
+## （）
+| ID |  |  |  |
 |---|---|---|---|
-| C01 | 人物存亡 | ... | critical |
-（列出所有硬性约束：谁活着、谁死了、什么事件已经发生、什么规则不可违反）
+| C01 |  | ... | critical |
+（：、、、）
 
-## 角色快照
-| 角色 | 当前状态 | 性格底色 | 对话特征 | 已知信息 | 未知信息 |
+## 
+|  |  |  |  |  |  |
 |---|---|---|---|---|---|
-（从状态卡和角色矩阵中提取每个重要角色的完整快照）
+（）
 
-## 角色双态处理原则
-- 未来会变强的角色：写潜力暗示
-- 未来会黑化的角色：写微小裂痕
-- 未来会死的角色：写导致死亡的性格底色
+## 
+- ：
+- ：
+- ：
 
-## 关键事件时间线
-| 章节 | 事件 | 涉及角色 | 对番外的约束 |
+## 
+|  |  |  |  |
 |---|---|---|---|
-（从章节摘要中提取关键事件）
+（）
 
-## 伏笔状态
-| Hook ID | 类型 | 状态 | 内容 | 预期回收 |
+## 
+| Hook ID |  |  |  |  |
 |---|---|---|---|---|
 
-## 资源账本快照
-（当前资源状态）
+## 
+（）
 
 ---
 meta:
   parentBookId: "{parentBookId}"
-  parentTitle: "{正传书名}"
+  parentTitle: "{}"
   generatedAt: "{ISO timestamp}"
 
-要求：
-1. 世界规则完整复制，不压缩——准确性优先
-2. 正典约束必须穷尽，遗漏会导致番外与正传矛盾
-3. 角色快照必须包含信息边界（已知/未知），防止番外中角色引用不该知道的信息`,
+：
+1. ，——
+2. ，
+3. （/），`,
       },
       {
         role: "user",
-        content: `正传书名：${parentBook.title}
-正传ID：${parentBookId}
+        content: `：${parentBook.title}
+ID：${parentBookId}
 
-## 正传世界设定
+## 
 ${storyBible}
 
-## 正传当前状态卡
+## 
 ${currentState}
 
-## 正传资源账本
+## 
 ${ledger}
 
-## 正传伏笔池
+## 
 ${hooks}
 
-## 正传章节摘要
+## 
 ${summaries}
 
-## 正传支线进度
+## 
 ${subplots}
 
-## 正传情感弧线
+## 
 ${emotions}
 
-## 正传角色矩阵
+## 
 ${matrix}`,
       },
     ], this.currentActivatedSkills()), { temperature: 0.3, signal: this.currentAbortSignal() });
@@ -3501,7 +3484,7 @@ ${matrix}`,
       // Step 1: Generate foundation on first run (not on resume)
       if (startFrom === 1) {
         log?.info(this.localize(resolvedLanguage, {
-          vi: `步骤 1：从 ${input.chapters.length} 章生成基础设定...`,
+          vi: ` 1： ${input.chapters.length} ...`,
           en: `Step 1: Generating foundation from ${input.chapters.length} chapters...`,
         }));
         const foundationSource = buildImportFoundationSource(input.chapters, resolvedLanguage);
@@ -3532,21 +3515,21 @@ ${matrix}`,
         // Generate style guide from imported chapters
         if (foundationSource.length >= 500) {
           log?.info(this.localize(resolvedLanguage, {
-            vi: "提取原文风格指纹...",
+            vi: "...",
             en: "Extracting source style fingerprint...",
           }));
           await this.tryGenerateStyleGuide(input.bookId, foundationSource, book.title, resolvedLanguage);
         }
 
         log?.info(this.localize(resolvedLanguage, {
-          vi: "基础设定已生成。",
+          vi: "。",
           en: "Foundation generated.",
         }));
       }
 
       // Step 2: Sequential replay
       log?.info(this.localize(resolvedLanguage, {
-        vi: `步骤 2：从第 ${startFrom} 章开始顺序回放...`,
+        vi: ` 2：Chương  ${startFrom} ...`,
         en: `Step 2: Sequential replay from chapter ${startFrom}...`,
       }));
       const analyzer = new ChapterAnalyzerAgent(this.agentCtxFor("chapter-analyzer", input.bookId));
@@ -3562,7 +3545,7 @@ ${matrix}`,
         const governedInput = await this.prepareWriteInput(book, bookDir, chapterNumber);
 
         log?.info(this.localize(resolvedLanguage, {
-          vi: `分析章节 ${chapterNumber}/${input.chapters.length}：${ch.title}...`,
+          vi: ` ${chapterNumber}/${input.chapters.length}：${ch.title}...`,
           en: `Analyzing chapter ${chapterNumber}/${input.chapters.length}: ${ch.title}...`,
         }));
 
@@ -3628,7 +3611,7 @@ ${matrix}`,
 
       const nextChapter = input.chapters.length + 1;
       log?.info(this.localize(resolvedLanguage, {
-        vi: `完成。已导入 ${importedCount} 章，共 ${formatLengthCount(totalWords, countingMode)}。下一章：${nextChapter}`,
+        vi: `。 ${importedCount} ， ${formatLengthCount(totalWords, countingMode)}。：${nextChapter}`,
         en: `Done. ${importedCount} chapters imported, ${formatLengthCount(totalWords, countingMode)}. Next chapter: ${nextChapter}`,
       }));
 
@@ -3811,17 +3794,17 @@ ${matrix}`,
     }
 
     return [
-      "# 当前状态",
+      "# Trạng thái hiện tại",
       "",
-      "| 字段 | 值 |",
+      "| Trường | Giá trị |",
       "| --- | --- |",
-      "| 当前章节 | 0 |",
-      "| 当前位置 | （未设定） |",
-      "| 主角状态 | （未设定） |",
-      "| 当前目标 | （未设定） |",
-      "| 当前限制 | （未设定） |",
-      "| 当前敌我 | （未设定） |",
-      "| 当前冲突 | （未设定） |",
+      "| Chương hiện tại | 0 |",
+      "| Vị trí hiện tại | (chưa thiết lập) |",
+      "| Trạng thái nhân vật chính | (chưa thiết lập) |",
+      "| Mục tiêu hiện tại | (chưa thiết lập) |",
+      "| Ràng buộc hiện tại | (chưa thiết lập) |",
+      "| Quan hệ hiện tại | (chưa thiết lập) |",
+      "| Xung đột hiện tại | (chưa thiết lập) |",
       "",
     ].join("\n");
   }
@@ -3838,9 +3821,9 @@ ${matrix}`,
     }
 
     return [
-      "# 伏笔池",
+      "# Hook đang chờ",
       "",
-      "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+      "| hook_id | chương bắt đầu | loại | trạng thái | lần thúc đẩy gần nhất | dự kiến thu hồi | ghi chú |",
       "| --- | --- | --- | --- | --- | --- | --- |",
       "",
     ].join("\n");
@@ -3857,7 +3840,7 @@ ${matrix}`,
       await this.rebuildCurrentStateFactHistory(bookDir, uptoChapter);
     } catch (error) {
       this.logWarn(await this.resolveBookLanguageById(bookId), {
-        vi: `状态事实同步已跳过：${String(error)}`,
+        vi: `：${String(error)}`,
         en: `State fact sync skipped: ${String(error)}`,
       });
     }
@@ -3887,7 +3870,7 @@ ${matrix}`,
       await this.rebuildNarrativeMemoryIndex(bookDir);
     } catch (error) {
       this.logWarn(await this.resolveBookLanguageById(bookId), {
-        vi: `叙事记忆同步已跳过：${String(error)}`,
+        vi: `：${String(error)}`,
         en: `Narrative memory sync skipped: ${String(error)}`,
       });
     }
@@ -3913,7 +3896,7 @@ ${matrix}`,
     }
     return [
       this.localize(this.languageFromLengthSpec(lengthSpec), {
-        vi: `第${chapterNumber}章未达到篇幅预算（${lengthSpec.hardMin}-${lengthSpec.hardMax}，实际 ${finalCount}）。`,
+        vi: `Chương ${chapterNumber}（${lengthSpec.hardMin}-${lengthSpec.hardMax}， ${finalCount}）。`,
         en: `Chapter ${chapterNumber} is outside its length budget (${lengthSpec.hardMin}-${lengthSpec.hardMax}, actual ${finalCount}).`,
       }),
     ];
@@ -3965,17 +3948,17 @@ ${matrix}`,
 
     const block = [
       this.localize(params.language, {
-        vi: "# 审计纠偏",
+        vi: "# ",
         en: "# Audit Drift",
       }),
       "",
       this.localize(params.language, {
-        vi: "## 审计纠偏（自动生成，下一章写作前参照）",
+        vi: "## （，）",
         en: "## Audit Drift Correction",
       }),
       "",
       this.localize(params.language, {
-        vi: `> 第${params.chapterNumber}章审计发现以下问题，下一章写作时必须避免：`,
+        vi: `> Chương ${params.chapterNumber}，：`,
         en: `> Chapter ${params.chapterNumber} audit found the following issues to avoid in the next chapter:`,
       }),
       ...params.issues.map((issue) => `> - [${issue.severity}] ${issue.category}: ${issue.description}`),
@@ -3987,9 +3970,9 @@ ${matrix}`,
 
   private stripAuditDriftCorrectionBlock(currentState: string): string {
     const headers = [
-      "## 审计纠偏（自动生成，下一章写作前参照）",
+      "## （，）",
       "## Audit Drift Correction",
-      "# 审计纠偏",
+      "# ",
       "# Audit Drift",
     ];
 

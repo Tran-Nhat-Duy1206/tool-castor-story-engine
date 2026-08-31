@@ -97,13 +97,13 @@ describe("use_skill agent tool", () => {
     await writeFile(
       join(baseDir, "references", "continuity.md"),
       [
-        "# 伏笔连续性",
+        "# mock_text",
         "",
-        "师债必须通过誓令碎片和导师旧信继续推进。",
+        "mock_text。",
         "",
-        "# 节奏",
+        "# mock_text",
         "",
-        "日常章节允许降低冲突密度。",
+        "mock_text。",
       ].join("\n"),
       "utf-8",
     );
@@ -121,16 +121,16 @@ describe("use_skill agent tool", () => {
 
     const result = await tool.execute("skill-search", {
       skillId: "long-writing",
-      query: "导师旧信和誓令碎片的伏笔如何推进",
+      query: "mock_text",
     });
 
     expect(result.content).toEqual([expect.objectContaining({
-      text: expect.stringMatching(/references\/continuity\.md:[0-9]+-[0-9]+[\s\S]*师债必须通过誓令碎片/),
+      text: expect.stringMatching(/references\/continuity\.md:[0-9]+-[0-9]+[\s\S]*mock_text/),
     })]);
     expect(result.details).toMatchObject({
       kind: "skill_activated",
       skillId: "long-writing",
-      query: "导师旧信和誓令碎片的伏笔如何推进",
+      query: "mock_text",
       retrievedResources: [expect.objectContaining({ path: "references/continuity.md" })],
     });
   });

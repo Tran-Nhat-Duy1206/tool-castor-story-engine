@@ -1,15 +1,9 @@
-/**
- * 火山方舟 (Volcengine Ark / Doubao)
- *
- * - 官网：https://www.volcengine.com/product/ark
- * - 控制台 / API key：https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey
- * - API 文档：https://www.volcengine.com/docs/82379
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const VOLCENGINE: ProviderEndpoint = {
   id: "volcengine",
-  label: "火山引擎 (豆包)",
+  label: "Volcengine (Doubao)",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://ark.cn-beijing.volces.com/api/v3",

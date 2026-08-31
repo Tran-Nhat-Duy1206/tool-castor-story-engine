@@ -165,7 +165,7 @@ describe("loadProjectConfig local provider auth", () => {
       language: "vi",
       llm: {
         services: [
-          { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
+          { service: "custom", name: "mock_textGPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
         ],
         defaultModel: "corp-chat",
       },
@@ -174,7 +174,7 @@ describe("loadProjectConfig local provider auth", () => {
     await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
       join(root, ".castor", "secrets.json"),
-      JSON.stringify({ services: { "custom:内网GPT": { apiKey: "sk-corp" } } }, null, 2),
+      JSON.stringify({ services: { "custom:mock_textGPT": { apiKey: "sk-corp" } } }, null, 2),
       "utf-8",
     );
 
@@ -204,7 +204,7 @@ describe("loadProjectConfig local provider auth", () => {
       llm: {
         configSource: "studio",
         services: [
-          { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9 },
+          { service: "custom", name: "mock_textGPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9 },
         ],
         defaultModel: "corp-chat",
       },
@@ -219,7 +219,7 @@ describe("loadProjectConfig local provider auth", () => {
     await mkdir(join(root, ".castor"), { recursive: true });
     await writeFile(
       join(root, ".castor", "secrets.json"),
-      JSON.stringify({ services: { "custom:内网GPT": { apiKey: "sk-corp" } } }, null, 2),
+      JSON.stringify({ services: { "custom:mock_textGPT": { apiKey: "sk-corp" } } }, null, 2),
       "utf-8",
     );
 

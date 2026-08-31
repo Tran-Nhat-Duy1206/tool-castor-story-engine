@@ -28,13 +28,13 @@ describe("ForecastStore", () => {
     const store = new ForecastStore(bookDir);
     const forecast = makeForecast();
 
-    const saved = await store.save(forecast, "# 对比\n内容");
+    const saved = await store.save(forecast, "# mock_text\nmock_text");
 
     const expectedDir = join(bookDir, "story", "runtime", "narrative-forecasts", forecast.forecastId);
     expect(saved.forecastJsonPath).toBe(join(expectedDir, "forecast.json"));
     expect(saved.comparisonPath).toBe(join(expectedDir, "comparison.md"));
     expect(JSON.parse(await readFile(saved.forecastJsonPath, "utf-8")).forecastId).toBe(forecast.forecastId);
-    expect(await readFile(saved.comparisonPath, "utf-8")).toContain("# 对比");
+    expect(await readFile(saved.comparisonPath, "utf-8")).toContain("# mock_text");
   });
 
   it("round-trips a forecast through save and load", async () => {
@@ -86,12 +86,12 @@ describe("ForecastStore", () => {
     const forecast = makeForecast();
     await store.save(forecast, "cmp");
 
-    const planPath = await store.writeSelectedPlan(forecast.forecastId, "# 分支计划");
+    const planPath = await store.writeSelectedPlan(forecast.forecastId, "# mock_text");
 
     expect(planPath).toBe(join(
       bookDir, "story", "runtime", "narrative-forecasts", forecast.forecastId, "selected-branch-plan.md",
     ));
-    expect(await readFile(planPath, "utf-8")).toContain("# 分支计划");
+    expect(await readFile(planPath, "utf-8")).toContain("# mock_text");
   });
 
   it("derives deterministic forecast ids from the injected clock", async () => {

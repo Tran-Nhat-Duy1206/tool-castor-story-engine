@@ -14,22 +14,21 @@ export const DEFAULT_HOOK_LOOKAHEAD_CHAPTERS = 3;
 const HOOK_STATUS_ALIASES: ReadonlyMap<string, HookStatus> = new Map([
   ...[
     "resolved", "closed", "done", "paid_off", "paid-off", "paid off",
-    "已回收", "回收", "完成", "已解决", "已兑现", "兑现",
+    "đã thu hồi", "thu hồi", "hoàn thành", "đã giải quyết", "đã đổi", "giải quyết",
   ].map((value) => [value, "resolved"] as const),
   ...[
     "deferred", "paused", "hold", "dormant", "sleeping", "inactive",
     "unplanted", "unseeded", "not_started", "not-started", "not started",
-    "not_active", "not-active", "not active", "搁置", "延后", "延期", "暂缓",
-    "休眠", "未激活", "未开启", "待开启", "未启动", "待启动", "未推进",
-    "尚未推进", "待推进",
+    "not_active", "not-active", "not active", "tạm hoãn", "hoãn", "lùi lại", "chưa kích hoạt",
+    "chờ mở", "chưa bắt đầu", "chưa tiến triển", "chờ xử lý", "đang chờ",
   ].map((value) => [value, "deferred"] as const),
   ...[
     "progressing", "advanced", "progress", "active", "pressured", "confirmed",
-    "confirmed_hit", "confirmed-hit", "confirmed hit", "命中", "已确认命中", "已推进",
-    "推进", "进行中", "持续推进", "重大推进",
+    "confirmed_hit", "confirmed-hit", "confirmed hit", "trúng", "đã trúng", "đã tiến triển",
+    "tiến triển", "đang tiến hành", "thúc đẩy", "đang diễn ra",
   ].map((value) => [value, "progressing"] as const),
   ...[
-    "open", "pending", "seeded", "planted", "待定", "未回收", "已埋", "已种下", "已铺垫",
+    "open", "pending", "seeded", "planted", "đang mở", "chưa thu hồi", "đã gieo", "đã đặt mầm", "mở",
   ].map((value) => [value, "open"] as const),
 ]);
 
@@ -105,19 +104,19 @@ const LABELS: Record<"vi" | "en", Record<HookPayoffTiming, string>> = {
 };
 
 const TIMING_ALIASES: Array<[HookPayoffTiming, RegExp]> = [
-  ["immediate", /^(?:立即|马上|当章|本章|下一章|immediate|instant|next(?:\s+chapter|\s+beat)?|right\s+away)$/i],
-  ["near-term", /^(?:近期|近几章|短线|soon|short(?:\s+run)?|near(?:\s*-\s*|\s+)term|current\s+sequence)$/i],
-  ["mid-arc", /^(?:中程|中期|卷中|mid(?:\s*-\s*|\s+)arc|mid(?:\s*-\s*|\s+)book|middle)$/i],
-  ["slow-burn", /^(?:慢烧|长线|后续|later|late(?:r)?|long(?:\s*-\s*|\s+)arc|slow(?:\s*-\s*|\s+)burn)$/i],
-  ["endgame", /^(?:终局|终章|大结局|最终|climax|finale|endgame|late\s+book)$/i],
+  ["immediate", /^(?:ngay(?:\s+lập\s+tức)?|tức\s+thì|chương\s+này|chương\s+sau|immediate|instant|next(?:\s+chapter|\s+beat)?|right\s+away)$/i],
+  ["near-term", /^(?:ngắn\s+hạn|sớm|vài\s+chương\s+tới|soon|short(?:\s+run)?|near(?:\s*-\s*|\s+)term|current\s+sequence)$/i],
+  ["mid-arc", /^(?:giữa\s+mạch|trung\s+kỳ|giữa\s+tập|mid(?:\s*-\s*|\s+)arc|mid(?:\s*-\s*|\s+)book|middle)$/i],
+  ["slow-burn", /^(?:âm\s+ỉ|dài\s+hạn|về\s+sau|later|late(?:r)?|long(?:\s*-\s*|\s+)arc|slow(?:\s*-\s*|\s+)burn)$/i],
+  ["endgame", /^(?:hồi\s+kết|chung\s+kết|đoạn\s+kết|cuối\s+sách|cuối\s+truyện|climax|finale|endgame|late\s+book)$/i],
 ];
 
 const SIGNAL_PATTERNS: Array<[HookPayoffTiming, RegExp]> = [
-  ["endgame", /(终局|终章|大结局|最终揭晓|最终摊牌|climax|finale|endgame|final reveal|last act)/i],
-  ["immediate", /(当章|本章|下一章|马上|立刻|即刻|immediate|next chapter|right away|at once)/i],
-  ["near-term", /(近期|近几章|很快|短线|soon|near-term|short run|current sequence)/i],
-  ["mid-arc", /(中期|卷中|本卷中段|mid-book|mid arc|middle of the arc)/i],
-  ["slow-burn", /(长线|慢烧|后续发酵|慢慢揭开|later|slow burn|long arc|long tail)/i],
+  ["endgame", /(hồi kết|chung kết|đoạn kết|cuối truyện|climax|finale|endgame|final reveal|last act)/i],
+  ["immediate", /(ngay lập tức|tức thì|chương này|chương sau|immediate|next chapter|right away|at once)/i],
+  ["near-term", /(ngắn hạn|sắp tới|vài chương tới|soon|near-term|short run|current sequence)/i],
+  ["mid-arc", /(giữa mạch|trung kỳ|giữa tập|mid-book|mid arc|middle of the arc)/i],
+  ["slow-burn", /(âm ỉ|dài hạn|chậm rãi|về sau|later|slow burn|long arc|long tail)/i],
 ];
 
 export function normalizeHookPayoffTiming(value: string | undefined | null): HookPayoffTiming | undefined {
@@ -197,7 +196,7 @@ export function describeHookLifecycle(params: {
   const age = Math.max(0, params.chapterNumber - Math.max(1, params.startChapter));
   const lastTouchChapter = Math.max(params.startChapter, params.lastAdvancedChapter);
   const dormancy = Math.max(0, params.chapterNumber - Math.max(1, lastTouchChapter));
-  const explicitProgressing = /^(progressing|advanced|重大推进|持续推进)$/i.test(params.status.trim());
+  const explicitProgressing = /^(progressing|advanced||)$/i.test(params.status.trim());
   const phaseReady = HOOK_PHASE_WEIGHT[phase] >= HOOK_PHASE_WEIGHT[profile.minimumPhase];
   const recentlyTouched = dormancy <= HOOK_ACTIVITY_THRESHOLDS.recentlyTouchedDormancy;
   const overdue = phaseReady && age >= profile.overdueAge;

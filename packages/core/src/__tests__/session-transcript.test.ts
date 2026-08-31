@@ -28,7 +28,7 @@ describe("session transcript codec", () => {
     await rm(projectRoot, { recursive: true, force: true });
   });
 
-  it("一行写入一个 JSON event 并保留 raw AgentMessage 字段", async () => {
+  it("mock_text JSON event mock_text raw AgentMessage  từmock_text", async () => {
     const started: RequestStartedEvent = {
       type: "request_started",
       version: 1,
@@ -36,7 +36,7 @@ describe("session transcript codec", () => {
       requestId: "r1",
       seq: 1,
       timestamp: 100,
-      input: "继续写",
+      input: "mock_text",
     };
     const message: MessageEvent = {
       type: "message",
@@ -51,8 +51,8 @@ describe("session transcript codec", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "推理", signature: "sig-1" },
-          { type: "text", text: "正文" },
+          { type: "thinking", thinking: "mock_text", signature: "sig-1" },
+          { type: "text", text: "mock_text" },
         ],
         provider: "anthropic",
         api: "anthropic-messages",
@@ -81,13 +81,13 @@ describe("session transcript codec", () => {
     expect((events[1] as MessageEvent).message).toMatchObject({
       role: "assistant",
       content: [
-        { type: "thinking", thinking: "推理", signature: "sig-1" },
-        { type: "text", text: "正文" },
+        { type: "thinking", thinking: "mock_text", signature: "sig-1" },
+        { type: "text", text: "mock_text" },
       ],
     });
   });
 
-  it("跳过坏行并保留合法 event", async () => {
+  it("mock_text event", async () => {
     const dir = join(projectRoot, ".castor", "sessions");
     await mkdir(dir, { recursive: true });
     await writeFile(
@@ -118,7 +118,7 @@ describe("session transcript codec", () => {
     expect(events.map((event) => event.type)).toEqual(["request_started", "request_committed"]);
   });
 
-  it("按已有 transcript 分配单调递增 seq", async () => {
+  it("mock_text transcript mock_text seq", async () => {
     const committed: RequestCommittedEvent = {
       type: "request_committed",
       version: 1,
@@ -153,7 +153,7 @@ describe("session transcript codec", () => {
     expect(events.map((event) => event.seq)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   });
 
-  it("appendManualSessionMessages 写入 committed request 并保留 raw assistant message", async () => {
+  it("appendManualSessionMessages mock_text committed request mock_text raw assistant message", async () => {
     await appendManualSessionMessages(projectRoot, "s1", [{
       role: "assistant",
       content: [{ type: "text", text: "fallback" }],
@@ -209,9 +209,9 @@ describe("session transcript codec", () => {
         toolExecutions: [{
           id: "play-1",
           tool: "play_start",
-          label: "启动互动世界",
+          label: "mock_text",
           status: "completed",
-          details: { kind: "play_world_started", suggestedActions: ["开门"] },
+          details: { kind: "play_world_started", suggestedActions: ["mock_text"] },
           startedAt: 1,
           completedAt: 2,
         }],
@@ -226,14 +226,14 @@ describe("session transcript codec", () => {
         toolExecutions: [
           expect.objectContaining({
             tool: "play_start",
-            details: expect.objectContaining({ suggestedActions: ["开门"] }),
+            details: expect.objectContaining({ suggestedActions: ["mock_text"] }),
           }),
         ],
       }),
     ]);
   });
 
-  it("从 core index 导出 transcript helper", async () => {
+  it("mock_text core index mock_text transcript helper", async () => {
     const core = await import("../index.js");
     expect(typeof core.readTranscriptEvents).toBe("function");
     expect(typeof core.restoreAgentMessagesFromTranscript).toBe("function");

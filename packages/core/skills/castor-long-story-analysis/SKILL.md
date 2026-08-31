@@ -1,6 +1,6 @@
 ---
 name: castor-long-story-analysis
-description: 长篇小说拆稿、文风分析与可迁移机制提炼。Use when analyzing a full novel or long sample without copying its expression.
+description: Long-form novel deconstruction, style analysis, and transferable mechanism extraction. Use when analyzing a full novel or long sample without copying its expression.
 ---
 # Long-form story analysis
 

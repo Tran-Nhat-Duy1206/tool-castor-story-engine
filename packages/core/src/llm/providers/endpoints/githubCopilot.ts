@@ -1,10 +1,4 @@
-/**
- * GitHub Copilot
- *
- * - 官网：https://github.com/features/copilot
- * - 通过 GitHub OAuth 获取 token 后走 Copilot API，castor 用它作为 LLM 入口需要用户已有 Copilot 订阅。
- * - 接入细节：https://docs.github.com/en/copilot
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const GITHUB_COPILOT: ProviderEndpoint = {

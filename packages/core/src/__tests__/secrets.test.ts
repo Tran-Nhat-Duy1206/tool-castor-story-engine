@@ -85,10 +85,10 @@ describe("secrets", () => {
       await writeFile(
         join(root, ".castor", "secrets.json"),
         JSON.stringify({
-          services: { "custom:内网GPT": { apiKey: "sk-custom" } },
+          services: { "custom:mock_textGPT": { apiKey: "sk-custom" } },
         }),
       );
-      const key = await getServiceApiKey(root, "custom:内网GPT");
+      const key = await getServiceApiKey(root, "custom:mock_textGPT");
       expect(key).toBe("sk-custom");
     });
   });

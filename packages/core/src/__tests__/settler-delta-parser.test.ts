@@ -5,15 +5,15 @@ describe("parseSettlerDeltaOutput", () => {
   it("parses a valid runtime-state delta block", () => {
     const result = parseSettlerDeltaOutput([
       "=== POST_SETTLEMENT ===",
-      "| 伏笔变动 | mentor-oath 推进 | 同步更新 |",
+      "| mock_text | mentor-oath mock_text | mock_text |",
       "",
       "=== RUNTIME_STATE_DELTA ===",
       "```json",
       JSON.stringify({
         chapter: 12,
         currentStatePatch: {
-          currentGoal: "追到河埠旧账的尽头",
-          currentConflict: "商会噪音仍在干扰师债主线",
+          currentGoal: "mock_text",
+          currentConflict: "mock_text",
         },
         hookOps: {
           upsert: [
@@ -23,8 +23,8 @@ describe("parseSettlerDeltaOutput", () => {
               type: "relationship",
               status: "progressing",
               lastAdvancedChapter: 12,
-              expectedPayoff: "揭开师债真相",
-              notes: "河埠旧账把师债再往前推了一格",
+              expectedPayoff: "mock_textSu that",
+              notes: "mock_text",
             },
           ],
           resolve: [],
@@ -32,15 +32,15 @@ describe("parseSettlerDeltaOutput", () => {
         },
         chapterSummary: {
           chapter: 12,
-          title: "河埠对账",
-          characters: "林月",
-          events: "林月核对河埠旧账",
-          stateChanges: "师债线索进一步收束",
+          title: "mock_text",
+          characters: "mock_text",
+          events: "mock_text",
+          stateChanges: "mock_text",
           hookActivity: "mentor-oath advanced",
-          mood: "紧绷",
-          chapterType: "主线推进",
+          mood: "mock_text",
+          chapterType: "mock_text",
         },
-        notes: ["保留商会噪音，但不盖过主线"],
+        notes: ["mock_text，mock_text"],
       }, null, 2),
       "```",
     ].join("\n"));
@@ -48,7 +48,7 @@ describe("parseSettlerDeltaOutput", () => {
     expect(result.postSettlement).toContain("mentor-oath");
     expect(result.runtimeStateDelta.chapter).toBe(12);
     expect(result.runtimeStateDelta.hookOps.upsert[0]?.hookId).toBe("mentor-oath");
-    expect(result.runtimeStateDelta.chapterSummary?.title).toBe("河埠对账");
+    expect(result.runtimeStateDelta.chapterSummary?.title).toBe("mock_text");
   });
 
   it("rejects invalid runtime-state delta payloads", () => {

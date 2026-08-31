@@ -1,6 +1,6 @@
 ---
 name: castor-story-deslop
-description: 识别并修复空泛、模板化、总结腔和其他AI写作痕迹，同时保留作者声音。Use for semantic prose cleanup, not keyword deletion.
+description: Prose deslopping and anti-AI-tell polishing methodology.
 ---
 # Semantic prose cleanup
 

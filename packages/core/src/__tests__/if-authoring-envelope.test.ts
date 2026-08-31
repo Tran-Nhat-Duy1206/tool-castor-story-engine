@@ -12,7 +12,7 @@ describe("phase-2b envelope extensions", () => {
     }
   });
   it("accepts draftStructure payload", () => {
-    const p = ActionPayloadSchema.parse({ draftStructure: { projectId: "p", instruction: "建一个三幕宫斗骨架" } });
+    const p = ActionPayloadSchema.parse({ draftStructure: { projectId: "p", instruction: "mock_text" } });
     expect(p.draftStructure?.projectId).toBe("p");
   });
   it("accepts connectChoice + removeNode payloads", () => {

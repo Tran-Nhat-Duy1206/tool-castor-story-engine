@@ -7,19 +7,8 @@ import {
 } from "./hook-lifecycle.js";
 
 /**
- * Legacy compat note:
- *  Old markdown files (story/*.md, state snapshots) were written with Chinese
- *  headers like 章节 (\u7ae0\u8282), 标题 etc. Previous renderers emitted those
- *  literals. To keep reading old books we preserve escaped \uXXXX checks in
- *  parsing helpers below (isStateTableHeaderRow, isCurrentChapterLabel,
- *  inferFactSubject, parseDependsOn, parseBooleanCell, ...). The \uXXXX
- *  escapes are intentional — they let us match legacy Han without reintroducing
- *  literal Chinese into new source.
- *
- *  New markdown emitted by this engine must use Vietnamese with proper
- *  diacritics (e.g. Chương, Tiêu đề) or English. Never emit literal Chinese
- *  or fake ASCII Vietnamese (Chuong, Tieu de). Diacritics are required:
- *  Chương, Tiêu đề, Nhân vật, Sự kiện, etc.
+ * Runtime markdown is canonical Vietnamese (with proper diacritics) or English.
+ * Machine-facing identifiers remain stable English labels such as hook_id.
  */
 
 export function renderSummarySnapshot(
@@ -99,7 +88,6 @@ function renderHalfLifeCell(value: number | undefined): string {
 function renderPromotedCell(value: boolean | undefined, language: "vi" | "en"): string {
   if (value === undefined) return "";
   if (language === "en") return value ? "true" : "false";
-  // Vietnamese with diacritics; legacy Chinese "\u662f"/"\u5426" (是/否) still parsed via escaped checks
   return value ? "có" : "không";
 }
 
@@ -110,7 +98,6 @@ function renderDependsOnCell(ids: ReadonlyArray<string>, language: "vi" | "en"):
 
 function renderCoreHookCell(isCore: boolean, language: "vi" | "en"): string {
   if (language === "en") return isCore ? "true" : "false";
-  // Vietnamese; legacy "\u662f" (是) still accepted in parseBooleanCell via escaped regex
   return isCore ? "có" : "không";
 }
 
@@ -219,28 +206,23 @@ export function parseMarkdownTableRows(markdown: string): string[][] {
 export function isStateTableHeaderRow(row: ReadonlyArray<string>): boolean {
   const first = (row[0] ?? "").trim().toLowerCase();
   const second = (row[1] ?? "").trim().toLowerCase();
-  // Legacy Chinese: \u5b57\u6bb5 = 字段, \u503c = 值  (escaped so we can still read old markdown)
-  // New Vietnamese uses Trường / Giá trị, English uses field/value
   return (
-    (first === "\u5b57\u6bb5" && second === "\u503c") ||
-    (first === "tr\u01b0\u1eddng" && second === "gi\u00e1 tr\u1ecb") ||
+    (first === "trường" && second === "giá trị") ||
     (first === "field" && second === "value")
   );
 }
 
 export function isCurrentChapterLabel(label: string): boolean {
-  // Legacy Chinese \u5f53\u524d\u7ae0\u8282 = 当前章节, plus Vietnamese "Chương hiện tại"
-  return /^(?:\u5f53\u524d\u7ae0\u8282|ch\u01b0\u01a1ng hi\u1ec7n t\u1ea1i|current chapter)$/i.test(label.trim());
+  return /^(?:chương hiện tại|current chapter)$/i.test(label.trim());
 }
 
 export function inferFactSubject(label: string): string {
-  // Keep escaped Chinese for legacy compat; also handle Vietnamese with diacritics
-  if (/^(?:\u5f53\u524d\u4f4d\u7f6e|current location|v\u1ecb tr\u00ed hi\u1ec7n t\u1ea1i)$/i.test(label)) return "protagonist";
-  if (/^(?:\u4e3b\u89d2\u72b6\u6001|protagonist state|tr\u1ea1ng th\u00e1i nh\u00e2n v\u1eadt ch\u00ednh)$/i.test(label)) return "protagonist";
-  if (/^(?:\u5f53\u524d\u76ee\u6807|current goal|m\u1ee5c ti\u00eau hi\u1ec7n t\u1ea1i)$/i.test(label)) return "protagonist";
-  if (/^(?:\u5f53\u524d\u9650\u5236|current constraint|r\u00e0ng bu\u1ed9c hi\u1ec7n t\u1ea1i)$/i.test(label)) return "protagonist";
-  if (/^(?:\u5f53\u524d\u654c\u6211|current alliances|current relationships|quan h\u1ec7 hi\u1ec7n t\u1ea1i|\u0111\u1ed3ng minh.*\u0111\u1ed1i \u0111\u1ecbch)$/i.test(label)) return "protagonist";
-  if (/^(?:\u5f53\u524d\u51b2\u7a81|current conflict|xung \u0111\u1ed9t hi\u1ec7n t\u1ea1i)$/i.test(label)) return "protagonist";
+  if (/^(?:current location|vị trí hiện tại)$/i.test(label)) return "protagonist";
+  if (/^(?:protagonist state|trạng thái nhân vật chính)$/i.test(label)) return "protagonist";
+  if (/^(?:current goal|mục tiêu hiện tại)$/i.test(label)) return "protagonist";
+  if (/^(?:current constraint|ràng buộc hiện tại)$/i.test(label)) return "protagonist";
+  if (/^(?:current alliances|current relationships|quan hệ hiện tại|đồng minh.*đối địch)$/i.test(label)) return "protagonist";
+  if (/^(?:current conflict|xung đột hiện tại)$/i.test(label)) return "protagonist";
   return "current_state";
 }
 
@@ -253,7 +235,7 @@ export function parseInteger(value: string | undefined): number {
 /**
  * Strict integer parse — only accepts cells that are purely numeric
  * (after stripping markdown formatting). Returns 0 for cells containing
- * prose like "第141号文明" to prevent narrative numbers from being
+ * prose like "Nền văn minh số 141" to prevent narrative numbers from being
  * mistaken for chapter/progress values.
  */
 function parseStrictChapterInteger(value: string | undefined): number {
@@ -281,7 +263,7 @@ export function normalizeHookId(value: string | undefined): string {
     .replace(/-{2,}/g, "-")
     .replace(/^-+|-+$/g, "")
     .trim();
-  return /[a-z0-9\u4e00-\u9fff]/iu.test(normalized) ? normalized : "";
+  return /[\p{L}\p{N}]/u.test(normalized) ? normalized : "";
 }
 
 function parsePendingHookRow(row: ReadonlyArray<string | undefined>): StoredHook {
@@ -336,9 +318,8 @@ function parseOptionalBooleanCell(cell: string | undefined): boolean | undefined
   const normalized = (cell ?? "").trim();
   if (!normalized) return undefined;
   const lower = normalized.toLowerCase();
-  // Accept Vietnamese có/không plus legacy Chinese \u662f (是)/\u5426 (否) via escaped, plus English
-  if (/^(true|yes|y|\u662f|\u6838\u5fc3|core|1|✓|✔|promoted|\u5df2\u5347\u7ea7|c\u00f3)$/.test(lower)) return true;
-  if (/^(false|no|n|\u5426|\u672a\u5347\u7ea7|seed|0|✗|✘|kh\u00f4ng)$/.test(lower)) return false;
+  if (/^(true|yes|y|core|1|✓|✔|promoted|có)$/.test(lower)) return true;
+  if (/^(false|no|n|seed|0|✗|✘|không)$/.test(lower)) return false;
   return undefined;
 }
 
@@ -346,13 +327,12 @@ function parseDependsOn(cell: string): ReadonlyArray<string> {
   const trimmed = cell.trim();
   if (!trimmed) return [];
   const lower = trimmed.toLowerCase();
-  // Legacy Chinese \u65e0 = 无 plus Vietnamese không
-  if (lower === "none" || lower === "n/a" || lower === "-" || trimmed === "\u65e0" || lower === "kh\u00f4ng") return [];
+  if (lower === "none" || lower === "n/a" || lower === "-" || lower === "không") return [];
 
   // Accept [H01, H02] or H01, H02 or H01/H02.
   const stripped = trimmed.replace(/^[\[\(]\s*/, "").replace(/\s*[\]\)]$/, "");
   return stripped
-    .split(/[,，、\/]+/)
+    .split(/[,\/]+/)
     .map((item) => normalizeHookId(item))
     .filter((item) => item.length > 0);
 }
@@ -360,8 +340,7 @@ function parseDependsOn(cell: string): ReadonlyArray<string> {
 function parseBooleanCell(cell: string | undefined): boolean {
   const normalized = (cell ?? "").trim().toLowerCase();
   if (!normalized) return false;
-  // Vietnamese c\u00f3, legacy \u662f (是), \u6838\u5fc3 (核心)
-  return /^(true|yes|y|\u662f|\u6838\u5fc3|core|1|✓|✔|c\u00f3)$/.test(normalized);
+  return /^(true|yes|y|core|1|✓|✔|có)$/.test(normalized);
 }
 
 function parseOptionalInt(cell: string | undefined): number | undefined {

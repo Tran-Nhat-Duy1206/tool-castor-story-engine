@@ -1,14 +1,9 @@
-/**
- * LongCat (美团)
- *
- * - 官网：https://longcat.chat/
- * - API 文档：https://longcat.chat/platform/docs
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const LONGCAT: ProviderEndpoint = {
   id: "longcat",
-  label: "美团 LongCat",
+  label: " LongCat",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://api.longcat.chat/openai/v1",

@@ -9,20 +9,15 @@
  * When MemoryDB is available, can do more precise queries.
  */
 
-/**
- * Extract the POV character from the volume outline for a given chapter.
- * Looks for patterns like "POV: 角色名" or "视角: 角色名" or "POV: CharacterName"
- * in the chapter's section of the outline.
- */
+// Core narrative engine processing.
 export function extractPOVFromOutline(volumeOutline: string, chapterNumber: number): string | null {
   // Find the section for this chapter
   const lines = volumeOutline.split("\n");
 
   // Look for chapter reference near the chapter number
   const chapterPatterns = [
-    new RegExp(`第${chapterNumber}章`),
-    new RegExp(`Chapter\\s+${chapterNumber}\\b`),
-    new RegExp(`\\b${chapterNumber}\\b.*章`),
+    new RegExp(`(?:Chương|Chapter)\\s*${chapterNumber}\\b`, "i"),
+    new RegExp(`^#{1,3}\\s*${chapterNumber}\\b`),
   ];
 
   let inChapterSection = false;
@@ -37,7 +32,7 @@ export function extractPOVFromOutline(volumeOutline: string, chapterNumber: numb
 
     if (inChapterSection) {
       // Look for POV declaration
-      const povMatch = line.match(/(?:POV|视角|pov)[：:\s]+([^\s，,。.、]+)/i);
+      const povMatch = line.match(/(?:POV|Góc nhìn|Goc nhin|pov)[：:\s]+([^\s,;]+)/i);
       if (povMatch) return povMatch[1]!;
     }
   }
@@ -50,23 +45,23 @@ export function extractPOVFromOutline(volumeOutline: string, chapterNumber: numb
  * Returns only what the POV character knows — strips other characters' "known info".
  */
 export function filterMatrixByPOV(characterMatrix: string, povCharacter: string): string {
-  if (!characterMatrix || characterMatrix === "(文件尚未创建)") return characterMatrix;
+  if (!characterMatrix || characterMatrix.includes("not created yet") || characterMatrix.includes("chưa tạo")) return characterMatrix;
   if (!povCharacter) return characterMatrix;
 
-  // Find the 信息边界 / Information Boundaries section
+  // Find the Ranh giới thông tin / Information Boundaries section
   const sections = characterMatrix.split(/(?=^###)/m);
   const filtered = sections.map((section) => {
-    const isInfoBoundary = /信息边界|Information\s+Boundar/i.test(section);
+    const isInfoBoundary = /Ranh giới thông tin|Information\s+Boundar|Info\s+Boundary/i.test(section);
     if (!isInfoBoundary) return section;
 
     // In the info boundary table, keep only the POV character's row
     // and add a note about what other characters know
     const lines = section.split("\n");
     const headerLines = lines.filter((l) =>
-      l.startsWith("|") && (l.includes("---") || l.includes("角色") || l.includes("Character") || l.includes("已知") || l.includes("Known")),
+      l.startsWith("|") && (l.includes("---") || l.includes("Nhân vật") || l.includes("Character") || l.includes("Đã biết") || l.includes("Known")),
     );
     const dataLines = lines.filter((l) =>
-      l.startsWith("|") && !l.includes("---") && !l.includes("角色") && !l.includes("Character") && !l.includes("已知") && !l.includes("Known"),
+      l.startsWith("|") && !l.includes("---") && !l.includes("Nhân vật") && !l.includes("Character") && !l.includes("Đã biết") && !l.includes("Known"),
     );
 
     // Keep POV character's row + a summary note
@@ -75,8 +70,8 @@ export function filterMatrixByPOV(characterMatrix: string, povCharacter: string)
 
     const sectionHeader = lines.find((l) => l.startsWith("###"));
     const result = [
-      sectionHeader ?? "### 信息边界",
-      `（当前视角：${povCharacter}，其他 ${otherCharCount} 个角色的信息边界已隐藏）`,
+      sectionHeader ?? "### Information Boundaries",
+      `([POV: ${povCharacter} - ${otherCharCount} other character info boundaries hidden])`,
       ...headerLines,
       ...povRows,
     ];
@@ -99,7 +94,7 @@ export function filterHooksByPOV(
   povCharacter: string,
   chapterSummaries: string,
 ): string {
-  if (!hooks || hooks === "(文件尚未创建)") return hooks;
+  if (!hooks || hooks === "(file not created yet)") return hooks;
   if (!povCharacter) return hooks;
 
   const lines = hooks.split("\n");

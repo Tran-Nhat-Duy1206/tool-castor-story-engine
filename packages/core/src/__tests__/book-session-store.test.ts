@@ -83,19 +83,19 @@ describe("book-session-store", () => {
 
     it("round-trips title through persist/load", async () => {
       let session = createBookSession("book");
-      session = { ...session, title: "测试标题" };
+      session = { ...session, title: "Testmock_text" };
       await persistBookSession(tempDir, session);
 
       const loaded = await loadBookSession(tempDir, session.sessionId);
-      expect(loaded!.title).toBe("测试标题");
+      expect(loaded!.title).toBe("Testmock_text");
     });
 
-    it("读取 legacy JSON 时迁移为 JSONL 并保留 UI thinking", async () => {
+    it("mock_text legacy JSON mock_text JSONL mock_text UI thinking", async () => {
       const session = {
         ...createBookSession("book-a", "legacy-1"),
         messages: [
-          { role: "user" as const, content: "继续", timestamp: 10 },
-          { role: "assistant" as const, content: "好的", thinking: "旧思考", timestamp: 11 },
+          { role: "user" as const, content: "mock_text", timestamp: 10 },
+          { role: "assistant" as const, content: "mock_text", thinking: "mock_text", timestamp: 11 },
         ],
       };
       await persistBookSession(tempDir, session);
@@ -106,8 +106,8 @@ describe("book-session-store", () => {
         sessionId: "legacy-1",
         bookId: "book-a",
         messages: [
-          { role: "user", content: "继续" },
-          { role: "assistant", content: "好的", thinking: "旧思考" },
+          { role: "user", content: "mock_text" },
+          { role: "assistant", content: "mock_text", thinking: "mock_text" },
         ],
       });
       await expect(readFile(join(tempDir, ".castor", "sessions", "legacy-1.jsonl"), "utf-8"))
@@ -143,7 +143,7 @@ describe("book-session-store", () => {
       expect(restored.map((message) => message.role)).toEqual(["user", "assistant"]);
     });
 
-    it("createAndPersistBookSession 为新 session 写 JSONL 而不是 legacy JSON", async () => {
+    it("createAndPersistBookSession mock_text session mock_text JSONL mock_text legacy JSON", async () => {
       const session = await createAndPersistBookSession(tempDir, "book-a", "123456-abcdef");
 
       expect(session.sessionId).toBe("123456-abcdef");
@@ -176,17 +176,17 @@ describe("book-session-store", () => {
       expect(events.map((event) => event.seq)).toEqual([1]);
     });
 
-    it("renameBookSession 追加 metadata event 并从 JSONL 派生新标题", async () => {
+    it("renameBookSession mock_text metadata event mock_text JSONL mock_text", async () => {
       await createAndPersistBookSession(tempDir, "book-a", "123456-abcdef");
 
-      const renamed = await renameBookSession(tempDir, "123456-abcdef", "新标题");
+      const renamed = await renameBookSession(tempDir, "123456-abcdef", "mock_text");
 
-      expect(renamed!.title).toBe("新标题");
+      expect(renamed!.title).toBe("mock_text");
       const loaded = await loadBookSession(tempDir, "123456-abcdef");
-      expect(loaded!.title).toBe("新标题");
+      expect(loaded!.title).toBe("mock_text");
     });
 
-    it("listBookSessions 同时列出 JSONL session 和未迁移 legacy JSON session", async () => {
+    it("listBookSessions mock_text JSONL session mock_text legacy JSON session", async () => {
       await createAndPersistBookSession(tempDir, "book-a", "123456-abcdef");
       const dir = join(tempDir, ".castor", "sessions");
       await mkdir(dir, { recursive: true });
@@ -241,7 +241,7 @@ describe("book-session-store", () => {
 
       await appendManualSessionMessages(tempDir, session.sessionId, [{
         role: "user",
-        content: "继续",
+        content: "mock_text",
         timestamp: Date.now(),
       } as any]);
 
@@ -264,10 +264,10 @@ describe("book-session-store", () => {
       const oldUpdatedAt = session.updatedAt;
 
       await new Promise((resolve) => setTimeout(resolve, 5));
-      await renameBookSession(tempDir, session.sessionId, "新标题");
+      await renameBookSession(tempDir, session.sessionId, "mock_text");
 
       const loaded = await loadBookSession(tempDir, session.sessionId);
-      expect(loaded!.title).toBe("新标题");
+      expect(loaded!.title).toBe("mock_text");
       expect(loaded!.updatedAt).toBeGreaterThan(oldUpdatedAt);
     });
 
@@ -280,8 +280,8 @@ describe("book-session-store", () => {
       await createAndPersistBookSession(tempDir, "book-a", "metadata-race");
 
       await Promise.all([
-        renameBookSession(tempDir, "metadata-race", "标题 A"),
-        renameBookSession(tempDir, "metadata-race", "标题 B"),
+        renameBookSession(tempDir, "metadata-race", "mock_text A"),
+        renameBookSession(tempDir, "metadata-race", "mock_text B"),
       ]);
 
       const events = await readTranscriptEvents(tempDir, "metadata-race");
@@ -321,22 +321,22 @@ describe("book-session-store", () => {
     it("picks the first user message content", () => {
       expect(extractFirstUserMessageTitle([
         { role: "system", content: "sys" },
-        { role: "user", content: "第一条提问" },
-        { role: "assistant", content: "回答" },
-        { role: "user", content: "第二条提问" },
-      ])).toBe("第一条提问");
+        { role: "user", content: "Chương mock_text" },
+        { role: "assistant", content: "mock_text" },
+        { role: "user", content: "Chương mock_text" },
+      ])).toBe("Chương mock_text");
     });
 
     it("collapses whitespace into single spaces", () => {
       expect(extractFirstUserMessageTitle([
-        { role: "user", content: "多行\n\n内容   有空格" },
-      ])).toBe("多行 内容 有空格");
+        { role: "user", content: "mock_text\n\nmock_text   mock_text" },
+      ])).toBe("mock_text mock_text mock_text");
     });
 
     it("truncates content longer than 20 chars with ellipsis", () => {
       expect(extractFirstUserMessageTitle([
-        { role: "user", content: "这是一段超过二十个字符的很长的提问内容会被截断" },
-      ])).toBe("这是一段超过二十个字符的很长的提问内容会…");
+        { role: "user", content: "mock_text từmock_text" },
+      ])).toBe("mock_text từmock_text…");
     });
 
     it("returns null when content is only whitespace", () => {
@@ -352,47 +352,47 @@ describe("book-session-store", () => {
     });
   });
 
-  describe("listBookSessions: 老 session lazy migration", () => {
-    it("把 title 为 null 但已有用户消息的老 session 补写 title 并持久化", async () => {
+  describe("listBookSessions: mock_text session lazy migration", () => {
+    it("mock_text title mock_text null mock_text session mock_text title mock_text", async () => {
       const session = {
         ...createBookSession("book-a"),
         title: null,
         messages: [
-          { role: "user" as const, content: "帮我写下一章", timestamp: 100 },
-          { role: "assistant" as const, content: "好的，正在构思...", timestamp: 200 },
+          { role: "user" as const, content: "mock_text", timestamp: 100 },
+          { role: "assistant" as const, content: "mock_text，mock_text...", timestamp: 200 },
         ],
       };
       await persistBookSession(tempDir, session);
 
-      // 触发 list → 应该迁移
+      // mock_text list → mock_text
       const list = await listBookSessions(tempDir, "book-a");
       expect(list).toHaveLength(1);
-      expect(list[0].title).toBe("帮我写下一章");
+      expect(list[0].title).toBe("mock_text");
 
-      // 验证已经落盘
+      // mock_text
       const reloaded = await loadBookSession(tempDir, session.sessionId);
-      expect(reloaded!.title).toBe("帮我写下一章");
+      expect(reloaded!.title).toBe("mock_text");
     });
 
-    it("不覆盖已有 title 的 session", async () => {
+    it("mock_text title mock_text session", async () => {
       let session = createBookSession("book-a");
       session = {
         ...session,
-        title: "原有标题",
+        title: "mock_text",
         messages: [
-          { role: "user" as const, content: "后来的消息", timestamp: 100 },
+          { role: "user" as const, content: "mock_text", timestamp: 100 },
         ],
       };
       await persistBookSession(tempDir, session);
 
       const list = await listBookSessions(tempDir, "book-a");
-      expect(list[0].title).toBe("原有标题");
+      expect(list[0].title).toBe("mock_text");
 
       const reloaded = await loadBookSession(tempDir, session.sessionId);
-      expect(reloaded!.title).toBe("原有标题");
+      expect(reloaded!.title).toBe("mock_text");
     });
 
-    it("没有用户消息的 session：title 保持 null，不 persist", async () => {
+    it("mock_text session：title mock_text null，mock_text persist", async () => {
       const session = createBookSession("book-a");
       await persistBookSession(tempDir, session);
       const originalUpdatedAt = session.updatedAt;
@@ -405,16 +405,16 @@ describe("book-session-store", () => {
       expect(reloaded!.updatedAt).toBe(originalUpdatedAt);
     });
 
-    it("多条老 session 同时迁移", async () => {
+    it("mock_text session mock_text", async () => {
       const s1 = {
         ...createBookSession("book-b"),
         title: null,
-        messages: [{ role: "user" as const, content: "问题一", timestamp: 1 }],
+        messages: [{ role: "user" as const, content: "mock_text", timestamp: 1 }],
       };
       const s2 = {
         ...createBookSession("book-b"),
         title: null,
-        messages: [{ role: "user" as const, content: "问题二", timestamp: 1 }],
+        messages: [{ role: "user" as const, content: "mock_text", timestamp: 1 }],
       };
       await persistBookSession(tempDir, s1);
       await persistBookSession(tempDir, s2);
@@ -422,7 +422,7 @@ describe("book-session-store", () => {
       const list = await listBookSessions(tempDir, "book-b");
       expect(list).toHaveLength(2);
       const titles = new Set(list.map((s) => s.title));
-      expect(titles).toEqual(new Set(["问题一", "问题二"]));
+      expect(titles).toEqual(new Set(["mock_text", "mock_text"]));
     });
   });
 

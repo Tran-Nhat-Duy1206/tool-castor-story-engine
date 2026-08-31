@@ -116,9 +116,9 @@ describe("evaluateHookAdmission", () => {
   it("does not guess Chinese semantic equivalence with token overlap", () => {
     const decision = evaluateHookAdmission({
       candidate: {
-        type: "神秘",
-        expectedPayoff: "弄明白雨夜匿名来电背后是谁",
-        notes: "一下雨就有陌生号码劝她远离旧码头",
+        type: "mock_text",
+        expectedPayoff: "mock_text",
+        notes: "mock_text",
       },
     });
 

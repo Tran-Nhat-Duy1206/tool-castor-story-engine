@@ -87,7 +87,7 @@ function derivativeCreationToolMock(
     }),
   }));
 }
-const createFanficBookToolMock = derivativeCreationToolMock("fanfic_create", "fanfic", "霜港来信", "霜港来信");
+const createFanficBookToolMock = derivativeCreationToolMock("fanfic_create", "fanfic", "mock_val", "mock_val");
 const createContinuationImportToolMock = vi.fn((
   _pipeline: unknown,
   _activeBookId: string | null,
@@ -95,21 +95,21 @@ const createContinuationImportToolMock = vi.fn((
 ) => ({
   name: "continuation_import",
   execute: vi.fn(async (_id: string, params: Record<string, unknown>) => {
-    await writeCompleteBookFixture(projectRoot, "雾港续章", "雾港续章");
+    await writeCompleteBookFixture(projectRoot, "mock_val", "mock_val");
     return {
-      content: [{ type: "text", text: "Created 雾港续章." }],
+      content: [{ type: "text", text: "Created mock_val." }],
       details: {
         kind: "book_created",
         creationKind: "continuation",
-        bookId: "雾港续章",
-        title: "雾港续章",
+        bookId: "mock_val",
+        title: "mock_val",
         params,
       },
     };
   }),
 }));
-const createSpinoffBookToolMock = derivativeCreationToolMock("spinoff_create", "spinoff", "雨夜旧账", "雨夜旧账");
-const createImitationBookToolMock = derivativeCreationToolMock("imitation_create", "imitation", "纸灯新案", "纸灯新案");
+const createSpinoffBookToolMock = derivativeCreationToolMock("spinoff_create", "spinoff", "mock_val", "mock_val");
+const createImitationBookToolMock = derivativeCreationToolMock("imitation_create", "imitation", "mock_val", "mock_val");
 type ServicePresetMock = {
   providerFamily: "openai" | "anthropic";
   baseUrl: string;
@@ -183,7 +183,7 @@ const endpointMocks = [
       { id: `${id}-disabled`, maxOutput: 4096, contextWindowTokens: 32768, enabled: false },
     ],
   }))),
-  { id: "custom", label: "自定义端点", models: [] },
+  { id: "custom", label: "mock_val", models: [] },
 ];
 const getAllEndpointsMock = vi.fn(() => endpointMocks);
 const probeModelsFromUpstreamMock = vi.fn(async () => [
@@ -364,8 +364,8 @@ vi.mock("@actalk/castor-core", async (importOriginal) => {
       ...options,
       runnerFactory: ({ db }) => ({
         seedOpening: async () => {
-          db.upsertEntity({ id: "actor_player", type: "actor", label: "玩家", summary: "当前玩家。" });
-          db.upsertEntity({ id: "location_opening", type: "location", label: "开场地点", summary: "第一幕所在地点。" });
+          db.upsertEntity({ id: "actor_player", type: "actor", label: "mock_val", summary: "mock_val。" });
+          db.upsertEntity({ id: "location_opening", type: "location", label: "Mo daumock_val", summary: "mock_val。" });
           return null;
         },
       }),
@@ -693,10 +693,10 @@ describe("createStudioServer daemon lifecycle", () => {
     playRunnerStepMock.mockReset();
     playRunnerCtorArgs.length = 0;
     playRunnerStepMock.mockResolvedValue({
-      sceneText: "车机弹出新城花园 187 次。",
-      suggestedActions: ["继续查看医院记录", "问徐晋安今晚去哪"],
-      action: { actionKind: "look", intent: "查看导航" },
-      mutation: { eventId: "evt-1", turn: 1, actionKind: "look", summary: "发现常用地址统计。" },
+      sceneText: "mock_val 187 mock_val。",
+      suggestedActions: ["mock_val", "mock_valXu Jinanmock_val"],
+      action: { actionKind: "look", intent: "mock_val" },
+      mutation: { eventId: "evt-1", turn: 1, actionKind: "look", summary: "mock_val。" },
     });
     createAndPersistBookSessionMock.mockReset();
     loadBookSessionMock.mockReset();
@@ -1055,7 +1055,7 @@ describe("createStudioServer daemon lifecycle", () => {
   it("persists Studio radar scans and exposes scan history", async () => {
     runRadarMock.mockResolvedValueOnce({
       timestamp: "2026-05-14T12:00:00.000Z",
-      marketSummary: "女频短篇复仇继续强势",
+      marketSummary: "mock_val",
       recommendations: [],
     });
 
@@ -1072,9 +1072,9 @@ describe("createStudioServer daemon lifecycle", () => {
         {
           file: "scan-2026-05-14T12-00-00-000Z.json",
           timestamp: "2026-05-14T12:00:00.000Z",
-          summaryPreview: "女频短篇复仇继续强势",
+          summaryPreview: "mock_val",
           result: {
-            marketSummary: "女频短篇复仇继续强势",
+            marketSummary: "mock_val",
           },
         },
       ],
@@ -1109,12 +1109,12 @@ describe("createStudioServer daemon lifecycle", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: "revenge-short",
-        name: "短篇：复仇",
+        name: "mock_val：mock_val",
         language: "zh",
-        chapterTypes: ["开局", "反杀"],
-        fatigueWords: ["震惊"],
-        pacingRule: "3:1 压迫/回报",
-        body: "规则正文",
+        chapterTypes: ["mock_val", "mock_val"],
+        fatigueWords: ["mock_val"],
+        pacingRule: "3:1 mock_val/mock_val",
+        body: "mock_val",
       }),
     });
     expect(create.status).toBe(200);
@@ -1125,7 +1125,7 @@ describe("createStudioServer daemon lifecycle", () => {
       genres: expect.arrayContaining([
         expect.objectContaining({
           id: "revenge-short",
-          name: "短篇：复仇",
+          name: "mock_val：mock_val",
           source: "project",
           language: "zh",
         }),
@@ -1138,7 +1138,7 @@ describe("createStudioServer daemon lifecycle", () => {
       ...projectConfig,
       llm: {
         services: [
-          { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1" },
+          { service: "custom", name: "mock_valGPT", baseUrl: "https://llm.internal.corp/v1" },
           { service: "lmstudio", temperature: 0.7, apiFormat: "chat", stream: true },
         ],
       },
@@ -1146,7 +1146,7 @@ describe("createStudioServer daemon lifecycle", () => {
     loadSecretsMock.mockResolvedValue({
       services: {
         moonshot: { apiKey: "sk-moonshot" },
-        "custom:内网GPT": { apiKey: "sk-corp" },
+        "custom:mock_valGPT": { apiKey: "sk-corp" },
       },
     });
 
@@ -1170,7 +1170,7 @@ describe("createStudioServer daemon lifecycle", () => {
       connected: true,
       apiKeyOptional: true,
     });
-    expect(body.services.find((s) => s.service === "custom:内网GPT")).toMatchObject({
+    expect(body.services.find((s) => s.service === "custom:mock_valGPT")).toMatchObject({
       connected: true,
     });
   });
@@ -1246,13 +1246,13 @@ describe("createStudioServer daemon lifecycle", () => {
       ...projectConfig,
       llm: {
         services: [
-          { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1" },
+          { service: "custom", name: "mock_valGPT", baseUrl: "https://llm.internal.corp/v1" },
         ],
       },
     }, null, 2), "utf-8");
     loadSecretsMock.mockResolvedValue({
       services: {
-        "custom:内网GPT": { apiKey: "sk-corp" },
+        "custom:mock_valGPT": { apiKey: "sk-corp" },
       },
     });
 
@@ -1264,8 +1264,8 @@ describe("createStudioServer daemon lifecycle", () => {
     await expect(response.json()).resolves.toEqual({
       groups: [
         {
-          service: "custom:内网GPT",
-          label: "内网GPT",
+          service: "custom:mock_valGPT",
+          label: "mock_valGPT",
           models: [{ id: "custom-model", name: "custom-model", contextWindow: 0 }],
         },
       ],
@@ -1398,7 +1398,7 @@ describe("createStudioServer daemon lifecycle", () => {
       llm: {
         services: [
           { service: "moonshot", temperature: 1, apiFormat: "chat", stream: true, models: ["kimi-k3-preview"] },
-          { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
+          { service: "custom", name: "mock_valGPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
         ],
         defaultModel: "kimi-k2.5",
       },
@@ -1426,7 +1426,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const raw = JSON.parse(await readFile(join(root, "castor.json"), "utf-8"));
     expect(raw.llm.services).toEqual([
       { service: "moonshot", temperature: 0.5, apiFormat: "responses", stream: false, models: ["kimi-k3-preview"] },
-      { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
+      { service: "custom", name: "mock_valGPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
     ]);
   });
 
@@ -1477,17 +1477,17 @@ describe("createStudioServer daemon lifecycle", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       ...projectConfig,
       llm: {
-        service: "custom:内网GPT",
+        service: "custom:mock_valGPT",
         defaultModel: "corp-chat",
         services: [
-          { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "chat", stream: false },
+          { service: "custom", name: "mock_valGPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "chat", stream: false },
           { service: "moonshot", temperature: 1, apiFormat: "chat", stream: true },
         ],
       },
     }, null, 2), "utf-8");
     loadSecretsMock.mockResolvedValue({
       services: {
-        "custom:内网GPT": { apiKey: "sk-corp" },
+        "custom:mock_valGPT": { apiKey: "sk-corp" },
         moonshot: { apiKey: "sk-moon" },
       },
     });
@@ -1679,14 +1679,14 @@ describe("createStudioServer daemon lifecycle", () => {
       ...projectConfig,
       llm: {
         services: [
-          { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1" },
+          { service: "custom", name: "mock_valGPT", baseUrl: "https://llm.internal.corp/v1" },
         ],
         defaultModel: "corp-chat",
       },
     }, null, 2), "utf-8");
     loadSecretsMock.mockResolvedValue({
       services: {
-        "custom:内网GPT": { apiKey: "sk-corp" },
+        "custom:mock_valGPT": { apiKey: "sk-corp" },
       },
     });
 
@@ -2234,7 +2234,7 @@ describe("createStudioServer daemon lifecycle", () => {
     vi.stubGlobal("fetch", fetchMock as typeof fetch);
     createLLMClientMock.mockImplementation(((cfg: unknown) => cfg) as any);
     chatCompletionMock.mockRejectedValue(
-      new Error("API 返回 400（请求参数错误）。常见原因：\n  1. temperature / max_tokens 超出模型约束（如 Moonshot kimi-k2.X 强制 temperature=1）\n  (baseUrl: https://generativelanguage.googleapis.com/v1beta/openai, model: gemini-2.5-flash)"),
+      new Error("API mock_val 400（mock_val）。mock_val：\n  1. temperature / max_tokens mock_val（mock_val Moonshot kimi-k2.X mock_val temperature=1）\n  (baseUrl: https://generativelanguage.googleapis.com/v1beta/openai, model: gemini-2.5-flash)"),
     );
 
     const { createStudioServer } = await import("./server.js");
@@ -2417,7 +2417,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        apiKey: "kkaiapi 测试连接失败。上游返回：Cannot convert argument to a ByteString",
+        apiKey: "kkaiapi Testmock_val。mock_val：Cannot convert argument to a ByteString",
       }),
     });
 
@@ -2525,7 +2525,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const app = createStudioServer(cloneProjectConfig() as never, root);
     const artifactDir = join(root, "interactive-films", "demo");
     await mkdir(artifactDir, { recursive: true });
-    await writeFile(join(artifactDir, "script.md"), "# 初稿\n\n第一幕", "utf-8");
+    await writeFile(join(artifactDir, "script.md"), "# mock_val\n\nmock_val", "utf-8");
     await writeFile(join(artifactDir, "cover.png"), Buffer.from("not-text"));
 
     const ok = await app.request("http://localhost/api/v1/project/artifacts/interactive-films/demo/script.md");
@@ -2533,17 +2533,17 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(ok.headers.get("content-type")).toContain("application/json");
     expect(await ok.json()).toMatchObject({
       path: "interactive-films/demo/script.md",
-      content: "# 初稿\n\n第一幕",
+      content: "# mock_val\n\nmock_val",
       contentType: "text/markdown; charset=utf-8",
     });
 
     const save = await app.request("http://localhost/api/v1/project/artifacts/interactive-films/demo/script.md", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: "# 修订\n\n第二幕" }),
+      body: JSON.stringify({ content: "# mock_val\n\nmock_val" }),
     });
     expect(save.status).toBe(200);
-    expect(await readFile(join(artifactDir, "script.md"), "utf-8")).toBe("# 修订\n\n第二幕");
+    expect(await readFile(join(artifactDir, "script.md"), "utf-8")).toBe("# mock_val\n\nmock_val");
 
     const unsupported = await app.request("http://localhost/api/v1/project/artifacts/interactive-films/demo/cover.png");
     expect(unsupported.status).toBe(415);
@@ -2616,13 +2616,13 @@ describe("createStudioServer daemon lifecycle", () => {
     // bare 404 that a polling client reads as "creation failed".
     const bookDir = join(root, "books", "disk-ready");
     await mkdir(join(bookDir, "story", "outline"), { recursive: true });
-    await mkdir(join(bookDir, "story", "roles", "主要角色"), { recursive: true });
+    await mkdir(join(bookDir, "story", "roles", "major"), { recursive: true });
     await writeFile(join(bookDir, "book.json"), "{}");
     await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "frame");
     await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "map");
     await writeFile(join(bookDir, "story", "book_rules.md"), "rules");
     await writeFile(join(bookDir, "story", "pending_hooks.md"), "hooks");
-    await writeFile(join(bookDir, "story", "roles", "主要角色", "lead.md"), "lead");
+    await writeFile(join(bookDir, "story", "roles", "major", "lead.md"), "lead");
 
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -2730,7 +2730,7 @@ describe("createStudioServer daemon lifecycle", () => {
         language: "zh",
         chapterWordCount: 2600,
         targetChapters: 88,
-        blurb: "主角在旧城查账洗白，卷一先追账本。",
+        blurb: "mock_valKiem tra so sachmock_val，mock_val。",
       }),
     });
 
@@ -2746,7 +2746,7 @@ describe("createStudioServer daemon lifecycle", () => {
         platform: "qidian",
         chapterWordCount: 2600,
         targetChapters: 88,
-        blurb: "主角在旧城查账洗白，卷一先追账本。",
+        blurb: "mock_valKiem tra so sachmock_val，mock_val。",
       },
     }));
   });
@@ -2801,11 +2801,11 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/books/demo-book/revise/3", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "rewrite", brief: "把注意力拉回师债主线。" }),
+      body: JSON.stringify({ mode: "rewrite", brief: "mock_val。" }),
     });
 
     expect(response.status).toBe(200);
-    expect(pipelineConfigs.at(-1)).toMatchObject({ externalContext: "把注意力拉回师债主线。" });
+    expect(pipelineConfigs.at(-1)).toMatchObject({ externalContext: "mock_val。" });
     expect(reviseDraftMock).toHaveBeenCalledWith("demo-book", 3, "rewrite");
   });
 
@@ -2816,9 +2816,9 @@ describe("createStudioServer daemon lifecycle", () => {
     const versionId = "1782864000000_manual_11111111-1111-4111-8111-111111111111";
     await mkdir(runtimeDir, { recursive: true });
     await mkdir(versionsDir, { recursive: true });
-    await writeFile(join(runtimeDir, "chapter-0003.user-brief.md"), "保留证人的原话。\n", "utf-8");
+    await writeFile(join(runtimeDir, "chapter-0003.user-brief.md"), "mock_val。\n", "utf-8");
     await writeFile(join(runtimeDir, "chapter-0003.plan.md"), "# Chapter 3 Plan\n\nFind the ledger.", "utf-8");
-    await writeFile(join(versionsDir, `${versionId}.md`), "# 第3章 旧稿\n\n旧正文。", "utf-8");
+    await writeFile(join(versionsDir, `${versionId}.md`), "# Chương 3 mock_val\n\nmock_val。", "utf-8");
     loadChapterIndexMock.mockResolvedValue([{
       number: 3,
       title: "Demo",
@@ -2837,7 +2837,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
       chapterNumber: 3,
-      brief: "保留证人的原话。",
+      brief: "mock_val。",
       plan: expect.stringContaining("Find the ledger"),
       canDelete: true,
       versions: [expect.objectContaining({
@@ -2850,7 +2850,7 @@ describe("createStudioServer daemon lifecycle", () => {
       `http://localhost/api/v1/books/demo-book/chapters/3/versions/${versionId}`,
     );
     await expect(versionResponse.json()).resolves.toMatchObject({
-      content: expect.stringContaining("旧正文"),
+      content: expect.stringContaining("mock_val"),
     });
   });
 
@@ -2873,28 +2873,28 @@ describe("createStudioServer daemon lifecycle", () => {
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brief: "让证人先撒谎，再被账页击穿。" }),
+        body: JSON.stringify({ brief: "mock_val，mock_val。" }),
       },
     );
     expect(briefResponse.status).toBe(200);
     await expect(readFile(
       join(root, "books", "demo-book", "story", "runtime", "chapter-0003.user-brief.md"),
       "utf-8",
-    )).resolves.toContain("让证人先撒谎");
+    )).resolves.toContain("mock_val");
 
     const saveResponse = await app.request(
       "http://localhost/api/v1/books/demo-book/chapters/3",
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: "# 第3章 新稿\n\n人工修改后的正文。" }),
+        body: JSON.stringify({ content: "# Chương 3 mock_val\n\nmock_val。" }),
       },
     );
     expect(saveResponse.status).toBe(200);
     await expect(readFile(
       join(root, "books", "demo-book", "chapters", "0003_Demo.md"),
       "utf-8",
-    )).resolves.toContain("人工修改后的正文");
+    )).resolves.toContain("mock_val");
     const versionFiles = await (await import("node:fs/promises")).readdir(
       join(root, "books", "demo-book", "chapters", ".versions", "0003"),
     );
@@ -2908,7 +2908,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
   it("generates a non-mutating chapter inspiration card from the current manuscript", async () => {
     runWorkerAgentMock.mockResolvedValueOnce({
-      content: "## 灵感卡\n\n让证人先交出一页伪账，再由水印暴露替换时间。",
+      content: "## mock_val\n\nmock_val，mock_val。",
       usage: { inputTokens: 100, outputTokens: 30 },
     });
     const chapterPath = join(root, "books", "demo-book", "chapters", "0003_Demo.md");
@@ -2921,14 +2921,14 @@ describe("createStudioServer daemon lifecycle", () => {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brief: "不要增加新角色。" }),
+        body: JSON.stringify({ brief: "mock_val。" }),
       },
     );
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
       chapterNumber: 3,
-      card: expect.stringContaining("水印"),
+      card: expect.stringContaining("mock_val"),
     });
     expect(runWorkerAgentMock).toHaveBeenCalledWith(
       expect.anything(),
@@ -2936,7 +2936,7 @@ describe("createStudioServer daemon lifecycle", () => {
       expect.arrayContaining([
         expect.objectContaining({
           role: "user",
-          content: expect.stringContaining("不要增加新角色"),
+          content: expect.stringContaining("mock_val"),
         }),
       ]),
       expect.objectContaining({ temperature: 0.9, signal: expect.any(AbortSignal) }),
@@ -2951,7 +2951,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/books/demo-book/rewrite/3", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ brief: "保留事实，重做冲突顺序。" }),
+      body: JSON.stringify({ brief: "mock_val，mock_val。" }),
     });
 
     expect(response.status).toBe(200);
@@ -2959,13 +2959,13 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(rollbackToChapterMock).not.toHaveBeenCalled();
     expect(writeNextChapterMock).not.toHaveBeenCalled();
     expect(pipelineConfigs.at(-1)).toMatchObject({
-      externalContext: "保留事实，重做冲突顺序。",
+      externalContext: "mock_val，mock_val。",
       revisionGate: "always",
     });
     await expect(readFile(
       join(root, "books", "demo-book", "story", "runtime", "chapter-0003.user-brief.md"),
       "utf-8",
-    )).resolves.toContain("保留事实");
+    )).resolves.toContain("mock_val");
   });
 
   it("restores an archived chapter version and exposes safe latest-chapter deletion", async () => {
@@ -2973,7 +2973,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const versionsDir = join(bookDir, "chapters", ".versions", "0003");
     const versionId = "1782864000000_revision_11111111-1111-4111-8111-111111111111";
     await mkdir(versionsDir, { recursive: true });
-    await writeFile(join(versionsDir, `${versionId}.md`), "# 第3章 旧稿\n\n恢复后的正文。", "utf-8");
+    await writeFile(join(versionsDir, `${versionId}.md`), "# Chương 3 mock_val\n\nmock_val。", "utf-8");
     loadChapterIndexMock.mockResolvedValue([{
       number: 3,
       title: "Demo",
@@ -2994,7 +2994,7 @@ describe("createStudioServer daemon lifecycle", () => {
     );
     expect(restoreResponse.status).toBe(200);
     await expect(readFile(join(bookDir, "chapters", "0003_Demo.md"), "utf-8"))
-      .resolves.toContain("恢复后的正文");
+      .resolves.toContain("mock_val");
 
     const deleteResponse = await app.request(
       "http://localhost/api/v1/books/demo-book/chapters/3",
@@ -3015,11 +3015,11 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/books/demo-book/resync/3", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ brief: "以师债线为准同步状态。" }),
+      body: JSON.stringify({ brief: "mock_val。" }),
     });
 
     expect(response.status).toBe(200);
-    expect(pipelineConfigs.at(-1)).toMatchObject({ externalContext: "以师债线为准同步状态。" });
+    expect(pipelineConfigs.at(-1)).toMatchObject({ externalContext: "mock_val。" });
     expect(resyncChapterArtifactsMock).toHaveBeenCalledWith("demo-book", 3);
   });
 
@@ -3082,7 +3082,7 @@ describe("createStudioServer daemon lifecycle", () => {
     renameBookSessionMock.mockResolvedValueOnce({
       sessionId: "agent-session-1",
       bookId: "demo-book",
-      title: "新标题",
+      title: "mock_val",
       messages: [],
       events: [],
       draftRounds: [],
@@ -3096,13 +3096,13 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/sessions/agent-session-1", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "  新标题  " }),
+      body: JSON.stringify({ title: "  mock_val  " }),
     });
 
     expect(response.status).toBe(200);
-    expect(renameBookSessionMock).toHaveBeenCalledWith(root, "agent-session-1", "新标题");
+    expect(renameBookSessionMock).toHaveBeenCalledWith(root, "agent-session-1", "mock_val");
     await expect(response.json()).resolves.toMatchObject({
-      session: { sessionId: "agent-session-1", title: "新标题" },
+      session: { sessionId: "agent-session-1", title: "mock_val" },
     });
   });
 
@@ -3169,7 +3169,7 @@ describe("createStudioServer daemon lifecycle", () => {
       return {
         responseText: "Completed write_next for demo-book.",
         messages: [
-          { role: "user", content: "检查当前状态" },
+          { role: "user", content: "mock_val" },
           { role: "assistant", content: "Completed write_next for demo-book." },
         ],
       };
@@ -3181,7 +3181,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instruction: "检查当前状态", activeBookId: "demo-book", sessionId: "agent-session-1" }),
+      body: JSON.stringify({ instruction: "mock_val", activeBookId: "demo-book", sessionId: "agent-session-1" }),
     });
 
     expect(response.status).toBe(200);
@@ -3196,12 +3196,12 @@ describe("createStudioServer daemon lifecycle", () => {
         bookId: "demo-book",
         projectRoot: root,
       }),
-      "检查当前状态",
+      "mock_val",
     );
   });
 
   it("stores uploaded attachments and forwards them to the agent session", async () => {
-    const note = Buffer.from("# 参考资料\n主角必须保留第一人称。", "utf-8").toString("base64");
+    const note = Buffer.from("# mock_val\nmock_val。", "utf-8").toString("base64");
     const image = Buffer.from("fakepng", "utf-8").toString("base64");
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -3210,7 +3210,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "按附件继续讨论",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         attachments: [
@@ -3239,7 +3239,7 @@ describe("createStudioServer daemon lifecycle", () => {
       id: "note-1",
       filename: "brief.md",
       mimeType: "text/markdown",
-      text: "# 参考资料\n主角必须保留第一人称。",
+      text: "# mock_val\nmock_val。",
     });
     expect(agentConfig.attachments?.[1]).toMatchObject({
       id: "img-1",
@@ -3271,14 +3271,14 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《夜间派送》，番茄，100章以内。",
+        instruction: "mock_val《mock_val》，mock_val，100mock_val。",
         sessionId: "agent-session-1",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
         actionPayload: {
           createBook: {
-            title: "夜间派送",
+            title: "mock_val",
             genre: "urban",
             platform: "tomato",
             targetChapters: 100,
@@ -3293,18 +3293,18 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(runAgentSessionMock).not.toHaveBeenCalled();
     expect(initBookMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: "夜间派送",
-        title: "夜间派送",
+        id: "mock_val",
+        title: "mock_val",
         genre: "urban",
         platform: "tomato",
         targetChapters: 100,
         chapterWordCount: 2600,
         language: "zh",
       }),
-      { externalContext: "创建《夜间派送》，番茄，100章以内。" },
+      { externalContext: "mock_val《mock_val》，mock_val，100mock_val。" },
     );
     await expect(response.json()).resolves.toMatchObject({
-      session: { activeBookId: "夜间派送" },
+      session: { activeBookId: "mock_val" },
     });
   });
 
@@ -3326,31 +3326,31 @@ describe("createStudioServer daemon lifecycle", () => {
     const cases = [
       {
         intent: "fanfic_init",
-        payload: { fanficCreate: { title: "霜港来信", sourceText: "正典片段", sourceName: "霜港" } },
+        payload: { fanficCreate: { title: "mock_val", sourceText: "mock_val", sourceName: "mock_val" } },
         factory: createFanficBookToolMock,
         tool: "fanfic_create",
-        bookId: "霜港来信",
+        bookId: "mock_val",
       },
       {
         intent: "continuation_import",
-        payload: { continuationImport: { title: "雾港续章", sourcePath: ".castor/uploads/novel.txt" } },
+        payload: { continuationImport: { title: "mock_val", sourcePath: ".castor/uploads/novel.txt" } },
         factory: createContinuationImportToolMock,
         tool: "continuation_import",
-        bookId: "雾港续章",
+        bookId: "mock_val",
       },
       {
         intent: "spinoff_create",
-        payload: { spinoffCreate: { title: "雨夜旧账", parentBookId: "harbor", direction: "老船工视角" } },
+        payload: { spinoffCreate: { title: "mock_val", parentBookId: "harbor", direction: "mock_val" } },
         factory: createSpinoffBookToolMock,
         tool: "spinoff_create",
-        bookId: "雨夜旧账",
+        bookId: "mock_val",
       },
       {
         intent: "style_imitation",
-        payload: { imitationCreate: { title: "纸灯新案", referenceText: "参考片段", storyIdea: "原创县城悬疑" } },
+        payload: { imitationCreate: { title: "mock_val", referenceText: "mock_val", storyIdea: "mock_val" } },
         factory: createImitationBookToolMock,
         tool: "imitation_create",
-        bookId: "纸灯新案",
+        bookId: "mock_val",
       },
     ] as const;
 
@@ -3360,7 +3360,7 @@ describe("createStudioServer daemon lifecycle", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          instruction: `确认执行 ${item.intent}`,
+          instruction: `mock_val ${item.intent}`,
           sessionId: `derivative-session-${index}`,
           sessionKind: "chat",
           actionSource: "button",
@@ -3405,9 +3405,9 @@ describe("createStudioServer daemon lifecycle", () => {
         details: {
           kind: "book_created",
           creationKind: "fanfic",
-          bookId: "不存在的同人",
-          title: "不存在的同人",
-          params: { sourceText: "正典片段" },
+          bookId: "mock_val",
+          title: "mock_val",
+          params: { sourceText: "mock_val" },
         },
       })),
     }));
@@ -3418,13 +3418,13 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "确认创建不存在的同人",
+        instruction: "mock_val",
         sessionId: "missing-derivative-session",
         sessionKind: "chat",
         actionSource: "button",
         requestedIntent: "fanfic_init",
         actionPayload: {
-          fanficCreate: { title: "不存在的同人", sourceText: "正典片段" },
+          fanficCreate: { title: "mock_val", sourceText: "mock_val" },
         },
       }),
     });
@@ -3518,13 +3518,13 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "写一篇证据驱动的短篇。",
+        instruction: "mock_val。",
         sessionId: shortSession.sessionId,
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
         requestedSkills: ["evidence-tone"],
-        actionPayload: { shortRun: { direction: "旧账本悬疑", cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", cover: false } },
       }),
     });
 
@@ -3564,12 +3564,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《雨夜旧账》。",
+        instruction: "mock_val《mock_val》。",
         sessionId: "long-task-session",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
-        actionPayload: { createBook: { title: "雨夜旧账", language: "zh" } },
+        actionPayload: { createBook: { title: "mock_val", language: "zh" } },
       }),
     });
 
@@ -3582,7 +3582,7 @@ describe("createStudioServer daemon lifecycle", () => {
       });
     });
 
-    await writeCompleteBookFixture(root, "雨夜旧账", "雨夜旧账");
+    await writeCompleteBookFixture(root, "mock_val", "mock_val");
     resolveInitBook();
     const response = await pendingResponse;
     expect(response.status).toBe(200);
@@ -3616,12 +3616,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《失败样本》。",
+        instruction: "mock_val《mock_val》。",
         sessionId: "failed-task-session",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
-        actionPayload: { createBook: { title: "失败样本", language: "zh" } },
+        actionPayload: { createBook: { title: "mock_val", language: "zh" } },
       }),
     });
 
@@ -3660,12 +3660,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《雨夜账本》。",
+        instruction: "mock_val《mock_val》。",
         sessionId: "refresh-task-session",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
-        actionPayload: { createBook: { title: "雨夜账本", language: "zh" } },
+        actionPayload: { createBook: { title: "mock_val", language: "zh" } },
       }),
     });
     await vi.waitFor(async () => {
@@ -3688,14 +3688,14 @@ describe("createStudioServer daemon lifecycle", () => {
       },
     });
 
-    await writeCompleteBookFixture(root, "雨夜账本", "雨夜账本");
+    await writeCompleteBookFixture(root, "mock_val", "mock_val");
     resolveInitBook();
     await pendingResponse;
   });
 
   it("rewrites a stale running task snapshot to error when the server has no live task for it", async () => {
-    // 直接写入 running 快照后新建 server 实例，等价于任务运行期间 server 进程重启：
-    // 快照必须被改写为终态，否则前端每次刷新都会恢复出一个永远运行中的任务卡。
+    // mock_val running mock_val server mock_val，mock_val server mock_val：
+    // mock_val，mock_val。
     await saveStudioTaskSnapshot(root, {
       version: 1,
       sessionId: "stale-task-session",
@@ -3704,10 +3704,10 @@ describe("createStudioServer daemon lifecycle", () => {
       execution: {
         id: "stale-task-1",
         tool: "short_fiction_run",
-        label: "生成短篇",
+        label: "mock_val",
         status: "running",
         startedAt: 10,
-        logs: ["正在生成大纲"],
+        logs: ["mock_val"],
       },
     });
     const { createStudioServer } = await import("./server.js");
@@ -3732,9 +3732,9 @@ describe("createStudioServer daemon lifecycle", () => {
     });
   });
 
-  // 下面三个用例把 appendManualSessionMessages / loadBookSession 接回真实实现，
-  // 走真实 transcript 文件验证：确认式生产任务的用户指令必须在任务开始时就
-  // 写进 transcript（而不是任务完成后才补写），完成/失败时只追加助手工具消息。
+  // mock_val appendManualSessionMessages / loadBookSession mock_val，
+  // mock_val transcript mock_val：mock_val
+  // mock_val transcript（mock_val），mock_val/mock_val。
   async function wireRealSessionTranscript() {
     const actual = await vi.importActual<typeof import("@actalk/castor-core")>("@actalk/castor-core");
     appendManualSessionMessagesMock.mockImplementation(actual.appendManualSessionMessages);
@@ -3750,7 +3750,7 @@ describe("createStudioServer daemon lifecycle", () => {
       name: "short_fiction_run",
       execute: vi.fn(() => new Promise((resolve) => {
         handle.resolveShort = () => resolve({
-          content: [{ type: "text", text: "短篇《雨夜档案》已完成。" }],
+          content: [{ type: "text", text: "mock_val《mock_val》mock_val。" }],
           details: {
             kind: "short_fiction_created",
             storyId: "rainy-archive",
@@ -3769,7 +3769,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
-    const instruction = "写一篇雨夜档案馆悬疑短篇。";
+    const instruction = "mock_val。";
     const pendingTask = app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -3779,7 +3779,7 @@ describe("createStudioServer daemon lifecycle", () => {
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
-        actionPayload: { shortRun: { direction: "雨夜档案馆悬疑", chapters: 12, cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", chapters: 12, cover: false } },
       }),
     });
     await vi.waitFor(async () => {
@@ -3787,7 +3787,7 @@ describe("createStudioServer daemon lifecycle", () => {
       expect(task?.execution.status).toBe("running");
     });
 
-    // 任务运行中刷新：transcript 里已有这轮用户指令，用户气泡不会消失。
+    // mock_val：transcript mock_val，mock_val。
     const midRun = await app.request("http://localhost/api/v1/sessions/instr-short-session");
     expect(midRun.status).toBe(200);
     const midBody = await midRun.json() as {
@@ -3803,7 +3803,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await pendingTask;
     expect(response.status).toBe(200);
 
-    // 任务完成后：指令只出现一次，助手工具消息排在其后。
+    // mock_val：mock_val，mock_val。
     const final = await app.request("http://localhost/api/v1/sessions/instr-short-session");
     const finalBody = await final.json() as {
       session: { messages: Array<{ role: string; content: string; toolExecutions?: Array<{ tool: string; status: string }> }> };
@@ -3825,7 +3825,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
-    const instruction = "写一篇雨夜档案馆悬疑短篇。";
+    const instruction = "mock_val。";
     const pendingTask = app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -3835,7 +3835,7 @@ describe("createStudioServer daemon lifecycle", () => {
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
-        actionPayload: { shortRun: { direction: "雨夜档案馆悬疑", chapters: 12, cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", chapters: 12, cover: false } },
       }),
     });
     await vi.waitFor(async () => {
@@ -3843,12 +3843,12 @@ describe("createStudioServer daemon lifecycle", () => {
       expect(task?.execution.status).toBe("running");
     });
 
-    // 任务运行期间插入一轮并行聊天（真实 agent 路径会把聊天消息写进同一份 transcript）。
+    // mock_val（mock_val agent mock_val transcript）。
     await actual.appendManualSessionMessages(root, "order-short-session", [
-      { role: "user", content: "任务进度如何？", timestamp: Date.now() },
+      { role: "user", content: "mock_val？", timestamp: Date.now() },
       {
         role: "assistant",
-        content: [{ type: "text", text: "短篇任务还在运行。" }],
+        content: [{ type: "text", text: "mock_val。" }],
         api: "anthropic-messages",
         provider: "openai",
         model: "gpt-5.4",
@@ -3863,7 +3863,7 @@ describe("createStudioServer daemon lifecycle", () => {
         stopReason: "stop",
         timestamp: Date.now(),
       },
-    ] as never, "任务进度如何？", { sessionKind: "short" });
+    ] as never, "mock_val？", { sessionKind: "short" });
 
     handle.resolveShort();
     const response = await pendingTask;
@@ -3873,12 +3873,12 @@ describe("createStudioServer daemon lifecycle", () => {
     const finalBody = await final.json() as {
       session: { messages: Array<{ role: string; content: string }> };
     };
-    // 重新加载后按真实时间排序：生产指令在并行聊天之前，任务结果在最后。
+    // mock_val：mock_val，mock_val。
     expect(finalBody.session.messages.map((message) => [message.role, message.content])).toEqual([
       ["user", instruction],
-      ["user", "任务进度如何？"],
-      ["assistant", "短篇任务还在运行。"],
-      ["assistant", expect.stringContaining("短篇《雨夜档案》已完成。")],
+      ["user", "mock_val？"],
+      ["assistant", "mock_val。"],
+      ["assistant", expect.stringContaining("mock_val《mock_val》mock_val。")],
     ]);
   });
 
@@ -3894,7 +3894,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
-    const instruction = "写一篇会失败的短篇。";
+    const instruction = "mock_val。";
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -3904,7 +3904,7 @@ describe("createStudioServer daemon lifecycle", () => {
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
-        actionPayload: { shortRun: { direction: "会失败的短篇", chapters: 12, cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", chapters: 12, cover: false } },
       }),
     });
 
@@ -3943,12 +3943,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《第一本书》。",
+        instruction: "mock_val《mock_val》。",
         sessionId: "busy-task-session",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
-        actionPayload: { createBook: { title: "第一本书", language: "zh" } },
+        actionPayload: { createBook: { title: "mock_val", language: "zh" } },
       }),
     });
     await vi.waitFor(async () => {
@@ -3960,12 +3960,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《第二本书》。",
+        instruction: "mock_val《mock_val》。",
         sessionId: "busy-task-session",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
-        actionPayload: { createBook: { title: "第二本书", language: "zh" } },
+        actionPayload: { createBook: { title: "mock_val", language: "zh" } },
       }),
     });
 
@@ -3976,22 +3976,22 @@ describe("createStudioServer daemon lifecycle", () => {
         message: expect.stringContaining("tác vụ sản xuất đang chạy"),
       },
     });
-    // 第二个任务没有真正启动
+    // mock_val
     expect(initBookMock).toHaveBeenCalledTimes(1);
 
-    await writeCompleteBookFixture(root, "第一本书", "第一本书");
+    await writeCompleteBookFixture(root, "mock_val", "mock_val");
     resolveInitBook();
     await pendingTask;
-    // 第一个任务不受影响，正常完成
+    // mock_val，mock_val
     await expect(loadStudioTaskSnapshot(root, "busy-task-session")).resolves.toMatchObject({
       execution: { status: "completed" },
     });
   });
 
   it("lets exactly one of two concurrent confirmed requests start and rejects the other with 409", async () => {
-    // 单任务检查曾是"await 读快照 → 之后才 set controller"的 check-then-act：
-    // 两个并发确认请求都能通过检查，双任务同时启动。用 loadBookSession 做
-    // 屏障，让两个请求同时到达检查窗口，验证名额是同步预留的。
+    // mock_val"await mock_val → mock_val set controller"mock_val check-then-act：
+    // mock_val，mock_val。mock_val loadBookSession mock_val
+    // mock_val，mock_val，mock_val。
     const sessionRecord = {
       sessionId: "race-task-session",
       bookId: null,
@@ -4014,7 +4014,7 @@ describe("createStudioServer daemon lifecycle", () => {
       await barrier;
       return sessionRecord;
     });
-    // 任务本体拖一拍，保证第二个请求做检查时第一个任务还在运行中
+    // mock_val，mock_val
     initBookMock.mockImplementation(async (book: { id: string; title: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 25));
       await writeCompleteBookFixture(root, book.id, book.title);
@@ -4026,7 +4026,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: `创建《${title}》。`,
+        instruction: `mock_val《${title}》。`,
         sessionId: "race-task-session",
         sessionKind: "book-create",
         actionSource: "button",
@@ -4035,7 +4035,7 @@ describe("createStudioServer daemon lifecycle", () => {
       }),
     });
 
-    const responses = await Promise.all([request("并发一"), request("并发二")]);
+    const responses = await Promise.all([request("mock_val"), request("mock_val")]);
 
     const statuses = responses.map((response) => response.status).sort();
     expect(statuses).toEqual([200, 409]);
@@ -4043,9 +4043,9 @@ describe("createStudioServer daemon lifecycle", () => {
     await expect(rejected.json()).resolves.toMatchObject({
       error: { code: "PRODUCTION_TASK_ALREADY_RUNNING" },
     });
-    // 败者的任务没有真正启动
+    // mock_val
     expect(initBookMock).toHaveBeenCalledTimes(1);
-    // 胜者的任务不受影响，快照收敛为 completed
+    // mock_val，mock_val completed
     await expect(loadStudioTaskSnapshot(root, "race-task-session")).resolves.toMatchObject({
       execution: { status: "completed" },
     });
@@ -4067,7 +4067,7 @@ describe("createStudioServer daemon lifecycle", () => {
       createdAt: 1,
       updatedAt: 1,
     });
-    runAgentSessionMock.mockResolvedValueOnce({ responseText: "任务还在后台跑。", messages: [] });
+    runAgentSessionMock.mockResolvedValueOnce({ responseText: "mock_val。", messages: [] });
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
@@ -4075,12 +4075,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《并行验证》。",
+        instruction: "mock_val《mock_val》。",
         sessionId: "parallel-chat-session",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
-        actionPayload: { createBook: { title: "并行验证", language: "zh" } },
+        actionPayload: { createBook: { title: "mock_val", language: "zh" } },
       }),
     });
     await vi.waitFor(async () => {
@@ -4092,7 +4092,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "现在在写吗？",
+        instruction: "mock_val？",
         sessionId: "parallel-chat-session",
         sessionKind: "book-create",
       }),
@@ -4101,25 +4101,25 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(chatResponse.status).toBe(200);
     const agentCall = runAgentSessionMock.mock.calls.at(-1);
     const config = agentCall?.[0] as { backgroundTaskContext?: string; suppressProductionTools?: boolean };
-    // 任务状态块注入到了 agent 上下文（含任务名和运行状态），用户指令原样传递
+    // mock_val agent mock_val（mock_val），mock_val
     expect(config.backgroundTaskContext).toContain("Tạo sách");
     expect(config.backgroundTaskContext).toContain("đang chạy");
-    // 任务运行期间聊天 agent 的生产工具被 host 侧禁用，提示词同步说明
-    expect(config.backgroundTaskContext).toContain("生产类工具已临时不可用");
+    // mock_val agent mock_val host mock_val，mock_val
+    expect(config.backgroundTaskContext).toContain("mock_val");
     expect(config.suppressProductionTools).toBe(true);
-    expect(agentCall?.[1]).toBe("现在在写吗？");
+    expect(agentCall?.[1]).toBe("mock_val？");
 
-    await writeCompleteBookFixture(root, "并行验证", "并行验证");
+    await writeCompleteBookFixture(root, "mock_val", "mock_val");
     resolveInitBook();
     await pendingTask;
 
-    // 任务结束后：新一轮聊天不再禁用生产工具，也不再注入任务状态块
-    runAgentSessionMock.mockResolvedValueOnce({ responseText: "任务已经完成。", messages: [] });
+    // mock_val：mock_val，mock_val
+    runAgentSessionMock.mockResolvedValueOnce({ responseText: "mock_val。", messages: [] });
     const afterTask = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "现在还在写吗？",
+        instruction: "mock_val？",
         sessionId: "parallel-chat-session",
         sessionKind: "book-create",
       }),
@@ -4153,7 +4153,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
-    // 通过 /api/v1/events 订阅 SSE，收集服务端 broadcast 出来的事件。
+    // mock_val /api/v1/events mock_val SSE，mock_val broadcast mock_val。
     const sseResponse = await app.request("http://localhost/api/v1/events");
     const sseEvents: Array<{ event: string; data: Record<string, unknown> | null }> = [];
     const sseReader = sseResponse.body!.getReader();
@@ -4178,14 +4178,14 @@ describe("createStudioServer daemon lifecycle", () => {
           }
         }
       } catch {
-        // abort 断开 SSE 连接时 read 会抛错，这是本测试收尾的正常关闭路径
+        // abort mock_val SSE mock_val read mock_val，mock_valTestmock_val
       }
     })();
     await vi.waitFor(() => expect(sseEvents.some((entry) => entry.event === "ping")).toBe(true));
 
-    // 把最近一次 buildPipelineConfig 传给 createLogger 的每个 sink 各写一条日志，
-    // 模拟 pipeline 运行期间经 logger 广播日志的真实路径（createLogger 本身被
-    // mock 成不分发，所以直接写 sink）。
+    // mock_val buildPipelineConfig mock_val createLogger mock_val sink mock_val，
+    // mock_val pipeline mock_val logger mock_val（createLogger mock_val
+    // mock mock_val，mock_val sink）。
     const emitLatestPipelineLog = (message: string) => {
       const createLoggerArgs = vi.mocked(core.createLogger).mock.calls.at(-1)?.[0] as
         | { sinks?: ReadonlyArray<{ write: (entry: { level: "info"; tag: string; message: string }) => void }> }
@@ -4202,12 +4202,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "创建《日志打标验证》。",
+        instruction: "mock_val《mock_val》。",
         sessionId: "tagged-log-session",
         sessionKind: "book-create",
         actionSource: "button",
         requestedIntent: "create_book",
-        actionPayload: { createBook: { title: "日志打标验证", language: "zh" } },
+        actionPayload: { createBook: { title: "mock_val", language: "zh" } },
       }),
     });
     await vi.waitFor(async () => {
@@ -4218,13 +4218,13 @@ describe("createStudioServer daemon lifecycle", () => {
     const executionId = runningTask!.execution.id;
     expect(executionId).toMatch(/^direct-create_book-/);
 
-    // 任务运行期间：任务 pipeline 广播的 log 与 llm:progress 都带任务的 execution id
-    emitLatestPipelineLog("任务运行中的日志");
+    // mock_val：mock_val pipeline mock_val log mock_val llm:progress mock_val execution id
+    emitLatestPipelineLog("mock_val");
     (pipelineConfigs.at(-1) as {
       onStreamProgress?: (progress: { status: string; elapsedMs: number; totalChars: number; chineseChars: number }) => void;
     }).onStreamProgress?.({ status: "writing", elapsedMs: 1200, totalChars: 800, chineseChars: 640 });
-    await vi.waitFor(() => expect(findLogEvent("任务运行中的日志")).toBeDefined());
-    expect(findLogEvent("任务运行中的日志")?.data).toMatchObject({
+    await vi.waitFor(() => expect(findLogEvent("mock_val")).toBeDefined());
+    expect(findLogEvent("mock_val")?.data).toMatchObject({
       sessionId: "tagged-log-session",
       executionId,
     });
@@ -4234,51 +4234,51 @@ describe("createStudioServer daemon lifecycle", () => {
       executionId,
     });
 
-    // 任务运行期间的并行聊天轮：聊天 pipeline 广播的日志只带 sessionId，不带任务 id
+    // mock_val：mock_val pipeline mock_val sessionId，mock_val id
     runAgentSessionMock.mockImplementationOnce(async () => {
-      emitLatestPipelineLog("并行聊天轮的日志");
-      return { responseText: "任务还在后台跑。", messages: [] };
+      emitLatestPipelineLog("mock_val");
+      return { responseText: "mock_val。", messages: [] };
     });
     const chatDuringTask = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "现在在写吗？",
+        instruction: "mock_val？",
         sessionId: "tagged-log-session",
         sessionKind: "book-create",
       }),
     });
     expect(chatDuringTask.status).toBe(200);
-    await vi.waitFor(() => expect(findLogEvent("并行聊天轮的日志")).toBeDefined());
-    const parallelChatLog = findLogEvent("并行聊天轮的日志")!.data!;
+    await vi.waitFor(() => expect(findLogEvent("mock_val")).toBeDefined());
+    const parallelChatLog = findLogEvent("mock_val")!.data!;
     expect(parallelChatLog.sessionId).toBe("tagged-log-session");
     expect(parallelChatLog.executionId).toBeUndefined();
 
-    await writeCompleteBookFixture(root, "日志打标验证", "日志打标验证");
+    await writeCompleteBookFixture(root, "mock_val", "mock_val");
     resolveInitBook();
     const taskResponse = await pendingTask;
     expect(taskResponse.status).toBe(200);
 
-    // 任务结束后：同会话新一轮聊天的日志同样不带已结束任务的 execution id
+    // mock_val：mock_val execution id
     runAgentSessionMock.mockImplementationOnce(async () => {
-      emitLatestPipelineLog("任务结束后的日志");
-      return { responseText: "任务已经完成。", messages: [] };
+      emitLatestPipelineLog("mock_val");
+      return { responseText: "mock_val。", messages: [] };
     });
     const chatAfterTask = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "刚才那个任务怎么样了？",
+        instruction: "mock_val？",
         sessionId: "tagged-log-session",
         sessionKind: "book-create",
       }),
     });
     expect(chatAfterTask.status).toBe(200);
-    await vi.waitFor(() => expect(findLogEvent("任务结束后的日志")).toBeDefined());
-    expect(findLogEvent("任务结束后的日志")!.data!.executionId).toBeUndefined();
+    await vi.waitFor(() => expect(findLogEvent("mock_val")).toBeDefined());
+    expect(findLogEvent("mock_val")!.data!.executionId).toBeUndefined();
 
-    // 取消 body reader 会触发 hono 流的 abort（Node 下请求 signal 不会），
-    // 由它清掉 keepAlive 定时器并把订阅者从 broadcast 集合移除。
+    // mock_val body reader mock_val hono mock_val abort（Node mock_val signal mock_val），
+    // mock_val keepAlive mock_val broadcast mock_val。
     await sseReader.cancel();
     await ssePump;
   }, 60_000);
@@ -4322,24 +4322,24 @@ describe("createStudioServer daemon lifecycle", () => {
           }
         }
       } catch {
-        // abort 断开 SSE 连接时 read 会抛错，这是本测试收尾的正常关闭路径
+        // abort mock_val SSE mock_val read mock_val，mock_valTestmock_val
       }
     })();
     await vi.waitFor(() => expect(sseEvents.some((entry) => entry.event === "ping")).toBe(true));
 
-    // 确认式生产任务分支：tool:start 必须带 background 标记，前端据此把
-    // free-text 命中任务分支的聊天轮重分类为任务轮。
+    // mock_val：tool:start mock_val background mock_val，mock_val
+    // free-text mock_val。
     const taskResponse = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "写一篇冷库账本短篇。",
+        instruction: "mock_val。",
         sessionId: "bg-flag-session",
         clientRequestId: "client-request-1",
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
-        actionPayload: { shortRun: { direction: "冷库账本悬疑", cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", cover: false } },
       }),
     });
     expect(taskResponse.status).toBe(200);
@@ -4354,16 +4354,16 @@ describe("createStudioServer daemon lifecycle", () => {
       sourceRequestId: "client-request-1",
     });
 
-    // 聊天轮工具的 tool:start 不带 background 标记，前端维持聊天轮分类。
+    // mock_val tool:start mock_val background mock_val，mock_val。
     runAgentSessionMock.mockImplementationOnce(async (config: { onEvent?: (event: unknown) => void }) => {
       config.onEvent?.({ type: "tool_execution_start", toolCallId: "chat-tool-1", toolName: "read", args: {} });
-      return { responseText: "读完了。", messages: [] };
+      return { responseText: "mock_val。", messages: [] };
     });
     const chatResponse = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "帮我读一下大纲。",
+        instruction: "mock_val。",
         sessionId: "bg-flag-session",
         sessionKind: "short",
       }),
@@ -4411,12 +4411,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "写一篇冷库账本短篇。",
+        instruction: "mock_val。",
         sessionId: "chat-scope-session",
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
-        actionPayload: { shortRun: { direction: "冷库账本悬疑", cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", cover: false } },
       }),
     });
     await vi.waitFor(() => expect(capturedSignal).toBeDefined());
@@ -4434,8 +4434,8 @@ describe("createStudioServer daemon lifecycle", () => {
   });
 
   it("aborts the running production task and drops its snapshot when the session is deleted", async () => {
-    // 用真实 transcript / 真实删除验证文件层行为：删除会话后，任务收尾的
-    // 助手消息追加不能把 transcript 文件和 sessions 目录条目重建出来。
+    // mock_val transcript / mock_val：mock_val，mock_val
+    // mock_val transcript mock_val sessions mock_val。
     const actual = await wireRealSessionTranscript();
     deleteBookSessionMock.mockImplementation(
       (projectRoot: string, sessionId: string) => actual.deleteBookSession(projectRoot, sessionId),
@@ -4446,7 +4446,7 @@ describe("createStudioServer daemon lifecycle", () => {
       name: "short_fiction_run",
       execute: vi.fn(async (_id: string, _params: unknown, signal: AbortSignal) => {
         capturedSignal = signal;
-        // 模拟真实 pipeline：任务挂起，直到中止信号到来才在检查点抛出中止错误
+        // mock_val pipeline：mock_val，mock_val
         await new Promise<never>((_resolve, reject) => {
           signal.addEventListener("abort", () => reject(new Error("This operation was aborted")));
         });
@@ -4460,12 +4460,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "写一篇冷库账本短篇。",
+        instruction: "mock_val。",
         sessionId: "deleted-task-session",
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
-        actionPayload: { shortRun: { direction: "冷库账本悬疑", cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", cover: false } },
       }),
     });
     await vi.waitFor(async () => {
@@ -4478,23 +4478,23 @@ describe("createStudioServer daemon lifecycle", () => {
     });
 
     expect(deleteResponse.status).toBe(200);
-    // 删除会话必须同时中止它的生产任务
+    // mock_val
     expect(capturedSignal?.aborted).toBe(true);
 
-    // 等任务的错误路径走完：中止后的错误持久化不能把已删除会话的快照重建出来
+    // mock_val：mock_val
     const response = await pendingTask;
     expect(response.status).toBeGreaterThanOrEqual(400);
     await expect(access(studioTaskSnapshotPath(root, "deleted-task-session"))).rejects.toThrow();
-    // 任务失败路径的助手消息追加也不能把已删除会话的 transcript 文件与
-    // sessions 目录条目重建出来（appendTranscriptEvents 底层是 mkdir+appendFile）
+    // mock_val transcript mock_val
+    // sessions mock_val（appendTranscriptEvents mock_val mkdir+appendFile）
     await expect(access(actual.transcriptPath(root, "deleted-task-session"))).rejects.toThrow();
     await expect(actual.loadBookSession(root, "deleted-task-session")).resolves.toBeNull();
   });
 
-  // 制造"controller 已注册、磁盘还没有任务快照"的窗口：任务开始时预写用户
-  // 指令的第一次 appendManualSessionMessages 挂起，此时确认分支已同步注册
-  // AbortController，但首次快照持久化（在 executeConfirmedProductionAction
-  // 内部）还没执行。
+  // mock_val"controller mock_val、mock_val"mock_val：mock_val
+  // mock_val appendManualSessionMessages mock_val，mock_val
+  // AbortController，mock_val（mock_val executeConfirmedProductionAction
+  // mock_val）mock_val。
   function taskInPersistWindow(sessionId: string): {
     releaseInstructionAppend: () => void;
     getCapturedSignal: () => AbortSignal | undefined;
@@ -4512,7 +4512,7 @@ describe("createStudioServer daemon lifecycle", () => {
       execute: vi.fn(async (_id: string, _params: unknown, signal: AbortSignal) => {
         capturedSignal = signal;
         signal.throwIfAborted();
-        return { content: [{ type: "text", text: "窗口外完成（不应到达）" }] };
+        return { content: [{ type: "text", text: "mock_val（mock_val）" }] };
       }),
     }));
     loadBookSessionMock.mockResolvedValue({
@@ -4537,12 +4537,12 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "写一篇冷库账本短篇。",
+        instruction: "mock_val。",
         sessionId,
         sessionKind: "short",
         actionSource: "button",
         requestedIntent: "short_run",
-        actionPayload: { shortRun: { direction: "冷库账本悬疑", cover: false } },
+        actionPayload: { shortRun: { direction: "mock_val", cover: false } },
       }),
     }));
   }
@@ -4554,10 +4554,10 @@ describe("createStudioServer daemon lifecycle", () => {
 
     const pendingTask = startShortRunTask(app, "window-abort-session");
     await vi.waitFor(() => expect(appendManualSessionMessagesMock).toHaveBeenCalled());
-    // 窗口成立：controller 已注册，但磁盘上还没有任务快照
+    // mock_val：controller mock_val，mock_val
     await expect(loadStudioTaskSnapshot(root, "window-abort-session")).resolves.toBeNull();
 
-    // 窗口内中止：必须从内存拿到任务控制器，不能依赖磁盘快照
+    // mock_val：mock_val，mock_val
     const abortResponse = await app.request("http://localhost/api/v1/sessions/window-abort-session/abort", {
       method: "POST",
     });
@@ -4586,10 +4586,10 @@ describe("createStudioServer daemon lifecycle", () => {
 
     window.releaseInstructionAppend();
     const response = await pendingTask;
-    // 删除会话必须中止窗口内刚启动的任务
+    // mock_val
     expect(response.status).toBeGreaterThanOrEqual(400);
     expect(window.getCapturedSignal()?.aborted).toBe(true);
-    // 已删除会话的快照不会被任务的后续持久化重建出来
+    // mock_val
     await expect(access(studioTaskSnapshotPath(root, "window-delete-session"))).rejects.toThrow();
   });
 
@@ -4614,20 +4614,20 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "确认启动旧档案馆之夜。",
+        instruction: "mock_val。",
         sessionId: "play-session-1",
         sessionKind: "play",
         actionSource: "button",
         requestedIntent: "play_start",
         actionPayload: {
           playStart: {
-            title: "旧档案馆之夜",
-            premise: "我是城郊旧档案馆夜班保安，暴雨夜收到写着我名字的借阅卡。",
-            worldContract: "时间按行动语义推进；嫌疑人和保安队会在同一段时间里自主移动和隐瞒线索。",
-            visualContract: "证据可信度通过清晰度、潮湿程度和环境危险性体现，不要游戏 UI。",
+            title: "mock_val",
+            premise: "mock_val，mock_val。",
+            worldContract: "mock_val；mock_valGiau giemmock_val。",
+            visualContract: "mock_val、mock_val，mock_val UI。",
             mode: "open",
-            initialScene: "暴雨敲着铁皮门，封存档案箱压在门口。",
-            suggestedActions: ["把箱子拖进值班室", "查看借阅卡背面"],
+            initialScene: "mock_val，mock_val。",
+            suggestedActions: ["mock_val", "mock_val"],
           },
         },
       }),
@@ -4642,22 +4642,22 @@ describe("createStudioServer daemon lifecycle", () => {
           expect.objectContaining({
             tool: "play_start",
             status: "completed",
-            result: "暴雨敲着铁皮门，封存档案箱压在门口。",
+            result: "mock_val，mock_val。",
             details: expect.objectContaining({ skillIds: ["castor-play-world"] }),
           }),
         ],
       },
       session: { sessionId: "play-session-1", sessionKind: "play" },
     });
-    // 任务开始时：指令作为 user 消息预写进 transcript。
+    // mock_val：mock_val user mock_val transcript。
     expect(appendManualSessionMessagesMock).toHaveBeenCalledWith(
       root,
       "play-session-1",
-      [expect.objectContaining({ role: "user", content: "确认启动旧档案馆之夜。" })],
-      "确认启动旧档案馆之夜。",
+      [expect.objectContaining({ role: "user", content: "mock_val。" })],
+      "mock_val。",
       { sessionKind: "play" },
     );
-    // 任务完成时：只补助手工具消息，指令不再重复写入。
+    // mock_val：mock_val，mock_val。
     expect(appendManualSessionMessagesMock).toHaveBeenCalledWith(
       root,
       "play-session-1",
@@ -4672,9 +4672,9 @@ describe("createStudioServer daemon lifecycle", () => {
               status: "completed",
               details: expect.objectContaining({
                 kind: "play_world_started",
-                worldContract: expect.stringContaining("自主移动"),
-                visualContract: expect.stringContaining("不要游戏 UI"),
-                suggestedActions: expect.arrayContaining(["把箱子拖进值班室"]),
+                worldContract: expect.stringContaining("mock_val"),
+                visualContract: expect.stringContaining("mock_val UI"),
+                suggestedActions: expect.arrayContaining(["mock_val"]),
               }),
             }),
           ],
@@ -4683,10 +4683,10 @@ describe("createStudioServer daemon lifecycle", () => {
     );
     const world = JSON.parse(await readFile(join(root, "worlds", "play-session-1", "world.json"), "utf-8")) as { title: string; mode: string };
     expect(world).toMatchObject({
-      title: "旧档案馆之夜",
+      title: "mock_val",
       mode: "open",
-      worldContract: expect.stringContaining("行动语义推进"),
-      visualContract: expect.stringContaining("证据可信度"),
+      worldContract: expect.stringContaining("mock_val"),
+      visualContract: expect.stringContaining("mock_val"),
     });
   });
 
@@ -4711,18 +4711,18 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "确认启动旧戏院夜巡。初始场景：我站在配电室门口，手电照到泛黄演出表，主演栏写着赵铁生。",
+        instruction: "mock_val。mock_val：mock_val，mock_val，mock_val。",
         sessionId: "play-session-truncated",
         sessionKind: "play",
         actionSource: "button",
         requestedIntent: "play_start",
         actionPayload: {
           playStart: {
-            title: "旧戏院夜巡",
-            premise: "我在县城旧戏院做夜间检修，停电后舞台下传来拍板声。",
+            title: "mock_val",
+            premise: "mock_val，mock_val。",
             mode: "open",
-            initialScene: "剧目是《挑滑车》，主演栏里有个名字叫",
-            suggestedActions: ["检查演出表"],
+            initialScene: "mock_val《mock_val》，mock_val",
+            suggestedActions: ["mock_val"],
           },
         },
       }),
@@ -4731,9 +4731,9 @@ describe("createStudioServer daemon lifecycle", () => {
     const body = await response.json();
     expect(response.status, JSON.stringify(body)).toBe(200);
     expect(body.response).toBe("");
-    expect(body.details?.toolExecutions?.[0]?.result).toContain("主演栏里有个名字叫");
+    expect(body.details?.toolExecutions?.[0]?.result).toContain("mock_val");
     await expect(readFile(join(root, "worlds", "play-session-truncated", "runs", "main", "projections", "scene.md"), "utf-8"))
-      .resolves.toContain("主演栏里有个名字叫");
+      .resolves.toContain("mock_val");
   });
 
   it("routes write-next button instructions directly to the shared writer pipeline", async () => {
@@ -4744,7 +4744,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -4756,7 +4756,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const body = await response.json();
     expect(response.status, JSON.stringify(body)).toBe(200);
     expect(body).toMatchObject({
-      response: expect.stringContaining("已为 demo-book 完成第 3 章"),
+      response: expect.stringContaining("mock_val demo-book mock_valChương 3"),
       session: {
         sessionId: "agent-session-1",
         activeBookId: "demo-book",
@@ -4766,18 +4766,18 @@ describe("createStudioServer daemon lifecycle", () => {
       "demo-book",
       undefined,
       undefined,
-      "继续",
+      "mock_val",
     );
     expect(runAgentSessionMock).not.toHaveBeenCalled();
-    // 任务开始时：指令作为 user 消息预写进 transcript。
+    // mock_val：mock_val user mock_val transcript。
     expect(appendManualSessionMessagesMock).toHaveBeenCalledWith(
       root,
       "agent-session-1",
-      [expect.objectContaining({ role: "user", content: "继续" })],
-      "继续",
+      [expect.objectContaining({ role: "user", content: "mock_val" })],
+      "mock_val",
       { sessionKind: "book" },
     );
-    // 任务完成时：只补助手工具消息，指令不再重复写入。
+    // mock_val：mock_val，mock_val。
     expect(appendManualSessionMessagesMock).toHaveBeenCalledWith(
       root,
       "agent-session-1",
@@ -4803,7 +4803,7 @@ describe("createStudioServer daemon lifecycle", () => {
     writeChaptersMock.mockResolvedValueOnce([
       {
         chapterNumber: 3,
-        title: "第三章",
+        title: "mock_val",
         wordCount: 1800,
         revised: false,
         status: "ready-for-review",
@@ -4811,7 +4811,7 @@ describe("createStudioServer daemon lifecycle", () => {
       },
       {
         chapterNumber: 4,
-        title: "第四章",
+        title: "mock_val",
         wordCount: 1750,
         revised: false,
         status: "ready-for-review",
@@ -4825,7 +4825,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "连续写两章",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -4837,7 +4837,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     const body = await response.json();
     expect(response.status, JSON.stringify(body)).toBe(200);
-    expect(body.response).toContain("已连续完成 2 章");
+    expect(body.response).toContain("mock_val 2 mock_val");
     expect(writeChaptersMock).toHaveBeenCalledWith(
       "demo-book",
       2,
@@ -4853,7 +4853,7 @@ describe("createStudioServer daemon lifecycle", () => {
       wordCount: 971,
       revised: false,
       status: "audit-failed",
-      auditResult: { passed: false, issues: [{ severity: "critical", description: "禁止句式" }], summary: "failed" },
+      auditResult: { passed: false, issues: [{ severity: "critical", description: "mock_val" }], summary: "failed" },
     });
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -4862,7 +4862,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -4873,7 +4873,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
-      response: expect.stringContaining("审稿未通过"),
+      response: expect.stringContaining("mock_val"),
       session: {
         sessionId: "agent-session-1",
         activeBookId: "demo-book",
@@ -4892,7 +4892,7 @@ describe("createStudioServer daemon lifecycle", () => {
               tool: "sub_agent",
               agent: "writer",
               status: "error",
-              result: expect.stringContaining("审稿未通过"),
+              result: expect.stringContaining("mock_val"),
               details: expect.objectContaining({ kind: "chapter_written", bookId: "demo-book", status: "audit-failed" }),
             }),
           ],
@@ -4911,7 +4911,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -4939,7 +4939,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -4948,7 +4948,7 @@ describe("createStudioServer daemon lifecycle", () => {
       }),
     });
 
-    // 写章期间：任务快照已写到磁盘，刷新后能恢复出运行中的任务卡
+    // mock_val：mock_val，mock_val
     await vi.waitFor(async () => {
       const task = await loadStudioTaskSnapshot(root, "agent-session-1");
       expect(task).toMatchObject({
@@ -4968,7 +4968,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await pendingResponse;
     const body = await response.json();
     expect(response.status, JSON.stringify(body)).toBe(200);
-    expect(body.response).toContain("已为 demo-book 完成第 3 章");
+    expect(body.response).toContain("mock_val demo-book mock_valChương 3");
     await expect(loadStudioTaskSnapshot(root, "agent-session-1")).resolves.toMatchObject({
       execution: {
         tool: "sub_agent",
@@ -4991,7 +4991,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -5010,10 +5010,10 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(abortResponse.status).toBe(200);
     await expect(abortResponse.json()).resolves.toMatchObject({ aborted: true });
-    // 任务控制器的中止信号已经通过统一 AgentContext 传给了写章流程
+    // mock_val AgentContext mock_val
     expect(pipelineAbortSignals.at(-1)?.aborted).toBe(true);
 
-    // 真实 pipeline 会在下一个检查点抛出中止错误，这里手动模拟这次拒绝
+    // mock_val pipeline mock_val，mock_val
     rejectWrite(new Error("This operation was aborted"));
     const response = await pendingResponse;
     expect(response.status).toBeGreaterThanOrEqual(400);
@@ -5034,7 +5034,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -5081,7 +5081,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -5098,7 +5098,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -5135,7 +5135,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "继续",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -5147,7 +5147,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(writeNextChapterMock).not.toHaveBeenCalled();
     expect(runAgentSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({ bookId: "demo-book", sessionKind: "book" }),
-      "继续",
+      "mock_val",
     );
   });
 
@@ -5159,7 +5159,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "开始写第一章。写完后落盘，不要只在聊天里给我正文。",
+        instruction: "mock_val。mock_val，mock_val。",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "book",
@@ -5171,7 +5171,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(writeNextChapterMock).not.toHaveBeenCalled();
     expect(runAgentSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({ bookId: "demo-book", sessionKind: "book" }),
-      "开始写第一章。写完后落盘，不要只在聊天里给我正文。",
+      "mock_val。mock_val，mock_val。",
     );
   }, 60_000);
 
@@ -5182,7 +5182,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "开一局",
+        instruction: "mock_val",
         sessionId: "agent-session-1",
         sessionKind: "play",
         playMode: "guided",
@@ -5191,7 +5191,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(response.status).toBe(200);
     expect(runAgentSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({ sessionKind: "play", playMode: "guided" }),
-      "开一局",
+      "mock_val",
     );
   });
 
@@ -5228,7 +5228,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "第3章把「Body」改成「Body updated」",
+        instruction: "Chương 3mock_val「Body」mock_val「Body updated」",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
         sessionKind: "edit",
@@ -5245,14 +5245,14 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(saveChapterIndexMock).not.toHaveBeenCalled();
     expect(runAgentSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({ sessionKind: "edit", bookId: "demo-book" }),
-      "第3章把「Body」改成「Body updated」",
+      "Chương 3mock_val「Body」mock_val「Body updated」",
     );
     expect(writeNextChapterMock).not.toHaveBeenCalled();
   });
 
   it("does not bypass the agent for edit-shaped questions", async () => {
     await mkdir(join(root, "covers", "demo"), { recursive: true });
-    await writeFile(join(root, "covers", "demo", "cover-prompt.md"), "标题字太小。\n", "utf-8");
+    await writeFile(join(root, "covers", "demo", "cover-prompt.md"), "mock_val。\n", "utf-8");
 
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -5261,7 +5261,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "可以把 covers/demo/cover-prompt.md 里的「标题字太小」改成「标题字压到最大」吗？",
+        instruction: "mock_val covers/demo/cover-prompt.md mock_val「mock_val」mock_val「mock_val」mock_val？",
         sessionId: "agent-session-1",
       }),
     });
@@ -5271,7 +5271,7 @@ describe("createStudioServer daemon lifecycle", () => {
       response: "Agent response.",
     });
     await expect(readFile(join(root, "covers", "demo", "cover-prompt.md"), "utf-8"))
-      .resolves.toBe("标题字太小。\n");
+      .resolves.toBe("mock_val。\n");
     expect(runAgentSessionMock).toHaveBeenCalledOnce();
     expect(appendManualSessionMessagesMock).not.toHaveBeenCalled();
   });
@@ -5353,7 +5353,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instruction: "检查当前状态", sessionId: "agent-session-1" }),
+      body: JSON.stringify({ instruction: "mock_val", sessionId: "agent-session-1" }),
     });
 
     expect(response.status).toBe(200);
@@ -5434,7 +5434,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instruction: "检查当前状态", activeBookId: "demo-book", sessionId: "agent-session-1" }),
+      body: JSON.stringify({ instruction: "mock_val", activeBookId: "demo-book", sessionId: "agent-session-1" }),
     });
 
     expect(response.status).toBe(200);
@@ -5446,7 +5446,7 @@ describe("createStudioServer daemon lifecycle", () => {
     runAgentSessionMock.mockResolvedValueOnce({
       responseText: "Agent response.",
       messages: [
-        { role: "user", content: "检查当前状态", timestamp: 1 },
+        { role: "user", content: "mock_val", timestamp: 1 },
         { role: "assistant", content: [{ type: "text", text: "Agent response." }], timestamp: 2 },
       ],
     });
@@ -5464,9 +5464,9 @@ describe("createStudioServer daemon lifecycle", () => {
       .mockResolvedValueOnce({
         sessionId: "agent-session-1",
         bookId: "demo-book",
-        title: "检查当前状态",
+        title: "mock_val",
         messages: [
-          { role: "user", content: "检查当前状态", timestamp: 1 },
+          { role: "user", content: "mock_val", timestamp: 1 },
           { role: "assistant", content: "Agent response.", timestamp: 2 },
         ],
         events: [],
@@ -5481,7 +5481,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instruction: "检查当前状态", activeBookId: "demo-book", sessionId: "agent-session-1" }),
+      body: JSON.stringify({ instruction: "mock_val", activeBookId: "demo-book", sessionId: "agent-session-1" }),
     });
 
     expect(response.status).toBe(200);
@@ -5489,7 +5489,7 @@ describe("createStudioServer daemon lifecycle", () => {
     expect(persistBookSessionMock).not.toHaveBeenCalled();
     expect(runAgentSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({ sessionId: "agent-session-1" }),
-      "检查当前状态",
+      "mock_val",
     );
     expect(loadBookSessionMock).toHaveBeenCalledTimes(2);
   });
@@ -5526,10 +5526,10 @@ describe("createStudioServer daemon lifecycle", () => {
       apiKey: "sk-test",
     });
     runAgentSessionMock.mockResolvedValueOnce({
-      responseText: "你好，我在。",
+      responseText: "mock_val，mock_val。",
       messages: [
         { role: "user", content: "nihao" },
-        { role: "assistant", content: "你好，我在。" },
+        { role: "assistant", content: "mock_val，mock_val。" },
       ],
     });
 
@@ -5549,7 +5549,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
-      response: "你好，我在。",
+      response: "mock_val，mock_val。",
     });
   });
 
@@ -5608,10 +5608,10 @@ describe("createStudioServer daemon lifecycle", () => {
       apiKey: "",
     });
     runAgentSessionMock.mockResolvedValueOnce({
-      responseText: "收到。",
+      responseText: "mock_val。",
       messages: [
         { role: "user", content: "/create" },
-        { role: "assistant", content: "收到。" },
+        { role: "assistant", content: "mock_val。" },
       ],
     });
 
@@ -5698,10 +5698,10 @@ describe("createStudioServer daemon lifecycle", () => {
       apiKey: "",
     });
     runAgentSessionMock.mockResolvedValueOnce({
-      responseText: "收到。",
+      responseText: "mock_val。",
       messages: [
-        { role: "user", content: "你好" },
-        { role: "assistant", content: "收到。" },
+        { role: "user", content: "mock_val" },
+        { role: "assistant", content: "mock_val。" },
       ],
     });
 
@@ -5712,7 +5712,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "你好",
+        instruction: "mock_val",
         service: "lmstudio",
         model: "openai/gpt-oss-20b",
         sessionId: "agent-session-1",
@@ -5772,7 +5772,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instruction: "检查当前状态", activeBookId: "demo-book", sessionId: "agent-session-1" }),
+      body: JSON.stringify({ instruction: "mock_val", activeBookId: "demo-book", sessionId: "agent-session-1" }),
     });
 
     expect(response.status).toBe(500);
@@ -5855,7 +5855,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "检查当前写作状态",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-1",
       }),
@@ -5885,7 +5885,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "检查当前写作状态",
+        instruction: "mock_val",
         activeBookId: "demo-book",
         sessionId: "agent-session-lock",
       }),
@@ -5942,7 +5942,7 @@ describe("createStudioServer daemon lifecycle", () => {
         type: "tool_execution_start",
         toolCallId: "play-step-1",
         toolName: "play_step",
-        args: { input: "检查封条" },
+        args: { input: "mock_val" },
       });
       config.onEvent?.({
         type: "tool_execution_end",
@@ -5956,7 +5956,7 @@ describe("createStudioServer daemon lifecycle", () => {
       });
       return {
         responseText: "",
-        messages: [{ role: "user", content: "检查封条" }],
+        messages: [{ role: "user", content: "mock_val" }],
       };
     });
     const { createStudioServer } = await import("./server.js");
@@ -5966,7 +5966,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "检查封条",
+        instruction: "mock_val",
         sessionId: "agent-session-1",
         sessionKind: "play",
         playMode: "open",
@@ -6014,7 +6014,7 @@ describe("createStudioServer daemon lifecycle", () => {
         type: "tool_execution_start",
         toolCallId: "play-step-duplicate",
         toolName: "play_step",
-        args: { input: "检查封条" },
+        args: { input: "mock_val" },
       });
       config.onEvent?.({
         type: "tool_execution_end",
@@ -6022,18 +6022,18 @@ describe("createStudioServer daemon lifecycle", () => {
         toolName: "play_step",
         isError: false,
         result: {
-          content: [{ type: "text", text: "封条背面有一道新鲜划痕。" }],
+          content: [{ type: "text", text: "mock_val。" }],
           details: {
             kind: "play_turn_advanced",
             worldId: "world-1",
             runId: "main",
-            sceneText: "封条背面有一道新鲜划痕。",
+            sceneText: "mock_val。",
           },
         },
       });
       return {
-        responseText: "封条背面有一道新鲜划痕。",
-        messages: [{ role: "assistant", content: "封条背面有一道新鲜划痕。" }],
+        responseText: "mock_val。",
+        messages: [{ role: "assistant", content: "mock_val。" }],
       };
     });
     const { createStudioServer } = await import("./server.js");
@@ -6043,7 +6043,7 @@ describe("createStudioServer daemon lifecycle", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        instruction: "检查封条",
+        instruction: "mock_val",
         sessionId: "agent-session-1",
         sessionKind: "play",
         playMode: "open",
@@ -6114,7 +6114,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instruction: "写一本都市商战", sessionId: "agent-session-1" }),
+      body: JSON.stringify({ instruction: "mock_val", sessionId: "agent-session-1" }),
     });
 
     expect(response.status).toBe(200);
@@ -6160,7 +6160,7 @@ describe("createStudioServer daemon lifecycle", () => {
       });
       return {
         responseText: "",
-        messages: [{ role: "user", content: "写一本都市悬疑" }],
+        messages: [{ role: "user", content: "mock_val" }],
       };
     });
     const { createStudioServer } = await import("./server.js");
@@ -6169,7 +6169,7 @@ describe("createStudioServer daemon lifecycle", () => {
     const response = await app.request("http://localhost/api/v1/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ instruction: "写一本都市悬疑", sessionId: "agent-session-1" }),
+      body: JSON.stringify({ instruction: "mock_val", sessionId: "agent-session-1" }),
     });
 
     expect(response.status).toBe(200);
@@ -6231,9 +6231,9 @@ describe("createStudioServer daemon lifecycle", () => {
       projectRoot: root,
       automationMode: "semi",
       creationDraft: {
-        concept: "港风商战悬疑，主角从灰产洗白。",
-        title: "夜港账本",
-        nextQuestion: "你更想写长篇连载，还是十来章能收住？",
+        concept: "mock_val，mock_val。",
+        title: "mock_val",
+        nextQuestion: "mock_val，mock_val？",
         missingFields: ["targetChapters"],
         readyToCreate: false,
       },
@@ -6250,8 +6250,8 @@ describe("createStudioServer daemon lifecycle", () => {
     await expect(response.json()).resolves.toMatchObject({
       session: expect.objectContaining({
         creationDraft: expect.objectContaining({
-          title: "夜港账本",
-          nextQuestion: "你更想写长篇连载，还是十来章能收住？",
+          title: "mock_val",
+          nextQuestion: "mock_val，mock_val？",
         }),
       }),
     });
@@ -6265,8 +6265,8 @@ describe("createStudioServer daemon lifecycle", () => {
     await writeFile(
       join(runDir, "transcript.jsonl"),
       [
-        JSON.stringify({ role: "user", content: "查看导航记录", timestamp: 1 }),
-        JSON.stringify({ role: "assistant", content: "车机弹出新城花园 187 次。", timestamp: 2 }),
+        JSON.stringify({ role: "user", content: "mock_val", timestamp: 1 }),
+        JSON.stringify({ role: "assistant", content: "mock_val 187 mock_val。", timestamp: 2 }),
       ].join("\n") + "\n",
       "utf-8",
     );
@@ -6283,8 +6283,8 @@ describe("createStudioServer daemon lifecycle", () => {
       worldId: "betrayal-car",
       runId: "run-1",
       transcript: [
-        { role: "user", content: "查看导航记录", timestamp: 1 },
-        { role: "assistant", content: "车机弹出新城花园 187 次。", timestamp: 2 },
+        { role: "user", content: "mock_val", timestamp: 1 },
+        { role: "assistant", content: "mock_val 187 mock_val。", timestamp: 2 },
       ],
       currentState: { turn: 1, lastEventId: "evt-1" },
       graph: {
@@ -6360,7 +6360,7 @@ describe("createStudioServer daemon lifecycle", () => {
   it("returns Play image generation failures as non-fatal manifest status instead of a network error", async () => {
     generatePlayImageMock.mockResolvedValueOnce({ status: "failed", error: "provider unavailable" });
     await mkdir(join(root, "worlds", "img-world", "runs", "run-1", "projections"), { recursive: true });
-    await writeFile(join(root, "worlds", "img-world", "runs", "run-1", "projections", "scene.md"), "雨夜里，侦探站在冷库门口。", "utf-8");
+    await writeFile(join(root, "worlds", "img-world", "runs", "run-1", "projections", "scene.md"), "mock_val，mock_val。", "utf-8");
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
@@ -6580,7 +6580,7 @@ describe("createStudioServer daemon lifecycle", () => {
     loadBookConfigMock.mockResolvedValue({ id: "demo-book", fanficMode: "canon" });
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
-    const source = "# 第一章\n\n林舟在旧码头发现了母本中的关键规则。";
+    const source = "# mock_val\n\nmock_val。";
 
     const upload = await app.request("http://localhost/api/v1/import/canon/upload", {
       method: "POST",
@@ -6603,7 +6603,7 @@ describe("createStudioServer daemon lifecycle", () => {
     await expect(access(join(root, body.material.markdownPath))).resolves.toBeUndefined();
     expect(importFanficCanonMock).toHaveBeenCalledWith(
       "demo-book",
-      expect.stringContaining("林舟在旧码头发现了母本中的关键规则"),
+      expect.stringContaining("mock_val"),
       "motherbook",
       "canon",
     );
@@ -6615,7 +6615,7 @@ describe("createStudioServer daemon lifecycle", () => {
 
     const missing = await app.request("http://localhost/api/v1/spinoff/init", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "番外·林深往事" }),
+      body: JSON.stringify({ title: "mock_val·Lin Shenmock_val" }),
     });
     expect(missing.status).toBe(400);
     expect(initSpinoffBookMock).not.toHaveBeenCalled();
@@ -6623,7 +6623,7 @@ describe("createStudioServer daemon lifecycle", () => {
     loadBookConfigMock.mockRejectedValueOnce(new Error("not found"));
     const noParent = await app.request("http://localhost/api/v1/spinoff/init", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "番外·林深往事", parentBookId: "ghost-book" }),
+      body: JSON.stringify({ title: "mock_val·Lin Shenmock_val", parentBookId: "ghost-book" }),
     });
     expect(noParent.status).toBe(404);
     expect(initSpinoffBookMock).not.toHaveBeenCalled();
@@ -6631,12 +6631,12 @@ describe("createStudioServer daemon lifecycle", () => {
     loadBookConfigMock.mockResolvedValueOnce({ genre: "urban", language: "zh", platform: "tomato" });
     const ok = await app.request("http://localhost/api/v1/spinoff/init", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "番外·林深往事", parentBookId: "memory-clinic", direction: "学生时代" }),
+      body: JSON.stringify({ title: "mock_val·Lin Shenmock_val", parentBookId: "memory-clinic", direction: "mock_val" }),
     });
-    await expect(ok.json()).resolves.toMatchObject({ status: "creating", bookId: "番外-林深往事" });
+    await expect(ok.json()).resolves.toMatchObject({ status: "creating", bookId: "mock_val-Lin Shenmock_val" });
     await vi.waitFor(() => expect(initSpinoffBookMock).toHaveBeenCalledTimes(1));
     expect(initSpinoffBookMock.mock.calls[0]?.[1]).toBe("memory-clinic");
-    expect(initSpinoffBookMock.mock.calls[0]?.[2]).toBe("学生时代");
+    expect(initSpinoffBookMock.mock.calls[0]?.[2]).toBe("mock_val");
   });
 
   it("spinoff/init rejects a duplicate target book id before running the pipeline", async () => {
@@ -6666,24 +6666,24 @@ describe("createStudioServer daemon lifecycle", () => {
 
     const missing = await app.request("http://localhost/api/v1/imitation/init", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "仿写新书", storyIdea: "一个原创故事" }),
+      body: JSON.stringify({ title: "mock_val", storyIdea: "mock_val" }),
     });
     expect(missing.status).toBe(400);
     expect(initImitationBookMock).not.toHaveBeenCalled();
 
     const ok = await app.request("http://localhost/api/v1/imitation/init", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "仿写新书", referenceText: "参考文本片段……", storyIdea: "一个原创故事", sourceName: "范本" }),
+      body: JSON.stringify({ title: "mock_val", referenceText: "mock_val……", storyIdea: "mock_val", sourceName: "mock_val" }),
     });
-    await expect(ok.json()).resolves.toMatchObject({ status: "creating", bookId: "仿写新书" });
+    await expect(ok.json()).resolves.toMatchObject({ status: "creating", bookId: "mock_val" });
     await vi.waitFor(() => expect(initImitationBookMock).toHaveBeenCalledTimes(1));
-    expect(initImitationBookMock.mock.calls[0]?.[2]).toBe("一个原创故事");
+    expect(initImitationBookMock.mock.calls[0]?.[2]).toBe("mock_val");
   });
 
   it("uploads a translation source, creates a translation project, lists it, and exports markdown", async () => {
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
-    const source = "# 第一章 雨夜\n\n雨水落在旧码头。\n";
+    const source = "# mock_val mock_val\n\nmock_val。\n";
     const dataUrl = `data:text/markdown;base64,${Buffer.from(source, "utf-8").toString("base64")}`;
 
     const upload = await app.request("http://localhost/api/v1/translations/upload", {
@@ -6730,7 +6730,7 @@ describe("createStudioServer daemon lifecycle", () => {
   it("surfaces translation model failures without masking upstream provider errors", async () => {
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
-    const source = "# 第一章 雨夜\n\n雨水落在旧码头。\n";
+    const source = "# mock_val mock_val\n\nmock_val。\n";
     const dataUrl = `data:text/markdown;base64,${Buffer.from(source, "utf-8").toString("base64")}`;
 
     const upload = await app.request("http://localhost/api/v1/translations/upload", {
@@ -6745,8 +6745,8 @@ describe("createStudioServer daemon lifecycle", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         filePath: uploaded.storedPath,
-        sourceLanguage: "自动识别",
-        targetLanguage: "英语",
+        sourceLanguage: "mock_val",
+        targetLanguage: "mock_val",
         title: "Rain Translation",
       }),
     });
@@ -6783,7 +6783,7 @@ describe("createStudioServer daemon lifecycle", () => {
   it("returns translated chapter text in translation detail for in-page review", async () => {
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
-    const source = "# 第一章 雨夜\n\n雨水落在旧码头。\n\n她把账本压进怀里。\n";
+    const source = "# mock_val mock_val\n\nmock_val。\n\nmock_val。\n";
     const dataUrl = `data:text/markdown;base64,${Buffer.from(source, "utf-8").toString("base64")}`;
 
     const upload = await app.request("http://localhost/api/v1/translations/upload", {
@@ -6798,8 +6798,8 @@ describe("createStudioServer daemon lifecycle", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         filePath: uploaded.storedPath,
-        sourceLanguage: "自动识别",
-        targetLanguage: "英语",
+        sourceLanguage: "mock_val",
+        targetLanguage: "mock_val",
         title: "Rain Translation",
       }),
     });
@@ -6818,18 +6818,18 @@ describe("createStudioServer daemon lifecycle", () => {
       chapters: [
         {
           number: 1,
-          title: "雨夜",
+          title: "mock_val",
           status: "reviewed",
           segments: [
             {
               index: 1,
-              source: "雨水落在旧码头。",
-              target: "Translated: 雨水落在旧码头。",
+              source: "mock_val。",
+              target: "Translated: mock_val。",
             },
             {
               index: 2,
-              source: "她把账本压进怀里。",
-              target: "Translated: 她把账本压进怀里。",
+              source: "mock_val。",
+              target: "Translated: mock_val。",
             },
           ],
         },

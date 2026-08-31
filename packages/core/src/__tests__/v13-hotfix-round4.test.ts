@@ -101,20 +101,20 @@ describe("Issue 2 — rerunPromotionPass", () => {
       {
         hookId: "H05",
         startChapter: 3,
-        type: "小承诺",
+        type: "mock_text",
         status: "open",
         lastAdvancedChapter: 7,
-        expectedPayoff: "15章",
+        expectedPayoff: "15mock_text",
         payoffTiming: "near-term",
         notes: "",
         promoted: false,
       },
     ];
     const summaries = [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 4 | A | X | event | change | H05 推进 | 压抑 | 铺垫 |",
-      "| 7 | B | X | event2 | change2 | H05 推进 | 紧绷 | 推进 |",
+      "| 4 | A | X | event | change | H05 mock_text | mock_text | mock_text |",
+      "| 7 | B | X | event2 | change2 | H05 mock_text | mock_text | mock_text |",
     ].join("\n");
 
     const result = rerunPromotionPass(hooks, summaries);
@@ -128,7 +128,7 @@ describe("Issue 2 — rerunPromotionPass", () => {
       {
         hookId: "H06",
         startChapter: 5,
-        type: "小",
+        type: "mock_text",
         status: "open",
         lastAdvancedChapter: 0,
         expectedPayoff: "",
@@ -137,9 +137,9 @@ describe("Issue 2 — rerunPromotionPass", () => {
       },
     ];
     const summaries = [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 5 | A | X | event | change | H06 推进 | 压抑 | 铺垫 |",
+      "| 5 | A | X | event | change | H06 mock_text | mock_text | mock_text |",
     ].join("\n");
 
     const result = rerunPromotionPass(hooks, summaries);
@@ -153,7 +153,7 @@ describe("Issue 2 — rerunPromotionPass", () => {
       {
         hookId: "H07",
         startChapter: 1,
-        type: "主线",
+        type: "mock_text",
         status: "open",
         lastAdvancedChapter: 5,
         expectedPayoff: "",
@@ -162,10 +162,10 @@ describe("Issue 2 — rerunPromotionPass", () => {
       },
     ];
     const summaries = [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 3 | A | X | event | change | H07 推进 | 压抑 | 铺垫 |",
-      "| 5 | B | X | event2 | change2 | H07 推进 | 紧绷 | 推进 |",
+      "| 3 | A | X | event | change | H07 mock_text | mock_text | mock_text |",
+      "| 5 | B | X | event2 | change2 | H07 mock_text | mock_text | mock_text |",
     ].join("\n");
 
     const result = rerunPromotionPass(hooks, summaries);
@@ -191,10 +191,10 @@ describe("Issue 2 — per-chapter promotion persists to pending_hooks.md", () =>
       {
         hookId: "H05",
         startChapter: 3,
-        type: "小承诺",
+        type: "mock_text",
         status: "open",
         lastAdvancedChapter: 7,
-        expectedPayoff: "15章",
+        expectedPayoff: "15mock_text",
         payoffTiming: "near-term",
         notes: "sister promise",
         promoted: false,
@@ -206,10 +206,10 @@ describe("Issue 2 — per-chapter promotion persists to pending_hooks.md", () =>
 
     // Simulate chapter_summaries with H05 mentioned in 2 chapters
     await writeFile(join(storyDir, "chapter_summaries.md"), [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 4 | 旧信 | 林辞 | 收到家书 | 回忆 | H05 推进 | 压抑 | 铺垫 |",
-      "| 7 | 码头 | 林辞 | 查账 | 汇合 | H05 推进 | 紧绷 | 推进 |",
+      "| 4 | mock_text | mock_text | mock_text | mock_text | H05 mock_text | mock_text | mock_text |",
+      "| 7 | mock_text | mock_text | Kiem tra so sach | mock_text | H05 mock_text | mock_text | mock_text |",
     ].join("\n"), "utf-8");
 
     // Run the promotion pass (same logic as runner.ts step 3c)
@@ -245,9 +245,9 @@ describe("Issue 3 — escapeRegex", () => {
 describe("Issue 3 — deriveAdvancedCountsFromSummaries", () => {
   it("H01 does NOT match H010 in the same row", () => {
     const summaries = [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 5 | title | char | event | change | H010 推进 | mood | type |",
+      "| 5 | title | char | event | change | H010 mock_text | mood | type |",
     ].join("\n");
 
     const counts = deriveAdvancedCountsFromSummaries(summaries, ["H01"]);
@@ -256,9 +256,9 @@ describe("Issue 3 — deriveAdvancedCountsFromSummaries", () => {
 
   it("H010 matches H010 correctly", () => {
     const summaries = [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 5 | title | char | event | change | H010 推进 | mood | type |",
+      "| 5 | title | char | event | change | H010 mock_text | mood | type |",
     ].join("\n");
 
     const counts = deriveAdvancedCountsFromSummaries(summaries, ["H010"]);
@@ -268,9 +268,9 @@ describe("Issue 3 — deriveAdvancedCountsFromSummaries", () => {
   it("hook_id in title column does NOT count as advancement", () => {
     // H01 appears in the title column (index 1), not hookActivity (index 5)
     const summaries = [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 5 | H01的故事 | char | event | change | 其他线索 | mood | type |",
+      "| 5 | H01mock_text | char | event | change | mock_text | mood | type |",
     ].join("\n");
 
     const counts = deriveAdvancedCountsFromSummaries(summaries, ["H01"]);
@@ -279,10 +279,10 @@ describe("Issue 3 — deriveAdvancedCountsFromSummaries", () => {
 
   it("hook_id in hookActivity column DOES count", () => {
     const summaries = [
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 5 | 普通标题 | char | event | change | H01 推进 | mood | type |",
-      "| 6 | 另一个 | char | event | change | H01 推进 | mood | type |",
+      "| 5 | mock_text | char | event | change | H01 mock_text | mood | type |",
+      "| 6 | mock_text | char | event | change | H01 mock_text | mood | type |",
     ].join("\n");
 
     const counts = deriveAdvancedCountsFromSummaries(summaries, ["H01"]);

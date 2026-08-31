@@ -101,7 +101,7 @@ function isCrossVolume(hook: StoredHook, context: PromotionContext): boolean {
   }
 
   // Case B: pays_off_in_arc mentions a different volume. We stay prose-friendly
-  // and only detect obvious "第 N 卷" / "volume N" tokens. When parsing fails
+  // Core narrative engine processing.
   // we fall back to payoff timing heuristics.
   const arcVolumeIndex = extractVolumeIndexFromArc(hook.paysOffInArc ?? "");
   if (arcVolumeIndex !== null && arcVolumeIndex !== seedVolumeIndex) {
@@ -134,7 +134,7 @@ function findVolumeIndex(
 }
 
 const VOLUME_PATTERNS: ReadonlyArray<RegExp> = [
-  /第\s*([一二三四五六七八九十百千\d]+)\s*卷/u,
+  /(?:quyển|tập)\s*(\d+)/i,
   /volume\s+(\d+)/i,
   /vol\.?\s*(\d+)/i,
 ];
@@ -147,21 +147,9 @@ function extractVolumeIndexFromArc(arc: string): number | null {
     const match = trimmed.match(pattern);
     if (!match) continue;
     const token = match[1] ?? "";
-    const n = parseVolumeNumber(token);
-    if (n !== null) return n - 1; // 1-indexed in prose, 0-indexed here.
+    const n = parseInt(token, 10);
+    if (!Number.isNaN(n)) return n - 1; // 1-indexed in prose, 0-indexed here.
   }
-  return null;
-}
-
-const CHINESE_NUMERALS: Readonly<Record<string, number>> = {
-  一: 1, 二: 2, 三: 3, 四: 4, 五: 5,
-  六: 6, 七: 7, 八: 8, 九: 9, 十: 10,
-};
-
-function parseVolumeNumber(token: string): number | null {
-  if (/^\d+$/.test(token)) return parseInt(token, 10);
-  if (token.length === 1 && CHINESE_NUMERALS[token]) return CHINESE_NUMERALS[token]!;
-  if (token === "十") return 10;
   return null;
 }
 
@@ -215,7 +203,7 @@ export interface PromotionPassResult {
  * Derive hook advancement counts from chapter_summaries.md content.
  *
  * Counts how many chapter-summary data rows mention each hook id in the
- * hookActivity column (index 5, 0-based — "伏笔动态" / "hookActivity").
+ * hookActivity column (index 5, 0-based — "Hoạt động manh mối" / "hookActivity").
  */
 export function deriveAdvancedCountsFromSummaries(
   summariesRaw: string,
@@ -235,7 +223,7 @@ export function deriveAdvancedCountsFromSummaries(
     for (const line of lines) {
       if (!line.startsWith("|")) continue;
       // Skip header / separator rows.
-      if (line.includes("---") || /\|\s*(章节|Chapter)\s*\|/i.test(line)) continue;
+      if (line.includes("---") || /\|\s*(Chương|Chapter)\s*\|/i.test(line)) continue;
       // Only match in the hookActivity column, not the full row.
       const cell = extractColumn(line, hookActivityIndex);
       if (cell !== null && pattern.test(cell)) count += 1;
@@ -246,16 +234,16 @@ export function deriveAdvancedCountsFromSummaries(
 }
 
 /**
- * Find the 0-based column index of the hookActivity / 伏笔动态 header.
+ * Find the 0-based column index of the hookActivity / Hoạt động manh mối header.
  * Falls back to 5 (the standard position in our schema).
  */
 function detectHookActivityColumnIndex(lines: ReadonlyArray<string>): number {
   const DEFAULT_INDEX = 5;
   for (const line of lines) {
     if (!line.startsWith("|")) continue;
-    if (/\|\s*(章节|Chapter)\s*\|/i.test(line)) {
+    if (/\|\s*(Chương|Chapter)\s*\|/i.test(line)) {
       const cols = line.split("|").map((c) => c.trim());
-      const idx = cols.findIndex((c) => /^(伏笔动态|hookActivity)$/i.test(c));
+      const idx = cols.findIndex((c) => /^(Hoạt động manh mối|hookActivity)$/i.test(c));
       return idx >= 0 ? idx : DEFAULT_INDEX;
     }
   }

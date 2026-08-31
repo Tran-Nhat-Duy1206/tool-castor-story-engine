@@ -13,10 +13,10 @@ import {
 const forecast: NarrativeForecast = {
   version: 1,
   forecastId: "fc-20260715-120234",
-  bookId: "雨账簿",
+  bookId: "mock_val",
   createdAt: "2026-07-15T12:02:34.979Z",
   language: "vi",
-  divergence: "主角是否立刻公开第三章发现的关键证据",
+  divergence: "mock_valCong khaimock_val",
   horizon: 3,
   baseChapter: 3,
   contextFingerprint: "fingerprint",
@@ -24,33 +24,33 @@ const forecast: NarrativeForecast = {
   branches: [
     {
       branchId: "branch-1",
-      title: "沉默的铁锈",
-      premise: "继续独自秘密调查，不向任何人公开。",
+      title: "mock_val",
+      premise: "mock_val，mock_valCong khai。",
       beats: [
-        { chapter: 4, summary: "重访档案架。" },
-        { chapter: 5, summary: "拜访退休维修工。" },
+        { chapter: 4, summary: "mock_val。" },
+        { chapter: 5, summary: "mock_val。" },
       ],
-      characterDecisions: [{ character: "陈雨声", decision: "暂不公开" }],
+      characterDecisions: [{ character: "mock_val", decision: "mock_valCong khai" }],
       projectedChanges: {
-        characters: ["主角更加警惕"],
-        relationships: ["与王师傅互相提防"],
-        world: ["档案室换锁"],
-        hooks: ["老周笔记本进入视野"],
+        characters: ["mock_val"],
+        relationships: ["mock_val"],
+        world: ["mock_val"],
+        hooks: ["mock_val"],
       },
-      risks: [{ kind: "continuity", description: "关键物证可能被清理" }],
-      uncertainties: ["是否存在副本"],
-      intentAlignment: { score: 75, rationale: "符合谨慎调查的作者意图" },
+      risks: [{ kind: "continuity", description: "mock_val" }],
+      uncertainties: ["mock_val"],
+      intentAlignment: { score: 75, rationale: "mock_val" },
     },
     {
       branchId: "branch-2",
-      title: "试探深水",
-      premise: "只向站长有限汇报。",
-      beats: [{ chapter: 4, summary: "私下汇报并观察反应。" }],
-      characterDecisions: [{ character: "陈雨声", decision: "有限汇报" }],
+      title: "mock_val",
+      premise: "mock_val。",
+      beats: [{ chapter: 4, summary: "mock_val。" }],
+      characterDecisions: [{ character: "mock_val", decision: "mock_val" }],
       projectedChanges: { characters: [], relationships: [], world: [], hooks: [] },
-      risks: [{ kind: "causality", description: "站长反应需要合理铺垫" }],
+      risks: [{ kind: "causality", description: "mock_val" }],
       uncertainties: [],
-      intentAlignment: { score: 82, rationale: "兼顾安全和推进速度" },
+      intentAlignment: { score: 82, rationale: "mock_val" },
     },
   ],
 };
@@ -108,9 +108,9 @@ describe("NarrativeForecastPreview", () => {
     expect(html).toContain("Dự báo truyện đa nhánh");
     expect(html).toContain("KHÔNG CHÍNH THỐNG");
     expect(html).toContain("Dựa trên sau chương 3");
-    expect(html).toContain("主角是否立刻公开第三章发现的关键证据");
-    expect(html).toContain("沉默的铁锈");
-    expect(html).toContain("试探深水");
+    expect(html).toContain("mock_valCong khaimock_val");
+    expect(html).toContain("mock_val");
+    expect(html).toContain("mock_val");
     expect(html).toContain("Chương 4");
     expect(html).toContain("Tính liên tục");
     expect(html).toContain("Dùng nhánh này");

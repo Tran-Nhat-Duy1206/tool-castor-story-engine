@@ -57,7 +57,7 @@ describe("film authoring LLM tools language switch", () => {
     await tool.execute("call-1", { nodeId: "n1", instruction: "Write the decision scene" } as never);
 
     expect(systemPrompt).toContain("You are an interactive film scriptwriter");
-    expect(systemPrompt).not.toContain("你是互动影游编剧");
+    expect(systemPrompt).not.toContain("mock_text");
     expect(userPrompt).toContain("Node id to fill: n1");
     expect(userPrompt).toContain("Instruction: Write the decision scene");
   });
@@ -73,10 +73,10 @@ describe("film authoring LLM tools language switch", () => {
       },
     }));
 
-    await tool.execute("call-2", { nodeId: "n1", instruction: "写抉择场景" } as never);
+    await tool.execute("call-2", { nodeId: "n1", instruction: "mock_textQuyet dinhmock_text" } as never);
 
-    expect(systemPrompt).toContain("你是互动影游编剧");
-    expect(userPrompt).toContain("要填的节点 id：n1");
+    expect(systemPrompt).toContain("mock_text");
+    expect(userPrompt).toContain("mock_text id：n1");
   });
 
   it("revise_node with language en sends the English node system prompt and user prompt", async () => {
@@ -112,7 +112,7 @@ describe("film authoring LLM tools language switch", () => {
 
     expect(systemPrompt).toContain("You are an interactive film scriptwriter");
     expect(systemPrompt).toContain("branching skeleton");
-    expect(systemPrompt).not.toContain("你是互动影游编剧");
+    expect(systemPrompt).not.toContain("mock_text");
     expect(userPrompt).toContain("Skeleton instruction: Three acts");
   });
 
@@ -127,9 +127,9 @@ describe("film authoring LLM tools language switch", () => {
       },
     }));
 
-    await tool.execute("call-5", { instruction: "三幕" } as never);
+    await tool.execute("call-5", { instruction: "mock_text" } as never);
 
-    expect(systemPrompt).toContain("你是互动影游编剧");
-    expect(userPrompt).toContain("骨架指令：三幕");
+    expect(systemPrompt).toContain("mock_text");
+    expect(userPrompt).toContain("mock_text：mock_text");
   });
 });

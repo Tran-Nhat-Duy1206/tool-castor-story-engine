@@ -34,15 +34,15 @@ function runtime(projectRoot: string): AgentContext {
 
 function stubBranches() {
   return [
-    makeModelBranch({ title: "接受提议" }),
+    makeModelBranch({ title: "Chap nhan de nghi" }),
     makeModelBranch({
-      title: "拒绝提议",
-      premise: "假设主角当场拒绝并公开把柄。",
+      title: "Tu choi de nghi",
+      premise: "Gia dinh nhan vat chinh tu choi de nghi.",
       projectedChanges: {
-        characters: ["主角声望上升"],
-        relationships: ["与盟友结盟加深"],
-        world: ["对手提前动手"],
-        hooks: ["hook-03 保持休眠"],
+        characters: ["Nhan vat chinh bi nghi ngo"],
+        relationships: ["Quan he voi dong minh ran nut"],
+        world: ["The luc doi thu manh len"],
+        hooks: ["hook-03 kich hoat"],
       },
     }),
   ];
@@ -71,7 +71,7 @@ describe("narrative forecast runner", () => {
     return {
       projectRoot: root,
       bookId: BOOK_ID,
-      divergence: "主角是否接受对手的合作提议",
+      divergence: "Nhan vat chinh co chap nhan de nghi hop tac",
       branchCount: 2,
       horizon: 5,
       runtime: runtime(root),
@@ -94,8 +94,8 @@ describe("narrative forecast runner", () => {
     const onDisk = JSON.parse(await readFile(result.forecastJsonPath, "utf-8"));
     expect(onDisk.contextFingerprint).toMatch(/^[0-9a-f]{64}$/);
     const comparison = await readFile(result.comparisonPath, "utf-8");
-    expect(comparison).toContain("接受提议");
-    expect(comparison).toContain("拒绝提议");
+    expect(comparison).toContain("Chap nhan de nghi");
+    expect(comparison).toContain("Tu choi de nghi");
   });
 
   it("keeps sibling branches isolated in the stored forecast", async () => {
@@ -104,8 +104,8 @@ describe("narrative forecast runner", () => {
     const result = await createNarrativeForecast(createOptions());
 
     const [first, second] = result.forecast.branches;
-    expect(first?.projectedChanges.relationships).toEqual(["主角与盟友决裂"]);
-    expect(second?.projectedChanges.relationships).toEqual(["与盟友结盟加深"]);
+    expect(first?.projectedChanges.relationships).toEqual(["Nhan vat chinh va dong minh ran nut"]);
+    expect(second?.projectedChanges.relationships).toEqual(["Quan he voi dong minh ran nut"]);
     expect(first?.beats).not.toBe(second?.beats);
   });
 
@@ -122,7 +122,7 @@ describe("narrative forecast runner", () => {
     const chatSpy = vi.spyOn(
       NarrativeForecastAgent.prototype as unknown as { chat: () => Promise<{ content: string; usage: object }> },
       "chat",
-    ).mockResolvedValue({ content: "不是 JSON", usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 } });
+    ).mockResolvedValue({ content: "not valid JSON", usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 } });
 
     await expect(createNarrativeForecast(createOptions())).rejects.toThrow(/not valid JSON/);
 
@@ -151,7 +151,7 @@ describe("narrative forecast runner", () => {
   it("marks a forecast stale after the canonical context changes", async () => {
     stubAgent();
     await createNarrativeForecast(createOptions());
-    await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["主角离开东城"] }), "utf-8");
+    await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["mock_text"] }), "utf-8");
 
     const result = await getNarrativeForecast({ projectRoot: root, bookId: BOOK_ID, forecastId: FIXED_ID });
 
@@ -163,7 +163,7 @@ describe("narrative forecast runner", () => {
   it("marks a forecast stale after the story frame changes", async () => {
     stubAgent();
     await createNarrativeForecast(createOptions());
-    await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# 故事框架\n都市复仇改为悬疑探案", "utf-8");
+    await writeFile(join(bookDir, "story", "outline", "story_frame.md"), "# mock_text\nmock_text", "utf-8");
 
     const result = await getNarrativeForecast({ projectRoot: root, bookId: BOOK_ID, forecastId: FIXED_ID });
 
@@ -187,7 +187,7 @@ describe("narrative forecast runner", () => {
 
     expect(result.branch.branchId).toBe("branch-2");
     const plan = await readFile(result.planPath, "utf-8");
-    expect(plan).toContain("拒绝提议");
+    expect(plan).toContain("Tu choi de nghi");
     expect(plan).not.toContain("branch-1");
     expect(await readFile(forecastJsonPath, "utf-8")).toBe(forecastJsonBefore);
     expect(await snapshotCanonicalFiles(bookDir)).toEqual(canonBefore);
@@ -212,7 +212,7 @@ describe("narrative forecast runner", () => {
   it("warns in the plan when selecting from a stale forecast", async () => {
     stubAgent();
     await createNarrativeForecast(createOptions());
-    await writeFile(join(bookDir, "chapters", "0003_反击.md"), "第三章正文", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0003_mock_text.md"), "Chương mock_text", "utf-8");
 
     const result = await selectNarrativeBranch({
       projectRoot: root,
@@ -223,7 +223,7 @@ describe("narrative forecast runner", () => {
     });
 
     expect(result.stale).toBe(true);
-    expect(await readFile(result.planPath, "utf-8")).toContain("已过期");
+    expect(await readFile(result.planPath, "utf-8")).toContain("⚠️ Bản suy diễn này đã cũ");
   });
 
   it("errors early when the book does not exist", async () => {

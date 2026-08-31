@@ -7,12 +7,12 @@ import {
 describe("governed-working-set", () => {
   it("filters out far-future hooks from the governed hook working set", () => {
     const hooks = [
-      "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+      "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- |",
-      "| opening-call | 1 | mystery | open | 0 | 8 | 匿名来电开篇出现 |",
-      "| nearby-ledger | 4 | evidence | open | 0 | 12 | 近期开启的账本线 |",
-      "| future-pr-machine | 22 | conspiracy | open | 0 | 60 | 远期舆情操盘线 |",
-      "| future-template | 45 | system | open | 0 | 80 | 远期系统性话术线 |",
+      "| opening-call | 1 | mystery | open | 0 | 8 | mock_text |",
+      "| nearby-ledger | 4 | evidence | open | 0 | 12 | mock_text |",
+      "| future-pr-machine | 22 | conspiracy | open | 0 | 60 | mock_text |",
+      "| future-template | 45 | system | open | 0 | 80 | mock_text |",
     ].join("\n");
 
     const filtered = buildGovernedHookWorkingSet({
@@ -23,7 +23,7 @@ describe("governed-working-set", () => {
           {
             source: "story/pending_hooks.md#opening-call",
             reason: "Current chapter opening hook.",
-            excerpt: "mystery | open | 8 | 匿名来电开篇出现",
+            excerpt: "mystery | open | 8 | mock_text",
           },
         ],
       },

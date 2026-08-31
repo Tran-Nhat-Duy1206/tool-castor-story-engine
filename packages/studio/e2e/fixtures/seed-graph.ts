@@ -13,24 +13,24 @@ export const E2E_PROJECT_ID = "e2e-player-demo";
 const graph = StoryGraphSchema.parse({
   schemaVersion: 1,
   projectId: E2E_PROJECT_ID,
-  title: "E2E 试玩剧本",
-  variables: [{ name: "trust", type: "counter", default: 0, desc: "信任" }],
+  title: "E2E mock_val",
+  variables: [{ name: "trust", type: "counter", default: 0, desc: "mock_val" }],
   nodes: [
     {
       id: "start",
-      title: "开场",
+      title: "Mo dau",
       type: "start",
-      sceneDesc: "你站在宫门前。",
+      sceneDesc: "mock_valCong dien。",
       choices: [
         {
           id: "trustup",
-          text: "交出证据（信任+1）",
+          text: "mock_val（mock_val+1）",
           targetNodeId: "mid",
           effects: [{ var: "trust", op: "add", value: 1 }],
         },
         {
           id: "hide",
-          text: "藏起证据",
+          text: "mock_val",
           targetNodeId: "mid",
           effects: [],
         },
@@ -38,42 +38,42 @@ const graph = StoryGraphSchema.parse({
     },
     {
       id: "mid",
-      title: "抉择",
+      title: "Quyet dinh",
       type: "branch",
-      sceneDesc: "侍卫盯着你。",
+      sceneDesc: "mock_val。",
       choices: [
         {
           id: "good",
-          text: "坦白",
+          text: "mock_val",
           targetNodeId: "endGood",
           effects: [],
           condition: { var: "trust", op: ">=", value: 1 },
         },
         {
           id: "bad",
-          text: "逃跑",
+          text: "mock_val",
           targetNodeId: "endBad",
           effects: [],
         },
       ],
     },
-    { id: "endGood", title: "真相结局", type: "ending", choices: [] },
-    { id: "endBad", title: "逃亡结局", type: "ending", choices: [] },
+    { id: "endGood", title: "Su thatmock_val", type: "ending", choices: [] },
+    { id: "endBad", title: "mock_val", type: "ending", choices: [] },
   ],
   endings: [
     {
       id: "g",
       nodeId: "endGood",
-      title: "真相大白",
+      title: "Su thatmock_val",
       type: "good",
-      description: "你赢得了信任。",
+      description: "mock_val。",
     },
     {
       id: "b",
       nodeId: "endBad",
-      title: "亡命天涯",
+      title: "mock_val",
       type: "bad",
-      description: "你消失在夜色里。",
+      description: "mock_valBong demmock_val。",
     },
   ],
 });

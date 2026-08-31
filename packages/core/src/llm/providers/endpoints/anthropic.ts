@@ -1,12 +1,4 @@
-/**
- * Anthropic (Claude)
- *
- * - 官网：https://www.anthropic.com/
- * - 控制台：https://console.anthropic.com/
- * - API key：https://console.anthropic.com/settings/keys
- * - API 文档：https://docs.anthropic.com/en/api/
- * - 模型列表：https://docs.anthropic.com/en/docs/about-claude/models/overview
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const ANTHROPIC: ProviderEndpoint = {
@@ -19,7 +11,7 @@ export const ANTHROPIC: ProviderEndpoint = {
   temperatureRange: [0, 1],
   defaultTemperature: 1.0,
   writingTemperature: 1.0,
-  temperatureHint: "不要同时改 temperature 和 top_p",
+  temperatureHint: " temperature  top_p",
   models: [
     {
       id: "claude-opus-4-6",

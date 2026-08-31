@@ -42,9 +42,9 @@ describe("buildPartsFromEvents", () => {
       { type: "thinking:delta", text: "Reasoning here" },
       { type: "thinking:end" },
       { type: "draft:delta", text: "I will call writer now" },
-      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["准备章节输入", "撰写章节草稿"] },
-      { type: "log:stage", stageName: "准备章节输入" },
-      { type: "log:stage", stageName: "撰写章节草稿" },
+      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["mock_val", "mock_val"] },
+      { type: "log:stage", stageName: "mock_val" },
+      { type: "log:stage", stageName: "mock_val" },
       { type: "tool:end", id: "t1" },
       { type: "draft:delta", text: "Chapter written." },
     ]);
@@ -71,7 +71,7 @@ describe("buildPartsFromEvents", () => {
       { type: "tool:end", id: "t1" },
       { type: "tool:start", id: "t2", tool: "grep" },
       { type: "tool:end", id: "t2" },
-      { type: "tool:start", id: "t3", tool: "sub_agent", agent: "writer", stages: ["准备章节输入"] },
+      { type: "tool:start", id: "t3", tool: "sub_agent", agent: "writer", stages: ["mock_val"] },
       { type: "tool:end", id: "t3" },
       { type: "draft:delta", text: "Done." },
     ]);
@@ -85,8 +85,8 @@ describe("buildPartsFromEvents", () => {
 
   it("tracks pipeline stages and progress on running tool", () => {
     const parts = buildPartsFromEvents([
-      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["步骤1", "步骤2"] },
-      { type: "log:stage", stageName: "步骤1" },
+      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["mock_val1", "mock_val2"] },
+      { type: "log:stage", stageName: "mock_val1" },
       { type: "llm:progress", status: "thinking", elapsedMs: 5000, totalChars: 0, chineseChars: 0 },
     ]);
 
@@ -132,7 +132,7 @@ describe("buildPartsFromEvents", () => {
 
   it("renders story context compression as a visible stage inside the running writer tool", () => {
     const parts = buildPartsFromEvents([
-      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["准备章节输入", "撰写章节草稿"] },
+      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["mock_val", "mock_val"] },
       {
         type: "context:compression",
         category: "story_context",
@@ -164,7 +164,7 @@ describe("buildPartsFromEvents", () => {
 
   it("shows context compression token budget and source trace while running", () => {
     const parts = buildPartsFromEvents([
-      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["准备章节输入"] },
+      { type: "tool:start", id: "t1", tool: "sub_agent", agent: "writer", stages: ["mock_val"] },
       {
         type: "context:compression",
         category: "story_context",
@@ -176,7 +176,7 @@ describe("buildPartsFromEvents", () => {
           "story/chapter_summaries.md#recent_titles",
           "story/pending_hooks.md#active",
           "story/outline/volume_map.md#volume_2",
-          "story/roles/主要角色/林月.md",
+          "story/roles/major/mock_val.md",
         ],
       },
     ]);
@@ -287,11 +287,11 @@ describe("buildPartsFromEvents", () => {
         result: "advanced",
         details: {
           kind: "play_turn_advanced",
-          sceneText: "工具生成的权威场景。",
-          suggestedActions: ["检查票根"],
+          sceneText: "mock_val。",
+          suggestedActions: ["mock_val"],
         },
       },
-      { type: "draft:delta", text: "模型又复述了一遍场景。" },
+      { type: "draft:delta", text: "mock_val。" },
     ]);
 
     expect(parts).toHaveLength(2);
@@ -309,11 +309,11 @@ describe("buildPartsFromEvents", () => {
         result: "revised",
         details: {
           kind: "play_turn_revised",
-          sceneText: "工具生成的新版本场景。",
-          suggestedActions: ["检查录音笔"],
+          sceneText: "mock_val。",
+          suggestedActions: ["mock_val"],
         },
       },
-      { type: "draft:delta", text: "模型又复述了一遍新版本。" },
+      { type: "draft:delta", text: "mock_val。" },
     ]);
 
     expect(parts).toHaveLength(2);

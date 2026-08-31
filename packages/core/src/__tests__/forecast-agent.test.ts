@@ -9,7 +9,7 @@ function llmResponse(content: string): LLMResponse {
 
 function validModelJson(count: number): string {
   const branches = Array.from({ length: count }, (_, index) => {
-    const { branchId: _branchId, ...rest } = makeForecastBranch({ title: `分支${index + 1}` });
+    const { branchId: _branchId, ...rest } = makeForecastBranch({ title: `mock_text${index + 1}` });
     return rest;
   });
   return JSON.stringify({ branches });
@@ -35,8 +35,8 @@ function spyOnChat(responses: ReadonlyArray<string>) {
 }
 
 const INPUT = {
-  contextMarkdown: "# 正史上下文",
-  divergence: "主角是否接受提议",
+  contextMarkdown: "# mock_text",
+  divergence: "mock_text",
   branchCount: 2,
   horizon: 5,
   baseChapter: 12,
@@ -57,11 +57,11 @@ describe("NarrativeForecastAgent", () => {
     expect(spy).toHaveBeenCalledTimes(1);
     const [messages] = spy.mock.calls[0]!;
     expect(messages[0]?.role).toBe("system");
-    expect(messages[1]?.content).toContain("主角是否接受提议");
+    expect(messages[1]?.content).toContain("mock_text");
   });
 
   it("retries once with the validation error when the first response is invalid", async () => {
-    const spy = spyOnChat(["这不是 JSON", validModelJson(2)]);
+    const spy = spyOnChat(["mock_text JSON", validModelJson(2)]);
 
     const output = await makeAgent().generateBranches(INPUT);
 
@@ -73,7 +73,7 @@ describe("NarrativeForecastAgent", () => {
   });
 
   it("throws after two invalid responses without further retries", async () => {
-    const spy = spyOnChat(["垃圾输出一", "垃圾输出二"]);
+    const spy = spyOnChat(["mock_text", "mock_text"]);
 
     await expect(makeAgent().generateBranches(INPUT)).rejects.toThrow(/not valid JSON/);
     expect(spy).toHaveBeenCalledTimes(2);

@@ -78,16 +78,16 @@ describe("applyPlayMutation", () => {
         eventId: "evt-player",
         turn: 1,
         actionKind: "look",
-        summary: "玩家接过铜令牌。",
+        summary: "mock_text。",
         entities: {
           upsert: [
-            { id: "player", type: "actor", label: "外门杂役（我）" },
-            { id: "copper_token", type: "item", label: "铜令牌" },
+            { id: "player", type: "actor", label: "mock_text（mock_text）" },
+            { id: "copper_token", type: "item", label: "mock_text" },
           ],
         },
         edges: {
           upsert: [
-            { id: "edge_player_持有_copper_token", fromId: "player", type: "持有", toId: "copper_token", value: { role: "holding" } },
+            { id: "edge_player_mock_text_copper_token", fromId: "player", type: "mock_text", toId: "copper_token", value: { role: "holding" } },
           ],
         },
         stateSlots: {
@@ -96,22 +96,22 @@ describe("applyPlayMutation", () => {
               id: "pressure:player:danger",
               ownerEntityId: "player",
               kind: "pressure",
-              label: "被发现风险",
+              label: "mock_text",
               value: { current: 20, min: 0, max: 100 },
               updatedEventId: "evt-player",
             },
           ],
         },
       },
-      rawInput: "接过铜令牌",
+      rawInput: "mock_text",
     });
 
     expect(db.entities.has("player")).toBe(false);
     expect(db.entities.get("actor_player")).toMatchObject({
       type: "actor",
-      label: "外门杂役（我）",
+      label: "mock_text（mock_text）",
     });
-    expect(db.edges.get("edge_player_持有_copper_token")).toMatchObject({
+    expect(db.edges.get("edge_player_mock_text_copper_token")).toMatchObject({
       fromId: "actor_player",
       toId: "copper_token",
       value: { role: "holding" },
@@ -128,24 +128,24 @@ describe("applyPlayMutation", () => {
         eventId: "evt-0",
         turn: 0,
         actionKind: "look",
-        summary: "开场播种玩家持有物。",
+        summary: "Mo daumock_text。",
         entities: {
           upsert: [
-            { id: "player", type: "actor", label: "守炉徒" },
-            { id: "copper_token", type: "item", label: "铜令牌" },
+            { id: "player", type: "actor", label: "mock_text" },
+            { id: "copper_token", type: "item", label: "mock_text" },
           ],
         },
         edges: {
           upsert: [
-            { id: "edge_player_持有_copper_token", fromId: "player", type: "持有", toId: "copper_token", value: { role: "holding" } },
+            { id: "edge_player_mock_text_copper_token", fromId: "player", type: "mock_text", toId: "copper_token", value: { role: "holding" } },
           ],
         },
       },
     });
 
     expect(db.entities.has("player")).toBe(false);
-    expect(db.entities.get("actor_player")?.label).toBe("守炉徒");
-    expect(db.edges.get("edge_player_持有_copper_token")?.fromId).toBe("actor_player");
+    expect(db.entities.get("actor_player")?.label).toBe("mock_text");
+    expect(db.edges.get("edge_player_mock_text_copper_token")?.fromId).toBe("actor_player");
   });
 
   it("records the event and applies entity, edge, state, and evidence changes atomically", () => {
@@ -157,12 +157,12 @@ describe("applyPlayMutation", () => {
         eventId: "evt-1",
         turn: 1,
         actionKind: "look",
-        summary: "玩家看见了账本。",
+        summary: "mock_text。",
         entities: {
           upsert: [
-            { id: "player", type: "actor", label: "宋词" },
-            { id: "ledger", type: "evidence", label: "常用地址统计" },
-            { id: "claim-affair", type: "claim", label: "徐晋安另有家庭" },
+            { id: "player", type: "actor", label: "mock_text" },
+            { id: "ledger", type: "evidence", label: "mock_text" },
+            { id: "claim-affair", type: "claim", label: "Xu Jinanmock_text" },
           ],
         },
         edges: {
@@ -181,7 +181,7 @@ describe("applyPlayMutation", () => {
             id: "pressure:player:danger",
             ownerEntityId: "player",
             kind: "pressure",
-            label: "被发现风险",
+            label: "mock_text",
             value: { current: 120, min: 0, max: 100 },
             updatedEventId: "evt-1",
           }],
@@ -190,11 +190,11 @@ describe("applyPlayMutation", () => {
           transitions: [{
             entityId: "ledger",
             to: "seen",
-            reason: "屏幕弹出统计。",
+            reason: "mock_text。",
           }],
         },
       },
-      rawInput: "看一下导航记录",
+      rawInput: "mock_text",
       createdAt: "2026-05-28T00:00:00.000Z",
     });
 
@@ -202,8 +202,8 @@ describe("applyPlayMutation", () => {
       id: "evt-1",
       turn: 1,
       actionKind: "look",
-      rawInput: "看一下导航记录",
-      outcomeSummary: "玩家看见了账本。",
+      rawInput: "mock_text",
+      outcomeSummary: "mock_text。",
     });
     expect(db.transactionCalls).toBe(1);
     expect(db.events).toHaveLength(1);
@@ -213,7 +213,7 @@ describe("applyPlayMutation", () => {
     expect(db.stateSlots.get("evidence:ledger:status")?.value).toEqual({
       previous: "unknown",
       status: "seen",
-      reason: "屏幕弹出统计。",
+      reason: "mock_text。",
     });
   });
 
@@ -227,19 +227,19 @@ describe("applyPlayMutation", () => {
         turn: 2,
         actionKind: "do",
         entities: { upsert: [
-          { id: "lin", type: "actor", label: "林远" },
-          { id: "clerk", type: "actor", label: "账房先生" },
+          { id: "lin", type: "actor", label: "mock_text" },
+          { id: "clerk", type: "actor", label: "Phong so sachmock_text" },
         ] },
         edges: {
           upsert: [
             // valid: both endpoints exist this turn
-            { id: "good-edge", fromId: "lin", type: "怀疑", toId: "clerk", validFromEventId: "evt-2", sourceEventId: "evt-2" },
+            { id: "good-edge", fromId: "lin", type: "mock_text", toId: "clerk", validFromEventId: "evt-2", sourceEventId: "evt-2" },
             // dangling: must be skipped, NOT crash the turn (which used to wipe everything)
             { id: "bad-edge", fromId: "lin", type: "knows", toId: "ghost", validFromEventId: "evt-2", sourceEventId: "evt-2" },
           ],
         },
       },
-      rawInput: "调查",
+      rawInput: "mock_text",
     });
 
     expect(result.event.id).toBe("evt-2");
@@ -251,8 +251,8 @@ describe("applyPlayMutation", () => {
 
   it("resolves edge endpoints that reference existing entities by label", () => {
     const db = new FakePlayDB();
-    db.upsertEntity({ id: "actor_afu", type: "actor", label: "阿福" });
-    db.upsertEntity({ id: "actor_laochen", type: "actor", label: "老陈" });
+    db.upsertEntity({ id: "actor_afu", type: "actor", label: "mock_text" });
+    db.upsertEntity({ id: "actor_laochen", type: "actor", label: "mock_text" });
 
     applyPlayMutation({
       db,
@@ -260,25 +260,25 @@ describe("applyPlayMutation", () => {
         eventId: "evt-4",
         turn: 4,
         actionKind: "say",
-        summary: "阿福试探老陈。",
+        summary: "mock_text。",
         edges: {
           upsert: [{
             id: "edge_ask",
-            fromId: "阿福",
-            type: "试探",
-            toId: "老陈",
+            fromId: "mock_text",
+            type: "mock_text",
+            toId: "mock_text",
             validFromEventId: "evt-4",
             sourceEventId: "evt-4",
           }],
         },
       },
-      rawInput: "我问老陈旧账的事",
+      rawInput: "mock_text",
     });
 
     expect(db.edges.get("edge_ask")).toMatchObject({
       fromId: "actor_afu",
       toId: "actor_laochen",
-      type: "试探",
+      type: "mock_text",
     });
   });
 
@@ -291,24 +291,24 @@ describe("applyPlayMutation", () => {
         eventId: "evt-5",
         turn: 5,
         actionKind: "look",
-        summary: "玩家看见草叶避开玉符。",
+        summary: "mock_text。",
         entities: {
           upsert: [
-            { id: "actor_player", type: "actor", label: "采药弟子" },
-            { id: "evidence_grass", type: "evidence", label: "草叶回避现象" },
-            { id: "evidence_note", type: "evidence", label: "夹层纸条" },
-            { id: "item_amulet", type: "item", label: "裂纹玉符" },
+            { id: "actor_player", type: "actor", label: "mock_text" },
+            { id: "evidence_grass", type: "evidence", label: "mock_text" },
+            { id: "evidence_note", type: "evidence", label: "mock_text" },
+            { id: "item_amulet", type: "item", label: "mock_text" },
           ],
         },
         edges: {
           upsert: [
-            { id: "edge-grass", fromId: "actor_player", type: "持有", toId: "evidence_grass", value: { role: "holding" } },
-            { id: "edge-note", fromId: "actor_player", type: "持有", toId: "evidence_note", value: { role: "holding", physical: true } },
-            { id: "edge-amulet", fromId: "actor_player", type: "持有", toId: "item_amulet", value: { role: "holding" } },
+            { id: "edge-grass", fromId: "actor_player", type: "mock_text", toId: "evidence_grass", value: { role: "holding" } },
+            { id: "edge-note", fromId: "actor_player", type: "mock_text", toId: "evidence_note", value: { role: "holding", physical: true } },
+            { id: "edge-amulet", fromId: "actor_player", type: "mock_text", toId: "item_amulet", value: { role: "holding" } },
           ],
         },
       },
-      rawInput: "观察草叶，不捡玉符",
+      rawInput: "mock_text，mock_text",
     });
 
     expect(db.edges.get("edge-grass")?.value).toMatchObject({ role: "observed" });
@@ -318,12 +318,12 @@ describe("applyPlayMutation", () => {
 
   it("rejects evidence status regressions", () => {
     const db = new FakePlayDB();
-    db.upsertEntity({ id: "receipt", type: "evidence", label: "住院收据" });
+    db.upsertEntity({ id: "receipt", type: "evidence", label: "mock_text" });
     db.upsertStateSlot({
       id: "evidence:receipt:status",
       ownerEntityId: "receipt",
       kind: "evidence",
-      label: "证据状态",
+      label: "mock_text",
       value: { status: "verified" },
       updatedEventId: "evt-old",
     });
@@ -341,7 +341,7 @@ describe("applyPlayMutation", () => {
           }],
         },
       },
-      rawInput: "重新看收据",
+      rawInput: "mock_text",
     })).toThrow(/regress/i);
 
     expect(db.events).toHaveLength(0);

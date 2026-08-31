@@ -1,15 +1,9 @@
-/**
- * 百川智能 (Baichuan AI)
- *
- * - 官网：https://www.baichuan-ai.com/
- * - 控制台 / API key：https://platform.baichuan-ai.com/console/apikey
- * - API 文档：https://platform.baichuan-ai.com/docs/api
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const BAICHUAN: ProviderEndpoint = {
   id: "baichuan",
-  label: "百川智能",
+  label: "Baichuan",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://api.baichuan-ai.com/v1",

@@ -19,7 +19,7 @@ export interface ContextCapOptions {
  * files every chapter while still making the omission visible to the model.
  */
 export function capContextBlock(content: string, options: ContextCapOptions): string {
-  if (!content || content === "(文件尚未创建)") return content;
+  if (!content || isMissingContext(content)) return content;
 
   const maxChars = Math.floor(options.maxChars);
   if (maxChars <= 0) return "";
@@ -41,10 +41,10 @@ export function capContextBlock(content: string, options: ContextCapOptions): st
 
 /** Filter pending_hooks: remove resolved/closed hooks. */
 export function filterHooks(hooks: string): string {
-  if (!hooks || hooks === "(文件尚未创建)") return hooks;
+  if (!hooks || isMissingContext(hooks)) return hooks;
   return filterTableRows(hooks, (row) => {
     const lower = row.toLowerCase();
-    return !lower.includes("已回收") && !lower.includes("resolved") && !lower.includes("closed");
+    return !lower.includes("đã giải quyết") && !lower.includes("đã đóng") && !lower.includes("resolved") && !lower.includes("closed");
   });
 }
 
@@ -54,7 +54,7 @@ export function filterSummaries(
   currentChapter: number,
   keepRecent = DEFAULT_CHAPTER_CADENCE_WINDOW,
 ): string {
-  if (!summaries || summaries === "(文件尚未创建)") return summaries;
+  if (!summaries || isMissingContext(summaries)) return summaries;
   return filterTableRows(summaries, (row) => {
     const match = row.match(/\|\s*(\d+)\s*\|/);
     if (!match) return true;
@@ -64,10 +64,10 @@ export function filterSummaries(
 
 /** Filter subplot_board: remove closed/resolved subplots. */
 export function filterSubplots(board: string): string {
-  if (!board || board === "(文件尚未创建)") return board;
+  if (!board || isMissingContext(board)) return board;
   return filterTableRows(board, (row) => {
     const lower = row.toLowerCase();
-    return !lower.includes("已回收") && !lower.includes("closed") && !lower.includes("resolved") && !lower.includes("已完结");
+    return !lower.includes("đã giải quyết") && !lower.includes("đã đóng") && !lower.includes("closed") && !lower.includes("resolved");
   });
 }
 
@@ -77,7 +77,7 @@ export function filterEmotionalArcs(
   currentChapter: number,
   keepRecent = DEFAULT_CHAPTER_CADENCE_WINDOW,
 ): string {
-  if (!arcs || arcs === "(文件尚未创建)") return arcs;
+  if (!arcs || isMissingContext(arcs)) return arcs;
   return filterTableRows(arcs, (row) => {
     const match = row.match(/\|\s*(\d+)\s*\|/);
     if (!match) return true;
@@ -94,14 +94,14 @@ export function filterCharacterMatrix(
   volumeOutline: string,
   protagonistName?: string,
 ): string {
-  if (!matrix || matrix === "(文件尚未创建)") return matrix;
+  if (!matrix || isMissingContext(matrix)) return matrix;
 
   // Extract names from outline
   const names = extractNames(volumeOutline);
   if (protagonistName) names.add(protagonistName);
   if (names.size === 0) return matrix;
 
-  // Split into sections (### 角色档案, ### 相遇记录, ### 信息边界)
+  // Split the character matrix into Markdown sections.
   const sections = matrix.split(/(?=^###)/m);
   const filtered = sections.map((section) => {
     const result = filterTableRows(section, (row) => {
@@ -121,27 +121,21 @@ export function filterCharacterMatrix(
 }
 
 /**
- * Extract character names from text.
- * Chinese: 2-4 char sequences before punctuation.
- * English: Capitalized words 3+ chars.
+ * Extract Vietnamese or English capitalized name tokens from text.
  */
 function extractNames(text: string): Set<string> {
   const names = new Set<string>();
 
-  // Chinese names
-  const cnRegex = /[\u4e00-\u9fff]{2,4}(?=[，、。：\s]|$)/g;
+  const nameRegex = /\b\p{Lu}[\p{L}\p{M}'’-]{1,}\b/gu;
   let match: RegExpExecArray | null;
-  while ((match = cnRegex.exec(text)) !== null) {
-    names.add(match[0]);
-  }
-
-  // English names
-  const enRegex = /\b[A-Z][a-z]{2,}\b/g;
-  while ((match = enRegex.exec(text)) !== null) {
-    names.add(match[0]);
-  }
+  while ((match = nameRegex.exec(text)) !== null) names.add(match[0]);
 
   return names;
+}
+
+function isMissingContext(content: string): boolean {
+  const normalized = content.trim().toLocaleLowerCase("vi");
+  return normalized === "(file not created)" || normalized === "(tệp chưa được tạo)";
 }
 
 function clampRatio(value: number): number {
@@ -155,7 +149,7 @@ function clampRatio(value: number): number {
 
 function isHeaderRow(line: string): boolean {
   // First data-like row in a table (contains column names)
-  return /^\|\s*(章节|角色|支线|hook_id|Chapter|Character|Subplot)/i.test(line);
+  return /^\|\s*(Chương|Nhân vật|Tuyến phụ|hook_id|Chapter|Character|Subplot)/iu.test(line);
 }
 
 /**

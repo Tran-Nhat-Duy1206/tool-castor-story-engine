@@ -125,7 +125,7 @@ const FINGERPRINT_FIXED_INPUTS: ReadonlyArray<string> = [
 ];
 
 // Same tier directories readRoleCards enumerates.
-const FINGERPRINT_ROLE_DIRS: ReadonlyArray<string> = ["主要角色", "次要角色", "major", "minor"];
+const FINGERPRINT_ROLE_DIRS: ReadonlyArray<string> = ["major", "minor", "vai_chinh", "vai_phu"];
 
 /**
  * Enumerate every context input as [relative posix path, content] pairs.
@@ -173,22 +173,22 @@ async function readIfExists(path: string): Promise<string | null> {
 }
 
 export function renderForecastContextMarkdown(context: ForecastContext): string {
-  const zh = context.language === "vi";
+  const zh = (context?.language ?? "vi") === "vi";
   const sectionList: ReadonlyArray<readonly [string, string]> = [
-    [zh ? "作者意图" : "Author intent", context.sections.authorIntent],
-    [zh ? "当前聚焦" : "Current focus", context.sections.currentFocus],
-    [zh ? "当前状态" : "Current state", context.sections.currentState],
-    [zh ? "伏笔与钩子" : "Pending hooks", context.sections.pendingHooks],
-    [zh ? "故事框架" : "Story frame", context.sections.storyFrame],
-    [zh ? "卷映射" : "Volume map", context.sections.volumeMap],
-    [zh ? "近期章节摘要" : "Recent chapter summaries", context.sections.recentChapterSummaries],
-    [zh ? "人物与关系" : "Characters and relationships", context.sections.characterContext],
-    [zh ? "支线看板" : "Subplot board", context.sections.subplotBoard],
+    [zh ? "Ý đồ tác giả" : "Author intent", context.sections.authorIntent],
+    [zh ? "Tiêu điểm hiện tại" : "Current focus", context.sections.currentFocus],
+    [zh ? "Trạng thái hiện tại" : "Current state", context.sections.currentState],
+    [zh ? "Phục bút và móc nối" : "Pending hooks", context.sections.pendingHooks],
+    [zh ? "Khung câu chuyện" : "Story frame", context.sections.storyFrame],
+    [zh ? "Sơ đồ quyển" : "Volume map", context.sections.volumeMap],
+    [zh ? "Tóm tắt các chương gần đây" : "Recent chapter summaries", context.sections.recentChapterSummaries],
+    [zh ? "Nhân vật và quan hệ" : "Characters and relationships", context.sections.characterContext],
+    [zh ? "Bảng tiến độ tuyến phụ" : "Subplot board", context.sections.subplotBoard],
   ];
 
   const blocks = [
     zh
-      ? `# 正史上下文（《${context.bookTitle}》，已完成至第 ${context.baseChapter} 章）`
+      ? `# Bối cảnh chính thống ("${context.bookTitle}", đã hoàn thành đến chương ${context.baseChapter})`
       : `# Canonical context ("${context.bookTitle}", written through chapter ${context.baseChapter})`,
     ...sectionList
       .filter(([, content]) => content.trim())

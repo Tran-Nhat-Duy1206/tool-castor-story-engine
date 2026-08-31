@@ -33,11 +33,11 @@ function parseCharacterMatrix(md: string): CharacterInfo[] {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  "主角": "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-  "反派": "bg-red-500/15 text-red-600 dark:text-red-400",
-  "盟友": "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  "配角": "bg-blue-500/15 text-blue-600 dark:text-blue-400",
-  "提及": "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400",
+  "": "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  "": "bg-red-500/15 text-red-600 dark:text-red-400",
+  "": "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  "": "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  "": "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400",
   "protagonist": "bg-amber-500/15 text-amber-600 dark:text-amber-400",
   "antagonist": "bg-red-500/15 text-red-600 dark:text-red-400",
   "ally": "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
@@ -83,9 +83,9 @@ function RoleEntry({ role }: { readonly role: RoleRef }) {
 
 function CharacterCard({ char }: { readonly char: CharacterInfo }) {
   const [expanded, setExpanded] = useState(false);
-  const role = char.fields["定位"] ?? char.fields["Role"] ?? "";
-  const tags = char.fields["标签"] ?? char.fields["Tags"] ?? "";
-  const current = char.fields["当前"] ?? char.fields["Current"] ?? "";
+  const role = char.fields[""] ?? char.fields["Role"] ?? "";
+  const tags = char.fields[""] ?? char.fields["Tags"] ?? "";
+  const current = char.fields[""] ?? char.fields["Current"] ?? "";
 
   return (
     <div className="rounded-lg bg-secondary/30 overflow-hidden">
@@ -113,7 +113,7 @@ function CharacterCard({ char }: { readonly char: CharacterInfo }) {
             <p className="text-[14px] leading-6 text-muted-foreground"><span className="text-muted-foreground/60">{tr("Hiện tại", "Current")}</span> {current}</p>
           )}
           {Object.entries(char.fields)
-            .filter(([k]) => !["定位", "Role", "标签", "Tags", "当前", "Current"].includes(k))
+            .filter(([k]) => !["", "Role", "", "Tags", "", "Current"].includes(k))
             .map(([key, val]) => (
               <p key={key} className="text-[14px] leading-6 text-muted-foreground">
                 <span className="text-muted-foreground/60">{key}</span> {val}

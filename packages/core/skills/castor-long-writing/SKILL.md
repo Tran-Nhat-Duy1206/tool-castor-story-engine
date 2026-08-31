@@ -1,6 +1,6 @@
 ---
 name: castor-long-writing
-description: 长篇小说的场景构造、人物因果、信息释放与连载节奏。Used by Castor long-form workers as their shared craft method.
+description: Long-form novel scene construction, character causality, information release, and serial rhythm. Used by Castor long-form workers as their shared craft method.
 ---
 # Long-form narrative craft
 

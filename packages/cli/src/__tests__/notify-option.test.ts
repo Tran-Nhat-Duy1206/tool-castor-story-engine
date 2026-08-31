@@ -30,7 +30,7 @@ vi.mock("@actalk/castor-core", () => ({
   resolveRevisionGate: vi.fn(() => undefined),
   DEFAULT_REVISE_MODE: "spot-fix",
   // Real localization.ts imports these from core; keep them deterministic.
-  formatLengthCount: (count: number) => `${count}字`,
+  formatLengthCount: (count: number) => `${count} từ`,
   resolveLengthCountingMode: () => "chars",
 }));
 
@@ -53,7 +53,7 @@ const notifyChannels = [
 function chapterResult(chapterNumber: number, status = "ready-for-review") {
   return {
     chapterNumber,
-    title: `第${chapterNumber}章`,
+    title: `test_mock${chapterNumber}test_mock`,
     wordCount: 3000,
     auditResult: { passed: true, issues: [], summary: "ok" },
     revised: false,
@@ -68,7 +68,7 @@ describe("--notify command option", () => {
     vi.resetModules();
     vi.clearAllMocks();
     loadBookConfigMock.mockResolvedValue({
-      title: "示例书",
+      title: "test_mock",
       language: "zh",
       writing: {},
     });
@@ -110,9 +110,9 @@ describe("--notify command option", () => {
       expect(dispatchNotificationMock).toHaveBeenCalledTimes(1);
       const [channels, message] = dispatchNotificationMock.mock.calls[0]!;
       expect(channels).toBe(notifyChannels);
-      expect(message.title).toBe("✅ Viết hoàn tất: 示例书");
+      expect(message.title).toBe("✅ Viết hoàn tất: test_mock");
       expect(message.body).toContain("Hoàn thành 2 chương (từ chương 4 đến chương 5)");
-      expect(message.body).toContain("Chương 4 第4章 | 3000字 | kiểm tra đạt");
+      expect(message.body).toContain("Chương 4 Chương 4 | 3000 từ | kiểm tra đạt");
     });
 
     it("does not send a batch summary without --notify", async () => {
@@ -136,7 +136,7 @@ describe("--notify command option", () => {
 
       expect(dispatchNotificationMock).toHaveBeenCalledTimes(1);
       const [, message] = dispatchNotificationMock.mock.calls[0]!;
-      expect(message.title).toBe("❌ Viết thất bại: 示例书");
+      expect(message.title).toBe("❌ Viết thất bại: test_mock");
       expect(message.body).toContain("LLM exploded");
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
@@ -177,7 +177,7 @@ describe("--notify command option", () => {
         chapterNumber: 4,
         passed: true,
         issues: [],
-        summary: "整体一致",
+        summary: "test_mock",
       });
 
       const { auditCommand } = await import("../commands/audit.js");
@@ -186,8 +186,8 @@ describe("--notify command option", () => {
       expect(dispatchNotificationMock).toHaveBeenCalledTimes(1);
       const [channels, message] = dispatchNotificationMock.mock.calls[0]!;
       expect(channels).toBe(notifyChannels);
-      expect(message.title).toBe("✅ Kiểm tra hoàn tất: 示例书");
-      expect(message.body).toBe("Kiểm tra chương 4 đạt (0 vấn đề)\n整体一致");
+      expect(message.title).toBe("✅ Kiểm tra hoàn tất: test_mock");
+      expect(message.body).toBe("Kiểm tra chương 4 đạt (0 vấn đề)\ntest_mock");
       expect(exitSpy).not.toHaveBeenCalled();
     });
 
@@ -248,7 +248,7 @@ describe("--notify command option", () => {
       await auditCommand.parseAsync(["node", "audit", "demo-book", "--notify"], { from: "node" });
 
       const [, message] = dispatchNotificationMock.mock.calls[0]!;
-      expect(message.title).toBe("❌ Kiểm tra thất bại: 示例书");
+      expect(message.title).toBe("❌ Kiểm tra thất bại: test_mock");
       expect(message.body).toContain("no chapters");
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
@@ -269,8 +269,8 @@ describe("--notify command option", () => {
 
       expect(dispatchNotificationMock).toHaveBeenCalledTimes(1);
       const [, message] = dispatchNotificationMock.mock.calls[0]!;
-      expect(message.title).toBe("✅ Chỉnh sửa hoàn tất: 示例书");
-      expect(message.body).toBe("Chương 3 đã chỉnh sửa | 3200字 | đã sửa 2 vấn đề");
+      expect(message.title).toBe("✅ Chỉnh sửa hoàn tất: test_mock");
+      expect(message.body).toBe("Chương 3 đã chỉnh sửa | 3200 từ | đã sửa 2 vấn đề");
     });
 
     it("reports a kept original draft with the skip reason", async () => {
@@ -280,15 +280,15 @@ describe("--notify command option", () => {
         fixedIssues: [],
         applied: false,
         status: "unchanged",
-        skippedReason: "无阻断问题",
+        skippedReason: "test_mock",
       });
 
       const { reviseCommand } = await import("../commands/revise.js");
       await reviseCommand.parseAsync(["node", "revise", "demo-book", "3", "--notify"], { from: "node" });
 
       const [, message] = dispatchNotificationMock.mock.calls[0]!;
-      expect(message.title).toBe("✅ Chỉnh sửa hoàn tất: 示例书");
-      expect(message.body).toBe("Chương 3 giữ nguyên bản gốc: 无阻断问题");
+      expect(message.title).toBe("✅ Chỉnh sửa hoàn tất: test_mock");
+      expect(message.body).toBe("Chương 3 giữ nguyên bản gốc: test_mock");
     });
 
     it("sends a failure notification when the revision fails", async () => {
@@ -298,7 +298,7 @@ describe("--notify command option", () => {
       await reviseCommand.parseAsync(["node", "revise", "demo-book", "3", "--notify"], { from: "node" });
 
       const [, message] = dispatchNotificationMock.mock.calls[0]!;
-      expect(message.title).toBe("❌ Chỉnh sửa thất bại: 示例书");
+      expect(message.title).toBe("❌ Chỉnh sửa thất bại: test_mock");
       expect(message.body).toContain("revision blew up");
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
@@ -316,7 +316,7 @@ describe("--notify command option", () => {
       expect(writeNextChapterMock).toHaveBeenCalledTimes(3);
       expect(dispatchNotificationMock).toHaveBeenCalledTimes(1);
       const [, message] = dispatchNotificationMock.mock.calls[0]!;
-      expect(message.title).toBe("✅ Tự động viết liên tiếp hoàn tất: 示例书");
+      expect(message.title).toBe("✅ Tự động viết liên tiếp hoàn tất: test_mock");
       expect(message.body).toContain("Hoàn thành 3 chương (từ chương 1 đến chương 3)");
     });
 
@@ -341,7 +341,7 @@ describe("--notify command option", () => {
 
       expect(dispatchNotificationMock).toHaveBeenCalledTimes(1);
       const [, message] = dispatchNotificationMock.mock.calls[0]!;
-      expect(message.title).toBe("❌ Tự động viết liên tiếp thất bại: 示例书");
+      expect(message.title).toBe("❌ Tự động viết liên tiếp thất bại: test_mock");
       expect(message.body).toContain("Chapter 2 failed");
       expect(exitSpy).toHaveBeenCalledWith(1);
     });

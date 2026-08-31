@@ -47,8 +47,10 @@ const RESOLVED_STATUSES: ReadonlyArray<RegExp> = [
   /^resolved$/i,
   /^closed$/i,
   /^done$/i,
-  /^已回收$/,
-  /^已解决$/,
+  /^đã thu hồi$/i,
+  /^đã giải quyết$/i,
+  /^thu hồi$/i,
+  /^hoàn thành$/i,
 ];
 
 function isResolved(hook: HookLike): boolean {
@@ -148,7 +150,7 @@ export function renderHookDiagnosticMarker(
   if (diagnostics.stale) {
     tokens.push(language === "en"
       ? `stale (d=${diagnostics.distance}/half=${diagnostics.halfLife})`
-      : `过期 (距=${diagnostics.distance}/半衰=${diagnostics.halfLife})`);
+      : `quá hạn (d=${diagnostics.distance}/half=${diagnostics.halfLife})`);
   }
   if (diagnostics.blocked) {
     const missing = diagnostics.missingUpstream.join(", ");
@@ -158,11 +160,11 @@ export function renderHookDiagnosticMarker(
     const distanceToken = diagnostics.blockedDistance > 0
       ? (language === "en"
         ? ` (blocked ${diagnostics.blockedDistance} chapters)`
-        : ` (已阻 ${diagnostics.blockedDistance} 章)`)
+        : ` (bị nghẽn ${diagnostics.blockedDistance} chương)`)
       : "";
     tokens.push(language === "en"
       ? `blocked on ${missing}${distanceToken}`
-      : `受阻于 ${missing}${distanceToken}`);
+      : `bị nghẽn bởi ${missing}${distanceToken}`);
   }
   return tokens.join("; ");
 }

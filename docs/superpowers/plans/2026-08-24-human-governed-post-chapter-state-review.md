@@ -18,7 +18,7 @@
 - TDD: RED run must fail for the named reason before GREEN.
 - Known baseline (never "fix" in Phase 4): exactly 2 failures in `packages/core/src/__tests__/skill-agent-tool.test.ts` (Windows symlink EPERM).
 - All filesystem-purity assertions use `captureBookMetadata(root)` from `packages/core/src/__tests__/helpers/canon-fixture.ts` (sha256+size+mtimeMs whole-tree map, deep-equality compare).
-- Fixtures: `createCanonBook({seedSnapshotsThrough: 12})` from the same helper module (facts: 主角/当前位置 closed@10 + open 东城公寓@11, 主角状态 open@12, 林晚/身份 open@4).
+- Fixtures: `createCanonBook({seedSnapshotsThrough: 12})` from the same helper module (facts: / closed@10 + open @11,  open@12, / open@4).
 - Never feed anything under `story/runtime/` to Writer-context builders; never write Canon outside `story/state/*.json`.
 - **No task may reference a symbol introduced by a LATER task.** The task order below is dependency-sorted; if an executor finds a missing dependency, STOP and escalate rather than implementing a future task early.
 - Language values are ALWAYS the canonical `RuntimeStateLanguageSchema` / `RuntimeStateLanguage` from `packages/core/src/models/runtime-state.ts` (:3-4, barrel-exported). No Phase 4 file declares its own `"zh" | "en"` literal union.
@@ -93,7 +93,7 @@ export function describeCurrentStateSlot(
   language: RuntimeStateLanguage,
 ): { readonly subject: "protagonist"; readonly predicate: string };
 // predicate === aliases[0] under the EXACT per-language ordering the reducer uses today
-// (zh books: ["当前位置","Current Location"], en books: ["Current Location","当前位置"], …)
+// (zh books: ["","Current Location"], en books: ["Current Location",""], …)
 ```
 
 `applyCurrentStatePatch` is refactored to consume it (byte-identical output asserted by existing reducer + projection suites BEFORE merge), and the converter (Task 4) uses the same helper. No third mapping, no invented Chinese constants in Phase 4 files.

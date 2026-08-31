@@ -38,12 +38,12 @@ async function seedBook(root: string, options: SeedOptions): Promise<string> {
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await mkdir(join(storyDir, "state"), { recursive: true });
   await writeIf(join(bookDir, "book.json"), JSON.stringify({
-    id: "demo-canon-book", title: "回声协议", genre: "urban", language: "vi",
+    id: "demo-canon-book", title: "mock_text", genre: "urban", language: "vi",
     platform: "other", createdAt: CREATED, updatedAt: CREATED,
   }));
   const index = Array.from({ length: options.prefixThrough }, (_, i) => i + 1).map((number) => ({
     number,
-    title: `第${number}章`,
+    title: `Chương ${number}mock_text`,
     status: "approved",
     wordCount: 100,
     createdAt: CREATED,
@@ -52,8 +52,8 @@ async function seedBook(root: string, options: SeedOptions): Promise<string> {
   await writeIf(join(bookDir, "chapters", "index.json"), JSON.stringify(index));
   for (let chapter = 1; chapter <= options.prefixThrough; chapter += 1) {
     await writeIf(
-      join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_第${chapter}章.md`),
-      `# 第${chapter}章\n\n正文。\n`,
+      join(bookDir, "chapters", `${String(chapter).padStart(4, "0")}_Chương ${chapter}mock_text.md`),
+      `# Chương ${chapter}mock_text\n\nmock_text。\n`,
     );
   }
   if (options.manifestHead !== undefined) {
@@ -70,8 +70,8 @@ async function seedBook(root: string, options: SeedOptions): Promise<string> {
       chapter: options.currentStateChapter,
       facts: [{
         subject: "protagonist",
-        predicate: "当前位置",
-        object: "悔痕灯塔",
+        predicate: "mock_text",
+        object: "mock_text",
         validFromChapter: options.currentStateChapter,
         validUntilChapter: null,
         sourceChapter: options.currentStateChapter,
@@ -81,11 +81,11 @@ async function seedBook(root: string, options: SeedOptions): Promise<string> {
   if (options.markdownSummariesRow999) {
     // Hallucinated markdown row FAR beyond the durable prefix.
     await writeIf(join(storyDir, "chapter_summaries.md"), [
-      "# 章节摘要",
+      "# mock_text",
       "",
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 999 | 幻影章 | 林秋 | 幻影事件 | 幻影变化 | | 平静 | 调查 |",
+      "| 999 | mock_text | mock_text | mock_text | mock_text | | mock_text | mock_text |",
       "",
     ].join("\n"));
   }
@@ -162,7 +162,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
     const bookDir = join(root, "books", "empty-book");
     await mkdir(join(bookDir), { recursive: true });
     await writeIf(join(bookDir, "book.json"), JSON.stringify({
-      id: "empty-book", title: "空", genre: "urban", language: "vi",
+      id: "empty-book", title: "mock_text", genre: "urban", language: "vi",
       platform: "other", createdAt: CREATED, updatedAt: CREATED,
     }));
     const result = await bootstrapStructuredStateFromMarkdown({ bookDir });

@@ -1,15 +1,9 @@
-/**
- * 阶跃星辰 (StepFun)
- *
- * - 官网：https://www.stepfun.com/
- * - 控制台 / API key：https://platform.stepfun.com/interface-key
- * - API 文档：https://platform.stepfun.com/docs/overview/concept
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const STEPFUN: ProviderEndpoint = {
   id: "stepfun",
-  label: "阶跃星辰",
+  label: "StepFun",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://api.stepfun.com/v1",

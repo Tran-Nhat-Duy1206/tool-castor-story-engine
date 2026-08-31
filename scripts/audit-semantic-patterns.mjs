@@ -37,14 +37,14 @@ const SEMANTIC_HINTS = [
   "fanfic",
   "spinoff",
   "imitation",
-  "续写",
-  "继续",
-  "建书",
-  "短篇",
-  "互动",
-  "番外",
-  "仿写",
-  "同人",
+  "viết tiếp",
+  "tiếp tục",
+  "tạo sách",
+  "truyện ngắn",
+  "tương tác",
+  "ngoại truyện",
+  "phỏng tác",
+  "đồng nhân",
 ];
 
 const PATTERN_TOKENS = [

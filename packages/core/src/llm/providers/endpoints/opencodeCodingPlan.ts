@@ -1,9 +1,4 @@
-/**
- * OpenCode CodingPlan
- *
- * - OpenCode 聚合的编码类套餐，具体后端随订阅变化。
- * - 官网：https://opencode.ai/
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const OPENCODE_CODING_PLAN: ProviderEndpoint = {

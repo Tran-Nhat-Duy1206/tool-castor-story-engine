@@ -24,8 +24,8 @@ describe("PlayDB", () => {
       db.upsertEntity({
         id: "actor_songci",
         type: "actor",
-        label: "宋词",
-        summary: "冷静的妻子。",
+        label: "mock_text",
+        summary: "mock_text。",
         status: "active",
         createdEventId: "event-0001",
         updatedEventId: "event-0001",
@@ -34,7 +34,7 @@ describe("PlayDB", () => {
 
       const reopened = new PlayDB(root);
       expect(reopened.getEntity("actor_songci")).toMatchObject({
-        label: "宋词",
+        label: "mock_text",
         type: "actor",
       });
       reopened.close();
@@ -48,8 +48,8 @@ describe("PlayDB", () => {
     const db = new PlayDB(root);
 
     try {
-      db.upsertEntity({ id: "evidence_stats", type: "evidence", label: "地址统计" });
-      db.upsertEntity({ id: "claim_cohabit", type: "claim", label: "婚外同居" });
+      db.upsertEntity({ id: "evidence_stats", type: "evidence", label: "mock_text" });
+      db.upsertEntity({ id: "claim_cohabit", type: "claim", label: "mock_text" });
       db.upsertEdge({
         id: "edge-supports",
         fromId: "evidence_stats",
@@ -76,9 +76,9 @@ describe("PlayDB", () => {
     const db = new PlayDB(root);
 
     try {
-      db.upsertEntity({ id: "evidence_stats", type: "evidence", label: "地址统计" });
-      db.upsertEntity({ id: "claim_cohabit", type: "claim", label: "婚外同居" });
-      db.upsertEntity({ id: "evidence_recording", type: "evidence", label: "录音" });
+      db.upsertEntity({ id: "evidence_stats", type: "evidence", label: "mock_text" });
+      db.upsertEntity({ id: "claim_cohabit", type: "claim", label: "mock_text" });
+      db.upsertEntity({ id: "evidence_recording", type: "evidence", label: "mock_text" });
       db.upsertEdge({
         id: "edge-supports-1",
         fromId: "evidence_stats",
@@ -111,12 +111,12 @@ describe("PlayDB", () => {
     const db = new PlayDB(root);
 
     try {
-      db.upsertEntity({ id: "actor_husband", type: "actor", label: "徐晋安" });
+      db.upsertEntity({ id: "actor_husband", type: "actor", label: "Xu Jinan" });
       db.upsertStateSlot({
         id: "slot_husband_suspicion",
         ownerEntityId: "actor_husband",
         kind: "pressure",
-        label: "丈夫警觉",
+        label: "mock_text",
         value: { current: 45, min: 0, max: 100 },
         updatedEventId: "event-0002",
       });
@@ -124,12 +124,12 @@ describe("PlayDB", () => {
         id: "event-0002",
         turn: 2,
         actionKind: "say",
-        rawInput: "问他删了什么",
-        outcomeSummary: "丈夫警觉提高。",
+        rawInput: "mock_text",
+        outcomeSummary: "mock_text。",
         createdAt: "2026-05-28T00:00:00.000Z",
       });
 
-      expect(db.getStateSlotsForEntity("actor_husband")[0]?.label).toBe("丈夫警觉");
+      expect(db.getStateSlotsForEntity("actor_husband")[0]?.label).toBe("mock_text");
       expect(db.getEvent("event-0002")?.actionKind).toBe("say");
       expect(db.snapshot()).toMatchObject({
         entities: [expect.objectContaining({ id: "actor_husband" })],

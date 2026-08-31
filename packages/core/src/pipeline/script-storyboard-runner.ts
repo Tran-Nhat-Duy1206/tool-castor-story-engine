@@ -201,8 +201,8 @@ export async function runScriptCreation(
 }
 
 function assertScriptDeliverable(script: string, language: "vi" | "en"): void {
-  const characterHeadings = language === "en" ? ["Characters"] : ["人物", "Characters"];
-  const scriptHeadings = language === "en" ? ["Script"] : ["剧本正文", "Script"];
+  const characterHeadings = language === "en" ? ["Characters"] : ["", "Characters"];
+  const scriptHeadings = language === "en" ? ["Script"] : ["", "Script"];
   const body = extractMarkdownSection(
     script,
     scriptHeadings,
@@ -213,7 +213,7 @@ function assertScriptDeliverable(script: string, language: "vi" | "en"): void {
     throw new Error(
       language === "en"
         ? "Script production did not return exactly one `## Characters` and one non-empty `## Script` deliverable. No artifacts were committed."
-        : "剧本生产没有返回且仅返回一份 `## 人物` 和一份非空 `## 剧本正文` 交付段，未提交任何产物。",
+        : " `## `  `## ` ，。",
     );
   }
 }
@@ -244,27 +244,27 @@ export async function runInteractiveFilmCreation(
   const agent = new InteractiveFilmCreationAgent(options.runtime);
   const packageMarkdown = await agent.writeInteractiveFilm(input);
   const storyTree = requiredSection(packageMarkdown, [
-    "剧情树",
+    "",
     "Story Tree",
     "Branching Story Tree",
   ], packageMarkdown);
   const flags = requiredSection(packageMarkdown, [
-    "旗标与变量系统说明",
-    "变量与旗标表",
-    "变量和旗标表",
-    "变量表",
-    "旗标表",
+    "",
+    "",
+    "",
+    "",
+    "",
     "Variables and Flags",
     "Flag Table",
   ], packageMarkdown);
   const script = requiredSection(packageMarkdown, [
-    "互动剧本",
+    "",
     "Interactive Script",
     "Script",
   ], packageMarkdown);
   const storyboard = requiredSection(packageMarkdown, [
-    "分镜与图像提示词",
-    "分镜表",
+    "",
+    "",
     "Storyboard and Image Prompts",
     "Storyboard",
   ], packageMarkdown);
@@ -453,7 +453,7 @@ function splitStoryboardSource(
     const heading = /^#{1,6}\s+(.+?)\s*$/u.exec(raw.trim());
     if (!heading) continue;
     const label = heading[1]!.trim();
-    if (/^第\s*[一二三四五六七八九十百千万\d]+\s*集(?:\s|《|$)/u.test(label)
+    if (/^Chương \s*[\d]+\s*(?:\s|《|$)/u.test(label)
       || /^episode\s+\d+(?:\s|[:：\-—]|$)/iu.test(label)) {
       headings.push({ line, label });
     }
@@ -481,7 +481,7 @@ function splitStoryboardEpisodeScenes(episode: StoryboardSourceSegment): Storybo
     const bold = /^\*\*(.+?)\*\*(?:\s.*)?$/u.exec(text);
     const label = bold?.[1]?.trim();
     if (!label) continue;
-    if (/^(?:场次\s*\d+|集尾钩子)(?:\s|[：:／/]|$)/u.test(label)
+    if (/^(?:\s*\d+|)(?:\s|[：:／/]|$)/u.test(label)
       || /^(?:scene\s+\d+|episode[- ]end hook)(?:\s|[：:/\-—]|$)/iu.test(label)) {
       boundaries.push({ line, label });
     }
@@ -511,7 +511,7 @@ async function createInteractiveFilmStoryGraph(
 ): Promise<StoryGraph> {
   args.onProgress?.(args.input.language === "en"
     ? "Building the playable story graph through the structured authoring harness..."
-    : "正在通过结构化创作内核生成可玩故事图谱……");
+    : "……");
   return generateStoryGraph(runtime.client, runtime.model, {
     projectId: args.projectId,
     title: args.title,
@@ -545,16 +545,16 @@ function buildInteractiveFilmGraphPremise(
     ].filter(Boolean).join("\n\n");
   }
   return [
-    `创作需求：${input.requirements}`,
-    input.targetAudience ? `目标受众：${input.targetAudience}` : "",
-    input.episodeCount ? `段落/集数：${input.episodeCount}` : "",
-    input.episodeDuration ? `单段时长：${input.episodeDuration}` : "",
-    input.budget ? `预算：${input.budget}` : "",
-    input.referenceMode ? `参考模式：${input.referenceMode}` : "",
-    `剧情树：\n${storyTree}`,
-    `变量旗标：\n${flags}`,
-    `互动剧本：\n${script}`,
-    `图像提示词：\n${imagePrompts}`,
+    `：${input.requirements}`,
+    input.targetAudience ? `：${input.targetAudience}` : "",
+    input.episodeCount ? `/：${input.episodeCount}` : "",
+    input.episodeDuration ? `：${input.episodeDuration}` : "",
+    input.budget ? `：${input.budget}` : "",
+    input.referenceMode ? `：${input.referenceMode}` : "",
+    `：\n${storyTree}`,
+    `：\n${flags}`,
+    `：\n${script}`,
+    `：\n${imagePrompts}`,
   ].filter(Boolean).join("\n\n");
 }
 
@@ -640,7 +640,7 @@ function mergeRequirements(
   requirements: string | undefined,
   language: "vi" | "en" = "vi",
 ): string {
-  const extraLabel = language === "en" ? "Additional requirements:" : "补充要求：";
+  const extraLabel = language === "en" ? "Additional requirements:" : "：";
   return [
     instruction.trim(),
     requirements?.trim() ? `\n${extraLabel}\n${requirements.trim()}` : "",
@@ -708,7 +708,7 @@ function parseStoryboardPromptLines(markdown: string): string[] {
       continue;
     }
     promptColumnIndex = -1;
-    const promptMatch = /(?:^|[|>\-\d.)、\s])(?:\*\*)?\s*(?:Prompt(?:\s+for\s+[^:*：]+)?|提示词(?:\s*[^:*：]+)?|图像提示词|分镜图提示词)\s*(?:\*\*)?\s*[：:]\s*(.+?)\s*$/iu.exec(line);
+    const promptMatch = /(?:^|[|>\-\d.)、\s])(?:\*\*)?\s*(?:Prompt(?:\s+for\s+[^:*：]+)?|(?:\s*[^:*：]+)?||)\s*(?:\*\*)?\s*[：:]\s*(.+?)\s*$/iu.exec(line);
     if (promptMatch) {
       const prompt = cleanPromptText(promptMatch[1]!);
       if (prompt) prompts.push(prompt);
@@ -737,7 +737,7 @@ function isMarkdownTableSeparator(cells: readonly string[]): boolean {
 }
 
 function isPromptColumnHeader(cell: string): boolean {
-  return /^(?:prompt|image\s*prompt|shot\s*prompt|提示词|图像提示词|分镜图提示词)$/iu.test(
+  return /^(?:prompt|image\s*prompt|shot\s*prompt|||)$/iu.test(
     cell.replace(/[`*_]+/gu, "").trim(),
   );
 }
@@ -746,7 +746,7 @@ function cleanPromptText(text: string): string {
   return text
     .replace(/\s*\|\s*$/u, "")
     .replace(/\*\*$/u, "")
-    .replace(/^(?:Prompt(?:\s+for\s+[^:*：]+)?|提示词(?:\s*[^:*：]+)?|图像提示词|分镜图提示词)\s*[：:]\s*/iu, "")
+    .replace(/^(?:Prompt(?:\s+for\s+[^:*：]+)?|(?:\s*[^:*：]+)?||)\s*[：:]\s*/iu, "")
     .replace(/\s+/g, " ")
     .trim();
 }

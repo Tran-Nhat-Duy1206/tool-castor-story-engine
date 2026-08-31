@@ -1,6 +1,6 @@
 ---
 name: castor-short-writing
-description: 12–18章商业短篇的构思、一次写完、整篇审改与包装。Use for confirmed standalone short-fiction production.
+description: Commercial short-form fiction writing methodology: golden opening, emotion hook, turning point, and climax payoff.
 ---
 # Short-fiction writing
 

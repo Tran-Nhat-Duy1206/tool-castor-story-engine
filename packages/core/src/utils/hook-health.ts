@@ -45,10 +45,10 @@ export function analyzeHookHealth(params: {
       params.language,
       params.language === "en"
         ? `There are ${activeHooks.length} active hooks, above the recommended cap of ${maxActiveHooks}.`
-        : `当前有 ${activeHooks.length} 个活跃伏笔，已经高于建议上限 ${maxActiveHooks} 个。`,
+        : `Hiện có ${activeHooks.length} manh mối/phục bút đang hoạt động, vượt quá mức khuyến nghị ${maxActiveHooks}.`,
       params.language === "en"
         ? "Prefer advancing, resolving, or deferring existing debt before opening more hooks."
-        : "优先推进、回收或延后已有伏笔，再继续开新伏笔。",
+        : "Ưu tiên thúc đẩy, giải quyết hoặc tạm hoãn các manh mối hiện có trước khi mở thêm manh mối mới.",
     ));
   }
 
@@ -84,7 +84,7 @@ export function analyzeHookHealth(params: {
       }),
       params.language === "en"
         ? "Move one pressured hook with a real payoff, escalation, or explicit defer before opening adjacent debt."
-        : "先让一个已进入压力区的伏笔发生真实推进、回收或明确延后，再继续扩展同类债务。",
+        : "Hãy thúc đẩy, thu hồi hoặc tạm hoãn rõ ràng ít nhất một manh mối đang chịu áp lực trước khi tạo thêm nợ manh mối tương tự.",
     ));
   } else {
     const latestRealAdvance = activeHooks.reduce(
@@ -100,10 +100,10 @@ export function analyzeHookHealth(params: {
         params.language,
         params.language === "en"
           ? `No real hook advancement has landed for ${params.chapterNumber - latestRealAdvance} chapters.`
-          : `已经连续 ${params.chapterNumber - latestRealAdvance} 章没有真实伏笔推进。`,
+          : `Đã liên tiếp ${params.chapterNumber - latestRealAdvance} chương không có tiến triển manh mối thực tế nào.`,
         params.language === "en"
           ? "Schedule one old hook for real movement instead of opening parallel restatements."
-          : "下一章优先让一个旧伏笔发生真实推进，而不是继续平行重述。",
+          : "Chương tiếp theo nên ưu tiên tiến triển thực tế cho một manh mối cũ thay vì chỉ lặp lại.",
       ));
     }
   }
@@ -120,10 +120,10 @@ export function analyzeHookHealth(params: {
         params.language,
         params.language === "en"
           ? `Opened ${newHookIds.length} new hooks without resolving any older debt.`
-          : `本章新开了 ${newHookIds.length} 个伏笔，但没有回收任何旧债。`,
+          : `Chương này đã mở thêm ${newHookIds.length} manh mối mới nhưng chưa giải quyết manh mối cũ nào.`,
         params.language === "en"
           ? "Keep the hook table from ballooning by pairing new openings with old payoffs."
-          : "控制伏笔膨胀，新开伏笔时尽量配套回收旧伏笔。",
+          : "Kiểm soát số lượng manh mối, cố gắng giải quyết manh mối cũ khi mở manh mối mới.",
       ));
     }
   }
@@ -144,14 +144,12 @@ function buildPressureDescription(params: {
     .map(({ hook, lifecycle }) => {
       const timing = localizeHookPayoffTiming(lifecycle.timing, params.language);
       const pressure = localizePressureLabel(lifecycle, params.language);
-      return params.language === "en"
-        ? `${hook.hookId} (${timing}, ${pressure})`
-        : `${hook.hookId}（${timing}，${pressure}）`;
+      return `${hook.hookId} (${timing}, ${pressure})`;
     });
   const suffix = params.entries.length > summarized.length
     ? params.language === "en"
       ? `, +${params.entries.length - summarized.length} more`
-      : `，另有 ${params.entries.length - summarized.length} 条`
+      : `, +${params.entries.length - summarized.length} khác`
     : "";
 
   if (params.language === "en") {
@@ -161,8 +159,8 @@ function buildPressureDescription(params: {
   }
 
   return params.mentionsCurrentChapter
-    ? `这些伏笔已经进入回收/推进压力，但本章没有真正处理：${summarized.join("、")}${suffix}。`
-    : `这些伏笔已经进入回收/推进压力，但近期没有真实推进：${summarized.join("、")}${suffix}。`;
+    ? `Các manh mối này đang chịu áp lực thu hồi/tiến triển nhưng chương này chưa xử lý: ${summarized.join(", ")}${suffix}.`
+    : `Các manh mối này đang chịu áp lực thu hồi/tiến triển nhưng gần đây chưa có tiến triển thực tế: ${summarized.join(", ")}${suffix}.`;
 }
 
 function localizePressureLabel(
@@ -170,12 +168,12 @@ function localizePressureLabel(
   language: "vi" | "en",
 ): string {
   if (lifecycle.overdue) {
-    return language === "en" ? "overdue" : "已逾期";
+    return language === "en" ? "overdue" : "quá hạn";
   }
   if (lifecycle.readyToResolve) {
-    return language === "en" ? "ready to pay off" : "可回收";
+    return language === "en" ? "ready to pay off" : "có thể thu hồi";
   }
-  return language === "en" ? "stale" : "陈旧";
+  return language === "en" ? "stale" : "tồn đọng";
 }
 
 function warning(
@@ -185,7 +183,7 @@ function warning(
 ): AuditIssue {
   return {
     severity: "warning",
-    category: language === "en" ? "Hook Debt" : "伏笔债务",
+    category: language === "en" ? "Hook Debt" : "Nợ manh mối",
     description,
     suggestion,
   };

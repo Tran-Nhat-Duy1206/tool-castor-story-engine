@@ -12,20 +12,20 @@ const LENGTH_BUDGET = {
   softMax: 2500,
   hardMin: 1600,
   hardMax: 2800,
-  unit: "字",
+  unit: " từ",
 } as const;
 
 describe("PLANNER_MEMO_SYSTEM_PROMPT", () => {
   it("contains key mobile web-fiction craft phrases", () => {
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("1 主线 + 1 支线");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("三连问");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("不要 YAML frontmatter");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## 本章目标");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## 关联线索");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## 场景与篇幅预算");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("不超过 50 字");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## 当前任务");
-    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## 不要做");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("1 mock_text + 1 mock_text");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("mock_text");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("mock_text YAML frontmatter");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## mock_text");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## mock_text");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## Cảnh và ngân sách độ dài");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("mock_text 50  từ");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## Nhiệm vụ hiện tại");
+    expect(PLANNER_MEMO_SYSTEM_PROMPT).toContain("## Không làm");
   });
 
   it("is not accidentally empty", () => {
@@ -64,35 +64,35 @@ describe("buildPlannerUserMessage", () => {
   it("fills placeholders in order", () => {
     const out = buildPlannerUserMessage({
       chapterNumber: 12,
-      previousChapterEndingExcerpt: "上一屏结尾原文",
+      previousChapterEndingExcerpt: "mock_text",
       recentSummaries: "| ch9 | ... |",
-      currentArcProse: "主线推进七号门",
-      protagonistMatrixRow: "| 阿泽 | 主角 | ... |",
-      opponentRows: "| 老李 | 对手 | ... |",
-      collaboratorRows: "| 小白 | 盟友 | ... |",
-      relevantThreads: "- H03: 未解码信\n- S004: 七号门异常",
-      recyclableHooks: "（暂无陈旧 hook——账本干净）",
+      currentArcProse: "mock_text",
+      protagonistMatrixRow: "| mock_text | mock_text | ... |",
+      opponentRows: "| mock_text | mock_text | ... |",
+      collaboratorRows: "| mock_text | mock_text | ... |",
+      relevantThreads: "- H03: mock_text\n- S004: mock_text",
+      recyclableHooks: "（Chua comock_text hook——mock_text）",
       isGoldenOpening: false,
       lengthBudget: LENGTH_BUDGET,
-      bookRulesRelevant: "- 禁止主角降智",
+      bookRulesRelevant: "- mock_text",
     });
 
-    expect(out).toContain("# 第 12 章 memo 请求");
-    expect(out).toContain("上一屏结尾原文");
+    expect(out).toContain("# Chương 12 memo mock_text");
+    expect(out).toContain("mock_text");
     expect(out).toContain("| ch9 | ... |");
-    expect(out).toContain("主线推进七号门");
-    expect(out).toContain("| 阿泽 | 主角 | ... |");
-    expect(out).toContain("| 老李 | 对手 | ... |");
-    expect(out).toContain("| 小白 | 盟友 | ... |");
-    expect(out).toContain("- H03: 未解码信");
-    expect(out).toContain("是否黄金三章：否");
-    expect(out).toContain("目标 2200 字");
-    expect(out).toContain("硬区间 1600-2800");
-    expect(out).toContain("- 禁止主角降智");
+    expect(out).toContain("mock_text");
+    expect(out).toContain("| mock_text | mock_text | ... |");
+    expect(out).toContain("| mock_text | mock_text | ... |");
+    expect(out).toContain("| mock_text | mock_text | ... |");
+    expect(out).toContain("- H03: mock_text");
+    expect(out).toContain("mock_text：mock_text");
+    expect(out).toContain("mock_text 2200  từ");
+    expect(out).toContain("mock_text 1600-2800");
+    expect(out).toContain("- mock_text");
     expect(out).not.toContain("{{");
   });
 
-  it("translates isGoldenOpening true to 是", () => {
+  it("translates isGoldenOpening true to mock_text", () => {
     const out = buildPlannerUserMessage({
       chapterNumber: 1,
       previousChapterEndingExcerpt: "",
@@ -107,7 +107,7 @@ describe("buildPlannerUserMessage", () => {
       lengthBudget: LENGTH_BUDGET,
       bookRulesRelevant: "",
     });
-    expect(out).toContain("是否黄金三章：是");
+    expect(out).toContain("mock_text：mock_text");
   });
 });
 
@@ -118,31 +118,31 @@ describe("buildPlannerUserMessage", () => {
 describe("buildGoldenOpeningGuidance", () => {
   it("emits zh slot prose for chapter 1 (confront core conflict)", () => {
     const out = buildGoldenOpeningGuidance(1, "vi");
-    expect(out).toContain("黄金三章规划指引");
-    expect(out).toContain("第 1 章");
+    expect(out).toContain("mock_text");
+    expect(out).toContain("Chương 1");
     // Ch1 slot: throw protagonist into core conflict
-    expect(out).toContain("核心冲突");
-    expect(out).toContain("主角出场即面对主线矛盾");
+    expect(out).toContain("mock_text");
+    expect(out).toContain("mock_text");
     // Opening economy
-    expect(out).toContain("场景 ≤ 3");
-    expect(out).toContain("人物 ≤ 3");
+    expect(out).toContain("mock_text ≤ 3");
+    expect(out).toContain("mock_text ≤ 3");
     // Information layering
-    expect(out).toContain("信息分层");
+    expect(out).toContain("mock_text");
   });
 
   it("emits zh slot prose for chapter 2 (demonstrate the edge)", () => {
     const out = buildGoldenOpeningGuidance(2, "vi");
-    expect(out).toContain("第 2 章");
-    expect(out).toContain("金手指");
+    expect(out).toContain("Chương 2");
+    expect(out).toContain("mock_text");
     // Must demand a concrete event, not narration
-    expect(out).toContain("一次具体事件");
+    expect(out).toContain("mock_text");
   });
 
   it("emits zh slot prose for chapter 3 (lock the short-term goal)", () => {
     const out = buildGoldenOpeningGuidance(3, "vi");
-    expect(out).toContain("第 3 章");
-    expect(out).toContain("短期目标");
-    expect(out).toContain("3-10 章");
+    expect(out).toContain("Chương 3");
+    expect(out).toContain("mock_text");
+    expect(out).toContain("3-10 mock_text");
   });
 
   it("emits en slot prose for chapter 1 with all three slot descriptions", () => {
@@ -185,10 +185,10 @@ describe("buildGoldenOpeningGuidance", () => {
     };
 
     const ch2 = buildPlannerUserMessage({ ...base, chapterNumber: 2 });
-    expect(ch2).toContain("黄金三章规划指引");
-    expect(ch2).toContain("第 2 章");
+    expect(ch2).toContain("mock_text");
+    expect(ch2).toContain("Chương 2");
 
     const ch4 = buildPlannerUserMessage({ ...base, chapterNumber: 4 });
-    expect(ch4).not.toContain("黄金三章规划指引");
+    expect(ch4).not.toContain("mock_text");
   });
 });

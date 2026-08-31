@@ -124,8 +124,8 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
     bookDir = join(root, "books", "hotfix-book");
     storyDir = join(bookDir, "story");
     await mkdir(join(storyDir, "outline"), { recursive: true });
-    await mkdir(join(storyDir, "roles/主要角色"), { recursive: true });
-    await mkdir(join(storyDir, "roles/次要角色"), { recursive: true });
+    await mkdir(join(storyDir, "roles/major"), { recursive: true });
+    await mkdir(join(storyDir, "roles/minor"), { recursive: true });
     loadProjectConfigMock.mockReset();
     loadProjectConfigMock.mockResolvedValue(cloneProjectConfig());
   });
@@ -160,15 +160,15 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
         "---",
         "version: \"1.0\"",
         "protagonist:",
-        "  name: 陈烬",
+        "  name: mock_val",
         "genreLock:",
-        "  primary: 都市悬疑",
+        "  primary: mock_val",
         "prohibitions:",
-        "  - 不写穿越",
+        "  - mock_val",
         "---",
         "",
-        "# 世界观",
-        "潮湿的港口城市。",
+        "# mock_val",
+        "mock_val。",
       ].join("\n"),
       "utf-8",
     );
@@ -188,16 +188,16 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
     expect(body.content).toContain("---");
     expect(body.content).toContain("protagonist:");
     // Structured fields surface for friendly cards.
-    expect(body.frontmatter?.protagonist?.name).toBe("陈烬");
-    expect(body.frontmatter?.genreLock?.primary).toBe("都市悬疑");
-    expect(body.frontmatter?.prohibitions).toEqual(["不写穿越"]);
+    expect(body.frontmatter?.protagonist?.name).toBe("mock_val");
+    expect(body.frontmatter?.genreLock?.primary).toBe("mock_val");
+    expect(body.frontmatter?.prohibitions).toEqual(["mock_val"]);
     // Body is the prose with the frontmatter stripped — no raw YAML keys.
-    expect(body.body).toContain("潮湿的港口城市");
+    expect(body.body).toContain("mock_val");
     expect(body.body).not.toContain("protagonist:");
   });
 
   it("returns no frontmatter for a file without a YAML block (plain prose stays plain)", async () => {
-    await writeFile(join(storyDir, "outline/volume_map.md"), "# 卷纲\n第一卷：开端。", "utf-8");
+    await writeFile(join(storyDir, "outline/volume_map.md"), "# mock_val\nmock_val：mock_val。", "utf-8");
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
@@ -206,26 +206,26 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
     );
     expect(response.status).toBe(200);
     const body = await response.json() as { content: string; frontmatter?: unknown; body?: string };
-    expect(body.content).toContain("第一卷");
+    expect(body.content).toContain("mock_val");
     expect(body.frontmatter).toBeUndefined();
     expect(body.body).toBeUndefined();
   });
 
-  it("serves roles/主要角色/<name>.md content", async () => {
+  it("serves roles/major/<name>.md content", async () => {
     await writeFile(
-      join(storyDir, "roles/主要角色/主角甲.md"),
-      "# 主角甲\n核心标签：沉默",
+      join(storyDir, "roles/major/mock_val.md"),
+      "# mock_val\nmock_val：mock_val",
       "utf-8",
     );
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
 
     const response = await app.request(
-      "http://localhost/api/v1/books/hotfix-book/truth/roles/主要角色/主角甲.md",
+      "http://localhost/api/v1/books/hotfix-book/truth/roles/major/mock_val.md",
     );
     expect(response.status).toBe(200);
     const body = await response.json() as { file: string; content: string };
-    expect(body.content).toContain("核心标签");
+    expect(body.content).toContain("mock_val");
   });
 
   it("tags legacy shim files (story_bible.md, book_rules.md) with legacy: true on GET for new-layout book", async () => {
@@ -275,7 +275,7 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
 
     // roles/ with unknown tier
     const response3 = await app.request(
-      "http://localhost/api/v1/books/hotfix-book/truth/roles/其他/x.md",
+      "http://localhost/api/v1/books/hotfix-book/truth/roles/mock_val/x.md",
     );
     expect(response3.status).toBe(400);
   });
@@ -360,7 +360,7 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
     await mkdir(join(storyDir, "roles/minor"), { recursive: true });
     await writeFile(join(storyDir, "roles/major/Mara.md"), "major", "utf-8");
     await writeFile(join(storyDir, "roles/minor/Kit.md"), "minor", "utf-8");
-    await writeFile(join(storyDir, "roles/主要角色/主角甲.md"), "zh-major", "utf-8");
+    await writeFile(join(storyDir, "roles/major/mock_val.md"), "zh-major", "utf-8");
 
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -370,14 +370,14 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
     const names = body.files.map((f) => f.name);
     expect(names).toContain("roles/major/Mara.md");
     expect(names).toContain("roles/minor/Kit.md");
-    expect(names).toContain("roles/主要角色/主角甲.md");
+    expect(names).toContain("roles/major/mock_val.md");
   });
 
   it("lists outline/* and roles/**/*.md files in the truth browser", async () => {
     await writeFile(join(storyDir, "outline/story_frame.md"), "frame", "utf-8");
     await writeFile(join(storyDir, "outline/volume_map.md"), "map", "utf-8");
-    await writeFile(join(storyDir, "roles/主要角色/主角甲.md"), "major", "utf-8");
-    await writeFile(join(storyDir, "roles/次要角色/朋友乙.md"), "minor", "utf-8");
+    await writeFile(join(storyDir, "roles/major/mock_val.md"), "major", "utf-8");
+    await writeFile(join(storyDir, "roles/minor/mock_val.md"), "minor", "utf-8");
     await writeFile(join(storyDir, "book_rules.md"), "shim", "utf-8");
     const { createStudioServer } = await import("./server.js");
     const app = createStudioServer(cloneProjectConfig() as never, root);
@@ -388,8 +388,8 @@ describe("Phase 5 hotfix 1 — Studio truth file endpoints", () => {
     const names = body.files.map((f) => f.name).sort();
     expect(names).toContain("outline/story_frame.md");
     expect(names).toContain("outline/volume_map.md");
-    expect(names).toContain("roles/主要角色/主角甲.md");
-    expect(names).toContain("roles/次要角色/朋友乙.md");
+    expect(names).toContain("roles/major/mock_val.md");
+    expect(names).toContain("roles/minor/mock_val.md");
     const shimEntry = body.files.find((f) => f.name === "book_rules.md");
     expect(shimEntry?.legacy).toBe(true);
   });

@@ -23,17 +23,17 @@ async function setupBook(): Promise<void> {
   await writeFile(
     join(bookDir, "story", "outline", "story_frame.md"),
     [
-      "## 主题与基调",
-      "主题段落：命运与选择。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
-      "## 核心冲突",
-      "冲突段落：家族债务与个人自由。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
-      "## 世界观底色",
-      "世界段落：河港城，商会与帮派。",
+      "## mock_text",
+      "mock_text：mock_text，mock_text。",
       "",
-      "## 终局方向",
-      "结局段落：主角在平衡中收束。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
     ].join("\n"),
     "utf-8",
@@ -41,16 +41,16 @@ async function setupBook(): Promise<void> {
   await writeFile(
     join(bookDir, "story", "book_rules.md"),
     [
-      "## 主角",
-      "- 名字：林辞",
-      "- 性格锁：冷静、执着",
+      "## mock_text",
+      "- mock_text từ：mock_text",
+      "- mock_text：mock_text、mock_text",
       "",
-      "## 数值/资源规则",
-      "- 核心资源：灵石",
-      "- 硬上限：筑基不可突破",
+      "## mock_text/mock_text",
+      "- mock_text：mock_text",
+      "- mock_text：mock_text",
       "",
-      "## 禁止事项",
-      "- 不得破坏核心世界观",
+      "## mock_text",
+      "- mock_text",
       "",
     ].join("\n"),
     "utf-8",
@@ -58,15 +58,15 @@ async function setupBook(): Promise<void> {
   await writeFile(
     join(bookDir, "story", "pending_hooks.md"),
     [
-      "| hook_id | 起始章节 | 类型 | 状态 |",
+      "| hook_id | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- |",
-      "| H01 | 1 | 主线 | 未开启 |",
-      "| H02 | 3 | 支线 | 未开启 |",
+      "| H01 | 1 | mock_text | mock_text |",
+      "| H02 | 3 | mock_text | mock_text |",
       "",
     ].join("\n"),
     "utf-8",
   );
-  await writeFile(join(bookDir, "story", "roles", "major", "林辞.md"), "## 核心标签\n冷静、执着\n", "utf-8");
+  await writeFile(join(bookDir, "story", "roles", "major", "mock_text.md"), "## mock_text\nmock_text、mock_text\n", "utf-8");
 }
 
 afterEach(async () => {
@@ -136,12 +136,12 @@ describe("extractGovernedContent", () => {
     const conflict = await extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "core_conflict" });
     const world = await extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "world_setting" });
     const ending = await extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "ending_direction" });
-    expect(theme).toContain("主题段落");
-    expect(theme).not.toContain("冲突段落");
-    expect(conflict).toContain("冲突段落");
-    expect(world).toContain("世界段落");
-    expect(ending).toContain("结局段落");
-    expect(conflict).not.toContain("主题段落");
+    expect(theme).toContain("mock_text");
+    expect(theme).not.toContain("mock_text");
+    expect(conflict).toContain("mock_text");
+    expect(world).toContain("mock_text");
+    expect(ending).toContain("mock_text");
+    expect(conflict).not.toContain("mock_text");
   });
 
   it("changing one section changes only that unit's governed content", async () => {
@@ -150,12 +150,12 @@ describe("extractGovernedContent", () => {
     const beforeTheme = await extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "theme_tone" });
     const beforeConflict = await extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "core_conflict" });
     const framePath = join(bookDir, "story", "outline", "story_frame.md");
-    const updated = (await readFile(framePath, "utf-8")).replace("主题段落：命运与选择。", "主题段落：抗争与救赎。");
+    const updated = (await readFile(framePath, "utf-8")).replace("mock_text：mock_text。", "mock_text：mock_text。");
     await writeFile(framePath, updated, "utf-8");
     const afterTheme = await extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "theme_tone" });
     const afterConflict = await extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "core_conflict" });
     expect(afterTheme).not.toEqual(beforeTheme);
-    expect(afterTheme).toContain("抗争与救赎");
+    expect(afterTheme).toContain("mock_text");
     expect(afterConflict).toEqual(beforeConflict);
   });
 
@@ -164,7 +164,7 @@ describe("extractGovernedContent", () => {
     const framePath = join(bookDir, "story", "outline", "story_frame.md");
     const base = { sourceRelPath: "story/outline/story_frame.md" };
     // 3 sections
-    await writeFile(framePath, "## 主题与基调\nA\n\n## 核心冲突\nB\n\n## 世界观底色\nC\n", "utf-8");
+    await writeFile(framePath, "## mock_text\nA\n\n## mock_text\nB\n\n## mock_text\nC\n", "utf-8");
     await expect(
       extractGovernedContent(bookDir, { contentKind: "section", ...base, sectionKey: "theme_tone" }),
     ).rejects.toThrow(/exactly 4/);
@@ -177,11 +177,11 @@ describe("extractGovernedContent", () => {
 
   it("governs Book Rules per rule using the existing ## heading format", async () => {
     await setupBook();
-    const protagonist = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "主角" });
-    const prohibitions = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "禁止事项" });
-    expect(protagonist).toContain("名字：林辞");
-    expect(prohibitions).toContain("核心世界观");
-    expect(prohibitions).not.toContain("林辞");
+    const protagonist = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text" });
+    const prohibitions = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text" });
+    expect(protagonist).toContain("mock_text từ：mock_text");
+    expect(prohibitions).toContain("mock_text");
+    expect(prohibitions).not.toContain("mock_text");
   });
 
   it("governs hooks per entry using the existing pending_hooks hook_id convention", async () => {
@@ -195,8 +195,8 @@ describe("extractGovernedContent", () => {
 
   it("reads a character role sheet as a whole-file locator", async () => {
     await setupBook();
-    const content = await extractGovernedContent(bookDir, { contentKind: "whole_file", sourceRelPath: "story/roles/major/林辞.md" });
-    expect(content).toContain("冷静、执着");
+    const content = await extractGovernedContent(bookDir, { contentKind: "whole_file", sourceRelPath: "story/roles/major/mock_text.md" });
+    expect(content).toContain("mock_text、mock_text");
   });
 
   it("cannot escape the book root via traversal", async () => {
@@ -246,13 +246,13 @@ describe("no prose in governance JSON", () => {
     await setupBook();
     const manifest = FoundationUnitManifestSchema.parse(makeManifest());
     const json = JSON.stringify(manifest);
-    expect(json).not.toContain("主题段落");
+    expect(json).not.toContain("mock_text");
     expect(json).not.toContain('"content"');
     expect(json).not.toContain('"prose"');
   });
 
   it("manifest schema is strict and rejects stray prose fields", () => {
-    expect(FoundationUnitManifestSchema.safeParse(makeManifest({ content: "主题段落" })).success).toBe(false);
+    expect(FoundationUnitManifestSchema.safeParse(makeManifest({ content: "mock_text" })).success).toBe(false);
   });
 
   it("rejects unexpected nested locator fields (no hidden prose in nested objects)", () => {
@@ -313,25 +313,25 @@ describe("no prose in governance JSON", () => {
 });
 
 describe("rule locator source-key compatibility (real Castor headings)", () => {
-  it("a rule locator targeting the real heading 数值/资源规则 must parse", async () => {
+  it("a rule locator targeting the real heading mock_text/mock_text must parse", async () => {
     await setupBook();
     // This is the exact real repository heading (architect book_rules card).
     const manifest = FoundationUnitManifestSchema.parse(makeManifest({
       unitId: "rule-numerical-system",              // stable SAFE logical unit id — never the raw heading
       kind: "book_rule",
-      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "数值/资源规则" },
+      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text/mock_text" },
     }));
     const content = await extractGovernedContent(bookDir, manifest.locator);
-    expect(content).toContain("核心资源");
+    expect(content).toContain("mock_text");
   });
 
   it("neighboring rule cards remain independently extractable", async () => {
     await setupBook();
-    const protagonist = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "主角" });
-    const prohibitions = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "禁止事项" });
-    expect(protagonist).toContain("名字：林辞");
-    expect(prohibitions).toContain("核心世界观");
-    expect(prohibitions).not.toContain("林辞");
+    const protagonist = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text" });
+    const prohibitions = await extractGovernedContent(bookDir, { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text" });
+    expect(protagonist).toContain("mock_text từ：mock_text");
+    expect(prohibitions).toContain("mock_text");
+    expect(prohibitions).not.toContain("mock_text");
   });
 
   it("a safe unitId + slash-containing ruleId round-trips through the manifest store", async () => {
@@ -339,7 +339,7 @@ describe("rule locator source-key compatibility (real Castor headings)", () => {
     const manifest = FoundationUnitManifestSchema.parse(makeManifest({
       unitId: "rule-numerical-system",
       kind: "book_rule",
-      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "数值/资源规则" },
+      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text/mock_text" },
     }));
     await writeUnitManifest(bookDir, manifest);
     const loaded = await readUnitManifests(bookDir);
@@ -347,17 +347,17 @@ describe("rule locator source-key compatibility (real Castor headings)", () => {
   });
 
   it("unitId still MUST reject '/' while ruleId may contain it", () => {
-    expect(FoundationUnitManifestSchema.safeParse(makeManifest({ unitId: "rule/数值" })).success).toBe(false);
+    expect(FoundationUnitManifestSchema.safeParse(makeManifest({ unitId: "rule/mock_text" })).success).toBe(false);
     expect(FoundationUnitManifestSchema.safeParse(makeManifest({ unitId: "rule-numerical-system" })).success).toBe(true);
   });
 
   it("ruleId with control characters or newlines fails closed", async () => {
     await setupBook();
     expect(FoundationUnitManifestSchema.safeParse(makeManifest({
-      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "坏\u0000规则" },
+      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text\u0000mock_text" },
     })).success).toBe(false);
     expect(FoundationUnitManifestSchema.safeParse(makeManifest({
-      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "坏\n规则" },
+      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text\nmock_text" },
     })).success).toBe(false);
   });
 
@@ -369,11 +369,11 @@ describe("rule locator source-key compatibility (real Castor headings)", () => {
     const manifest = FoundationUnitManifestSchema.parse(makeManifest({
       unitId: "rule-numerical-system",
       kind: "book_rule",
-      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "数值/资源规则" },
+      locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text/mock_text" },
     }));
     await writeUnitManifest(bookDir, manifest);
     const expected = join(bookDir, "story", "foundation-v2", "rule-numerical-system.gov.json");
-    await expect(readFile(expected, "utf-8")).resolves.toContain("数值/资源规则");
+    await expect(readFile(expected, "utf-8")).resolves.toContain("mock_text/mock_text");
   });
 });
 
@@ -385,7 +385,7 @@ describe("manifest persistence safety", () => {
     const beforeFrame = await readFile(framePath, "utf-8");
     const beforeRules = await readFile(rulesPath, "utf-8");
     await writeUnitManifest(bookDir, FoundationUnitManifestSchema.parse(makeManifest()));
-    await writeUnitManifest(bookDir, FoundationUnitManifestSchema.parse(makeManifest({ unitId: "rule-protagonist", kind: "book_rule", locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "主角" } })));
+    await writeUnitManifest(bookDir, FoundationUnitManifestSchema.parse(makeManifest({ unitId: "rule-protagonist", kind: "book_rule", locator: { contentKind: "rule", sourceRelPath: "story/book_rules.md", ruleId: "mock_text" } })));
     expect(await readFile(framePath, "utf-8")).toBe(beforeFrame);
     expect(await readFile(rulesPath, "utf-8")).toBe(beforeRules);
   });

@@ -62,8 +62,8 @@ const HEAD = 25;
 const EFFECTIVE = 26;
 const SOURCE = 16;
 const OLD_RECEIPT_ID = "historical-r16-old-generation";
-const P16_OLD = "# 第16章 反转\n\n林秋在北岸灯塔烧毁了账本。\n";
-const P16_NEW = "# 第16章 反转\n\n林秋在北岸灯塔烧毁了账本，并把灰烬撒进海雾。\n";
+const P16_OLD = "# Chương 16 mock_text\n\nmock_text。\n";
+const P16_NEW = "# Chương 16 mock_text\n\nmock_text，mock_text。\n";
 const CREATED_AT = "2026-08-24T00:00:00.000Z";
 const TAIL = [17, 18, 19, 20, 21, 22, 23, 24, 25] as const;
 
@@ -75,11 +75,11 @@ async function seedHistoricalBook(): Promise<CanonBookFixture> {
   const fixture = await createCanonBook({ chapterCount: HEAD, seedSnapshotsThrough: HEAD });
   // Distinct durable bytes per chapter so no-cascade comparisons are meaningful.
   for (let chapter = 1; chapter <= HEAD; chapter += 1) {
-    const name = `第${chapter}章`;
+    const name = `Chương ${chapter}mock_text`;
     await rm(join(fixture.bookDir, "chapters", `${String(chapter).padStart(4, "0")}_${name}.md`), { force: true });
     await writeFileDirect(
       join(fixture.bookDir, "chapters", `${String(chapter).padStart(4, "0")}_${name}.md`),
-      `# 第${chapter}章 ${name}\n\n第${chapter}章的独有正文，用于历史无级联比对。\n`,
+      `# Chương ${chapter}mock_text ${name}\n\nChương ${chapter}mock_text，mock_text。\n`,
     );
   }
   // Exactly ONE durable prose file for the edited chapter.
@@ -92,13 +92,13 @@ async function seedHistoricalBook(): Promise<CanonBookFixture> {
     }
   }
   await writeFileDirect(
-    join(fixture.bookDir, "chapters", "0016_反转.md"),
+    join(fixture.bookDir, "chapters", "0016_mock_text.md"),
     P16_OLD,
   );
   // Full lifecycle index: 1..25 approved (READY head included).
   const index = Array.from({ length: HEAD }, (_, i) => i + 1).map((number) => ({
     number,
-    title: `第${number}章`,
+    title: `Chương ${number}mock_text`,
     status: "approved",
     wordCount: 100 + number,
     createdAt: CREATED_AT,
@@ -110,12 +110,12 @@ async function seedHistoricalBook(): Promise<CanonBookFixture> {
   );
   // Resolved receipt history: R16-old plus one receipt per tail chapter.
   await seedResolvedReceipt(fixture.bookDir, SOURCE, OLD_RECEIPT_ID, {
-    object: "旧灯塔",
+    object: "mock_text",
     resolution: "confirmed-changes",
   });
   for (const chapter of TAIL) {
     await seedResolvedReceipt(fixture.bookDir, chapter, `historical-r${chapter}-gen`, {
-      object: `尾章事实${chapter}`,
+      object: `mock_text sự thật${chapter}`,
       resolution: "confirmed-changes",
     });
   }
@@ -140,14 +140,14 @@ async function seedResolvedReceipt(
 ): Promise<void> {
   const factChange: ProposalChange = {
     type: "fact",
-    change: { action: "set", subject: "主角", predicate: "当前位置", object: options.object },
+    change: { action: "set", subject: "mock_text", predicate: "mock_text", object: options.object },
   };
   const receipt = ResolvedReviewReceiptSchema.parse({
     schemaVersion: 1,
     reviewId,
     sourceChapter: chapter,
     effectiveChapter: chapter,
-    proseRevision: computeProseRevision(`# 第${chapter}章\n\nseeded。`),
+    proseRevision: computeProseRevision(`# Chương ${chapter}mock_text\n\nseeded。`),
     baseCanonRevision: hex(chapter),
     resultingCanonRevision: hex(1000 + chapter),
     proposals: [factChange],
@@ -288,7 +288,7 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       // approved `deps.createWriter` seam. No external LLM.
       const settlementDelta: RuntimeStateDelta = {
         chapter: SOURCE,
-        currentStatePatch: { currentLocation: "新灯塔" },
+        currentStatePatch: { currentLocation: "mock_text" },
         hookOps: { upsert: [], mention: [], resolve: [], defer: [] },
         newHookCandidates: [],
         // Source-truthful summary row (design §20/§23): the rebuilt summary
@@ -296,13 +296,13 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
         // Task 11's compiler, not to the proposal layer.
         chapterSummary: {
           chapter: SOURCE,
-          title: "反转重写",
-          characters: "主角；林秋",
-          events: "林秋烧毁账本并把灰烬撒进海雾",
-          stateChanges: "当前位置→新灯塔",
+          title: "mock_text",
+          characters: "mock_text；mock_text",
+          events: "mock_text",
+          stateChanges: "mock_text→mock_text",
           hookActivity: "",
-          mood: "紧张",
-          chapterType: "调查",
+          mood: "mock_text",
+          chapterType: "mock_text",
         },
         subplotOps: [],
         emotionalArcOps: [],
@@ -350,8 +350,8 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
             settleProbe.canonRevisions.push((await readStoryCanon(bookDir)).revision);
             return {
               runtimeStateDelta: settlementDelta,
-              updatedState: "# 当前状态\n",
-              updatedHooks: "# 伏笔池\n",
+              updatedState: "# mock_text\n",
+              updatedHooks: "# mock_text\n",
             } as never;
           },
         }),
@@ -361,7 +361,7 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       // the LIVE head25 Canon as its semantic basis.
       expect(settleProbe.calls).toEqual(["acquire", "settle", "release"]);
       expect(settleProbe.chapterNumbers).toEqual([SOURCE]);
-      expect(settleProbe.titles).toEqual(["第16章"]);
+      expect(settleProbe.titles).toEqual(["Chương 16"]);
       expect(settleProbe.contents).toEqual([P16_NEW]); // latest durable prose
       expect(settleProbe.canonRevisions).toEqual([canonBefore.revision]);
       expect(artifact.status).toBe("active");
@@ -396,8 +396,8 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       const afterUserAdd = await addUserStateReviewItem({
         bookDir, chapter: SOURCE, expectedReviewRevision: 3,
         kind: "current-state-fact",
-        change: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前目标", object: "查清账本灰烬的下落" } },
-        title: "Human correction: 当前目标",
+        change: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } },
+        title: "Human correction: mock_text",
       });
       expectedRevisionAtConfirm = afterUserAdd.reviewRevision;
       expect(expectedRevisionAtConfirm).toBe(4); // three CAS increments
@@ -422,7 +422,7 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       prepared.canonWrites.find((w) => w.relativePath === "story/state/current_state.json")!.content,
     ));
     expect(candidateState.chapter).toBe(EFFECTIVE);
-    expect(candidateState.facts.some((f) => f.predicate === "当前位置" && f.object === "新灯塔")).toBe(true);
+    expect(candidateState.facts.some((f) => f.predicate === "mock_text" && f.object === "mock_text")).toBe(true);
     // Source chapter approved in the candidate index — NOT the effective slot.
     const candidateIndex = ChapterMetaSchema.array().parse(JSON.parse(prepared.indexWrite.content));
     expect(candidateIndex.find((meta) => meta.number === SOURCE)?.status).toBe("approved");
@@ -472,14 +472,14 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
     expect(reloadedCanonPrimary.currentState.chapter).toBe(EFFECTIVE);
     expect(reloadedCanonPrimary.revision).toBe(result.resultingCanonRevision);
     // V1 provenance convention: application anchor 26 in Canon facts.
-    const appliedFact = liveState.facts.find((f) => f.predicate === "当前位置" && f.object === "新灯塔")!;
+    const appliedFact = liveState.facts.find((f) => f.predicate === "mock_text" && f.object === "mock_text")!;
     expect(appliedFact.sourceChapter).toBe(EFFECTIVE);
     expect(appliedFact.validFromChapter).toBe(EFFECTIVE);
     // Applied chapter summary lives at slot 26.
     const summaries = ChapterSummariesStateSchema.parse(JSON.parse(
       await readFile(join(bookDir, "story/state/chapter_summaries.json"), "utf-8"),
     ));
-    expect(summaries.rows.find((row) => row.title === "反转重写")?.chapter).toBe(EFFECTIVE);
+    expect(summaries.rows.find((row) => row.title === "mock_text")?.chapter).toBe(EFFECTIVE);
 
     // Effective-slot snapshot created; NO replacement snapshots/16.
     const snapManifest = StateManifestSchema.parse(JSON.parse(
@@ -520,8 +520,8 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       // Slot facts use the literal shared subject "protagonist" (Task 11
       // describeCurrentStateSlot convention) — same as plan's pinned assert.
       const factsAtEffective = db.getFactsAt("protagonist", EFFECTIVE)
-        .filter((fact) => fact.predicate === "当前位置");
-      expect(factsAtEffective.map((fact) => fact.object)).toContain("新灯塔");
+        .filter((fact) => fact.predicate === "mock_text");
+      expect(factsAtEffective.map((fact) => fact.object)).toContain("mock_text");
       expect(factsAtEffective[0]?.validFromChapter).toBe(EFFECTIVE);
     } finally {
       db.close();
@@ -563,7 +563,7 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
         id: "hist-zero-item",
         kind: "note",
         origin: "ai",
-        title: "备注",
+        title: "mock_text",
         proposal: { type: "none" },
         decision: "undecided",
       }],
@@ -581,13 +581,13 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       await writeFileDirect(join(quiet.bookDir, "chapters/index.json"), JSON.stringify(
         ChapterMetaSchema.array().parse(
           Array.from({ length: HEAD }, (_, i) => i + 1).map((number) => ({
-            number, title: `第${number}章`, status: "approved", wordCount: 100,
+            number, title: `Chương ${number}mock_text`, status: "approved", wordCount: 100,
             createdAt: CREATED_AT, updatedAt: CREATED_AT,
           })),
         ), null, 2,
       ));
       await seedResolvedReceipt(quiet.bookDir, 3, "only-history-gen", {
-        object: "旧值", resolution: "confirmed-changes",
+        object: "mock_text", resolution: "confirmed-changes",
       });
       await expect(assertCanAdvanceStory(quiet.bookDir, EFFECTIVE)).resolves.toBeUndefined();
     } finally {
@@ -616,8 +616,8 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
         id: "hist-rejected-fact",
         kind: "current-state-fact",
         origin: "ai",
-        title: "Current-state update: 当前位置",
-        proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "北岸灯塔" } },
+        title: "Current-state update: mock_text",
+        proposal: { type: "fact", change: { action: "set", subject: "mock_text", predicate: "mock_text", object: "mock_text" } },
         decision: "undecided",
       }],
     });
@@ -648,7 +648,7 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
     const liveState = CurrentStateStateSchema.parse(JSON.parse(
       await readFile(join(bookDir, "story/state/current_state.json"), "utf-8"),
     ));
-    expect(liveState.facts.some((f) => f.object === "北岸灯塔")).toBe(false); // rejected semantics absent
+    expect(liveState.facts.some((f) => f.object === "mock_text")).toBe(false); // rejected semantics absent
     const snapManifest = StateManifestSchema.parse(JSON.parse(
       await readFile(join(bookDir, `story/snapshots/${EFFECTIVE}/state/manifest.json`), "utf-8"),
     ));

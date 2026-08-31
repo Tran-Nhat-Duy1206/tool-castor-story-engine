@@ -139,11 +139,7 @@ export class PlayRunner {
     this.sceneReconciler = options.agents?.sceneReconciler ?? (ctx ? new PlaySceneReconcilerAgent(ctx) : null);
   }
 
-  /**
-   * 关闭 runner 自己创建的数据库连接（外部传入的 db 由调用方负责关闭）。
-   * SQLite 文件句柄不关闭时 Windows 上无法删除 play.db；node:sqlite 的
-   * close 不允许二次调用，所以这里做幂等保护。
-   */
+  // SQLite connection management and idempotent closing for Play runner.
   close(): void {
     if (this.ownsDb && !this.dbClosed) {
       this.dbClosed = true;
@@ -165,7 +161,7 @@ export class PlayRunner {
     const language = world?.language ?? "vi";
     const action: PlayActionIntent = {
       actionKind: "look",
-      intent: language === "en" ? "Seed the opening state for the first playable scene." : "播种第一幕已成立的开场状态。",
+      intent: language === "en" ? "Seed the opening state for the first playable scene." : "Seed the opening state for the first playable scene.",
       manner: "",
       risk: "",
       ambiguity: "",
@@ -221,7 +217,7 @@ export class PlayRunner {
         finalMutation.blockedReason
           || (language === "en"
             ? "The opening scene did not produce a usable player/world graph. Retry world creation."
-            : "开场没有生成可用的玩家与世界图谱，请重试创建互动世界。"),
+            : "Opening failed to generate a playable character and world graph. Please try creating the interactive world again."),
       );
     }
     await this.store.writeProjection(this.options.worldId, this.options.runId, "projections/state.md", renderStateBrief({ action, mutation: finalMutation }));
@@ -266,7 +262,7 @@ export class PlayRunner {
     const sceneBrief = await this.readOptionalProjection("projections/scene.md");
     const action = PlayActionIntentSchema.parse(await this.actionInterpreter.interpret({
       input: rawInput,
-      sceneBrief: sceneBrief || (language === "en" ? "A new turn begins; carry over the current world state." : "新回合开始，沿用当前世界状态。"),
+      sceneBrief: sceneBrief || (language === "en" ? "A new turn begins; carry over the current world state." : "A new turn begins; carry over the current world state."),
       language,
     }));
     const worldContext = renderPlayWorldContext(world, language);
@@ -477,15 +473,15 @@ export class PlayRunner {
     const stateBrief = await this.readOptionalProjection("projections/state.md");
     const isEn = language === "en";
     const worldContext = renderPlayWorldContext(world, language);
-    const sceneLabel = isEn ? "Current scene:" : "当前场景：";
-    const stateLabel = isEn ? "Current state:" : "当前状态：";
+    const sceneLabel = isEn ? "Current scene:" : "Cảnh hiện tại:";
+    const stateLabel = isEn ? "Current state:" : "Trạng thái hiện tại:";
     const entityRoster = renderEntityRoster(readGraphSnapshot(this.db)?.entities ?? [], language);
     return [
       worldContext,
       entityRoster,
       sceneBrief ? `${sceneLabel}\n${sceneBrief}` : "",
       stateBrief ? `${stateLabel}\n${stateBrief}` : "",
-    ].filter(Boolean).join("\n\n") || (isEn ? "No persisted state yet." : "暂无持久化状态。");
+    ].filter(Boolean).join("\n\n") || (isEn ? "No persisted state yet." : "Chưa có trạng thái lưu trữ.");
   }
 
   private async readOptionalProjection(relativePath: string): Promise<string> {
@@ -520,12 +516,12 @@ function buildOpeningSeedInput(input: {
         input.suggestedActions.length > 0 ? `Suggested player actions:\n${input.suggestedActions.map((action) => `- ${action}`).join("\n")}` : "",
       ]
     : [
-        "只播种这个互动世界开场已经成立的状态。",
-        "不要推进时间，不要解谜，不要写新的回合剧情。",
-        "如果世界前提或开场正文说玩家已经拿着、带着、揣着、穿着、携带或开局拥有某个实物，这就是已成立状态：必须为该实物建立实体，并补一条 actor_player 指向它、value.role=\"holding\" 的持有边。不要把已持有实物只藏在玩家 summary 里。",
-        input.premise ? `世界前提：\n${input.premise}` : "",
-        `开场正文：\n${input.sceneText}`,
-        input.suggestedActions.length > 0 ? `建议动作：\n${input.suggestedActions.map((action) => `- ${action}`).join("\n")}` : "",
+        "Only seed state already established at the opening of this interactive world.",
+        "Do not advance time, do not solve puzzles, and do not write new turn narrative.",
+        "If the premise or opening prose states the player holds, carries, wears, or begins with an item, this is established state: create an entity for the item with an actor_player holding edge. Do not hide held items inside the player summary.",
+        input.premise ? `World premise:\n${input.premise}` : "",
+        `Opening prose:\n${input.sceneText}`,
+        input.suggestedActions.length > 0 ? `Suggested actions:\n${input.suggestedActions.map((action) => `- ${action}`).join("\n")}` : "",
       ];
   return lines.filter(Boolean).join("\n\n");
 }
@@ -548,13 +544,13 @@ function buildReplayContext(input: {
     ].filter(Boolean).join("\n");
   }
   return [
-    "这是在重写上一回合，不是推进新的下一回合。",
-    `原玩家动作：${input.originalInput}`,
-    replacement && replacement !== input.originalInput ? `用户替换说明：${replacement}` : "",
-    "除非替换说明明确改变动作，否则保持同一个玩家动作。",
-    "当前状态摘要是权威，尤其是 Time/时间段：不得倒退时间，不得另写经过时长，也不得写另一个钟点。",
-    "不要加入玩家没有做的新动作。可以换表达、感官细节、压迫和侧重点，但必须留在同一份已应用状态里。",
-    "具体新事实、人物、物件、地点或线索必须已经出现在已应用变化或当前状态摘要中。",
+    "This is rewriting the previous turn, not advancing a new turn.",
+    `Original player action: ${input.originalInput}`,
+    replacement && replacement !== input.originalInput ? `User replacement note: ${replacement}` : "",
+    "Maintain the same player action unless the replacement note explicitly alters it.",
+    "Current state summary is authoritative. Do not regress time or change elapsed intervals.",
+    "Do not introduce unperformed player actions. Rephrasing and sensory details must remain in the applied state.",
+    "New facts, characters, items, locations, or clues must appear in applied mutations or state summary.",
   ].filter(Boolean).join("\n");
 }
 
@@ -566,13 +562,13 @@ function renderPlayWorldContext(world: PlayWorld | null | undefined, language: "
   const isEn = language === "en";
   const blocks = [
     premise
-      ? `${isEn ? "World setting" : "世界设定"}:\n${premise}`
+      ? `${isEn ? "World setting" : "Thiết lập thế giới"}:\n${premise}`
       : "",
     worldContract
-      ? `${isEn ? "World contract (high priority; obey before genre defaults)" : "世界契约（高优先级，先于题材惯例）"}:\n${worldContract}`
+      ? `${isEn ? "World contract (high priority; obey before genre defaults)" : "Khế ước thế giới (ưu tiên cao, tuân thủ trước mặc định thể loại)"}:\n${worldContract}`
       : "",
     visualContract
-      ? `${isEn ? "Visual contract (for scene and image consistency)" : "视觉契约（保持场景和配图一致）"}:\n${visualContract}`
+      ? `${isEn ? "Visual contract (for scene and image consistency)" : "Khế ước thị giác (giữ tính nhất quán cho cảnh và hình ảnh)"}:\n${visualContract}`
       : "",
   ].filter(Boolean);
   return blocks.join("\n\n");
@@ -674,9 +670,9 @@ function renderEntityRoster(entities: ReadonlyArray<PlayEntity>, language: "vi" 
   const isEn = language === "en";
   const header = isEn
     ? "Current entity roster (reuse these ids; do not recreate the same person/thing):"
-    : "当前实体名册（复用这些 id；不要把同一个人/物换新 id 重建）：";
+    : "Current entity roster (reuse these IDs; do not recreate entities with new IDs):";
   const lines = entities.slice(0, 40).map((entity) => {
-    const detail = [entity.summary, entity.status ? `${isEn ? "status" : "状态"}: ${entity.status}` : ""]
+    const detail = [entity.summary, entity.status ? `${isEn ? "status" : "trạng thái"}: ${entity.status}` : ""]
       .filter(Boolean)
       .join(isEn ? "; " : "；");
     return `- ${entity.id} [${entity.type}]: ${entity.label}${detail ? ` — ${clampRosterText(detail)}` : ""}`;

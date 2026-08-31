@@ -18,7 +18,7 @@ const REVIEW_ID = "3f2504e0-4f89-41d3-9a0c-0305e82c3301";
 function chapterMeta(number: number, status: string) {
   return {
     number,
-    title: `第${number}章`,
+    title: `Chương ${number}mock_text`,
     status,
     createdAt: CREATED_AT,
     updatedAt: CREATED_AT,

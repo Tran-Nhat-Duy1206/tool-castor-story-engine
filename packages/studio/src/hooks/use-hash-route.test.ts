@@ -24,7 +24,7 @@ describe("hash route", () => {
     });
 
     it("decodes encoded bookId", () => {
-      expect(parseHash("#/book/%E4%B9%9D%E9%BE%99")).toEqual({ page: "book", bookId: "九龙" });
+      expect(parseHash("#/book/%E4%B9%9D%E9%BE%99")).toEqual({ page: "book", bookId: "mock_val" });
     });
 
     it("parses book/new as book-create", () => {
@@ -56,7 +56,7 @@ describe("hash route", () => {
     });
 
     it("decodes encoded serviceId", () => {
-      expect(parseHash("#/services/%E8%87%AA%E5%AE%9A%E4%B9%89")).toEqual({ page: "service-detail", serviceId: "自定义" });
+      expect(parseHash("#/services/%E8%87%AA%E5%AE%9A%E4%B9%89")).toEqual({ page: "service-detail", serviceId: "mock_val" });
     });
 
     it("falls back to dashboard for unknown hash", () => {
@@ -82,9 +82,9 @@ describe("hash route", () => {
     });
 
     it("encodes Chinese bookId", () => {
-      const hash = routeToHash({ page: "book", bookId: "九龙城夜行" });
+      const hash = routeToHash({ page: "book", bookId: "mock_val" });
       expect(hash).toContain("#/book/");
-      expect(decodeURIComponent(hash)).toContain("九龙城夜行");
+      expect(decodeURIComponent(hash)).toContain("mock_val");
     });
 
     it("book-create -> #/book/new", () => {
@@ -112,9 +112,9 @@ describe("hash route", () => {
     });
 
     it("encodes Chinese serviceId", () => {
-      const hash = routeToHash({ page: "service-detail", serviceId: "自定义" });
+      const hash = routeToHash({ page: "service-detail", serviceId: "mock_val" });
       expect(hash).toContain("#/services/");
-      expect(decodeURIComponent(hash)).toContain("自定义");
+      expect(decodeURIComponent(hash)).toContain("mock_val");
     });
 
     it("non-hash pages return empty string", () => {

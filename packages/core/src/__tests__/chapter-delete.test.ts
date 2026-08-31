@@ -62,9 +62,9 @@ describe("deleteLatestChapter", () => {
     const { root, bookDir } = await setupBook({
       bookId: "delbook",
       chapters: [
-        { number: 1, title: "起风", content: "# 第1章 起风\n\n第一章正文。" },
-        { number: 2, title: "落雨", content: "# 第2章 落雨\n\n第二章正文。" },
-        { number: 3, title: "收网", content: "# 第3章 收网\n\n第三章正文。" },
+        { number: 1, title: "mock_text", content: "# Chương 1 mock_text\n\nChương mock_text。" },
+        { number: 2, title: "mock_text", content: "# Chương 2 mock_text\n\nChương mock_text。" },
+        { number: 3, title: "mock_text", content: "# Chương 3 mock_text\n\nChương mock_text。" },
       ],
       snapshotChapters: [1, 2, 3],
     });
@@ -73,15 +73,15 @@ describe("deleteLatestChapter", () => {
     const result = await deleteLatestChapter(state, "delbook");
 
     expect(result.deletedChapter).toBe(3);
-    expect(result.title).toBe("收网");
+    expect(result.title).toBe("mock_text");
     expect(result.rolledBackTo).toBe(2);
     expect(result.discarded).toEqual([3]);
-    expect(result.trashedFiles).toEqual(["chapters/.trash/0003_收网.md"]);
+    expect(result.trashedFiles).toEqual(["chapters/.trash/0003_mock_text.md"]);
 
     // Chapter file is preserved in the trash, not hard-deleted.
-    await expect(exists(join(bookDir, "chapters", "0003_收网.md"))).resolves.toBe(false);
-    await expect(readFile(join(bookDir, "chapters", ".trash", "0003_收网.md"), "utf-8"))
-      .resolves.toContain("第三章正文");
+    await expect(exists(join(bookDir, "chapters", "0003_mock_text.md"))).resolves.toBe(false);
+    await expect(readFile(join(bookDir, "chapters", ".trash", "0003_mock_text.md"), "utf-8"))
+      .resolves.toContain("Chương mock_text");
 
     // Index drops the deleted chapter.
     const savedIndex = JSON.parse(await readFile(join(bookDir, "chapters", "index.json"), "utf-8")) as ChapterMeta[];
@@ -98,8 +98,8 @@ describe("deleteLatestChapter", () => {
     const { root, bookDir } = await setupBook({
       bookId: "midbook",
       chapters: [
-        { number: 1, title: "起风", content: "第一章。" },
-        { number: 2, title: "落雨", content: "第二章。" },
+        { number: 1, title: "mock_text", content: "Chương mock_text。" },
+        { number: 2, title: "mock_text", content: "Chương mock_text。" },
       ],
       snapshotChapters: [1, 2],
     });
@@ -109,7 +109,7 @@ describe("deleteLatestChapter", () => {
       .rejects.toThrow(/latest chapter/i);
 
     // Nothing was touched.
-    await expect(exists(join(bookDir, "chapters", "0001_起风.md"))).resolves.toBe(true);
+    await expect(exists(join(bookDir, "chapters", "0001_mock_text.md"))).resolves.toBe(true);
     await expect(exists(join(bookDir, "chapters", ".trash"))).resolves.toBe(false);
   });
 
@@ -129,8 +129,8 @@ describe("deleteLatestChapter", () => {
     const { root, bookDir } = await setupBook({
       bookId: "nosnapbook",
       chapters: [
-        { number: 1, title: "起风", content: "第一章。" },
-        { number: 2, title: "落雨", content: "第二章。" },
+        { number: 1, title: "mock_text", content: "Chương mock_text。" },
+        { number: 2, title: "mock_text", content: "Chương mock_text。" },
       ],
       snapshotChapters: [2], // snapshot for chapter 1 (rollback target) is missing
     });
@@ -140,14 +140,14 @@ describe("deleteLatestChapter", () => {
       .rejects.toThrow(/snapshot/i);
 
     // The chapter file stays in place — no half-deleted state.
-    await expect(exists(join(bookDir, "chapters", "0002_落雨.md"))).resolves.toBe(true);
+    await expect(exists(join(bookDir, "chapters", "0002_mock_text.md"))).resolves.toBe(true);
     await expect(exists(join(bookDir, "chapters", ".trash"))).resolves.toBe(false);
   });
 
   it("deletes the only chapter of a book when the chapter-0 snapshot exists", async () => {
     const { root, bookDir } = await setupBook({
       bookId: "onebook",
-      chapters: [{ number: 1, title: "起风", content: "第一章正文。" }],
+      chapters: [{ number: 1, title: "mock_text", content: "Chương mock_text。" }],
       snapshotChapters: [0, 1],
     });
 
@@ -158,43 +158,43 @@ describe("deleteLatestChapter", () => {
     expect(result.rolledBackTo).toBe(0);
     const savedIndex = JSON.parse(await readFile(join(bookDir, "chapters", "index.json"), "utf-8")) as ChapterMeta[];
     expect(savedIndex).toEqual([]);
-    await expect(readFile(join(bookDir, "chapters", ".trash", "0001_起风.md"), "utf-8"))
-      .resolves.toBe("第一章正文。");
+    await expect(readFile(join(bookDir, "chapters", ".trash", "0001_mock_text.md"), "utf-8"))
+      .resolves.toBe("Chương mock_text。");
   });
 
   it("keeps existing trash entries by picking a distinct name on collision", async () => {
     const { root, bookDir } = await setupBook({
       bookId: "twicebook",
       chapters: [
-        { number: 1, title: "起风", content: "第一章。" },
-        { number: 2, title: "落雨", content: "新的第二章。" },
+        { number: 1, title: "mock_text", content: "Chương mock_text。" },
+        { number: 2, title: "mock_text", content: "mock_textChương mock_text。" },
       ],
       snapshotChapters: [1, 2],
     });
     await mkdir(join(bookDir, "chapters", ".trash"), { recursive: true });
-    await writeFile(join(bookDir, "chapters", ".trash", "0002_落雨.md"), "旧的第二章。", "utf-8");
+    await writeFile(join(bookDir, "chapters", ".trash", "0002_mock_text.md"), "mock_textChương mock_text。", "utf-8");
 
     const state = new StateManager(root);
     const result = await deleteLatestChapter(state, "twicebook");
 
-    expect(result.trashedFiles).toEqual(["chapters/.trash/0002_落雨-2.md"]);
-    await expect(readFile(join(bookDir, "chapters", ".trash", "0002_落雨.md"), "utf-8"))
-      .resolves.toBe("旧的第二章。");
-    await expect(readFile(join(bookDir, "chapters", ".trash", "0002_落雨-2.md"), "utf-8"))
-      .resolves.toBe("新的第二章。");
+    expect(result.trashedFiles).toEqual(["chapters/.trash/0002_mock_text-2.md"]);
+    await expect(readFile(join(bookDir, "chapters", ".trash", "0002_mock_text.md"), "utf-8"))
+      .resolves.toBe("mock_textChương mock_text。");
+    await expect(readFile(join(bookDir, "chapters", ".trash", "0002_mock_text-2.md"), "utf-8"))
+      .resolves.toBe("mock_textChương mock_text。");
   });
 
   it("rolls back the index even when the chapter file was already deleted by hand", async () => {
     const { root, bookDir } = await setupBook({
       bookId: "handbook",
       chapters: [
-        { number: 1, title: "起风", content: "第一章。" },
-        { number: 2, title: "落雨", content: "第二章。" },
+        { number: 1, title: "mock_text", content: "Chương mock_text。" },
+        { number: 2, title: "mock_text", content: "Chương mock_text。" },
       ],
       snapshotChapters: [1, 2],
     });
     const { rm } = await import("node:fs/promises");
-    await rm(join(bookDir, "chapters", "0002_落雨.md"));
+    await rm(join(bookDir, "chapters", "0002_mock_text.md"));
 
     const state = new StateManager(root);
     const result = await deleteLatestChapter(state, "handbook");
@@ -209,19 +209,19 @@ describe("deleteLatestChapter", () => {
     const { root, bookDir } = await setupBook({
       bookId: "trashscanbook",
       chapters: [
-        { number: 1, title: "起风", content: "第一章。" },
-        { number: 2, title: "落雨", content: "第二章。" },
+        { number: 1, title: "mock_text", content: "Chương mock_text。" },
+        { number: 2, title: "mock_text", content: "Chương mock_text。" },
       ],
       snapshotChapters: [1, 2],
     });
     await mkdir(join(bookDir, "chapters", ".trash"), { recursive: true });
-    await writeFile(join(bookDir, "chapters", ".trash", "0009_幽灵.md"), "trash ghost", "utf-8");
+    await writeFile(join(bookDir, "chapters", ".trash", "0009_mock_text.md"), "trash ghost", "utf-8");
 
     const state = new StateManager(root);
     const result = await deleteLatestChapter(state, "trashscanbook");
 
     expect(result.deletedChapter).toBe(2);
     const trashEntries = await readdir(join(bookDir, "chapters", ".trash"));
-    expect(trashEntries.sort()).toEqual(["0002_落雨.md", "0009_幽灵.md"]);
+    expect(trashEntries.sort()).toEqual(["0002_mock_text.md", "0009_mock_text.md"]);
   });
 });

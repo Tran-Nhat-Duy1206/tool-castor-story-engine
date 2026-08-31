@@ -109,8 +109,8 @@ describe("MiniMax thinking leak prevention (issue #329)", () => {
     responseQueue.push(jsonResponse({
       choices: [{
         message: {
-          content: "第一章正文开始。",
-          reasoning_content: "让我先推演一下剧情走向……",
+          content: "Chương mock_text。",
+          reasoning_content: "mock_text……",
         },
       }],
       usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
@@ -118,11 +118,11 @@ describe("MiniMax thinking leak prevention (issue #329)", () => {
     const client = minimaxClient("MiniMax-M2.7");
 
     const result = await chatCompletion(client, "MiniMax-M2.7", [
-      { role: "user", content: "写第一章" },
+      { role: "user", content: "mock_textChương mock_text" },
     ], { retry: false });
 
-    expect(result.content).toBe("第一章正文开始。");
-    expect(result.content).not.toContain("推演");
+    expect(result.content).toBe("Chương mock_text。");
+    expect(result.content).not.toContain("mock_text");
   });
 
   it("strips a leading inline <think> block from non-stream content", async () => {
@@ -130,7 +130,7 @@ describe("MiniMax thinking leak prevention (issue #329)", () => {
     responseQueue.push(jsonResponse({
       choices: [{
         message: {
-          content: "<think>这里是模型的内心推理，不该出现在章节里</think>\n\n第一章正文开始。",
+          content: "<think>mock_text，mock_text</think>\n\nChương mock_text。",
         },
       }],
       usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
@@ -138,20 +138,20 @@ describe("MiniMax thinking leak prevention (issue #329)", () => {
     const client = minimaxClient("MiniMax-M2.7");
 
     const result = await chatCompletion(client, "MiniMax-M2.7", [
-      { role: "user", content: "写第一章" },
+      { role: "user", content: "mock_textChương mock_text" },
     ], { retry: false });
 
-    expect(result.content).toBe("第一章正文开始。");
-    expect(result.content).not.toContain("内心推理");
+    expect(result.content).toBe("Chương mock_text。");
+    expect(result.content).not.toContain("mock_text");
   });
 
   it("keeps reasoning_content and reasoning_details deltas out of streamed content", async () => {
     fetchCalls.length = 0;
     responseQueue.push(sseResponse([
-      JSON.stringify({ choices: [{ delta: { reasoning_content: "思考片段A" } }] }),
-      JSON.stringify({ choices: [{ delta: { reasoning_details: [{ text: "思考片段B" }] } }] }),
-      JSON.stringify({ choices: [{ delta: { content: "第一章" } }] }),
-      JSON.stringify({ choices: [{ delta: { content: "正文。" } }] }),
+      JSON.stringify({ choices: [{ delta: { reasoning_content: "mock_textA" } }] }),
+      JSON.stringify({ choices: [{ delta: { reasoning_details: [{ text: "mock_textB" }] } }] }),
+      JSON.stringify({ choices: [{ delta: { content: "Chương mock_text" } }] }),
+      JSON.stringify({ choices: [{ delta: { content: "mock_text。" } }] }),
       JSON.stringify({ choices: [{ delta: {}, finish_reason: "stop" }], usage: { prompt_tokens: 3, completion_tokens: 4, total_tokens: 7 } }),
       "[DONE]",
     ]));
@@ -159,21 +159,21 @@ describe("MiniMax thinking leak prevention (issue #329)", () => {
     const deltas: string[] = [];
 
     const result = await chatCompletion(client, "MiniMax-M2.7", [
-      { role: "user", content: "写第一章" },
+      { role: "user", content: "mock_textChương mock_text" },
     ], { retry: false, onTextDelta: (text) => deltas.push(text) });
 
-    expect(result.content).toBe("第一章正文。");
-    expect(result.content).not.toContain("思考片段");
-    expect(deltas.join("")).toBe("第一章正文。");
+    expect(result.content).toBe("Chương mock_text。");
+    expect(result.content).not.toContain("mock_text");
+    expect(deltas.join("")).toBe("Chương mock_text。");
   });
 
   it("strips a leading inline <think> block split across stream chunks", async () => {
     fetchCalls.length = 0;
     responseQueue.push(sseResponse([
       JSON.stringify({ choices: [{ delta: { content: "<th" } }] }),
-      JSON.stringify({ choices: [{ delta: { content: "ink>模型内心推理" } }] }),
-      JSON.stringify({ choices: [{ delta: { content: "</think>\n第一" } }] }),
-      JSON.stringify({ choices: [{ delta: { content: "章正文。" } }] }),
+      JSON.stringify({ choices: [{ delta: { content: "ink>mock_text" } }] }),
+      JSON.stringify({ choices: [{ delta: { content: "</think>\nChương mock_text" } }] }),
+      JSON.stringify({ choices: [{ delta: { content: "mock_text。" } }] }),
       JSON.stringify({ choices: [{ delta: {}, finish_reason: "stop" }] }),
       "[DONE]",
     ]));
@@ -181,11 +181,11 @@ describe("MiniMax thinking leak prevention (issue #329)", () => {
     const deltas: string[] = [];
 
     const result = await chatCompletion(client, "MiniMax-M2.7", [
-      { role: "user", content: "写第一章" },
+      { role: "user", content: "mock_textChương mock_text" },
     ], { retry: false, onTextDelta: (text) => deltas.push(text) });
 
-    expect(result.content).toBe("第一章正文。");
-    expect(deltas.join("")).toBe("第一章正文。");
-    expect(deltas.join("")).not.toContain("内心推理");
+    expect(result.content).toBe("Chương mock_text。");
+    expect(deltas.join("")).toBe("Chương mock_text。");
+    expect(deltas.join("")).not.toContain("mock_text");
   });
 });

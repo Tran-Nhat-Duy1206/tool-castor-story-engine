@@ -7,20 +7,20 @@ import { initializeProjectDirectory } from "../project-bootstrap.js";
 export const initCommand = new Command("init")
   .description("Initialize a Castor project (current directory by default)")
   .argument("[name]", "Project name (creates subdirectory). Omit to init current directory.")
-  .option("--lang <language>", "Default writing language: zh (Chinese) or en (English)", "zh")
+  .option("--lang <language>", "Default writing language: vi (Vietnamese) or en (English)", "vi")
   .action(async (name: string | undefined, opts: { lang?: string }) => {
     const projectDir = name ? resolve(process.cwd(), name) : process.cwd();
 
     try {
       await mkdir(projectDir, { recursive: true });
       await initializeProjectDirectory(projectDir, {
-        language: (opts.lang === "en" ? "en" : "zh"),
+        language: (opts.lang === "en" ? "en" : "vi"),
         overwriteSupportFiles: true,
       });
 
       log(`Project initialized at ${projectDir}`);
       log("");
-      const isEnglish = (opts.lang ?? "zh") === "en";
+      const isEnglish = (opts.lang ?? "vi") === "en";
       const exampleCreateLines = isEnglish
         ? ["  castor book create --title 'My Novel' --genre progression --platform royalroad --lang en"]
         : [

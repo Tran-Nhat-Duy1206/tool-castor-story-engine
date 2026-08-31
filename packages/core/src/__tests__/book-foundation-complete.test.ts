@@ -19,8 +19,8 @@ async function writeFoundation(bookDir: string, parts: {
   if (parts.bookRules) await writeFile(join(bookDir, "story", "book_rules.md"), "rules");
   if (parts.pendingHooks) await writeFile(join(bookDir, "story", "pending_hooks.md"), "hooks");
   if (parts.role) {
-    await mkdir(join(bookDir, "story", "roles", "主要角色"), { recursive: true });
-    await writeFile(join(bookDir, "story", "roles", "主要角色", "lead.md"), "lead");
+    await mkdir(join(bookDir, "story", "roles", "major"), { recursive: true });
+    await writeFile(join(bookDir, "story", "roles", "major", "lead.md"), "lead");
   }
 }
 
@@ -59,18 +59,18 @@ describe("isBookFoundationComplete", () => {
     // The architect routinely writes roles to character_matrix.md instead of the
     // roles/ dir; the runtime reads either, so this book IS complete/usable.
     await writeFoundation(dir, { bookJson: true, storyFrame: true, volumeMap: true, bookRules: true, pendingHooks: true });
-    await writeFile(join(dir, "story", "character_matrix.md"), "## 林秋\n- 定位: 主角");
+    await writeFile(join(dir, "story", "character_matrix.md"), "## mock_text\n- mock_text: mock_text");
     expect(await isBookFoundationComplete(dir)).toBe(true);
   });
 
   it("does not treat an empty legacy character_matrix pointer as real roles", async () => {
     await writeFoundation(dir, { bookJson: true, storyFrame: true, volumeMap: true, bookRules: true, pendingHooks: true });
     await writeFile(join(dir, "story", "character_matrix.md"), [
-      "# 角色矩阵",
+      "# mock_text",
       "",
-      "兼容提示：新角色卡位于 `story/roles/`。",
+      "mock_text：mock_text `story/roles/`。",
       "",
-      "## 主要角色",
+      "## major",
       "(none)",
     ].join("\n"));
     expect(await isBookFoundationComplete(dir)).toBe(false);

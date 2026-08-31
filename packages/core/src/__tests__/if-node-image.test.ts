@@ -15,20 +15,20 @@ describe("generateNodeImage", () => {
   afterEach(async () => { await rm(root, { recursive: true, force: true }); });
 
   it("writes the image file and returns an assetRef + node-upsert delta", async () => {
-    const node = StoryNodeSchema.parse({ id: "s", type: "start", sceneDesc: "宫门前", choices: [] });
+    const node = StoryNodeSchema.parse({ id: "s", type: "start", sceneDesc: "Cong dien", choices: [] });
     const { assetRef, delta } = await generateNodeImage({ projectRoot: root, projectId: "p", node, deps: stub });
     expect(assetRef).toBe(nodeImageRelPath("p", "s", "png"));
     const written = await readFile(join(root, assetRef));
     expect(written.equals(PNG)).toBe(true);
     const parsed = StoryGraphDeltaSchema.parse(delta);
     expect(parsed.nodes?.upsert?.[0].imageSlot?.assetRef).toBe(assetRef);
-    expect(parsed.nodes?.upsert?.[0].imageSlot?.prompt).toBe("宫门前"); // fell back to sceneDesc
+    expect(parsed.nodes?.upsert?.[0].imageSlot?.prompt).toBe("Cong dien"); // fell back to sceneDesc
   });
 
   it("prefers imageSlot.prompt over sceneDesc", async () => {
-    const node = StoryNodeSchema.parse({ id: "s", type: "start", sceneDesc: "场景", imageSlot: { prompt: "显式提示词" }, choices: [] });
+    const node = StoryNodeSchema.parse({ id: "s", type: "start", sceneDesc: "mock_text", imageSlot: { prompt: "mock_text" }, choices: [] });
     const { delta } = await generateNodeImage({ projectRoot: root, projectId: "p", node, deps: stub });
-    expect(StoryGraphDeltaSchema.parse(delta).nodes?.upsert?.[0].imageSlot?.prompt).toBe("显式提示词");
+    expect(StoryGraphDeltaSchema.parse(delta).nodes?.upsert?.[0].imageSlot?.prompt).toBe("mock_text");
   });
 
   it("throws when there is no prompt or sceneDesc", async () => {

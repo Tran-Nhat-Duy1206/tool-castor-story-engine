@@ -31,24 +31,24 @@ describe("FoundationReviewerAgent", () => {
     ).mockResolvedValue({
       content: [
         "=== DIMENSION: 1 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 2 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 3 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 4 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 5 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== OVERALL ===",
-        "总分：80",
-        "通过：是",
-        "总评：可开写。",
+        "mock_text：80",
+        "mock_text：mock_text",
+        "mock_text：mock_text。",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -58,20 +58,20 @@ describe("FoundationReviewerAgent", () => {
       mode: "original",
       targetChapters: 8,
       foundation: {
-        storyBible: "故事框架",
-        volumeOutline: "8章大纲",
-        bookRules: "规则",
-        currentState: "状态",
-        pendingHooks: "伏笔",
+        storyBible: "mock_text",
+        volumeOutline: "8mock_text",
+        bookRules: "mock_text",
+        currentState: "mock_text",
+        pendingHooks: "mock_text",
       },
     });
 
     const messages = chatSpy.mock.calls[0]?.[0] as Array<{ role: string; content: string }>;
-    expect(messages[0]?.content).toContain("用户要求的8章");
-    expect(messages[0]?.content).toContain("前5章");
-    expect(messages[0]?.content).toContain("连续8章");
-    expect(messages[0]?.content).not.toContain("支撑40章");
-    expect(messages[0]?.content).not.toContain("连续10章");
+    expect(messages[0]?.content).toContain("mock_text8mock_text");
+    expect(messages[0]?.content).toContain("mock_text5mock_text");
+    expect(messages[0]?.content).toContain("mock_text8mock_text");
+    expect(messages[0]?.content).not.toContain("mock_text40mock_text");
+    expect(messages[0]?.content).not.toContain("mock_text10mock_text");
   });
 
   it("does not silently truncate foundation, canon, or style inputs before review", async () => {
@@ -87,24 +87,24 @@ describe("FoundationReviewerAgent", () => {
     ).mockResolvedValue({
       content: [
         "=== DIMENSION: 1 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 2 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 3 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 4 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== DIMENSION: 5 ===",
-        "分数：80",
-        "意见：可用",
+        "mock_text：80",
+        "mock_text：mock_text",
         "=== OVERALL ===",
-        "总分：80",
-        "通过：是",
-        "总评：可开写。",
+        "mock_text：80",
+        "mock_text：mock_text",
+        "mock_text：mock_text。",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -112,14 +112,14 @@ describe("FoundationReviewerAgent", () => {
     await agent.review({
       language: "vi",
       mode: "fanfic",
-      sourceCanon: `${"正典".repeat(9000)}\nSOURCE_CANON_TAIL_MARKER`,
-      styleGuide: `${"文风".repeat(3000)}\nSTYLE_GUIDE_TAIL_MARKER`,
+      sourceCanon: `${"mock_text".repeat(9000)}\nSOURCE_CANON_TAIL_MARKER`,
+      styleGuide: `${"mock_text".repeat(3000)}\nSTYLE_GUIDE_TAIL_MARKER`,
       foundation: {
-        storyBible: `${"世界".repeat(5000)}\nSTORY_BIBLE_TAIL_MARKER`,
-        volumeOutline: `${"卷纲".repeat(5000)}\nVOLUME_OUTLINE_TAIL_MARKER`,
-        bookRules: `${"规则".repeat(3000)}\nBOOK_RULES_TAIL_MARKER`,
-        currentState: `${"状态".repeat(2000)}\nCURRENT_STATE_TAIL_MARKER`,
-        pendingHooks: `${"伏笔".repeat(2000)}\nPENDING_HOOKS_TAIL_MARKER`,
+        storyBible: `${"mock_text".repeat(5000)}\nSTORY_BIBLE_TAIL_MARKER`,
+        volumeOutline: `${"mock_text".repeat(5000)}\nVOLUME_OUTLINE_TAIL_MARKER`,
+        bookRules: `${"mock_text".repeat(3000)}\nBOOK_RULES_TAIL_MARKER`,
+        currentState: `${"mock_text".repeat(2000)}\nCURRENT_STATE_TAIL_MARKER`,
+        pendingHooks: `${"mock_text".repeat(2000)}\nPENDING_HOOKS_TAIL_MARKER`,
       },
     });
 
@@ -234,9 +234,9 @@ describe("FoundationReviewerAgent", () => {
       "chat",
     ).mockResolvedValue({
       content: [
-        "### 核心冲突",
-        "分数：82",
-        "意见：主线清楚，但模型没有遵守约定的分项边界。",
+        "### mock_text",
+        "mock_text：82",
+        "mock_text：mock_text，mock_text。",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -246,11 +246,11 @@ describe("FoundationReviewerAgent", () => {
       mode: "original",
       targetChapters: 60,
       foundation: {
-        storyBible: "故事框架",
-        volumeOutline: "60章大纲",
-        bookRules: "规则",
-        currentState: "状态",
-        pendingHooks: "伏笔",
+        storyBible: "mock_text",
+        volumeOutline: "60mock_text",
+        bookRules: "mock_text",
+        currentState: "mock_text",
+        pendingHooks: "mock_text",
       },
     })).rejects.toEqual(expect.objectContaining<Partial<FoundationReviewParseError>>({
       name: "FoundationReviewParseError",

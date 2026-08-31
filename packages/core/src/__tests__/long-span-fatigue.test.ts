@@ -19,7 +19,7 @@ async function writeChapter(bookDir: string, chapter: number, title: string, bod
   const filename = `${String(chapter).padStart(4, "0")}_${title}.md`;
   await writeFile(
     join(bookDir, "chapters", filename),
-    `# 第${chapter}章 ${title}\n\n${body}\n`,
+    `# Chương ${chapter}mock_text ${title}\n\n${body}\n`,
     "utf-8",
   );
 }
@@ -29,17 +29,17 @@ describe("analyzeLongSpanFatigue", () => {
     const bookDir = await createBookDir("castor-long-span-type-test-");
 
     await Promise.all([
-      writeChapter(bookDir, 1, "铺陈", "城门口下着雨。林越压低斗笠，慢慢走进旧巷。风从墙缝里钻出来。"),
-      writeChapter(bookDir, 2, "潜伏", "午后的石街很亮。林越在茶棚外停了一下，随后绕向后院。铜铃轻轻响了一声。"),
+      writeChapter(bookDir, 1, "mock_text", "mock_text。mock_text，mock_text。mock_text。"),
+      writeChapter(bookDir, 2, "mock_text", "mock_text。mock_text，mock_text。mock_text。"),
       writeFile(
         join(bookDir, "story", "chapter_summaries.md"),
         [
-          "# 章节摘要",
+          "# mock_text",
           "",
-          "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+          "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "|------|------|----------|----------|----------|----------|----------|----------|",
-          "| 1 | 铺陈 | 林越 | 进城 | 潜伏开始 | 债印未解 | 克制 | 布局 |",
-          "| 2 | 潜伏 | 林越 | 试探 | 线索加深 | 债印未解 | 克制 | 布局 |",
+          "| 1 | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
+          "| 2 | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
         ].join("\n"),
         "utf-8",
       ),
@@ -49,12 +49,12 @@ describe("analyzeLongSpanFatigue", () => {
       const result = await analyzeLongSpanFatigue({
         bookDir,
         chapterNumber: 3,
-        chapterContent: "夜色像潮水一样漫到院墙根。林越没有立刻翻墙，而是先贴着墙根听了一阵。最后，他把手按在那道旧债印上。",
-        chapterSummary: "| 3 | 试探 | 林越 | 继续潜伏 | 目标未变 | 债印未解 | 克制 | 布局 |",
+        chapterContent: "Bong demmock_text。mock_text，mock_text。mock_text，mock_text。",
+        chapterSummary: "| 3 | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
         language: "vi",
       });
 
-      expect(result.issues.some((issue) => issue.category === "节奏单调")).toBe(true);
+      expect(result.issues.some((issue) => issue.category === "mock_text")).toBe(true);
     } finally {
       await rm(join(bookDir, ".."), { recursive: true, force: true });
     }
@@ -126,17 +126,17 @@ describe("analyzeLongSpanFatigue", () => {
     const bookDir = await createBookDir("castor-long-span-cadence-test-");
 
     await Promise.all([
-      writeChapter(bookDir, 1, "名单之前", "风贴着走廊吹。周谨川没有停，手指一直压着那份发潮的薄册。"),
-      writeChapter(bookDir, 2, "名单之后", "楼道里只有脚步声。周谨川顺着裂灯往下走，肩背始终绷着。"),
+      writeChapter(bookDir, 1, "mock_text", "mock_text。mock_text，mock_text。"),
+      writeChapter(bookDir, 2, "mock_text", "mock_text。mock_text，mock_text。"),
       writeFile(
         join(bookDir, "story", "chapter_summaries.md"),
         [
-          "# 章节摘要",
+          "# mock_text",
           "",
-          "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+          "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "|------|------|----------|----------|----------|----------|----------|----------|",
-          "| 1 | 名单之前 | 周谨川 | 初次接触名单 | 压力上升 | 名单线继续发酵 | 紧张、压抑 | 调查章 |",
-          "| 2 | 名单之后 | 周谨川 | 顺着名单继续追查 | 目标未变 | 名单线继续发酵 | 冷硬、逼仄 | 调查章 |",
+          "| 1 | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text、mock_text | mock_text |",
+          "| 2 | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text、mock_text | mock_text |",
         ].join("\n"),
         "utf-8",
       ),
@@ -146,13 +146,13 @@ describe("analyzeLongSpanFatigue", () => {
       const result = await analyzeLongSpanFatigue({
         bookDir,
         chapterNumber: 3,
-        chapterContent: "墙角的灰一直没落定。周谨川盯着名单最后一行，喉结很轻地滚了一下，还是没有把气松出来。",
-        chapterSummary: "| 3 | 名单未落 | 周谨川 | 名单追查继续推进 | 目标未变 | 名单线继续发酵 | 压迫、窒息 | 调查章 |",
+        chapterContent: "mock_text。mock_text，mock_text，mock_text。",
+        chapterSummary: "| 3 | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text、mock_text | mock_text |",
         language: "vi",
       });
 
-      expect(result.issues.some((issue) => issue.category === "标题重复")).toBe(true);
-      expect(result.issues.some((issue) => issue.category === "情绪单调")).toBe(true);
+      expect(result.issues.some((issue) => issue.category === "mock_text")).toBe(true);
+      expect(result.issues.some((issue) => issue.category === "mock_text")).toBe(true);
     } finally {
       await rm(join(bookDir, ".."), { recursive: true, force: true });
     }

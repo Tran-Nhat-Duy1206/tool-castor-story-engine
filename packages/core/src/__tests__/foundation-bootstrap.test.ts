@@ -19,7 +19,7 @@ async function setupLegacyBook(governance?: Record<string, string>): Promise<voi
   bookDir = join(root, "books", "bootstrap-book");
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "roles", "major"), { recursive: true });
-  await mkdir(join(bookDir, "story", "roles", "主要角色"), { recursive: true });
+  await mkdir(join(bookDir, "story", "roles", "major"), { recursive: true });
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await writeFile(
     join(bookDir, "book.json"),
@@ -38,38 +38,38 @@ async function setupLegacyBook(governance?: Record<string, string>): Promise<voi
   await writeFile(
     join(bookDir, "story", "outline", "story_frame.md"),
     [
-      "## 主题与基调",
-      "主题段落：命运与选择。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
-      "## 核心冲突",
-      "冲突段落：家族债务与个人自由。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
-      "## 世界观底色",
-      "世界段落：河港城，商会与帮派。",
+      "## mock_text",
+      "mock_text：mock_text，mock_text。",
       "",
-      "## 终局方向",
-      "结局段落：主角在平衡中收束。",
+      "## mock_text",
+      "mock_text：mock_text。",
       "",
     ].join("\n"),
     "utf-8",
   );
   await writeFile(
     join(bookDir, "story", "outline", "volume_map.md"),
-    "## 卷一\n第一卷追出站台背后的旧案。\n",
+    "## mock_text\nChương mock_text。\n",
     "utf-8",
   );
   await writeFile(
     join(bookDir, "story", "book_rules.md"),
     [
-      "## 主角",
-      "- 名字：林辞",
+      "## mock_text",
+      "- mock_text từ：mock_text",
       "",
-      "## 数值/资源规则",
-      "- 核心资源：灵石",
-      "- 硬上限：筑基不可突破",
+      "## mock_text/mock_text",
+      "- mock_text：mock_text",
+      "- mock_text：mock_text",
       "",
-      "## 禁止事项",
-      "- 不得破坏核心世界观",
+      "## mock_text",
+      "- mock_text",
       "",
     ].join("\n"),
     "utf-8",
@@ -77,20 +77,20 @@ async function setupLegacyBook(governance?: Record<string, string>): Promise<voi
   await writeFile(
     join(bookDir, "story", "pending_hooks.md"),
     [
-      "| hook_id | 起始章节 | 类型 | 状态 |",
+      "| hook_id | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- |",
-      "| H01 | 1 | 主线 | 未开启 |",
-      "| H02 | 3 | 支线 | 未开启 |",
+      "| H01 | 1 | mock_text | mock_text |",
+      "| H02 | 3 | mock_text | mock_text |",
       "",
     ].join("\n"),
     "utf-8",
   );
-  await writeFile(join(bookDir, "story", "roles", "major", "LinYue.md"), "## 核心标签\n冷静、执着\n", "utf-8");
-  await writeFile(join(bookDir, "story", "roles", "主要角色", "林辞.md"), "## 核心标签\n沉稳、果决\n", "utf-8");
+  await writeFile(join(bookDir, "story", "roles", "major", "LinYue.md"), "## mock_text\nmock_text、mock_text\n", "utf-8");
+  await writeFile(join(bookDir, "story", "roles", "major", "mock_text.md"), "## mock_text\nmock_text、mock_text\n", "utf-8");
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await writeFile(
-    join(bookDir, "chapters", "0003_第三章.md"),
-    "第三章正文：债务与选择。\n",
+    join(bookDir, "chapters", "0003_Chương mock_text.md"),
+    "Chương mock_text：mock_text。\n",
     "utf-8",
   );
   await writeFile(
@@ -109,13 +109,13 @@ async function setupLegacyBook(governance?: Record<string, string>): Promise<voi
 async function snapshotFingerprint(): Promise<Record<string, string>> {
   const files = [
     join(bookDir, "book.json"),
-    join(bookDir, "chapters", "0003_第三章.md"),
+    join(bookDir, "chapters", "0003_Chương mock_text.md"),
     join(bookDir, "story", "outline", "story_frame.md"),
     join(bookDir, "story", "outline", "volume_map.md"),
     join(bookDir, "story", "book_rules.md"),
     join(bookDir, "story", "pending_hooks.md"),
     join(bookDir, "story", "roles", "major", "LinYue.md"),
-    join(bookDir, "story", "roles", "主要角色", "林辞.md"),
+    join(bookDir, "story", "roles", "major", "mock_text.md"),
     join(bookDir, "story", "state", "manifest.json"),
   ];
   const out: Record<string, string> = {};
@@ -161,7 +161,7 @@ describe("bootstrapFoundation — legacy book", () => {
     const result = await bootstrapFoundation(bookDir);
     const rules = result.units.filter((unit) => unit.kind === "book_rule");
     const locators = rules.map((unit) => (unit.locator as { ruleId?: string }).ruleId);
-    expect(locators).toContain("数值/资源规则");
+    expect(locators).toContain("mock_text/mock_text");
     for (const unit of rules) {
       expect(SafeGovernanceIdSchema.safeParse(unit.unitId).success).toBe(true);
       expect(unit.unitId).not.toBe((unit.locator as { ruleId?: string }).ruleId); // unitId never the raw heading
@@ -222,8 +222,8 @@ describe("prepareFoundationV2Upgrade — durable, non-authoritative candidate", 
     await setupLegacyBook();
     const candidate = await prepareFoundationV2Upgrade(bookDir);
     const json = JSON.stringify(candidate);
-    expect(json).not.toContain("主题段落");
-    expect(json).not.toContain("核心资源：灵石");
+    expect(json).not.toContain("mock_text");
+    expect(json).not.toContain("mock_text：mock_text");
     expect(json).not.toContain('"content"');
   });
 });

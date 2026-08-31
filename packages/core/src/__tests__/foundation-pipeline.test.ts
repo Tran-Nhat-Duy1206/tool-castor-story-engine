@@ -123,10 +123,10 @@ async function createLegacyCandidate(): Promise<string> {
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await writeFile(join(bookDir, "story", "outline", "story_frame.md"), [
     "# Story Frame",
-    "## 主题与基调", "Legacy theme.",
-    "## 核心冲突", "Legacy conflict.",
-    "## 世界观底色", "Legacy world.",
-    "## 结局方向", "Legacy ending.",
+    "## mock_text", "Legacy theme.",
+    "## mock_text", "Legacy conflict.",
+    "## mock_text", "Legacy world.",
+    "## mock_text", "Legacy ending.",
   ].join("\n"), "utf-8");
   await writeFile(join(bookDir, "story", "outline", "volume_map.md"), "Legacy volume map.\n", "utf-8");
   await writeFile(join(bookDir, "story", "book_rules.md"), "", "utf-8");

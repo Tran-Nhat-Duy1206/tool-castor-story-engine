@@ -259,11 +259,11 @@ async function produceShort(
             outlineRevisionWarning,
           ].join("\n")
         : [
-            "# 第二版大纲未采用",
+            "# Chương ",
             "",
-            "可用的第一版大纲继续生效；可选修订没有完整结束，系统没有用残缺输出覆盖它。",
+            "Chương ；，。",
             "",
-            "## 原因",
+            "## ",
             "",
             outlineRevisionWarning,
           ].join("\n"));
@@ -346,11 +346,11 @@ async function produceShort(
             revisionWarning,
           ].join("\n")
         : [
-            "# 第二轮改稿未采用",
+            "# Chương ",
             "",
-            "系统没有用不完整或解析失败的改稿覆盖完整首稿。",
+            "failed。",
             "",
-            "## 原因",
+            "## ",
             "",
             revisionWarning,
           ].join("\n"));
@@ -594,7 +594,7 @@ async function writePackageArtifacts(
   const finalDir = join(baseDir, "final");
   const headings = language === "en"
     ? { intro: "## Synopsis", sellingPoints: "## Selling Points", coverPrompt: "## Cover Prompt" }
-    : { intro: "## 简介", sellingPoints: "## 卖点", coverPrompt: "## 封面提示词" };
+    : { intro: "## ", sellingPoints: "## ", coverPrompt: "## " };
   const packageMarkdown = [
     `# ${salesPackage.title}`,
     "",
@@ -1070,26 +1070,26 @@ function buildCoverImagePrompt(
   }
 
   const base = [
-    `标题：${salesPackage.title}`,
-    salesPackage.intro ? `简介：${salesPackage.intro}` : "",
-    salesPackage.sellingPoints.length > 0 ? `卖点：${salesPackage.sellingPoints.join("；")}` : "",
-    salesPackage.coverPrompt ? `用户视觉要求：${salesPackage.coverPrompt}` : "",
+    `：${salesPackage.title}`,
+    salesPackage.intro ? `：${salesPackage.intro}` : "",
+    salesPackage.sellingPoints.length > 0 ? `：${salesPackage.sellingPoints.join("；")}` : "",
+    salesPackage.coverPrompt ? `：${salesPackage.coverPrompt}` : "",
   ].filter(Boolean);
 
   if (mode === "generic") {
     return [
-      "按用户给出的标题、简介、卖点和视觉要求生成封面图。",
+      "、、。",
       ...base,
     ].join("\n");
   }
 
   return [
-    "为中文短篇小说生成手机端竖版书封，3:4竖图。",
-    ...base.map((line) => line.replace(/^标题：/u, "主标题：").replace(/^用户视觉要求：/u, "包装提示：")),
+    "，3:4。",
+    ...base.map((line) => line.replace(/^：/u, "：").replace(/^：/u, "：")),
     "",
-    "封面方向：平台短篇书封，不是电影海报。标题字要成为主视觉，预留两到四行大字排版区；人物近景或半身，表情有冷笑、震惊、崩溃、压迫或反杀感；道具少而大，一眼能看出冲突。",
-    "颜色高对比、高饱和，适合手机列表缩略图。避免写实会议摄影、横版视频缩略图、杂志大片、小清新细字和长段文字。",
-    "如果模型文字不稳定，优先生成明确标题留白/字块/排版空间，不要把大量乱码文字铺满画面。",
+    "：，。 từ， từ；，、、、；，。",
+    "、，。、、、 từ từ。",
+    " từ，/ từ/， từ。",
   ].filter(Boolean).join("\n");
 }
 

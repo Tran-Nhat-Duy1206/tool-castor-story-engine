@@ -1,15 +1,9 @@
-/**
- * 七牛云 AI 推理 (Qiniu)
- *
- * - 官网：https://www.qiniu.com/
- * - 控制台 / API key：https://portal.qiniu.com/ai-inference/api-key
- * - API 文档：https://developer.qiniu.com/aitokenapi
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const QINIU: ProviderEndpoint = {
   id: "qiniu",
-  label: "七牛云 AI",
+  label: "Qiniu Cloud AI",
   group: "aggregator",
   api: "openai-completions",
   baseUrl: "https://api.qnaigc.com/v1",

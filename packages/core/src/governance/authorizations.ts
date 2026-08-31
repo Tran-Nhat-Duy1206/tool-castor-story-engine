@@ -547,7 +547,7 @@ function parseDirectionScope(text: string, canonRevision: number): {
   unresolved: string[];
 } {
   const window = /(?:chapters?|ch(?:apters?)?)\s*(\d+)\s*(?:-|–|to|through)\s*(\d+)/i.exec(text)
-    ?? /第\s*(\d+)\s*(?:-|到|至)\s*(\d+)\s*章/u.exec(text);
+    ?? /Chương \s*(\d+)\s*(?:-||)\s*(\d+)\s*/u.exec(text);
   if (window) {
     const scope = HumanDirectionScopeSchema.parse({
       kind: "chapter_window",
@@ -556,7 +556,7 @@ function parseDirectionScope(text: string, canonRevision: number): {
     });
     return { scope, confidence: "high", unresolved: [] };
   }
-  const exact = /(?:chapter|ch)\s*(\d+)/i.exec(text) ?? /第\s*(\d+)\s*章/u.exec(text);
+  const exact = /(?:chapter|ch)\s*(\d+)/i.exec(text) ?? /Chương \s*(\d+)\s*/u.exec(text);
   if (exact) {
     return {
       scope: { kind: "exact_chapter", chapterNumber: Number(exact[1]) },

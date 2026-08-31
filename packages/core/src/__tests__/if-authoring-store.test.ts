@@ -6,7 +6,7 @@ import { applyGraphDelta, loadAuthoringState, revertToSnapshot } from "../intera
 import { loadStoryGraph } from "../interactive-film/graph-store.js";
 import { StoryGraphDeltaSchema } from "../interactive-film/delta.js";
 
-const emptyTitleDelta = StoryGraphDeltaSchema.parse({ worldAnchor: { storyCore: "核心A" } });
+const emptyTitleDelta = StoryGraphDeltaSchema.parse({ worldAnchor: { storyCore: "mock_textA" } });
 
 describe("authoring-store", () => {
   let root: string;
@@ -22,13 +22,13 @@ describe("authoring-store", () => {
       projectRoot: root, projectId: "p",
       delta: StoryGraphDeltaSchema.parse({
         nodes: { upsert: [{ id: "s", type: "start", choices: [] }] },
-        worldAnchor: { storyCore: "核心A" },
+        worldAnchor: { storyCore: "mock_textA" },
       }),
       phase: "structure",
     });
     expect(rev).toBe(1);
     expect(graph.nodes.map(n => n.id)).toEqual(["s"]);
-    expect((await loadStoryGraph(root, "p"))?.worldAnchor?.storyCore).toBe("核心A");
+    expect((await loadStoryGraph(root, "p"))?.worldAnchor?.storyCore).toBe("mock_textA");
     expect(await loadAuthoringState(root, "p")).toEqual({ phase: "structure", rev: 1 });
   });
 

@@ -34,7 +34,7 @@ function buildAgent(): ArchitectAgent {
 function baseBook(): BookConfig {
   return {
     id: "phase7-book",
-    title: "Phase7测试书",
+    title: "Phase7Testmock_text",
     platform: "other",
     genre: "urban",
     status: "active",
@@ -48,50 +48,50 @@ function baseBook(): BookConfig {
 
 const PHASE7_RESPONSE = [
   "=== SECTION: story_frame ===",
-  "## 主题与基调",
-  "这本书讲的是记忆与承诺。",
+  "## mock_text",
+  "mock_text。",
   "=== SECTION: volume_map ===",
-  "## 各卷主题与情绪曲线",
-  "三卷结构，第1卷 1-20 章。",
+  "## mock_text",
+  "mock_text，Chương 1mock_text 1-20 mock_text。",
   "=== SECTION: rhythm_principles ===",
-  "## 原则 1",
-  "每 10 章一个高潮。",
+  "## mock_text 1",
+  "mock_text 10 mock_text。",
   "=== SECTION: roles ===",
   "---ROLE---",
   "tier: major",
-  "name: 林辞",
+  "name: mock_text",
   "---CONTENT---",
-  "## 核心标签",
-  "沉默",
-  "## 反差细节",
-  "会给流浪狗留罐头",
-  "## 人物小传",
-  "过往。",
-  "## 当前现状",
-  "码头边做账房。",
-  "## 关系网络",
-  "与沈默是旧友。",
-  "## 内在驱动",
-  "查清真相。",
-  "## 成长弧光",
-  "从独行到托付。",
+  "## mock_text",
+  "mock_text",
+  "## mock_text",
+  "mock_text",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_textPhong so sach。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_textSu that。",
+  "## mock_text",
+  "mock_text。",
   "=== SECTION: book_rules ===",
   "---",
   "version: \"1.0\"",
   "---",
-  "## 叙事视角",
-  "第三人称。",
+  "## mock_text",
+  "Chương mock_text。",
   "=== SECTION: current_state ===",
-  "| 字段 | 值 |",
+  "|  từmock_text | mock_text |",
   "| --- | --- |",
-  "| 当前章节 | 0 |",
+  "| mock_text | 0 |",
   "",
   "=== SECTION: pending_hooks ===",
-  "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 上游依赖 | 回收卷 | 核心 | 半衰期 | 备注 |",
+  "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
   "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-  "| H01 | 1 | 主线 | 未开启 | 0 | 终章揭晓 | 终局 | 无 | 第3卷终章前 | 是 | 80 | 父亲笔记本 |",
-  "| H02 | 3 | 谜团 | 未开启 | 0 | 第2卷揭开 | 中程 | [H01] | 第2卷中段 | 否 | 30 | 码头名单碎片 |",
-  "| H03 | 7 | 小承诺 | 未开启 | 0 | 15章 | 近期 | 无 | 第1卷末 | 否 |  | 对妹妹的承诺 |",
+  "| H01 | 1 | mock_text | mock_text | 0 | mock_text | mock_text | mock_text | Chương 3mock_text | mock_text | 80 | mock_text |",
+  "| H02 | 3 | mock_text | mock_text | 0 | Chương 2mock_text | mock_text | [H01] | Chương 2mock_text | mock_text | 30 | mock_text |",
+  "| H03 | 7 | mock_text | mock_text | 0 | 15mock_text | mock_text | mock_text | Chương 1mock_text | mock_text |  | mock_text |",
 ].join("\n");
 
 describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
@@ -116,15 +116,15 @@ describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
     const messages = chat.mock.calls[0]?.[0] as Array<{ role: string; content: string }>;
     const system = messages[0]?.content ?? "";
     // The zh prompt must document all four new columns with clear rules.
-    expect(system).toContain("上游依赖");
-    expect(system).toContain("回收卷");
-    expect(system).toContain("核心");
-    expect(system).toContain("半衰期");
-    expect(system).toContain("普通种子行不要写 open");
+    expect(system).toContain("mock_text");
+    expect(system).toContain("mock_text");
+    expect(system).toContain("mock_text");
+    expect(system).toContain("mock_text");
+    expect(system).toContain("mock_text open");
     // Core-hook budget guidance: 3-7 per book.
-    expect(system).toContain("3-7 条");
+    expect(system).toContain("3-7 mock_text");
     // The extended table header must appear in the prompt example.
-    expect(system).toContain("| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 上游依赖 | 回收卷 | 核心 | 半衰期 | 备注 |");
+    expect(system).toContain("| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |");
   });
 
   it("round-trips extended columns through parseSections into the ledger", async () => {
@@ -134,18 +134,18 @@ describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
 
     const result = await agent.generateFoundation(baseBook());
 
-    // Phase 7 hotfix 1: rendered ledger now includes a 12th column `半衰期`
+    // Phase 7 hotfix 1: rendered ledger now includes a 12th column `mock_text`
     // (half_life) so architect-supplied values persist through the projection
     // roundtrip and are read by hook-stale-detection. Hooks without an explicit
     // half_life render an empty cell (parser falls back to timing default).
-    // Hotfix 2 adds a 13th `升级` (promoted) column — architect computes it
-    // from core_hook / depends_on / cross_volume at seed time. H01 (core=是)
-    // and H02 (depends_on=[H01]) both get promoted=是; H03 has no rule firing.
-    expect(result.pendingHooks).toContain("| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 上游依赖 | 回收卷 | 核心 | 半衰期 | 升级 | 备注 |");
-    expect(result.pendingHooks).toContain("| H01 | 1 | 主线 | 未开启 | 0 | 终章揭晓 | 终局 | 无 | 第3卷终章前 | 是 | 80 | 是 | 父亲笔记本 |");
-    expect(result.pendingHooks).toContain("| H02 | 3 | 谜团 | 未开启 | 0 | 第2卷揭开 | 中程 | [H01] | 第2卷中段 | 否 | 30 | 是 | 码头名单碎片 |");
-    // H03 omits half_life; cell renders empty. No rule fires so 升级=否.
-    expect(result.pendingHooks).toContain("| H03 | 7 | 小承诺 | 未开启 | 0 | 15章 | 近期 | 无 | 第1卷末 | 否 |  | 否 | 对妹妹的承诺 |");
+    // Hotfix 2 adds a 13th `mock_text` (promoted) column — architect computes it
+    // from core_hook / depends_on / cross_volume at seed time. H01 (core=mock_text)
+    // and H02 (depends_on=[H01]) both get promoted=mock_text; H03 has no rule firing.
+    expect(result.pendingHooks).toContain("| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |");
+    expect(result.pendingHooks).toContain("| H01 | 1 | mock_text | mock_text | 0 | mock_text | mock_text | mock_text | Chương 3mock_text | mock_text | 80 | mock_text | mock_text |");
+    expect(result.pendingHooks).toContain("| H02 | 3 | mock_text | mock_text | 0 | Chương 2mock_text | mock_text | [H01] | Chương 2mock_text | mock_text | 30 | mock_text | mock_text |");
+    // H03 omits half_life; cell renders empty. No rule fires so mock_text=mock_text.
+    expect(result.pendingHooks).toContain("| H03 | 7 | mock_text | mock_text | 0 | 15mock_text | mock_text | mock_text | Chương 1mock_text | mock_text |  | mock_text | mock_text |");
   });
 
   it("pending_hooks.md on disk carries the Phase 7 columns", async () => {
@@ -157,9 +157,9 @@ describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
     await agent.writeFoundationFiles(bookDir, result, false, "vi");
 
     const disk = await readFile(join(bookDir, "story", "pending_hooks.md"), "utf-8");
-    expect(disk).toContain("上游依赖");
-    expect(disk).toContain("回收卷");
-    expect(disk).toContain("核心");
+    expect(disk).toContain("mock_text");
+    expect(disk).toContain("mock_text");
+    expect(disk).toContain("mock_text");
     // Second row's depends_on column should be [H01].
     expect(disk).toMatch(/\| H02 \|.*\| \[H01\] \|/);
   });
@@ -176,13 +176,13 @@ describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
 
     const h01 = hooks.find((h) => h.hookId === "H01")!;
     expect(h01.coreHook).toBe(true);
-    expect(h01.paysOffInArc).toBe("第3卷终章前");
+    expect(h01.paysOffInArc).toBe("Chương 3mock_text");
     expect(h01.dependsOn ?? []).toEqual([]);
 
     const h02 = hooks.find((h) => h.hookId === "H02")!;
     expect(h02.coreHook).toBe(false);
     expect(h02.dependsOn).toEqual(["H01"]);
-    expect(h02.paysOffInArc).toBe("第2卷中段");
+    expect(h02.paysOffInArc).toBe("Chương 2mock_text");
 
     // Phase 7 hotfix 1: half_life survives the roundtrip.
     expect(h01.halfLifeChapters).toBe(80);
@@ -194,9 +194,9 @@ describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
 
   it("legacy 8-column pending_hooks tables still parse without new fields (backward compat)", () => {
     const legacy = [
-      "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 备注 |",
+      "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| L01 | 1 | 主线 | 未开启 | 0 | 15章 | 中程 | 旧书 |",
+      "| L01 | 1 | mock_text | mock_text | 0 | 15mock_text | mock_text | mock_text |",
     ].join("\n");
 
     const hooks = parsePendingHooksMarkdown(legacy);

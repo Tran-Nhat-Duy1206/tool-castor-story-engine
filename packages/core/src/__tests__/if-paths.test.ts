@@ -10,11 +10,11 @@ describe("enumerateRuntimePaths", () => {
   it("enumerates both branches to two endings", () => {
     const graph = g({
       nodes: [
-        { id: "s", type: "start", choices: [{ id: "a", text: "好", targetNodeId: "e1" }, { id: "b", text: "坏", targetNodeId: "e2" }] },
+        { id: "s", type: "start", choices: [{ id: "a", text: "mock_text", targetNodeId: "e1" }, { id: "b", text: "mock_text", targetNodeId: "e2" }] },
         { id: "e1", type: "ending", choices: [] },
         { id: "e2", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好", type: "good" }, { id: "b1", nodeId: "e2", title: "坏", type: "bad" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_text", type: "good" }, { id: "b1", nodeId: "e2", title: "mock_text", type: "bad" }],
     });
     const { paths } = enumerateRuntimePaths(graph);
     expect(paths.length).toBe(2);
@@ -27,13 +27,13 @@ describe("enumerateRuntimePaths", () => {
       variables: [{ name: "trust", type: "counter", default: 0, desc: "" }],
       nodes: [
         { id: "s", type: "start", choices: [
-          { id: "a", text: "需信任", targetNodeId: "e1", condition: { var: "trust", op: ">=", value: 1 } },
-          { id: "b", text: "总能走", targetNodeId: "e2" },
+          { id: "a", text: "mock_text", targetNodeId: "e1", condition: { var: "trust", op: ">=", value: 1 } },
+          { id: "b", text: "mock_text", targetNodeId: "e2" },
         ] },
         { id: "e1", type: "ending", choices: [] },
         { id: "e2", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好", type: "good" }, { id: "b1", nodeId: "e2", title: "坏", type: "bad" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_text", type: "good" }, { id: "b1", nodeId: "e2", title: "mock_text", type: "bad" }],
     });
     const { paths } = enumerateRuntimePaths(graph);
     // trust starts 0, choice a hidden → only the path to e2
@@ -47,7 +47,7 @@ describe("enumerateRuntimePaths", () => {
         { id: "s", type: "start", choices: [{ id: "c", text: "loop", targetNodeId: "s" }, { id: "d", text: "out", targetNodeId: "e" }] },
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_text", type: "good" }],
     });
     const { paths } = enumerateRuntimePaths(graph, { maxPaths: 50 });
     // cycle guard: 's' not re-entered in a single path → finite; the 'out' path reaches e
@@ -60,12 +60,12 @@ describe("enumerateRuntimePaths", () => {
       variables: [{ name: "clue", type: "counter", default: 0, desc: "" }],
       nodes: [
         { id: "s", type: "start", choices: [
-          { id: "search", text: "继续搜证", targetNodeId: "s", effects: [{ var: "clue", op: "add", value: 1 }] },
-          { id: "solve", text: "摊牌", targetNodeId: "e", condition: { var: "clue", op: ">=", value: 2 } },
+          { id: "search", text: "mock_text", targetNodeId: "s", effects: [{ var: "clue", op: "add", value: 1 }] },
+          { id: "solve", text: "mock_text", targetNodeId: "e", condition: { var: "clue", op: ">=", value: 2 } },
         ] },
         { id: "e", type: "ending", choices: [] },
       ],
-      endings: [{ id: "truth", nodeId: "e", title: "真相", type: "good" }],
+      endings: [{ id: "truth", nodeId: "e", title: "Su that", type: "good" }],
     });
     const { paths, truncated } = enumerateRuntimePaths(graph, { maxPaths: 20 });
     expect(truncated).toBe(true);
@@ -83,8 +83,8 @@ describe("enumerateRuntimePaths", () => {
         { id: "e2", type: "ending", choices: [] },
       ],
       endings: [
-        { id: "g1", nodeId: "e1", title: "好", type: "good" },
-        { id: "b1", nodeId: "e2", title: "坏", type: "bad" },
+        { id: "g1", nodeId: "e1", title: "mock_text", type: "good" },
+        { id: "b1", nodeId: "e2", title: "mock_text", type: "bad" },
       ],
     });
     const { paths, truncated } = enumerateRuntimePaths(graph, { maxPaths: 1 });
@@ -97,7 +97,7 @@ describe("enumerateRuntimePaths", () => {
       nodes: [
         { id: "e1", type: "ending", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e1", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e1", title: "mock_text", type: "good" }],
     });
     const { paths, truncated } = enumerateRuntimePaths(graph);
     expect(paths.length).toBe(0);
@@ -107,7 +107,7 @@ describe("enumerateRuntimePaths", () => {
   it("records a dead-end normal node (no choices, no ending) as a path with endingId=null ending at that node", () => {
     const graph = g({
       nodes: [
-        { id: "s", type: "start", choices: [{ id: "a", text: "前进", targetNodeId: "d" }] },
+        { id: "s", type: "start", choices: [{ id: "a", text: "mock_text", targetNodeId: "d" }] },
         { id: "d", type: "normal", choices: [] },
       ],
     });

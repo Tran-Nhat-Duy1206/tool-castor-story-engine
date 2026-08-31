@@ -39,9 +39,8 @@ export interface ChapterCadenceAnalysis {
 export const DEFAULT_CHAPTER_CADENCE_WINDOW = CADENCE_WINDOW_DEFAULTS.summaryLookback;
 
 const HIGH_TENSION_KEYWORDS = [
-  "紧张", "冷硬", "压抑", "逼仄", "肃杀", "沉重", "凝重",
-  "冷峻", "压迫", "阴沉", "焦灼", "窒息", "凛冽", "锋利",
-  "克制", "危机", "对峙", "绷紧", "僵持", "杀意",
+  "căng thẳng", "lạnh lùng", "áp bức", "ngột ngạt", "u ám", "nặng nề", "nghiêm trọng",
+  "dồn dập", "nguy cơ", "đối đầu", "sát ý", "tuyệt vọng", "hiểm nguy", "đe dọa",
   "tense", "cold", "oppressive", "grim", "ominous", "dark",
   "bleak", "hostile", "threatening", "heavy", "suffocating",
 ];
@@ -49,6 +48,10 @@ const HIGH_TENSION_KEYWORDS = [
 const ENGLISH_STOP_WORDS = new Set([
   "the", "and", "with", "from", "into", "after", "before",
   "over", "under", "this", "that", "your", "their",
+]);
+
+const VI_STOP_WORDS = new Set([
+  "trong", "ngoài", "những", "người", "chiếc", "cuộc", "nhưng", "không", "thành", "được",
 ]);
 
 export function analyzeChapterCadence(params: {
@@ -180,26 +183,13 @@ function analyzeTitlePressure(
 }
 
 function extractTitleTokens(title: string, language: "vi" | "en"): string[] {
-  if (language === "en") {
-    const words = title.match(/[a-z]{4,}/gi) ?? [];
-    return [...new Set(
-      words
-        .map((word) => word.toLowerCase())
-        .filter((word) => !ENGLISH_STOP_WORDS.has(word)),
-    )];
-  }
-
-  const segments = title.match(/[\u4e00-\u9fff]{2,}/g) ?? [];
-  const tokens = new Set<string>();
-  for (const segment of segments) {
-    for (let size = 2; size <= Math.min(4, segment.length); size += 1) {
-      for (let index = 0; index <= segment.length - size; index += 1) {
-        tokens.add(segment.slice(index, index + size));
-      }
-    }
-  }
-
-  return [...tokens];
+  const words = title.match(/[\p{L}]{4,}/gu) ?? [];
+  const stopWords = language === "en" ? ENGLISH_STOP_WORDS : VI_STOP_WORDS;
+  return [...new Set(
+    words
+      .map((word) => word.toLowerCase())
+      .filter((word) => !stopWords.has(word)),
+  )];
 }
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -207,5 +197,5 @@ function extractTitleTokens(title: string, language: "vi" | "en"): string[] {
 function isMeaningfulValue(value: string): boolean {
   const normalized = value.trim().toLowerCase();
   if (!normalized) return false;
-  return normalized !== "none" && normalized !== "(none)" && normalized !== "无";
+  return normalized !== "none" && normalized !== "(none)" && normalized !== "không";
 }

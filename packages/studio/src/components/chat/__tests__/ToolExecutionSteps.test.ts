@@ -16,8 +16,8 @@ const makeExec = (overrides: Partial<ToolExecution> & { id: string; tool: string
 describe("groupChronologically", () => {
   it("keeps read before pipeline when read happened first", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取文件" }),
-      makeExec({ id: "2", tool: "sub_agent", agent: "writer", label: "写作" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "sub_agent", agent: "writer", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -29,9 +29,9 @@ describe("groupChronologically", () => {
 
   it("groups consecutive utility tools together", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取文件" }),
-      makeExec({ id: "2", tool: "grep", label: "搜索" }),
-      makeExec({ id: "3", tool: "read", label: "读取文件" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "grep", label: "mock_val" }),
+      makeExec({ id: "3", tool: "read", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -45,10 +45,10 @@ describe("groupChronologically", () => {
 
   it("interleaves utility groups around pipeline ops", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取文件" }),
-      makeExec({ id: "2", tool: "sub_agent", agent: "writer", label: "写作" }),
-      makeExec({ id: "3", tool: "read", label: "读取文件" }),
-      makeExec({ id: "4", tool: "grep", label: "搜索" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "sub_agent", agent: "writer", label: "mock_val" }),
+      makeExec({ id: "3", tool: "read", label: "mock_val" }),
+      makeExec({ id: "4", tool: "grep", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -64,7 +64,7 @@ describe("groupChronologically", () => {
 
   it("handles pipeline-only executions", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "sub_agent", agent: "writer", label: "写作" }),
+      makeExec({ id: "1", tool: "sub_agent", agent: "writer", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -79,10 +79,10 @@ describe("groupChronologically", () => {
 
   it("renders short fiction and cover tools as visible pipeline cards", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取文件" }),
-      makeExec({ id: "2", tool: "generate_cover", label: "生成封面" }),
-      makeExec({ id: "3", tool: "short_fiction_run", label: "短篇生产" }),
-      makeExec({ id: "4", tool: "grep", label: "搜索" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "generate_cover", label: "mock_val" }),
+      makeExec({ id: "3", tool: "short_fiction_run", label: "mock_val" }),
+      makeExec({ id: "4", tool: "grep", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -95,12 +95,12 @@ describe("groupChronologically", () => {
 
   it("renders play tools as visible pipeline cards", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取文件" }),
-      makeExec({ id: "2", tool: "play_start", label: "启动互动世界" }),
-      makeExec({ id: "3", tool: "play_edit", label: "编辑互动世界" }),
-      makeExec({ id: "4", tool: "play_revise", label: "重做互动回合" }),
-      makeExec({ id: "5", tool: "play_step", label: "推进互动世界" }),
-      makeExec({ id: "6", tool: "grep", label: "搜索" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "play_start", label: "mock_val" }),
+      makeExec({ id: "3", tool: "play_edit", label: "mock_val" }),
+      makeExec({ id: "4", tool: "play_revise", label: "mock_val" }),
+      makeExec({ id: "5", tool: "play_step", label: "mock_val" }),
+      makeExec({ id: "6", tool: "grep", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -115,9 +115,9 @@ describe("groupChronologically", () => {
 
   it("renders proposed actions as visible pipeline cards", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取文件" }),
-      makeExec({ id: "2", tool: "propose_action", label: "确认动作" }),
-      makeExec({ id: "3", tool: "grep", label: "搜索" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "propose_action", label: "mock_val" }),
+      makeExec({ id: "3", tool: "grep", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -129,9 +129,9 @@ describe("groupChronologically", () => {
 
   it("renders context compression as a visible pipeline card", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取文件" }),
-      makeExec({ id: "2", tool: "context_compression", label: "整理会话记忆" }),
-      makeExec({ id: "3", tool: "grep", label: "搜索" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "context_compression", label: "mock_val" }),
+      makeExec({ id: "3", tool: "grep", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -143,11 +143,11 @@ describe("groupChronologically", () => {
 
   it("renders narrative forecast operations as visible pipeline cards", () => {
     const execs: ToolExecution[] = [
-      makeExec({ id: "1", tool: "read", label: "读取章节" }),
-      makeExec({ id: "2", tool: "create_narrative_forecast", label: "剧情推演" }),
-      makeExec({ id: "3", tool: "get_narrative_forecast", label: "核验推演" }),
-      makeExec({ id: "4", tool: "select_narrative_branch", label: "采用分支" }),
-      makeExec({ id: "5", tool: "grep", label: "搜索" }),
+      makeExec({ id: "1", tool: "read", label: "mock_val" }),
+      makeExec({ id: "2", tool: "create_narrative_forecast", label: "mock_val" }),
+      makeExec({ id: "3", tool: "get_narrative_forecast", label: "mock_val" }),
+      makeExec({ id: "4", tool: "select_narrative_branch", label: "mock_val" }),
+      makeExec({ id: "5", tool: "grep", label: "mock_val" }),
     ];
 
     const groups = groupToolExecutionsChronologically(execs);
@@ -169,14 +169,14 @@ describe("groupChronologically", () => {
       id: "writer-1",
       tool: "sub_agent",
       agent: "writer",
-      label: "写下一章",
-      result: "已完成第 1 章：雨棚。这里是更详细的操作结果。",
+      label: "mock_val",
+      result: "mock_valChương 1：mock_val。mock_val。",
     });
 
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
 
     expect(html).toContain("Xem kết quả thao tác");
-    expect(html).toContain("已完成第 1 章：雨棚");
+    expect(html).toContain("mock_valChương 1：mock_val");
   });
 
   it("renders applied revision audit status and concrete remaining issues", () => {
@@ -184,7 +184,7 @@ describe("groupChronologically", () => {
       id: "revision-1",
       tool: "sub_agent",
       agent: "reviser",
-      label: "重写第一章",
+      label: "mock_val",
       result: "Revision complete.",
       details: {
         kind: "chapter_revision",
@@ -192,12 +192,12 @@ describe("groupChronologically", () => {
         applied: true,
         status: "audit-failed",
         auditPassed: false,
-        fixedIssues: ["统一了孙玉珍和十一分钟的单元案"],
+        fixedIssues: ["mock_val"],
         auditIssues: [{
           severity: "warning",
           category: "continuity",
-          description: "第一句仍未直接落到孙玉珍抱钟进店。",
-          suggestion: "把该动作放到首句。",
+          description: "mock_val。",
+          suggestion: "mock_val。",
         }],
       },
     });
@@ -210,7 +210,7 @@ describe("groupChronologically", () => {
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
     expect(html).toContain("Chỉnh sửa chương 1");
     expect(html).toContain("Vẫn cần soát lại");
-    expect(html).toContain("第一句仍未直接落到孙玉珍抱钟进店");
+    expect(html).toContain("mock_val");
     expect(html).not.toContain("Xem kết quả thao tác");
   });
 
@@ -218,19 +218,19 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "resync-1",
       tool: "resync_chapter_state",
-      label: "同步章节状态",
+      label: "mock_val",
       result: "State resynced.",
       details: {
         kind: "chapter_state_resynced",
         chapterNumber: 1,
         status: "audit-failed",
         auditPassed: false,
-        summary: "状态已重建，正文仍有一个连续性问题。",
+        summary: "mock_val，mock_val。",
         auditIssues: [{
           severity: "warning",
           category: "continuity",
-          description: "末段还没有体现 H012 的十一分钟证据。",
-          suggestion: "让末段与已落盘伏笔保持一致。",
+          description: "mock_val H012 mock_val。",
+          suggestion: "mock_val。",
         }],
       },
     });
@@ -242,7 +242,7 @@ describe("groupChronologically", () => {
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
     expect(html).toContain("Đã đồng bộ trạng thái chương 1");
     expect(html).toContain("Vẫn cần chỉnh sửa");
-    expect(html).toContain("末段还没有体现 H012 的十一分钟证据");
+    expect(html).toContain("mock_val H012 mock_val");
     expect(html).not.toContain("Xem kết quả thao tác");
   });
 
@@ -251,7 +251,7 @@ describe("groupChronologically", () => {
       id: "writer-trace",
       tool: "sub_agent",
       agent: "writer",
-      label: "写下一章",
+      label: "mock_val",
       details: {
         kind: "chapter_written",
         chapterNumber: 8,
@@ -264,7 +264,7 @@ describe("groupChronologically", () => {
           tokenBudget: { protectedTokens: 1200, compressibleTokens: 800, totalSelectedTokens: 2000 },
           retrieval: {
             engine: "sqlite-fts5-bm25",
-            query: "第八章 证据反噬",
+            query: "mock_val mock_val",
             candidates: [{ id: "H7", kind: "hook", source: "story/pending_hooks.md#H7", score: 1.4 }],
             semanticSelectedIds: ["H7"],
           },
@@ -294,10 +294,10 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "play-skilled",
       tool: "play_step",
-      label: "推进互动世界",
+      label: "mock_val",
       details: {
         kind: "play_turn_advanced",
-        sceneText: "雨雾里的钟声停了一拍。",
+        sceneText: "mock_val。",
         skillIds: ["castor-play-world"],
       },
     });
@@ -312,7 +312,7 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "short-1",
       tool: "short_fiction_run",
-      label: "短篇生产",
+      label: "mock_val",
       details: {
         kind: "short_fiction_created",
         storyId: "demo-story",
@@ -335,10 +335,10 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "interactive-film-1",
       tool: "interactive_film_create",
-      label: "互动影游",
+      label: "mock_val",
       details: {
         kind: "interactive_film_created",
-        title: "盛世天下影游方案",
+        title: "mock_val",
         projectId: "shengshi-branching",
         storyGraphPath: "interactive-films/shengshi-branching/story-graph.json",
         specPath: "interactive-films/shengshi-branching/interactive-spec.md",
@@ -372,26 +372,26 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "play-1",
       tool: "play_step",
-      label: "推进互动世界",
+      label: "mock_val",
       details: {
         kind: "play_turn_advanced",
-        title: "雨夜茶馆",
+        title: "mock_val",
         worldId: "rain-teahouse",
         runId: "main",
-        sceneText: "你翻开账本，发现一张旧船票。",
-        suggestedActions: ["藏起船票", "追问来人"],
+        sceneText: "mock_val，mock_val。",
+        suggestedActions: ["mock_val", "mock_val"],
         currentState: { turn: 3 },
       },
     });
 
     expect(getPlayToolDetails(exec)).toMatchObject({
       kind: "play_turn_advanced",
-      title: "雨夜茶馆",
+      title: "mock_val",
       worldId: "rain-teahouse",
       runId: "main",
       turn: 3,
-      sceneText: "你翻开账本，发现一张旧船票。",
-      suggestedActions: ["藏起船票", "追问来人"],
+      sceneText: "mock_val，mock_val。",
+      suggestedActions: ["mock_val", "mock_val"],
     });
   });
 
@@ -399,25 +399,25 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "play-revise-1",
       tool: "play_revise",
-      label: "重做互动回合",
+      label: "mock_val",
       details: {
         kind: "play_turn_revised",
-        title: "雨夜茶馆",
+        title: "mock_val",
         worldId: "rain-teahouse",
         runId: "main",
-        sceneText: "你重新翻开账本，先看见夹层里的红印。",
-        suggestedActions: ["取出红印", "合上账本"],
+        sceneText: "mock_val，mock_val。",
+        suggestedActions: ["mock_val", "mock_val"],
         variantId: "v-new",
       },
     });
 
     expect(getPlayToolDetails(exec)).toMatchObject({
       kind: "play_turn_revised",
-      title: "雨夜茶馆",
+      title: "mock_val",
       worldId: "rain-teahouse",
       runId: "main",
-      sceneText: "你重新翻开账本，先看见夹层里的红印。",
-      suggestedActions: ["取出红印", "合上账本"],
+      sceneText: "mock_val，mock_val。",
+      suggestedActions: ["mock_val", "mock_val"],
       variantId: "v-new",
     });
   });
@@ -428,22 +428,22 @@ describe("groupChronologically", () => {
         makeExec({
           id: "play-choices-1",
           tool: "play_step",
-          label: "推进互动世界",
+          label: "mock_val",
           details: {
             kind: "play_turn_advanced",
             worldId: "rain-teahouse",
             runId: "main",
-            sceneText: "你翻开账本，发现一张旧船票。",
-            suggestedActions: ["藏起船票", "追问来人"],
+            sceneText: "mock_val，mock_val。",
+            suggestedActions: ["mock_val", "mock_val"],
             currentState: { turn: 3 },
           },
         }),
       ],
     }));
 
-    expect(html).toContain("你翻开账本");
-    expect(html).not.toContain("藏起船票");
-    expect(html).not.toContain("追问来人");
+    expect(html).toContain("mock_val");
+    expect(html).not.toContain("mock_val");
+    expect(html).not.toContain("mock_val");
   });
 
   it("does not guess a scene image file path before the run manifest reports it ready", () => {
@@ -452,7 +452,7 @@ describe("groupChronologically", () => {
       worldId: "rain-teahouse",
       runId: "main",
       turn: 3,
-      sceneText: "你翻开账本。",
+      sceneText: "mock_val。",
     };
 
     expect(buildPlaySceneImageUrl(details)).toBeNull();
@@ -463,7 +463,7 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "play-edit-1",
       tool: "play_edit",
-      label: "编辑互动世界",
+      label: "mock_val",
       details: {
         kind: "play_world_updated",
         worldId: "rain-flat",
@@ -490,19 +490,19 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "proposal-1",
       tool: "propose_action",
-      label: "确认动作",
+      label: "mock_val",
       details: {
         kind: "proposed_action",
         action: "short_run",
         targetSessionKind: "short",
         sameSession: true,
-        title: "生成短篇",
-        summary: "确认后生成完整短篇。",
-        instruction: "写一篇婚姻反杀短篇",
+        title: "mock_val",
+        summary: "mock_val。",
+        instruction: "mock_val",
         requestedSkills: ["writer-distillation"],
         actionPayload: {
           shortRun: {
-            direction: "婚姻反杀",
+            direction: "mock_val",
             chapters: 12,
             charsPerChapter: 1000,
             cover: true,
@@ -517,12 +517,12 @@ describe("groupChronologically", () => {
       action: "short_run",
       targetSessionKind: "short",
       sameSession: true,
-      title: "生成短篇",
-      instruction: "写一篇婚姻反杀短篇",
+      title: "mock_val",
+      instruction: "mock_val",
       requestedSkills: ["writer-distillation"],
       actionPayload: {
         shortRun: {
-          direction: "婚姻反杀",
+          direction: "mock_val",
           chapters: 12,
           charsPerChapter: 1000,
           cover: true,
@@ -535,18 +535,18 @@ describe("groupChronologically", () => {
     const exec = makeExec({
       id: "proposal-play-contract",
       tool: "propose_action",
-      label: "确认动作",
+      label: "mock_val",
       details: {
         kind: "proposed_action",
         action: "play_start",
         targetSessionKind: "play",
-        title: "玄照山外门",
-        instruction: "启动一个修仙开放世界。",
+        title: "mock_val",
+        instruction: "mock_val。",
         actionPayload: {
           playStart: {
-            title: "玄照山外门",
-            worldContract: "时间是世界同步轴；角色会自主修炼和布局；不要固定 tick 或 RPG 面板。",
-            visualContract: "法器珍惜程度通过材质、光泽和旁人反应体现，不要绿蓝紫橙边框。",
+            title: "mock_val",
+            worldContract: "mock_val；mock_val；mock_val tick mock_val RPG mock_val。",
+            visualContract: "mock_val、mock_val，mock_val。",
           },
         },
       },
@@ -557,11 +557,11 @@ describe("groupChronologically", () => {
     expect(getProposedActionContractRows(details!)).toEqual([
       {
         label: "Khế ước thế giới",
-        value: expect.stringContaining("时间是世界同步轴"),
+        value: expect.stringContaining("mock_val"),
       },
       {
         label: "Khế ước thị giác",
-        value: expect.stringContaining("不要绿蓝紫橙边框"),
+        value: expect.stringContaining("mock_val"),
       },
     ]);
   });
@@ -582,8 +582,8 @@ describe("tool details default-open preference", () => {
       id: "writer-1",
       tool: "sub_agent",
       agent: "writer",
-      label: "写下一章",
-      result: "已完成第 1 章：雨棚。这里是更详细的操作结果。",
+      label: "mock_val",
+      result: "mock_valChương 1：mock_val。mock_val。",
     });
 
     const html = renderToStaticMarkup(React.createElement(ToolExecutionSteps, { executions: [exec] }));
@@ -594,19 +594,19 @@ describe("tool details default-open preference", () => {
 
   it("renders the pipeline result details collapsed when the preference is off", () => {
     const html = renderToStaticMarkup(React.createElement(PipelineResultDetails, {
-      result: "已完成第 1 章：雨棚。这里是更详细的操作结果。",
+      result: "mock_valChương 1：mock_val。mock_val。",
       defaultOpen: false,
     }));
 
     // The block is still there (manually expandable), just not open by default.
     expect(html).toContain("Xem kết quả thao tác");
-    expect(html).toContain("已完成第 1 章：雨棚");
+    expect(html).toContain("mock_valChương 1：mock_val");
     expect(html).not.toContain("<details open");
   });
 
   it("renders the pipeline result details expanded when defaultOpen is true", () => {
     const html = renderToStaticMarkup(React.createElement(PipelineResultDetails, {
-      result: "已完成第 1 章：雨棚。",
+      result: "mock_valChương 1：mock_val。",
       defaultOpen: true,
     }));
 
@@ -640,7 +640,7 @@ describe("English app language", () => {
     expect(html).toContain("Completed");
     expect(html).toContain("View result");
     expect(html).toContain("1 file operation");
-    expect(html).not.toContain("已完成");
+    expect(html).not.toContain("mock_val");
     expect(html).not.toContain("Xem kết quả thao tác");
   });
 
@@ -694,14 +694,14 @@ describe("English app language", () => {
     const exec = makeExec({
       id: "play-start-structured",
       tool: "play_start",
-      label: "启动互动世界",
+      label: "mock_val",
       status: "completed",
-      result: "雨夜开场正文",
+      result: "mock_valMo daumock_val",
       details: {
         kind: "play_world_started",
         worldId: "rain-world",
         runId: "run-1",
-        sceneText: "雨夜开场正文",
+        sceneText: "mock_valMo daumock_val",
       },
     });
 
@@ -716,15 +716,15 @@ describe("UtilityExecutionRow", () => {
     const exec = makeExec({
       id: "read-1",
       tool: "read",
-      label: "读取文件",
+      label: "mock_val",
       args: { path: "books/demo/chapter-1.md" },
-      result: "第一章正文：雨停了，巷口的灯还亮着。",
+      result: "mock_val：mock_val，mock_val。",
     });
 
     const html = renderToStaticMarkup(React.createElement(UtilityExecutionRow, { exec }));
 
     expect(html).toContain("read books/demo/chapter-1.md");
-    expect(html).toContain("第一章正文：雨停了，巷口的灯还亮着。");
+    expect(html).toContain("mock_val：mock_val，mock_val。");
     expect(html).toContain("<details");
     expect(html).not.toContain("<details open");
   });
@@ -733,7 +733,7 @@ describe("UtilityExecutionRow", () => {
     const exec = makeExec({
       id: "ls-1",
       tool: "ls",
-      label: "列目录",
+      label: "mock_val",
       args: { path: "books/demo" },
     });
 
@@ -747,14 +747,14 @@ describe("UtilityExecutionRow", () => {
     const exec = makeExec({
       id: "grep-1",
       tool: "grep",
-      label: "搜索",
-      args: { pattern: "灯" },
+      label: "mock_val",
+      args: { pattern: "mock_val" },
       result: "   \n  ",
     });
 
     const html = renderToStaticMarkup(React.createElement(UtilityExecutionRow, { exec }));
 
-    expect(html).toContain("grep 灯");
+    expect(html).toContain("grep mock_val");
     expect(html).not.toContain("<details");
   });
 });

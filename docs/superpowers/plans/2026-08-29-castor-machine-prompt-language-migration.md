@@ -101,7 +101,7 @@ git commit -m "docs: inventory Castor machine prompt contracts"
 Fixture input containing a Castor-owned prompt such as:
 
 ```text
-你是一个章节规划器...
+...
 ```
 
 must fail with an error identifying the exact file/category. A fixture explicitly marked `USER` must not fail.

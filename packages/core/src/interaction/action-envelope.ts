@@ -51,8 +51,8 @@ export const WriteNextActionPayloadSchema = z.object({
   chapterCount: z.number().int().min(1).max(20).default(1),
 }).strict();
 
-// charsPerChapter 的单位随语言变化：zh 是每章汉字数（900-1200），en 是每章英文单词数（600-800）。
-// 这两个区间与 short-fiction-runner 的执行层校验共用同一组常量，保证确认卡和执行层不再各说各话。
+// Core narrative engine processing.
+// Core narrative engine processing.
 export function shortRunCharsPerChapterRange(language: "vi" | "en"): {
   readonly min: number;
   readonly max: number;
@@ -65,15 +65,15 @@ export function shortRunCharsPerChapterRange(language: "vi" | "en"): {
 export function shortRunCharsPerChapterError(value: number, language: "vi" | "en"): string {
   const { min, max } = shortRunCharsPerChapterRange(language);
   return language === "en"
-    ? `charsPerChapter=${value} 超出英文短篇的合法范围（每章 ${min}-${max} 个英文单词）。`
+    ? `charsPerChapter=${value} （ ${min}-${max} ）。`
       + `charsPerChapter=${value} is outside the valid range for English shorts (${min}-${max} words per chapter).`
-    : `charsPerChapter=${value} 超出中文短篇的合法范围（每章 ${min}-${max} 个汉字）。`
+    : `charsPerChapter=${value} （ ${min}-${max}  từ）。`
       + `charsPerChapter=${value} is outside the valid range for Chinese shorts (${min}-${max} characters per chapter).`;
 }
 
-// language 与 charsPerChapter 同时存在时按语言分段校验，让非法组合（如 en+1100）
-// 在确认卡阶段就被拒绝，而不是任务开跑后才在 runner 里抛错；language 缺省时维持
-// 600-1200 并集（此时最终语言由会话默认决定，envelope 层无法预知）。
+// Core narrative engine processing.
+// Core narrative engine processing.
+// Core narrative engine processing.
 export const ShortRunActionPayloadSchema = z.object({
   title: z.string().min(1).optional(),
   direction: z.string().min(1).optional(),

@@ -42,12 +42,12 @@ export interface ResearchDeps {
 }
 
 const PURPOSE_HINTS: Record<ResearchPurpose, string> = {
-  worldbuilding: "世界观 背景 生活细节",
-  era: "年代 背景 制度 物价 生活",
-  profession: "职业 流程 术语 工作细节",
-  market: "市场 趋势 受众 竞品",
-  "fact-check": "事实核查 来源",
-  general: "资料 参考",
+  worldbuilding: "  ",
+  era: "    ",
+  profession: "   ",
+  market: "   ",
+  "fact-check": " ",
+  general: " ",
 };
 
 export async function runResearchReport(
@@ -135,8 +135,8 @@ function depthConfig(depth: ResearchDepth): { queryCount: number; maxResults: nu
 function buildQueries(topic: string, purpose: ResearchPurpose, depth: ResearchDepth): string[] {
   const hint = PURPOSE_HINTS[purpose];
   const queries = [`${topic} ${hint}`];
-  if (depth !== "quick") queries.push(`${topic} 资料 来源`);
-  if (depth === "deep") queries.push(`${topic} 争议 误区 核查`);
+  if (depth !== "quick") queries.push(`${topic}  `);
+  if (depth === "deep") queries.push(`${topic}   `);
   return queries;
 }
 

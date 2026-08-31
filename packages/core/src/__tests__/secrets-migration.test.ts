@@ -24,7 +24,7 @@ describe("loadSecrets legacy service id migration", () => {
     return JSON.parse(await readFile(join(root, ".castor", "secrets.json"), "utf-8"));
   }
 
-  it("siliconflow -> siliconcloud 重命名（目标 id 不存在）", async () => {
+  it("siliconflow -> siliconcloud mock_text（mock_text id mock_text）", async () => {
     await seedSecrets({ services: { siliconflow: { apiKey: "sk-legacy" } } });
     const result = await loadSecrets(root);
     expect(result.services.siliconcloud).toEqual({ apiKey: "sk-legacy" });
@@ -35,7 +35,7 @@ describe("loadSecrets legacy service id migration", () => {
     expect(onDisk.services.siliconflow).toBeUndefined();
   });
 
-  it("目标 id 已存在时不迁移（幂等）", async () => {
+  it("mock_text id mock_text（mock_text）", async () => {
     await seedSecrets({
       services: {
         siliconflow: { apiKey: "sk-legacy" },
@@ -47,7 +47,7 @@ describe("loadSecrets legacy service id migration", () => {
     expect(result.services.siliconflow).toEqual({ apiKey: "sk-legacy" });
   });
 
-  it("无迁移时不重写磁盘", async () => {
+  it("mock_text", async () => {
     await seedSecrets({ services: { openai: { apiKey: "sk-openai" } } });
     const before = await readFile(join(root, ".castor", "secrets.json"), "utf-8");
     await loadSecrets(root);
@@ -55,13 +55,13 @@ describe("loadSecrets legacy service id migration", () => {
     expect(after).toBe(before);
   });
 
-  it("secrets 文件不存在时返回空 services,不报错", async () => {
+  it("secrets mock_text services,mock_text", async () => {
     await rm(join(root, ".castor", "secrets.json"), { force: true });
     const result = await loadSecrets(root);
     expect(result).toEqual({ services: {} });
   });
 
-  it("重复调用 loadSecrets 是幂等的", async () => {
+  it("mock_text loadSecrets mock_text", async () => {
     await seedSecrets({ services: { siliconflow: { apiKey: "sk-legacy" } } });
     await loadSecrets(root);
     const r2 = await loadSecrets(root);

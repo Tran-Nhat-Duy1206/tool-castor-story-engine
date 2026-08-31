@@ -14,7 +14,7 @@ const basePayload: WebhookPayload = {
   bookId: "test-book",
   chapterNumber: 5,
   timestamp: "2026-03-14T00:00:00.000Z",
-  data: { title: "测试章节", wordCount: 3000 },
+  data: { title: "Testmock_text", wordCount: 3000 },
 };
 
 describe("sendWebhook", () => {

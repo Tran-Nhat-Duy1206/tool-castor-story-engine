@@ -27,79 +27,79 @@ const ZERO_USAGE = {
 
 const SAMPLE_RESPONSE = [
   "=== SECTION: story_frame ===",
-  "## 主题与基调",
-  "一段测试用的主题散文。",
-  "## 主角弧线",
-  "主角从 A 走向 B。",
-  "## 核心冲突与对手",
-  "对手是 X。",
-  "## 世界观底色",
-  "湿冷的小镇。",
-  "## 终局方向",
-  "最后一个镜头。",
+  "## mock_text",
+  "mock_textTestmock_text。",
+  "## mock_text",
+  "mock_text A mock_text B。",
+  "## mock_text",
+  "mock_text X。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_text。",
   "",
   "=== SECTION: volume_map ===",
-  "## 各卷主题",
-  "卷一压卷二放。",
-  "## 关键节点章",
-  "第 10 章转折。",
-  "## 卷间钩子与回收",
-  "钩子 H01。",
-  "## 角色阶段性目标",
-  "卷一：定调。",
-  "## 卷尾必须发生的改变",
-  "身份暴露。",
-  "## 节奏意图",
-  "前 10 章压。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "Chương 10mock_text。",
+  "## mock_text",
+  "mock_text H01。",
+  "## mock_text",
+  "mock_text：mock_text。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_text 10 mock_text。",
   "",
   "=== SECTION: rhythm_principles ===",
-  "## 原则 1",
-  "每 8 章一个高潮。",
+  "## mock_text 1",
+  "mock_text 8 mock_text。",
   "",
   "=== SECTION: roles ===",
   "---ROLE---",
   "tier: major",
-  "name: 主角甲",
+  "name: mock_text",
   "---CONTENT---",
-  "## 核心标签",
-  "沉默、执拗",
-  "## 反差细节",
-  "会给流浪狗留罐头",
-  "## 人物小传",
-  "测试用小传。",
-  "## 当前现状",
-  "旧书店账房。",
-  "## 关系网络",
-  "无。",
-  "## 内在驱动",
-  "查清真相。",
-  "## 成长弧光",
-  "从单打独斗到托付他人。",
+  "## mock_text",
+  "mock_text、mock_text",
+  "## mock_text",
+  "mock_text",
+  "## mock_text",
+  "Testmock_text。",
+  "## mock_text",
+  "mock_textPhong so sach。",
+  "## mock_text",
+  "mock_text。",
+  "## mock_text",
+  "mock_textSu that。",
+  "## mock_text",
+  "mock_text。",
   "",
   "=== SECTION: book_rules ===",
-  "## 主角",
-  "- 名字：主角甲",
-  "- 性格锁：沉默、执拗",
-  "- 行为约束：不对长辈失礼",
+  "## mock_text",
+  "- mock_text từ：mock_text",
+  "- mock_text：mock_text、mock_text",
+  "- mock_text：mock_text",
   "",
-  "## 叙事人称",
-  "第三人称单一视角。",
+  "## mock_text",
+  "Chương mock_text。",
   "",
-  "## 禁止混入",
-  "- 仙侠升级口吻",
+  "## mock_text",
+  "- mock_text",
   "",
-  "## 禁止事项",
-  "- 不得美化体制暴力",
+  "## mock_text",
+  "- mock_text",
   "",
   "=== SECTION: current_state ===",
-  "| 字段 | 值 |",
+  "|  từmock_text | mock_text |",
   "| --- | --- |",
-  "| 当前章节 | 0 |",
+  "| mock_text | 0 |",
   "",
   "=== SECTION: pending_hooks ===",
-  "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | 备注 |",
+  "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
   "| --- | --- | --- | --- | --- | --- | --- | --- |",
-  "| H01 | 1 | 主线 | 未开启 | 0 | 32章 | 中程 | 测试钩子 |",
+  "| H01 | 1 | mock_text | mock_text | 0 | 32mock_text | mock_text | Testmock_text |",
 ].join("\n");
 
 function buildAgent(): ArchitectAgent {
@@ -124,7 +124,7 @@ function buildAgent(): ArchitectAgent {
 function baseBook(): BookConfig {
   return {
     id: "cleanup-book",
-    title: "清理测试书",
+    title: "mock_textTestmock_text",
     platform: "other",
     genre: "urban",
     status: "active",
@@ -161,7 +161,7 @@ describe("Phase 5 cleanup (1) — volume_outline.md mirror removed", () => {
     ).rejects.toThrow();
 
     const newOutline = await readFile(join(bookDir, "story/outline/volume_map.md"), "utf-8");
-    expect(newOutline).toContain("卷一压卷二放");
+    expect(newOutline).toContain("mock_text");
   });
 
   it("readVolumeMap resolves the new path without needing the legacy mirror", async () => {
@@ -291,12 +291,12 @@ describe("Phase 5 cleanup (3) — book_rules is authoritative Markdown", () => {
 
     const storyFrame = await readFile(join(bookDir, "story/outline/story_frame.md"), "utf-8");
     expect(storyFrame.trimStart().startsWith("---")).toBe(false);
-    expect(storyFrame).toContain("主题与基调");
+    expect(storyFrame).toContain("mock_text");
 
     const bookRules = await readFile(join(bookDir, "story/book_rules.md"), "utf-8");
-    expect(bookRules).toContain("## 主角");
-    expect(bookRules).toContain("主角甲");
-    expect(bookRules).toContain("## 禁止事项");
+    expect(bookRules).toContain("## mock_text");
+    expect(bookRules).toContain("mock_text");
+    expect(bookRules).toContain("## mock_text");
     expect(bookRules.trimStart().startsWith("---")).toBe(false);
   });
 
@@ -310,9 +310,9 @@ describe("Phase 5 cleanup (3) — book_rules is authoritative Markdown", () => {
 
     const parsed = await readStructuredBookRules(bookDir);
     expect(parsed).not.toBeNull();
-    expect(parsed?.rules.protagonist?.name).toBe("主角甲");
-    expect(parsed?.rules.protagonist?.personalityLock).toEqual(["沉默", "执拗"]);
-    expect(parsed?.rules.prohibitions).toEqual(["不得美化体制暴力"]);
+    expect(parsed?.rules.protagonist?.name).toBe("mock_text");
+    expect(parsed?.rules.protagonist?.personalityLock).toEqual(["mock_text", "mock_text"]);
+    expect(parsed?.rules.prohibitions).toEqual(["mock_text"]);
     expect(parsed?.rules.narrativePerson).toBe("third");
   });
 
@@ -379,24 +379,24 @@ describe("Phase 5 cleanup (3) — book_rules is authoritative Markdown", () => {
     await writeFile(
       join(storyDir, "book_rules.md"),
       [
-        "## 主角",
-        "- 名字：林辞",
-        "- 性格锁：沉默、执拗",
-        "- 行为约束：不对长辈失礼",
-        "## 禁止事项",
-        "- 不得美化体制暴力",
-        "- 不得神化主角",
+        "## mock_text",
+        "- mock_text từ：mock_text",
+        "- mock_text：mock_text、mock_text",
+        "- mock_text：mock_text",
+        "## mock_text",
+        "- mock_text",
+        "- mock_text",
       ].join("\n"),
       "utf-8",
     );
 
     const rendered = await readPlannerBookRules(storyDir);
-    expect(rendered).toContain("林辞");
-    expect(rendered).toContain("沉默");
-    expect(rendered).toContain("执拗");
-    expect(rendered).toContain("不得美化体制暴力");
-    expect(rendered).toContain("不得神化主角");
-    expect(rendered).toContain("不对长辈失礼");
+    expect(rendered).toContain("mock_text");
+    expect(rendered).toContain("mock_text");
+    expect(rendered).toContain("mock_text");
+    expect(rendered).toContain("mock_text");
+    expect(rendered).toContain("mock_text");
+    expect(rendered).toContain("mock_text");
   });
 
   it("readBookRules() extracts fanfic, numerical, and era constraints from markdown rules", async () => {
@@ -405,35 +405,35 @@ describe("Phase 5 cleanup (3) — book_rules is authoritative Markdown", () => {
     await writeFile(
       join(storyDir, "book_rules.md"),
       [
-        "## 主角",
-        "- 名字：林辞",
-        "- 性格锁：沉默、执拗",
-        "- 行为约束：不对长辈失礼",
-        "## 同人模式",
-        "- 模式：au",
-        "- 允许偏离：时间线提前、师徒关系改写",
-        "## 数值/资源规则",
-        "- 核心资源：灵力、功德",
-        "- 硬上限：筑基前不能御剑",
-        "## 年代限制",
-        "- 时期：2003 年春",
-        "- 地域：岭南小城",
-        "- 必须符合当年物价和通信条件",
-        "## 禁止事项",
-        "- 不得美化体制暴力",
+        "## mock_text",
+        "- mock_text từ：mock_text",
+        "- mock_text：mock_text、mock_text",
+        "- mock_text：mock_text",
+        "## mock_text",
+        "- mock_text：au",
+        "- mock_text：mock_text、mock_text",
+        "## mock_text/mock_text",
+        "- mock_text：mock_text、mock_text",
+        "- mock_text：mock_text",
+        "## mock_text",
+        "- mock_text：2003 mock_text",
+        "- mock_text：mock_text",
+        "- mock_text",
+        "## mock_text",
+        "- mock_text",
       ].join("\n"),
       "utf-8",
     );
 
     const parsed = await readStructuredBookRules(bookDir);
     expect(parsed?.rules.fanficMode).toBe("au");
-    expect(parsed?.rules.allowedDeviations).toEqual(["时间线提前", "师徒关系改写"]);
-    expect(parsed?.rules.numericalSystemOverrides?.resourceTypes).toEqual(["灵力", "功德"]);
-    expect(parsed?.rules.numericalSystemOverrides?.hardCap).toBe("筑基前不能御剑");
+    expect(parsed?.rules.allowedDeviations).toEqual(["mock_text", "mock_text"]);
+    expect(parsed?.rules.numericalSystemOverrides?.resourceTypes).toEqual(["mock_text", "mock_text"]);
+    expect(parsed?.rules.numericalSystemOverrides?.hardCap).toBe("mock_text");
     expect(parsed?.rules.eraConstraints).toEqual({
       enabled: true,
-      period: "2003 年春",
-      region: "岭南小城",
+      period: "2003 mock_text",
+      region: "mock_text",
     });
   });
 

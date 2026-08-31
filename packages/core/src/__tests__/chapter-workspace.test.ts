@@ -20,8 +20,8 @@ describe("chapter workspace", () => {
     const bookDir = await mkdtemp(join(tmpdir(), "castor-chapter-workspace-"));
 
     await expect(readChapterUserBrief(bookDir, 3)).resolves.toBe("");
-    await saveChapterUserBrief(bookDir, 3, "  保留雨夜证词，重写结尾。  ");
-    await expect(readChapterUserBrief(bookDir, 3)).resolves.toBe("保留雨夜证词，重写结尾。");
+    await saveChapterUserBrief(bookDir, 3, "  mock_text，mock_text。  ");
+    await expect(readChapterUserBrief(bookDir, 3)).resolves.toBe("mock_text，mock_text。");
 
     await saveChapterUserBrief(bookDir, 3, " \n ");
     await expect(readChapterUserBrief(bookDir, 3)).resolves.toBe("");
@@ -46,23 +46,23 @@ describe("chapter workspace", () => {
     const first = await archiveChapterVersion(
       bookDir,
       4,
-      "# 第4章 初稿\n\n旧正文。",
+      "# Chương 4 mock_text\n\nmock_text。",
       "manual",
       new Date("2026-07-01T00:00:00.000Z"),
     );
     const second = await archiveChapterVersion(
       bookDir,
       4,
-      "# 第4章 二稿\n\n新正文。",
+      "# Chương 4 mock_text\n\nmock_text。",
       "revision",
       new Date("2026-07-02T00:00:00.000Z"),
     );
 
     expect(first.id).not.toBe(second.id);
     await expect(readChapterVersion(bookDir, 4, first.id))
-      .resolves.toBe("# 第4章 初稿\n\n旧正文。");
+      .resolves.toBe("# Chương 4 mock_text\n\nmock_text。");
     await expect(readChapterVersion(bookDir, 4, second.id))
-      .resolves.toBe("# 第4章 二稿\n\n新正文。");
+      .resolves.toBe("# Chương 4 mock_text\n\nmock_text。");
 
     const versions = await listChapterVersions(bookDir, 4);
     expect(versions.map((version) => version.id)).toEqual([second.id, first.id]);
@@ -72,8 +72,8 @@ describe("chapter workspace", () => {
       "2026-07-01T00:00:00.000Z",
     ]);
     expect(versions.map((version) => version.characterCount)).toEqual([
-      "# 第4章 二稿\n\n新正文。".length,
-      "# 第4章 初稿\n\n旧正文。".length,
+      "# Chương 4 mock_text\n\nmock_text。".length,
+      "# Chương 4 mock_text\n\nmock_text。".length,
     ]);
   });
 
@@ -88,7 +88,7 @@ describe("chapter workspace", () => {
     const version = await archiveChapterVersion(
       bookDir,
       1,
-      "# 第1章",
+      "# Chương 1",
       "regeneration",
       new Date("2026-07-03T00:00:00.000Z"),
     );
@@ -97,6 +97,6 @@ describe("chapter workspace", () => {
     await expect(readFile(
       join(bookDir, "chapters", ".versions", "0001", `${version.id}.md`),
       "utf-8",
-    )).resolves.toBe("# 第1章");
+    )).resolves.toBe("# Chương 1");
   });
 });

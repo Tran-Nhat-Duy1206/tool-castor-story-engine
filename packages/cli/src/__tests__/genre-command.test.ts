@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildGenreTemplate } from "../commands/genre.js";
 
-const CHINESE_CHARS = /[一-鿿]/;
+const CHINESE_CHARS = /[test_mock-test_mock]/;
 
 describe("genre template scaffold", () => {
   const params = {

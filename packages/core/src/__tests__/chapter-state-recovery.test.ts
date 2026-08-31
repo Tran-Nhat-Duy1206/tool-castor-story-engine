@@ -34,7 +34,7 @@ function createValidationWarning(
 ): ValidationWarning {
   return {
     category: overrides.category ?? "current-state",
-    description: overrides.description ?? "铜牌位置与正文矛盾",
+    description: overrides.description ?? "mock_text",
   };
 }
 
@@ -52,15 +52,15 @@ function createWriteChapterOutput(
 ): WriteChapterOutput {
   return {
     chapterNumber: 3,
-    title: "第三章",
-    content: "铜牌贴在胸口。",
-    wordCount: "铜牌贴在胸口。".length,
+    title: "Chương mock_text",
+    content: "mock_text。",
+    wordCount: "mock_text。".length,
     preWriteCheck: "ok",
     postSettlement: "ok",
     updatedState: "new state",
     updatedLedger: "new ledger",
     updatedHooks: "new hooks",
-    chapterSummary: "| 3 | 第三章 |",
+    chapterSummary: "| 3 | Chương mock_text |",
     updatedSubplots: "new subplots",
     updatedEmotionalArcs: "new emotional arcs",
     updatedCharacterMatrix: "new character matrix",
@@ -75,7 +75,7 @@ function createChapterMeta(
 ): ChapterMeta {
   return {
     number: 3,
-    title: "第三章",
+    title: "Chương mock_text",
     status: "state-degraded",
     wordCount: 1200,
     createdAt: "2026-04-01T00:00:00.000Z",
@@ -113,8 +113,8 @@ describe("chapter-state-recovery", () => {
       book: createBook(),
       bookDir: "/tmp/test-book",
       chapterNumber: 3,
-      title: "第三章",
-      content: "铜牌贴在胸口。",
+      title: "Chương mock_text",
+      content: "mock_text。",
       oldState: "old state",
       oldHooks: "old hooks",
       originalValidation: createValidationResult(),
@@ -124,20 +124,20 @@ describe("chapter-state-recovery", () => {
     });
 
     expect(result.kind).toBe("recovered");
-    expect(capturedFeedback).toContain("上一次状态结算未通过校验");
-    expect(capturedFeedback).toContain("铜牌位置与正文矛盾");
+    expect(capturedFeedback).toContain("mock_text");
+    expect(capturedFeedback).toContain("mock_text");
     expect(writer.settleChapterState).toHaveBeenCalledWith(expect.objectContaining({
       allowReapply: true,
     }));
     expect(logWarn).toHaveBeenCalledWith(expect.objectContaining({
-      zh: expect.stringContaining("仅重试结算层"),
+      vi: expect.stringContaining("mock_text"),
     }));
     expect(warn).not.toHaveBeenCalled();
   });
 
   it("returns localized degraded issues when settlement retry still fails", async () => {
     const validatorWarning = createValidationWarning({
-      description: "挂坠状态仍与正文冲突",
+      description: "mock_text",
     });
     const result = await retrySettlementAfterValidationFailure({
       writer: {
@@ -152,8 +152,8 @@ describe("chapter-state-recovery", () => {
       book: createBook(),
       bookDir: "/tmp/test-book",
       chapterNumber: 3,
-      title: "第三章",
-      content: "铜牌贴在胸口。",
+      title: "Chương mock_text",
+      content: "mock_text。",
       oldState: "old state",
       oldHooks: "old hooks",
       originalValidation: createValidationResult({
@@ -169,8 +169,8 @@ describe("chapter-state-recovery", () => {
       expect(result.issues).toEqual([
         expect.objectContaining({
           category: "state-validation",
-          description: "挂坠状态仍与正文冲突",
-          suggestion: "请先基于已保存正文修复本章 state，再继续后续章节。",
+          description: "mock_text",
+          suggestion: "mock_text state，mock_text。",
         }),
       ]);
     }
@@ -185,7 +185,7 @@ describe("chapter-state-recovery", () => {
         hooks: [],
         chapterSummary: undefined,
       } as never,
-      updatedChapterSummaries: "| 3 | 新摘要 |",
+      updatedChapterSummaries: "| 3 | mock_text |",
     });
 
     const degraded = buildStateDegradedPersistenceOutput({
@@ -207,15 +207,15 @@ describe("chapter-state-recovery", () => {
     const issues: AuditIssue[] = [{
       severity: "warning",
       category: "state-validation",
-      description: "状态结算重试后仍未通过校验。",
-      suggestion: "请先基于已保存正文修复本章 state，再继续后续章节。",
+      description: "mock_text。",
+      suggestion: "mock_text state，mock_text。",
     }];
     const note = buildStateDegradedReviewNote("audit-failed", issues);
 
     expect(parseStateDegradedReviewNote(note)).toEqual({
       kind: "state-degraded",
       baseStatus: "audit-failed",
-      injectedIssues: ["[warning] 状态结算重试后仍未通过校验。"],
+      injectedIssues: ["[warning] mock_text。"],
     });
 
     expect(resolveStateDegradedBaseStatus(createChapterMeta({

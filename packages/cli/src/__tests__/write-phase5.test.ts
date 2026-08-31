@@ -36,7 +36,7 @@ vi.mock("@actalk/castor-core", () => ({
 }));
 
 vi.mock("node:fs/promises", () => ({
-  readdir: vi.fn(async () => ["0005_第五章.md"]),
+  readdir: vi.fn(async () => ["0005_test_mock.md"]),
   stat: vi.fn(async () => ({ mtimeMs: 0 })),
   unlink: vi.fn(async () => undefined),
 }));
@@ -78,7 +78,7 @@ beforeEach(() => {
   getNextChapterNumberMock.mockResolvedValue(5);
   getPlanningGateReportMock.mockResolvedValue({ verdict: "SAFE", canWrite: true });
   writeNextChapterMock.mockResolvedValue({
-    chapterNumber: 5, title: "第五章", wordCount: 2000,
+    chapterNumber: 5, title: "test_mock", wordCount: 2000,
     auditResult: { passed: true, issues: [] }, revised: false, status: "ready-for-review",
   });
 });

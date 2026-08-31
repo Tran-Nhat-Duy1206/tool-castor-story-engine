@@ -22,7 +22,7 @@ export const E2E_AUTHOR_ID = "e2e-authoring-confirm";
  *  - test-project/.castor/secrets.json
  *    (a fake DeepSeek API key so the UI's model picker goes to "ready" state
  *     and ChatPage auto-selects a model, allowing sendMessage to proceed past
- *     the "请先选择一个模型" guard)
+ *     the "mock_val" guard)
  *  - a fresh book session so the agent endpoint can load it
  *
  * IMPORTANT: we do NOT touch test-project/castor.json — that file is shared
@@ -59,12 +59,12 @@ export async function seedAuthoringConfirm(): Promise<void> {
     StoryGraphSchema.parse({
       schemaVersion: 1,
       projectId: E2E_AUTHOR_ID,
-      title: "E2E 确认流程样例",
+      title: "E2E mock_val",
       worldAnchor: {
-        storyCore: "测试",
-        theme: "测试",
-        genre: "现代",
-        worldRules: "无设定",
+        storyCore: "Test",
+        theme: "Test",
+        genre: "mock_val",
+        worldRules: "mock_val",
         durationMinutes: 10,
       },
       variables: [],
@@ -73,19 +73,19 @@ export async function seedAuthoringConfirm(): Promise<void> {
         {
           id: "s",
           type: "start",
-          title: "开场",
-          sceneDesc: "起始场景",
-          choices: [{ id: "c1", text: "继续", targetNodeId: "e" }],
+          title: "Mo dau",
+          sceneDesc: "mock_val",
+          choices: [{ id: "c1", text: "mock_val", targetNodeId: "e" }],
         },
         {
           id: "e",
           type: "ending",
-          title: "结局",
+          title: "mock_val",
           choices: [],
         },
       ],
       endings: [
-        { id: "g", nodeId: "e", title: "结局", type: "good", description: "" },
+        { id: "g", nodeId: "e", title: "mock_val", type: "good", description: "" },
       ],
     }),
   );

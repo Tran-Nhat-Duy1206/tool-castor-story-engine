@@ -17,14 +17,14 @@ describe("loadChaptersFromPath", () => {
     const source = join(root, "chapters");
     await mkdir(source);
     await Promise.all([
-      writeFile(join(source, "10_终局.md"), "ten"),
-      writeFile(join(source, "2_转折.md"), "two"),
-      writeFile(join(source, "1_开端.md"), "one"),
+      writeFile(join(source, "10_mock_text.md"), "ten"),
+      writeFile(join(source, "2_mock_text.md"), "two"),
+      writeFile(join(source, "1_mock_text.md"), "one"),
     ]);
 
     const chapters = await loadChaptersFromPath(source);
 
-    expect(chapters.map((chapter) => chapter.title)).toEqual(["开端", "转折", "终局"]);
+    expect(chapters.map((chapter) => chapter.title)).toEqual(["mock_text", "mock_text", "mock_text"]);
     expect(chapters.map((chapter) => chapter.content)).toEqual(["one", "two", "ten"]);
   });
 });

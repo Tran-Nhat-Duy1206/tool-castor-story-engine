@@ -577,7 +577,7 @@ function resolveProjectTextArtifactFile(root: string, rawPath: string): { readon
 function isLikelyFailedToolResult(exec: CollectedToolExec): boolean {
   if (exec.status === "error") return true;
   const text = `${exec.error ?? ""}\n${exec.result ?? ""}`.toLowerCase();
-  return /\bfailed\b|\berror\b|失败|异常|出错/.test(text);
+  return /\bfailed\b|\berror\b|Thất bại||/.test(text);
 }
 
 function hasSuccessfulSubAgentExec(
@@ -1004,7 +1004,7 @@ async function toStudioPromptPackPrompt(root: string, prompt: BuiltinPrompt) {
     content: loaded.content,
     source: loaded.source,
     overridden: loaded.source === "project",
-    // Windows 上 relative() 产生反斜杠，这个 path 会被前端展示/断言为 posix 相对路径
+    // Studio API server endpoint.
     path: loaded.source === "project" ? toPosixPath(relative(root, overridePath)) : undefined,
   };
 }
@@ -1124,12 +1124,12 @@ function classifyAgentFailure(message: string): AgentFailureKind {
     return "busy";
   }
   if (
-    /API\s*返回|上游|upstream|Bad Gateway|temporarily unavailable|rate limit|quota|API Key|unauthorized|forbidden|无法连接到 API|fetch failed|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|LLM returned empty response|Provider finish_reason|reasoning_content/i.test(text)
+    /API\s*||upstream|Bad Gateway|temporarily unavailable|rate limit|quota|API Key|unauthorized|forbidden| API|fetch failed|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|LLM returned empty response|Provider finish_reason|reasoning_content/i.test(text)
   ) {
     return "llm";
   }
   if (
-    /PlannerParseError|Architect output missing|required sections|missing YAML frontmatter|frontmatter delimiters|parseMemo|Book creation artifact is incomplete|Short-hit draft is incomplete|工具执行失败|执行失败|sub_agent|tool execution|RUNTIME_STATE_DELTA|JSON parse|解析失败/i.test(text)
+    /PlannerParseError|Architect output missing|required sections|missing YAML frontmatter|frontmatter delimiters|parseMemo|Book creation artifact is incomplete|Short-hit draft is incomplete|Thất bại|Thất bại|sub_agent|tool execution|RUNTIME_STATE_DELTA|JSON parse|Thất bại/i.test(text)
   ) {
     return "internal";
   }
@@ -1614,9 +1614,9 @@ async function executeConfirmedProductionAction(args: {
 
   await args.onTaskChange(exec);
 
-  // background: true 标明这是后台生产任务的工具启动（聊天轮工具不带）。
-  // free-text 命中写章启发式时前端在发送时无法预知这轮会按任务执行，
-  // 收到这个标记后把该轮从聊天轮重分类为任务轮。
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
   broadcast("tool:start", {
     sessionId: args.streamSessionId,
     id,
@@ -1638,8 +1638,8 @@ async function executeConfirmedProductionAction(args: {
         void args.onTaskChange(exec).catch(() => undefined);
       },
     );
-    // 工具可以在结果里带 isError=true 表示"执行完成但结果需要人工处理"
-    //（如写章完成但审稿未通过）：任务卡按错误态展示，请求仍按成功返回结果文本。
+    // Studio API server endpoint.
+    // Studio API server endpoint.
     const resultIsError = Boolean((result as { isError?: boolean } | null | undefined)?.isError);
     exec.status = resultIsError ? "error" : "completed";
     exec.completedAt = Date.now();
@@ -1689,7 +1689,7 @@ type EventHandler = (event: string, data: unknown) => void;
 const subscribers = new Set<EventHandler>();
 const bookCreateStatus = new Map<string, { status: "creating" | "error"; error?: string }>();
 
-// 内存缓存：service -> 模型列表 + 更新时间戳；避免每次 sidebar 挂载时都打真实 LLM /models
+// Studio API server endpoint.
 const modelListCache = new Map<string, { models: Array<{ id: string; name: string }>; at: number }>();
 
 interface ServiceConfigEntry {
@@ -2297,7 +2297,7 @@ function formatServiceProbeError(args: {
   const rawDetail = args.error
     .replace(/\n\s*\(baseUrl:[\s\S]*?\)$/m, "")
     .trim();
-  const upstreamDetail = rawDetail.includes("上游详情：")
+  const upstreamDetail = rawDetail.includes("：")
     ? rawDetail
     : "";
   const protocol = args.apiFormat === "responses" ? "Responses" : "Chat / Completions";
@@ -2658,22 +2658,22 @@ export function createStudioServer(
   const state = new StateManager(root);
   let cachedConfig = initialConfig;
   const activeConfirmedTasks = new Map<string, AbortController>();
-  // 确认式生产任务的单任务名额（sessionId → taskId）。原来的检查是"await 读快照
-  // → 之后才 set controller"的 check-then-act：两个并发确认请求都能通过检查，
-  // 双任务同时启动、快照互相覆盖。这里在任何 await 之前同步占位，占位失败的
-  // 请求直接 409；任务结束（成功/失败）后在 finally 释放。
-  // 值记 taskId：controller 注册与首次快照持久化之间有多个 await 间隙，删除/
-  // 中止在这个窗口内从磁盘读不到快照，必须先经内存 sessionId → taskId →
-  // controller 找到刚启动的任务。
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
   const reservedProductionSessions = new Map<string, string>();
-  // 已删除会话的 sessionId：删除会话时中止其生产任务，任务随后的错误持久化
-  // 不能把快照文件重新写回来（给已删除的会话"还魂"）。同名会话重新创建时移除标记。
+  // Studio API server endpoint.
+  // Studio API server endpoint.
   const deletedSessionIds = new Set<string>();
 
-  // 已删除会话不再追加 transcript 消息：appendManualSessionMessages 底层的
-  // appendTranscriptEvents 是 mkdir + appendFile，会把已删除会话的 sessions
-  // 目录条目和 transcript 文件重建出来（任务成功/失败的收尾追加正好落在删除
-  // 之后）。所有手动追加统一走这个守卫。
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
   const appendSessionMessagesUnlessDeleted: typeof appendManualSessionMessages = async (
     projectRoot,
     sessionId,
@@ -2712,10 +2712,10 @@ export function createStudioServer(
     if (!task) return null;
     const running = task.execution.status === "running" || task.execution.status === "processing";
     if (!running || activeConfirmedTasks.has(task.execution.id)) return task;
-    // running 快照但本进程没有对应的 AbortController，只可能是任务运行期间
-    // server 进程退出过（正常流程里 controller 先于首次持久化进入 Map、晚于
-    // 终态持久化删除）。任务本体已随旧进程消失，这里把快照改写为终态并保存，
-    // 否则前端每次刷新都会恢复出一个永远运行中的任务卡，停止按钮也无法终结它。
+    // Studio API server endpoint.
+    // Studio API server endpoint.
+    // Studio API server endpoint.
+    // Studio API server endpoint.
     const lang = await currentProjectLanguage();
     const completedAt = Date.now();
     const reconciled: StudioTaskSnapshot = {
@@ -2736,8 +2736,8 @@ export function createStudioServer(
     return reconciled;
   };
 
-  // 判断"该会话是否真有生产任务在跑"的唯一入口：
-  // 对账后的快照是 running/processing，且本进程还持有对应的 AbortController。
+  // Studio API server endpoint.
+  // Studio API server endpoint.
   const findActiveRunningTask = async (sessionId: string): Promise<StudioTaskSnapshot | null> => {
     const task = await loadReconciledTaskSnapshot(sessionId);
     if (!task) return null;
@@ -2745,9 +2745,9 @@ export function createStudioServer(
     return running && activeConfirmedTasks.has(task.execution.id) ? task : null;
   };
 
-  // 找该会话正在运行的任务控制器：优先查内存（预留表 sessionId → taskId →
-  // controller），磁盘快照只作回退。controller 注册与首次快照持久化之间有多个
-  // await 间隙，窗口内删除/中止只靠磁盘快照会漏掉刚启动的任务。
+  // Studio API server endpoint.
+  // Studio API server endpoint.
+  // Studio API server endpoint.
   const findRunningTaskController = async (sessionId: string): Promise<AbortController | undefined> => {
     const reservedTaskId = reservedProductionSessions.get(sessionId);
     const reserved = reservedTaskId ? activeConfirmedTasks.get(reservedTaskId) : undefined;
@@ -2757,281 +2757,6 @@ export function createStudioServer(
   };
 
   app.use("/*", cors());
-
-  // Structured error handler — ApiError returns typed JSON, others return 500
-  app.onError((error, c) => {
-    if (error instanceof ApiError) {
-      return c.json({ error: { code: error.code, message: error.message } }, error.status as 400);
-    }
-    const message = error instanceof Error ? error.message : String(error);
-    if (message.includes("LLM API key not set") || message.includes("CASTOR_LLM_API_KEY not set")) {
-      return c.json({ error: { code: "LLM_CONFIG_ERROR", message } }, 400);
-    }
-    console.error("[studio] Unexpected server error", error);
-    return c.json(
-      { error: { code: "INTERNAL_ERROR", message: "Unexpected server error." } },
-      500,
-    );
-  });
-
-  // BookId validation middleware — blocks path traversal on all book routes
-  app.use("/api/v1/books/:id/*", async (c, next) => {
-    const bookId = c.req.param("id");
-    if (!isSafeBookId(bookId)) {
-      throw new ApiError(400, "INVALID_BOOK_ID", `Invalid book ID: "${bookId}"`);
-    }
-    await next();
-  });
-  app.use("/api/v1/books/:id", async (c, next) => {
-    const bookId = c.req.param("id");
-    if (!isSafeBookId(bookId)) {
-      throw new ApiError(400, "INVALID_BOOK_ID", `Invalid book ID: "${bookId}"`);
-    }
-    await next();
-  });
-
-  // Logger sink that broadcasts to SSE
-  const sseSink: LogSink = {
-    write(entry: LogEntry): void {
-      broadcast("log", { level: entry.level, tag: entry.tag, message: entry.message });
-    },
-  };
-
-  // Logger sink that prints to server terminal
-  const consoleSink: LogSink = {
-    write(entry: LogEntry): void {
-      const prefix = `[${entry.tag}]`;
-      if (entry.level === "warn") console.warn(prefix, entry.message);
-      else if (entry.level === "error") console.error(prefix, entry.message);
-      else console.log(prefix, entry.message);
-    },
-  };
-
-  async function loadCurrentProjectConfig(
-    options?: { readonly requireApiKey?: boolean },
-  ): Promise<ProjectConfig> {
-    const freshConfig = await loadProjectConfig(root, { ...options, consumer: "studio" });
-    cachedConfig = freshConfig;
-    return freshConfig;
-  }
-
-  // Read the project language fresh from castor.json on every call, so a language
-  // switch takes effect on the next request instead of being frozen at startup.
-  // A missing/corrupt castor.json means "no project language configured" -> vi (legacy zh configs fall back to vi).
-  async function currentProjectLanguage(): Promise<StudioLanguage> {
-    const raw = await loadRawConfig(root).catch(() => ({} as Record<string, unknown>));
-    return normalizeStudioLanguage(raw.language);
-  }
-
-  async function buildPipelineConfig(
-    overrides?: Partial<Pick<PipelineConfig, "externalContext" | "client" | "model" | "revisionGate">> & {
-      readonly currentConfig?: ProjectConfig;
-      readonly sessionIdForSSE?: string;
-      // 确认式生产任务的 execution id。给任务构建 pipeline 时传入，该 pipeline
-      // 广播的 log / llm:progress / context:compression 事件都会带上 executionId，
-      // 前端据此把事件精确附加到任务卡；同会话聊天轮构建的 pipeline 不传，
-      // 事件维持只带 sessionId，走"最近一张运行中卡"的回退。
-      readonly executionIdForSSE?: string;
-      readonly bookIdForSettings?: string;
-    },
-  ): Promise<PipelineConfig> {
-    const currentConfig = overrides?.currentConfig ?? await loadCurrentProjectConfig();
-    const projectReviewMode = readProjectChapterReviewMode(currentConfig as unknown as Record<string, unknown>);
-    const chapterReviewMode = await resolveBookChapterReviewMode(root, overrides?.bookIdForSettings, projectReviewMode);
-    const projectRevisionGate = readProjectRevisionGate(currentConfig as unknown as Record<string, unknown>);
-    const revisionGate = await resolveBookRevisionGate(root, overrides?.bookIdForSettings, projectRevisionGate);
-    const sseExecutionTag = overrides?.executionIdForSSE
-      ? { executionId: overrides.executionIdForSSE }
-      : {};
-    const scopedSseSink: LogSink = overrides?.sessionIdForSSE
-      ? {
-          write(entry) {
-            broadcast("log", {
-              sessionId: overrides.sessionIdForSSE,
-              ...sseExecutionTag,
-              level: entry.level,
-              tag: entry.tag,
-              message: entry.message,
-            });
-          },
-        }
-      : sseSink;
-    const logger = createLogger({ tag: "studio", sinks: [scopedSseSink, consoleSink] });
-    return {
-      client: overrides?.client ?? createLLMClient(currentConfig.llm),
-      model: overrides?.model ?? currentConfig.llm.model,
-      projectRoot: root,
-      defaultLLMConfig: currentConfig.llm,
-      foundationReviewRetries: currentConfig.foundation?.reviewRetries ?? 2,
-      writingReviewRetries: currentConfig.writing?.reviewRetries ?? 1,
-      chapterReviewMode,
-      revisionGate: overrides?.revisionGate ?? revisionGate,
-      modelOverrides: currentConfig.modelOverrides,
-      notifyChannels: currentConfig.notify,
-      logger,
-      onContextCompression: (event) => {
-        broadcast("context:compression", {
-          ...(overrides?.sessionIdForSSE ? { sessionId: overrides.sessionIdForSSE } : {}),
-          ...sseExecutionTag,
-          ...event,
-        });
-      },
-      onStreamProgress: (progress) => {
-        broadcast("llm:progress", {
-          ...(overrides?.sessionIdForSSE ? { sessionId: overrides.sessionIdForSSE } : {}),
-          ...sseExecutionTag,
-          status: progress.status,
-          elapsedMs: progress.elapsedMs,
-          totalChars: progress.totalChars,
-          chineseChars: progress.chineseChars,
-        });
-      },
-      externalContext: overrides?.externalContext,
-    };
-  }
-
-  // --- Books ---
-
-  app.get("/api/v1/books", async (c) => {
-    const bookIds = await state.listBooks();
-    const books = await Promise.all(bookIds.map((id) => loadStudioBookListSummary(state, id)));
-    return c.json({ books });
-  });
-
-  app.get("/api/v1/books/:id", async (c) => {
-    const id = c.req.param("id");
-    try {
-      const book = await state.loadBookConfig(id);
-      const chapters = await state.loadChapterIndex(id);
-      const nextChapter = await state.getNextChapterNumber(id);
-      return c.json({ book, chapters, nextChapter });
-    } catch {
-      return c.json({ error: `Book "${id}" not found` }, 404);
-    }
-  });
-
-  // --- Canonical Story State (read-only Core boundary) ---
-
-  app.get("/api/v1/books/:id/canon", async (c) => {
-    const id = c.req.param("id");
-    const sectionParam = c.req.query("section");
-
-    if (sectionParam !== undefined && !isCanonSection(sectionParam)) {
-      return c.json(
-        { error: `Invalid canon section "${sectionParam}". Expected one of: manifest, current_state, hooks, chapter_summaries` },
-        400,
-      );
-    }
-
-    // Membership check BEFORE any read so unknown ids can never trigger the
-    // bootstrap side effect or touch the filesystem.
-    const bookIds = await state.listBooks();
-    if (!bookIds.includes(id)) {
-      return c.json({ error: `Book "${id}" not found` }, 404);
-    }
-
-    try {
-      const view = await readStoryCanon(state.bookDir(id));
-      const body: Record<string, unknown> =
-        sectionParam === undefined
-          ? {
-              bookId: id,
-              manifest: view.manifest,
-              currentState: view.currentState,
-              hooks: view.hooks,
-              chapterSummaries: view.chapterSummaries,
-              // Additive (T3B.1): clients retain this to send expectedRevision.
-              revision: view.revision,
-              // Slot/alias semantics are computed by Core so the UI can never
-              // diverge from what the engine itself believes.
-              description: describeCurrentState(view.currentState, view.manifest.language),
-            }
-          : { bookId: id, section: sectionParam, revision: view.revision, data: readCanonSection(view, sectionParam) };
-      return c.json(body);
-    } catch (e) {
-      // Pure-read contract: missing/invalid canonical state is an explicit
-      // structured error, never healed or bootstrapped by a GET.
-      if (e instanceof CanonUnavailableError) {
-        return c.json({ error: e.message, code: e.code, issues: e.issues }, 409);
-      }
-      return c.json({ error: e instanceof Error ? e.message : String(e) }, 500);
-    }
-  });
-
-  // --- Canon manual editing (T3B.1 lock-owning mutation boundary) ---
-
-  // Shared request handling: membership check → CORE-owned runtime schema
-  // validation (single semantic source; no Studio-local Zod duplicate).
-  // NOTE: Hono's c.json() does not return a global `Response` instance, so
-  // the failure branch is a discriminated result instead of instanceof.
-  async function parseCanonCommitTarget(
-    c: Context,
-  ): Promise<
-    | { ok: true; bookId: string; edits: CanonCommitRequest["edits"]; expectedRevision: string }
-    | { ok: false; response: Response }
-  > {
-    const id = c.req.param("id");
-    const bookIds = await state.listBooks();
-    if (!bookIds.includes(id ?? "")) {
-      return { ok: false, response: c.json({ error: `Book "${id}" not found`, code: "book_not_found" }, 404) };
-    }
-    let raw: unknown;
-    try {
-      raw = await c.req.json();
-    } catch {
-      return { ok: false as const, response: c.json({ error: "Request body must be JSON.", issues: [] }, 400) };
-    }
-    const parsed = CanonCommitRequestSchema.safeParse(raw);
-    if (!parsed.success) {
-      return {
-        ok: false as const,
-        response: c.json(
-          {
-            error: "Invalid canon edit request.",
-            code: "invalid_request",
-            issues: parsed.error.issues.map((issue) => ({
-              scope: issue.path.join("."),
-              message: issue.message,
-            })),
-          },
-          400,
-        ),
-      };
-    }
-    return {
-      ok: true as const,
-      bookId: id!,
-      edits: parsed.data.edits as CanonCommitRequest["edits"],
-      expectedRevision: parsed.data.expectedRevision,
-    };
-  }
-
-  // PURE preview — zero filesystem mutation, no lock required (read-only).
-  app.post("/api/v1/books/:id/canon/current-state/preview", async (c) => {
-    const target = await parseCanonCommitTarget(c);
-    if (!target.ok) return target.response;
-    try {
-      const preview = await previewCanonEdits(state.bookDir(target.bookId), target.edits);
-      return c.json({
-        bookId: target.bookId,
-        effectiveChapter: preview.effectiveChapter,
-        revision: preview.before.revision,
-        issues: preview.issues,
-        warnings: preview.warnings,
-      });
-    } catch (e) {
-      const mapped = mapCanonMutationError(e);
-      return c.json(mapped.body, mapped.status);
-    }
-  });
-
-  /**
-   * Commit route. LOCK OWNERSHIP LIVES HERE (P3A review discharge): the
-   * SAME `state.acquireBookLock` used by write-next/revise/rollback wraps
-   * the ENTIRE protected sequence (revision check → commit → memory sync),
-   * and the lock is released in `finally` even on failure. Core adds no
-   * second lock inside commitCanonEdits — by design.
-   */
   app.post("/api/v1/books/:id/canon/current-state/commit", async (c) => {
     const target = await parseCanonCommitTarget(c);
     if (!target.ok) return target.response;
@@ -4871,9 +4596,9 @@ export function createStudioServer(
       rawGenres.map(async (g) => {
         try {
           const { profile } = await readGenreProfile(root, g.id);
-          return { ...g, language: profile.language ?? "zh" };
+          return { ...g, language: profile.language ?? "vi" };
         } catch {
-          return { ...g, language: "zh" };
+          return { ...g, language: "vi" };
         }
       }),
     );
@@ -5057,7 +4782,7 @@ export function createStudioServer(
         state.loadBookConfig(id),
         buildPipelineConfig({ bookIdForSettings: id }),
       ]);
-      const language = book.language === "en" ? "en" : "zh";
+      const language = book.language === "en" ? "en" : "vi";
       const requestedBrief = typeof body.brief === "string" ? body.brief.trim() : "";
       const response = await runWorkerAgent(
         pipelineConfig.client,
@@ -5073,22 +4798,22 @@ export function createStudioServer(
                   "Return only a short, readable Markdown card.",
                 ].join("\n")
               : [
-                  "你是小说编辑，只为本章重写生成一张可选的灵感卡。",
-                  "给出一个符合现有设定的具体替代场面、证据或行动细节，以及章尾转折。",
-                  "不要代写整章，不要改写既成事实，也不要声称已经修改文件。",
-                  "只返回简短、可读的 Markdown 灵感卡。",
+                  "，。",
+                  "、，。",
+                  "，，。",
+                  "、 Markdown 。",
                 ].join("\n"),
           },
           {
             role: "user",
             content: [
-              language === "en" ? `Book: ${book.title}` : `书名：${book.title}`,
-              language === "en" ? `Chapter: ${num}` : `章节：第${num}章`,
+              language === "en" ? `Book: ${book.title}` : `：${book.title}`,
+              language === "en" ? `Chapter: ${num}` : `：${num}`,
               requestedBrief || persistedBrief
-                ? `${language === "en" ? "Current user brief" : "当前用户提示"}:\n${requestedBrief || persistedBrief}`
+                ? `${language === "en" ? "Current user brief" : ""}:\n${requestedBrief || persistedBrief}`
                 : "",
-              plan ? `${language === "en" ? "Generated chapter plan" : "系统章节计划"}:\n${plan}` : "",
-              `${language === "en" ? "Current chapter" : "当前章节"}:\n${chapter}`,
+              plan ? `${language === "en" ? "Generated chapter plan" : ""}:\n${plan}` : "",
+              `${language === "en" ? "Current chapter" : ""}:\n${chapter}`,
             ].filter(Boolean).join("\n\n"),
           },
         ],
@@ -5218,13 +4943,13 @@ export function createStudioServer(
 
   // Authoritative Phase 5 paths — prose outline + role sheets live under
   // dedicated subdirectories of story/. The full path (relative to story/) is
-  // matched literally here. `节奏原则.md` / `rhythm_principles.md` is optional
+  // Studio API server endpoint.
   // after Phase 5 consolidation (rhythm lives in volume_map's closing paragraph);
   // the entries stay whitelisted for legacy books and manual overrides.
   const TRUTH_OUTLINE_FILES = [
     "outline/story_frame.md",
     "outline/volume_map.md",
-    "outline/节奏原则.md",
+    "outline/.md",
     "outline/rhythm_principles.md",
   ];
 
@@ -5238,7 +4963,7 @@ export function createStudioServer(
    * Validate a requested truth-file path:
    *   1. Must be one of the declared flat files, an outline/* allow-listed
    *      entry, a runtime chapter trace file, or a roles/**\/*.md file under
-   *      主要角色/ | 次要角色/.
+   *      major/ | minor/.
    *   2. Must resolve to a path inside bookDir/story/ (no `..`, no absolute
    *      paths, no traversal via the tier-name segment).
    */
@@ -5256,7 +4981,7 @@ export function createStudioServer(
       TRUTH_FLAT_FILES.includes(file)
       || TRUTH_OUTLINE_FILES.includes(file)
       || RUNTIME_DIAGNOSTIC_FILE_RE.test(file)
-      || /^roles\/(主要角色|次要角色|major|minor)\/[^/]+\.md$/.test(file);
+      || /^roles\/(major|minor|major|minor)\/[^/]+\.md$/.test(file);
 
     if (!allowed) return null;
 
@@ -5849,7 +5574,7 @@ export function createStudioServer(
       language,
     });
 
-    // B12: 升级响应 shape 为 { probe, chat, ... }，同时保留老字段供 UI 过渡期兼容
+    // Studio API server endpoint.
     const connectionFailed = pick(language, "Kết nối thất bại", "Connection failed");
     const probeStatus = {
       ok: probe.ok,
@@ -5877,9 +5602,9 @@ export function createStudioServer(
         baseUrl: probe.baseUrl,
         modelsSource: probe.modelsSource,
       },
-      // B12 新字段：两步验证状态
+      // Studio API server endpoint.
       probe: probeStatus,
-      chat: null,  // probeServiceCapabilities 本身只做 probe，chat hello 在 Studio 的 follow-up 调用里单独触发
+      chat: null,  // Studio API server endpoint.
     });
   });
 
@@ -6014,7 +5739,7 @@ export function createStudioServer(
       }
     }
 
-    // B13: 走 listModelsForService 走 live probe + bank 交叉，返回带元数据的 models
+    // Studio API server endpoint.
     const enriched = await listModelsForService(
       isCustomServiceId(service) ? "custom" : service,
       apiKey,
@@ -6261,10 +5986,10 @@ export function createStudioServer(
       const flatFiles = (await listDir(".")).filter((f) => !f.startsWith("outline") && !f.startsWith("roles"));
       // Phase 5 outline/ files
       const outlineFiles = (await listDir("outline")).map((f) => `outline/${f}`);
-      // Phase 5 roles/主要角色 + roles/次要角色, plus Phase hotfix 3
+      // Phase 5 roles/major + roles/minor, plus Phase hotfix 3
       // English-locale equivalents so en-language books are visible.
-      const majorRolesZh = (await listDir("roles/主要角色")).map((f) => `roles/主要角色/${f}`);
-      const minorRolesZh = (await listDir("roles/次要角色")).map((f) => `roles/次要角色/${f}`);
+      const majorRolesZh = (await listDir("roles/major")).map((f) => `roles/major/${f}`);
+      const minorRolesZh = (await listDir("roles/minor")).map((f) => `roles/minor/${f}`);
       const majorRolesEn = (await listDir("roles/major")).map((f) => `roles/major/${f}`);
       const minorRolesEn = (await listDir("roles/minor")).map((f) => `roles/minor/${f}`);
       const runtimeFiles = (await listDir("runtime"))
@@ -6555,7 +6280,7 @@ export function createStudioServer(
     );
     const playMode = normalizeStudioPlayMode((body as { playMode?: unknown }).playMode);
     const sessionId = (body as { sessionId?: string }).sessionId;
-    // sessionId 只允许 timestamp-random 格式；防止注入任意文件名
+    // Studio API server endpoint.
     const safeSessionId = sessionId && /^[0-9]+-[a-z0-9]+$/.test(sessionId) ? sessionId : undefined;
     const session = await createAndPersistBookSession(
       root,
@@ -6564,8 +6289,8 @@ export function createStudioServer(
       sessionKind,
       ...(playMode ? [{ playMode }] as const : []),
     );
-    // 客户端可以用同一个 sessionId 重新创建会话：移除删除标记，
-    // 让新会话的生产任务可以正常持久化快照。
+    // Studio API server endpoint.
+    // Studio API server endpoint.
     deletedSessionIds.delete(session.sessionId);
     return c.json({ session });
   });
@@ -6605,8 +6330,8 @@ export function createStudioServer(
 
   app.delete("/api/v1/sessions/:sessionId", async (c) => {
     const sessionId = c.req.param("sessionId");
-    // 先标记删除，再中止任务：任务被中止后的错误持久化会检查这个标记，
-    // 不会把已删除会话的快照文件重建出来。
+    // Studio API server endpoint.
+    // Studio API server endpoint.
     deletedSessionIds.add(sessionId);
     const controller = await findRunningTaskController(sessionId);
     controller?.abort();
@@ -6743,7 +6468,7 @@ export function createStudioServer(
       const titleBeforeRun = bookSession.title;
       let sessionTitleBroadcasted = false;
       const refreshBookSessionFromTranscript = async (): Promise<void> => {
-        // 会话已删除：磁盘上没有 transcript 可刷，也不该再广播它的标题。
+        // Studio API server endpoint.
         if (deletedSessionIds.has(bookSession.sessionId)) return;
         const refreshed = await loadBookSession(root, bookSession.sessionId);
         if (refreshed) {
@@ -6866,10 +6591,10 @@ export function createStudioServer(
       const confirmedIntent = requestedIntent && isConfirmedProductionAction(actionSource, requestedIntent)
         ? requestedIntent
         : undefined;
-      // 任务的 execution id 在构建 pipeline 之前生成并传入 executionIdForSSE：
-      // 该 pipeline 广播的进度事件（log / llm:progress / context:compression）
-      // 由此带上任务 id。同会话并行聊天轮的 pipeline 是另一次请求单独构建的、
-      // 不带这个 id，前端才能把任务日志与聊天轮工具日志分开归属。
+      // Studio API server endpoint.
+      // Studio API server endpoint.
+      // Studio API server endpoint.
+      // Studio API server endpoint.
       const confirmedTaskId = confirmedIntent ? `direct-${confirmedIntent}-${randomUUID()}` : undefined;
 
       const pipeline = new PipelineRunner(await buildPipelineConfig({
@@ -6894,11 +6619,11 @@ export function createStudioServer(
           }, 409);
         };
 
-        // task-store 每会话只有一个任务快照，不支持并发生产任务。
-        // 名额必须在任何 await 之前同步预留：并发的第二个确认请求在这里 409，
-        // 不会与第一个请求一起通过后面的快照检查（check-then-act 竞态）。
-        // 预留键固定为此刻的 sessionId：后面 bookSession 可能因建书迁移被重新
-        // 赋值，finally 释放的必须是当初预留的那个键。
+        // Studio API server endpoint.
+        // Studio API server endpoint.
+        // Studio API server endpoint.
+        // Studio API server endpoint.
+        // Studio API server endpoint.
         const reservedSessionId = bookSession.sessionId;
         if (reservedProductionSessions.has(reservedSessionId)) {
           return productionTaskBusyResponse();
@@ -6910,9 +6635,9 @@ export function createStudioServer(
         activeConfirmedTasks.set(taskId, taskController);
         let pendingBookId: string | null = null;
         try {
-          // 预留成功后再走快照检查：本进程的任务都会占预留名额，这里防的是
-          // 旧进程遗留的运行中快照（loadReconciledTaskSnapshot 会把它对账成
-          // 终态）等边界情况，保证不覆盖一个仍被认为在运行的任务。
+          // Studio API server endpoint.
+          // Studio API server endpoint.
+          // Studio API server endpoint.
           const runningTask = await findActiveRunningTask(bookSession.sessionId);
           if (runningTask) {
             return productionTaskBusyResponse();
@@ -6930,10 +6655,10 @@ export function createStudioServer(
             });
           }
 
-          // 任务开始前先把用户指令作为 user 消息写进 transcript：任务运行期间
-          // 刷新页面时，用户气泡能从 transcript 恢复；并行聊天随后写入的消息
-          // 也会按真实时间排在指令之后。完成/失败路径只追加助手工具消息
-          //（instruction 传空字符串），指令不会写第二遍。
+          // Studio API server endpoint.
+          // Studio API server endpoint.
+          // Studio API server endpoint.
+          // Studio API server endpoint.
           await appendSessionMessagesUnlessDeleted(root, bookSession.sessionId, [{
             role: "user",
             content: instruction,
@@ -6996,7 +6721,7 @@ export function createStudioServer(
 
           const responseText = exec.result ?? pick(surfaceLanguage, "Đã hoàn tất.", "Done.");
           const responseForUser = suppressManualTextForTool(exec) ? "" : responseText;
-          // 指令已在任务开始时写入 transcript，这里只补助手工具消息。
+          // Studio API server endpoint.
           await appendSessionMessagesUnlessDeleted(root, bookSession.sessionId, [
             manualToolAssistantMessage(
               responseText,
@@ -7031,7 +6756,7 @@ export function createStudioServer(
             }, error.status as 400 | 401 | 403 | 404 | 409 | 413 | 415 | 422 | 429 | 500 | 502 | 503);
           }
           if (error instanceof ConfirmedActionExecutionError) {
-            // 指令已在任务开始时写入 transcript，失败时同样只补助手工具消息。
+            // Studio API server endpoint.
             await appendSessionMessagesUnlessDeleted(root, bookSession.sessionId, [
               manualToolAssistantMessage(
                 message,
@@ -7059,10 +6784,10 @@ export function createStudioServer(
       // Without this, an English request on a zh-default project gets Chinese replies — and
       // a Chinese play world, because play_start then infers from the rewritten premise.
       // Run pi-agent session
-      // 后台生产任务与聊天并行时，把任务状态注入 agent 的系统提示词，
-      // 让模型知道任务仍在运行、能回答进度、且不会重复发起同类任务；
-      // 同时传 suppressProductionTools 在 host 层剔除会修改书籍/产物的
-      // 生产工具（提示词只是软约束）。
+      // Studio API server endpoint.
+      // Studio API server endpoint.
+      // Studio API server endpoint.
+      // Studio API server endpoint.
       const backgroundTask = await findActiveRunningTask(bookSession.sessionId);
       const collectedToolExecs: CollectedToolExec[] = [];
       const result = await runAgentSession(
@@ -7775,7 +7500,7 @@ export function createStudioServer(
         ...(updates.chapterWordCount !== undefined ? { chapterWordCount: Number(updates.chapterWordCount) } : {}),
         ...(updates.targetChapters !== undefined ? { targetChapters: Number(updates.targetChapters) } : {}),
         ...(updates.status !== undefined ? { status: updates.status as typeof book.status } : {}),
-        ...(updates.language !== undefined ? { language: updates.language as "zh" | "en" } : {}),
+        ...(updates.language !== undefined ? { language: updates.language as "vi" | "en" } : {}),
         updatedAt: new Date().toISOString(),
       };
       await state.saveBookConfig(id, updated);
@@ -7903,7 +7628,7 @@ export function createStudioServer(
       "---",
       `name: ${yamlScalar(body.name)}`,
       `id: ${yamlScalar(body.id)}`,
-      `language: ${yamlScalar(body.language ?? "zh")}`,
+      `language: ${yamlScalar(body.language ?? "vi")}`,
       `chapterTypes: ${JSON.stringify(body.chapterTypes ?? [])}`,
       `fatigueWords: ${JSON.stringify(body.fatigueWords ?? [])}`,
       `numericalSystem: ${body.numericalSystem ?? false}`,
@@ -7939,7 +7664,7 @@ export function createStudioServer(
       "---",
       `name: ${yamlScalar(p.name ?? genreId)}`,
       `id: ${yamlScalar(p.id ?? genreId)}`,
-      `language: ${yamlScalar(p.language ?? "zh")}`,
+      `language: ${yamlScalar(p.language ?? "vi")}`,
       `chapterTypes: ${JSON.stringify(p.chapterTypes ?? [])}`,
       `fatigueWords: ${JSON.stringify(p.fatigueWords ?? [])}`,
       `numericalSystem: ${p.numericalSystem ?? false}`,
@@ -8111,7 +7836,7 @@ export function createStudioServer(
       targetChapters: body.targetChapters ?? 100,
       chapterWordCount: body.chapterWordCount ?? 3000,
       fanficMode: (body.mode ?? "canon") as "canon",
-      ...(body.language ? { language: body.language as "zh" | "en" } : {}),
+      ...(body.language ? { language: body.language as "vi" | "en" } : {}),
       createdAt: now,
       updatedAt: now,
     };
@@ -8161,7 +7886,7 @@ export function createStudioServer(
     }
   });
 
-  // --- Side-story (番外) init: companion book inheriting a parent's canon ---
+  // Studio API server endpoint.
 
   app.post("/api/v1/spinoff/init", async (c) => {
     const body = await c.req.json<{
@@ -8178,7 +7903,7 @@ export function createStudioServer(
     } catch {
       return c.json({ error: `Parent book "${body.parentBookId}" not found` }, 404);
     }
-    const language = (body.language ?? parent.language) as "zh" | "en" | undefined;
+    const language = (body.language ?? parent.language) as "vi" | "en" | undefined;
     const now = new Date().toISOString();
     const bookConfig = buildStudioBookConfig({
       title: body.title,
@@ -8215,7 +7940,7 @@ export function createStudioServer(
     return c.json({ status: "creating", bookId });
   });
 
-  // --- Imitation (仿写) init: original story imitating a reference work's style ---
+  // Studio API server endpoint.
 
   app.post("/api/v1/imitation/init", async (c) => {
     const body = await c.req.json<{
@@ -8352,7 +8077,7 @@ export function createStudioServer(
         if (graph) films.push({ projectId, title: graph.title || projectId });
       } catch { /* skip dirs without valid story-graph */ }
     }
-    films.sort((a, b) => a.title.localeCompare(b.title, "zh"));
+    films.sort((a, b) => a.title.localeCompare(b.title, "vi"));
     return c.json({ films });
   });
 

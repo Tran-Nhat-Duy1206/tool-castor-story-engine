@@ -68,12 +68,12 @@ describe("agent deterministic writing tools", () => {
     await writeFile(join(state.bookDir("harbor"), "story", "story_bible.md"), "# Story Bible\n\nLin Yue guards the jade seal.\n", "utf-8");
     await writeFile(
       join(state.bookDir("harbor"), "chapters", "0003_Storm.md"),
-      "# 第3章 风暴\n\nLin Yue kept the jade seal hidden under wet burlap, and she did not tell the guild.\n",
+      "# Chương 3 mock_text\n\nLin Yue kept the jade seal hidden under wet burlap, and she did not tell the guild.\n",
       "utf-8",
     );
     await state.saveChapterIndex("harbor", [{
       number: 3,
-      title: "风暴",
+      title: "mock_text",
       status: "ready-for-review",
       wordCount: 120,
       createdAt: "2026-04-16T00:00:00.000Z",
@@ -101,11 +101,11 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("binds, lists, and unbinds project reference assets for the active book", async () => {
-    await writeFile(join(root, "reference.md"), "# 开篇机制\n先让主角失去退路。\n", "utf-8");
+    await writeFile(join(root, "reference.md"), "# mock_text\nmock_text。\n", "utf-8");
     const asset = await ingestMaterial(root, {
       sourceKind: "file",
       filePath: "reference.md",
-      title: "开篇参考",
+      title: "mock_text",
       purpose: "reference",
     });
     const tool = createManageBookReferenceTool(root, "harbor");
@@ -113,21 +113,21 @@ describe("agent deterministic writing tools", () => {
     const bound = await tool.execute("bind-reference", {
       action: "bind",
       materialId: asset.id,
-      uses: ["开篇机制"],
-      note: "只借鉴压力建立方式。",
+      uses: ["mock_text"],
+      note: "mock_text。",
     });
     expect(bound.details).toMatchObject({
       kind: "book_reference_bound",
       bookId: "harbor",
       materialId: asset.id,
-      uses: ["开篇机制"],
+      uses: ["mock_text"],
     });
 
     const listed = await tool.execute("list-references", { action: "list" });
     expect(listed.details).toMatchObject({
       kind: "book_reference_list",
       bookId: "harbor",
-      references: [expect.objectContaining({ title: "开篇参考", available: true })],
+      references: [expect.objectContaining({ title: "mock_text", available: true })],
     });
 
     const unbound = await tool.execute("unbind-reference", {
@@ -173,13 +173,13 @@ describe("agent deterministic writing tools", () => {
     const tool = createWriteTruthFileTool({} as never, root, "harbor");
 
     const result = await tool.execute("tool-role", {
-      fileName: "roles/主要角色/林月.md",
-      content: "# 林月\n\n- 动机：守住码头账册，但不再相信公会。\n",
+      fileName: "roles/major/mock_text.md",
+      content: "# mock_text\n\n- mock_text：mock_text，mock_text。\n",
     });
 
     expect(result.content[0]?.type).toBe("text");
-    await expect(readFile(join(state.bookDir("harbor"), "story", "roles", "主要角色", "林月.md"), "utf-8"))
-      .resolves.toContain("不再相信公会");
+    await expect(readFile(join(state.bookDir("harbor"), "story", "roles", "major", "mock_text.md"), "utf-8"))
+      .resolves.toContain("mock_text");
   });
 
   it("renames entities through the deterministic edit controller", async () => {
@@ -237,11 +237,11 @@ describe("agent deterministic writing tools", () => {
 
     await tool.execute("tool-4b", {
       chapterNumber: 3,
-      fullText: "# 第3章 整章替换\n\n这是用户提供的完整新正文。",
+      fullText: "# Chương 3 mock_text\n\nmock_text。",
     });
 
     await expect(readFile(join(state.bookDir("harbor"), "chapters", "0003_Storm.md"), "utf-8"))
-      .resolves.toContain("完整新正文");
+      .resolves.toContain("mock_text");
     // Phase 4 (Task 9): a manual whole-chapter replacement is state-relevant,
     // so the edit transaction publishes the new prose AND lands the lifecycle
     // on needs-state-review inside one atomic set — no post-transaction
@@ -270,7 +270,7 @@ describe("agent deterministic writing tools", () => {
       resyncChapterStateAndAudit: vi.fn(async () => ({
         chapter: {
           chapterNumber: 3,
-          title: "风暴",
+          title: "mock_text",
           wordCount: 120,
           status: "ready-for-review",
         },
@@ -312,7 +312,7 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("tool-5", {
       agent: "architect",
-      instruction: "写一本港风商战小说",
+      instruction: "mock_text",
     });
 
     expect(result.content[0]?.type).toBe("text");
@@ -328,9 +328,9 @@ describe("agent deterministic writing tools", () => {
 
     const zh = await zhTool.execute("proposal-zh", {
       action: "create_book",
-      instruction: "写一本港风商战小说",
+      instruction: "mock_text",
       createBook: {
-        title: "港风商战",
+        title: "mock_text",
       },
     });
     const en = await enTool.execute("proposal-en", {
@@ -344,9 +344,9 @@ describe("agent deterministic writing tools", () => {
     expect(zh.content[0]?.type).toBe("text");
     expect(en.content[0]?.type).toBe("text");
     if (zh.content[0]?.type === "text") {
-      expect(zh.content[0].text).toContain("创建长篇书籍");
-      expect(zh.content[0].text).toContain("确认后将直接执行");
-      expect(zh.content[0].text).toContain("不会要求你再去另一个表单重复填写");
+      expect(zh.content[0].text).toContain("mock_text");
+      expect(zh.content[0].text).toContain("mock_text");
+      expect(zh.content[0].text).toContain("mock_text");
     }
     if (en.content[0]?.type === "text") {
       expect(en.content[0].text).toContain("Generate cover");
@@ -359,8 +359,8 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-same-session", {
       action: "short_run",
-      instruction: "写一篇婚姻反杀短篇",
-      shortRun: { title: "离婚协议", direction: "婚姻反杀短篇" },
+      instruction: "mock_text",
+      shortRun: { title: "mock_text", direction: "mock_text" },
     });
 
     expect(result.details).toMatchObject({
@@ -379,8 +379,8 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-with-skill", {
       action: "short_run",
-      instruction: "把这份素材蒸馏成一篇商业短篇",
-      shortRun: { title: "旧账新生", direction: "把已提供素材蒸馏成商业短篇" },
+      instruction: "mock_text",
+      shortRun: { title: "mock_text", direction: "mock_text" },
     });
 
     expect(result.details).toMatchObject({
@@ -395,8 +395,8 @@ describe("agent deterministic writing tools", () => {
 
     await expect(tool.execute("proposal-missing-short-title", {
       action: "short_run",
-      instruction: "写一篇婚姻反杀短篇",
-      shortRun: { direction: "婚姻反杀短篇" } as any,
+      instruction: "mock_text",
+      shortRun: { direction: "mock_text" } as any,
     })).rejects.toThrow(/shortRun\.title/);
   });
 
@@ -405,9 +405,9 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-book", {
       action: "create_book",
-      instruction: "创建《夜间派送》，番茄，100章以内，每章2600字。",
+      instruction: "mock_text《mock_text》，mock_text，100mock_text，mock_text2600 từ。",
       createBook: {
-        title: "夜间派送",
+        title: "mock_text",
         genre: "urban",
         platform: "tomato",
         targetChapters: 100,
@@ -421,7 +421,7 @@ describe("agent deterministic writing tools", () => {
       action: "create_book",
       actionPayload: {
         createBook: {
-          title: "夜间派送",
+          title: "mock_text",
           genre: "urban",
           platform: "tomato",
           targetChapters: 100,
@@ -437,20 +437,20 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-play", {
       action: "play_start",
-      instruction: "开一个旧戏院检修互动世界，从配电室和后台开始。",
+      instruction: "mock_text，mock_text。",
       playStart: {
-        title: "旧戏院夜巡",
-        premise: "我在县城旧戏院做夜间检修，停电后舞台下传来拍板声。",
+        title: "mock_text",
+        premise: "mock_text，mock_text。",
         mode: "open",
-        initialScene: "剧目是《挑滑车》，主演栏里有个名字叫",
-        suggestedActions: ["检查演出表", "走向配电室"],
+        initialScene: "mock_text《mock_text》，mock_text từmock_text",
+        suggestedActions: ["mock_text", "mock_text"],
       },
     });
 
     expect(result.details).toMatchObject({
       actionPayload: {
         playStart: {
-          initialScene: "剧目是《挑滑车》，主演栏里有个名字叫",
+          initialScene: "mock_text《mock_text》，mock_text từmock_text",
         },
       },
     });
@@ -461,15 +461,15 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-play-contract", {
       action: "play_start",
-      instruction: "开一个合租屋关系互动世界，物件有心动层级但不要游戏数值。",
+      instruction: "mock_text，mock_text。",
       playStart: {
-        title: "雨夜合租屋",
-        premise: "我刚搬进合租屋，室友们都在隐瞒停电夜的事。",
+        title: "mock_text",
+        premise: "mock_text，mock_textGiau giemmock_text。",
         mode: "open",
-        worldContract: "时间按动作语义推进；室友会自主行动；物件按心动层级表达关系变化，不使用 RPG 稀有度。",
-        visualContract: "心动层级通过摆放距离、磨损、光线和人物反应体现，不要绿蓝紫橙边框或游戏 UI。",
-        initialScene: "雨刚停，餐桌上多了一只贴着我名字的旧瓷杯。",
-        suggestedActions: ["拿起旧瓷杯", "观察室友的反应"],
+        worldContract: "mock_text；mock_text；mock_text，mock_text RPG mock_text。",
+        visualContract: "mock_text、mock_text、mock_text，mock_text UI。",
+        initialScene: "mock_text，mock_text từmock_text。",
+        suggestedActions: ["mock_text", "mock_text"],
       },
     });
 
@@ -478,8 +478,8 @@ describe("agent deterministic writing tools", () => {
       action: "play_start",
       actionPayload: {
         playStart: {
-          worldContract: expect.stringContaining("室友会自主行动"),
-          visualContract: expect.stringContaining("不要绿蓝紫橙边框"),
+          worldContract: expect.stringContaining("mock_text"),
+          visualContract: expect.stringContaining("mock_text"),
         },
       },
     });
@@ -490,14 +490,14 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-script", {
       action: "script_create",
-      instruction: "把冷库账页改成 12 集竖屏短剧，调查线七成、家怨三成。",
+      instruction: "mock_text 12 mock_text，mock_text、mock_text。",
       scriptCreate: {
-        title: "冷库账页",
-        sourceKind: "小说大纲",
+        title: "mock_text",
+        sourceKind: "mock_text",
         targetFormat: "vertical_short_drama",
-        requirements: "保留账页、赔偿款、失踪孩子三条线。",
+        requirements: "mock_text、mock_text、mock_text。",
         episodeCount: 12,
-        episodeDuration: "2分钟",
+        episodeDuration: "2mock_text",
       },
     });
 
@@ -507,7 +507,7 @@ describe("agent deterministic writing tools", () => {
       targetSessionKind: "script",
       actionPayload: {
         scriptCreate: {
-          title: "冷库账页",
+          title: "mock_text",
           targetFormat: "vertical_short_drama",
           episodeCount: 12,
         },
@@ -520,13 +520,13 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-storyboard", {
       action: "storyboard_create",
-      instruction: "把剧本拆成 9:16 分镜，写实冷色，每场给图像提示词。",
+      instruction: "mock_text 9:16 mock_text，mock_text，mock_text。",
       storyboardCreate: {
-        title: "冷库账页分镜",
-        sourceKind: "剧本",
-        visualStyle: "写实冷色",
+        title: "mock_text",
+        sourceKind: "mock_text",
+        visualStyle: "mock_text",
         aspectRatio: "9:16",
-        granularity: "按场景关键镜头拆分",
+        granularity: "mock_text",
         maxShots: 18,
       },
     });
@@ -537,8 +537,8 @@ describe("agent deterministic writing tools", () => {
       targetSessionKind: "storyboard",
       actionPayload: {
         storyboardCreate: {
-          title: "冷库账页分镜",
-          visualStyle: "写实冷色",
+          title: "mock_text",
+          visualStyle: "mock_text",
           maxShots: 18,
         },
       },
@@ -550,14 +550,14 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-interactive-film", {
       action: "interactive_film_create",
-      instruction: "做一个盛世天下式多结局互动影游，包含剧情树、旗标、剧本和分镜。",
+      instruction: "mock_text，mock_text、mock_text、mock_text。",
       interactiveFilmCreate: {
-        title: "盛世账页",
-        sourceKind: "投稿需求",
-        requirements: "多分支，多结局，变量记录玩家每次关键抉择。",
-        targetAudience: "欧美互动影游用户",
-        budget: "5000元",
-        referenceMode: "盛世天下式多走向",
+        title: "mock_text",
+        sourceKind: "mock_text",
+        requirements: "mock_text，mock_text，mock_textQuyet dinh。",
+        targetAudience: "mock_text",
+        budget: "5000mock_text",
+        referenceMode: "mock_text",
       },
     });
 
@@ -567,8 +567,8 @@ describe("agent deterministic writing tools", () => {
       targetSessionKind: "interactive-film",
       actionPayload: {
         interactiveFilmCreate: {
-          title: "盛世账页",
-          budget: "5000元",
+          title: "mock_text",
+          budget: "5000mock_text",
         },
       },
     });
@@ -595,10 +595,10 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-interactive-film-zero-count", {
       action: "interactive_film_create",
-      instruction: "做一个多结局互动影游。",
+      instruction: "mock_text。",
       interactiveFilmCreate: {
-        title: "第七阅览室",
-        requirements: "多分支，变量记录，至少两个结局。",
+        title: "Chương mock_text",
+        requirements: "mock_text，mock_text，mock_text。",
         episodeCount: 0,
       },
     });
@@ -608,8 +608,8 @@ describe("agent deterministic writing tools", () => {
       action: "interactive_film_create",
       actionPayload: {
         interactiveFilmCreate: {
-          title: "第七阅览室",
-          requirements: "多分支，变量记录，至少两个结局。",
+          title: "Chương mock_text",
+          requirements: "mock_text，mock_text，mock_text。",
         },
       },
     });
@@ -624,11 +624,11 @@ describe("agent deterministic writing tools", () => {
     const tool = createPlayStartTool(pipeline as never, root, "play-session-truncated", "open", {
       actionPayload: {
         playStart: {
-          title: "旧戏院夜巡",
-          premise: "我在县城旧戏院做夜间检修，停电后舞台下传来拍板声。",
+          title: "mock_text",
+          premise: "mock_text，mock_text。",
           mode: "open",
-          initialScene: "剧目是《挑滑车》，主演栏里有个名字叫",
-          suggestedActions: ["检查演出表"],
+          initialScene: "mock_text《mock_text》，mock_text từmock_text",
+          suggestedActions: ["mock_text"],
         },
       },
       runnerFactory: ({ db }) => ({
@@ -637,14 +637,14 @@ describe("agent deterministic writing tools", () => {
           db.upsertEntity({
             id: "actor_player",
             type: "actor",
-            label: "玩家",
-            summary: "当前玩家。",
+            label: "mock_text",
+            summary: "mock_text。",
           });
           db.upsertEntity({
             id: "location_theater",
             type: "location",
-            label: "旧戏院",
-            summary: "开场地点。",
+            label: "mock_text",
+            summary: "Mo daumock_text。",
           });
           return null;
         },
@@ -652,16 +652,16 @@ describe("agent deterministic writing tools", () => {
     });
 
     await tool.execute("play-start", {
-      title: "旧戏院夜巡",
-      premise: "我在县城旧戏院做夜间检修，停电后舞台下传来拍板声。",
+      title: "mock_text",
+      premise: "mock_text，mock_text。",
       mode: "open",
-      initialScene: "我站在配电室门口，手电照到泛黄演出表，主演栏写着赵铁生。",
-      suggestedActions: ["检查演出表"],
+      initialScene: "mock_text，mock_text，mock_text。",
+      suggestedActions: ["mock_text"],
     });
 
-    expect(seededScene).toContain("主演栏里有个名字叫");
+    expect(seededScene).toContain("mock_text từmock_text");
     await expect(readFile(join(root, "worlds", "play-session-truncated", "runs", "main", "projections", "scene.md"), "utf-8"))
-      .resolves.toContain("主演栏里有个名字叫");
+      .resolves.toContain("mock_text từmock_text");
   });
 
   it("does not emit a confirmation card when the proposed action payload is invalid", async () => {
@@ -669,9 +669,9 @@ describe("agent deterministic writing tools", () => {
 
     await expect(tool.execute("proposal-invalid", {
       action: "create_book",
-      instruction: "创建《夜间派送》",
+      instruction: "mock_text《mock_text》",
       createBook: {
-        title: "夜间派送",
+        title: "mock_text",
         platform: "tomato",
         unsafeExtra: "must not reach the UI",
       },
@@ -683,9 +683,9 @@ describe("agent deterministic writing tools", () => {
 
     await expect(tool.execute("proposal-play-missing-payload", {
       action: "play_start",
-      title: "玄照山外门",
-      summary: "卡内已提炼所有长期规则。",
-      instruction: "启动玄照山外门开放世界，时间是世界同步轴，角色会自主行动。",
+      title: "mock_text",
+      summary: "mock_text。",
+      instruction: "mock_text，mock_text，mock_text。",
     })).rejects.toThrow("playStart.title");
   });
 
@@ -695,37 +695,37 @@ describe("agent deterministic writing tools", () => {
     const cases = [
       {
         action: "fanfic_init",
-        payload: { fanficCreate: { title: "霜港来信", sourceText: "原作正典片段", sourceName: "霜港" } },
-        title: "创建同人作品",
+        payload: { fanficCreate: { title: "mock_text", sourceText: "mock_text", sourceName: "mock_text" } },
+        title: "mock_text",
       },
       {
         action: "continuation_import",
-        payload: { continuationImport: { title: "雾港续章", sourcePath: ".castor/uploads/novel.txt" } },
-        title: "导入并续写作品",
+        payload: { continuationImport: { title: "mock_text", sourcePath: ".castor/uploads/novel.txt" } },
+        title: "mock_text",
       },
       {
         action: "spinoff_create",
-        payload: { spinoffCreate: { title: "雨夜番外", parentBookId: "harbor", direction: "老船工视角" } },
-        title: "创建番外作品",
+        payload: { spinoffCreate: { title: "mock_text", parentBookId: "harbor", direction: "mock_text" } },
+        title: "mock_text",
       },
       {
         action: "style_imitation",
-        payload: { imitationCreate: { title: "纸灯新案", referenceText: "参考文风片段", storyIdea: "原创县城悬疑" } },
-        title: "创建仿写作品",
+        payload: { imitationCreate: { title: "mock_text", referenceText: "mock_text", storyIdea: "mock_text" } },
+        title: "mock_text",
       },
     ] as const;
 
     for (const item of cases) {
       const result = await tool.execute(`proposal-${item.action}`, {
         action: item.action,
-        instruction: "确认后直接创建对应作品。",
+        instruction: "mock_text。",
         ...item.payload,
       });
 
       expect(result.content[0]?.type).toBe("text");
       if (result.content[0]?.type === "text") {
         expect(result.content[0].text).toContain(item.title);
-        expect(result.content[0].text).toContain("确认后将直接执行");
+        expect(result.content[0].text).toContain("mock_text");
       }
       expect(result.details).toMatchObject({
         kind: "proposed_action",
@@ -745,10 +745,10 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-imitation-attachment", {
       action: "style_imitation",
-      instruction: "参考附件文风创作一个全新故事。",
+      instruction: "mock_text。",
       imitationCreate: {
-        title: "借来的三分钟",
-        storyIdea: "港口夜班修表师发现全镇的钟每天借走三分钟。",
+        title: "mock_text",
+        storyIdea: "mock_text。",
       },
     });
 
@@ -757,8 +757,8 @@ describe("agent deterministic writing tools", () => {
       action: "style_imitation",
       actionPayload: {
         imitationCreate: {
-          title: "借来的三分钟",
-          storyIdea: "港口夜班修表师发现全镇的钟每天借走三分钟。",
+          title: "mock_text",
+          storyIdea: "mock_text。",
           referencePath: attachmentPath,
         },
       },
@@ -773,10 +773,10 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("proposal-imitation-truncated-attachment", {
       action: "style_imitation",
-      instruction: "参考附件文风创作一个全新故事。",
+      instruction: "mock_text。",
       imitationCreate: {
-        title: "借来的三分钟",
-        storyIdea: "港口夜班修表师发现全镇的钟每天借走三分钟。",
+        title: "mock_text",
+        storyIdea: "mock_text。",
         referencePath: ".castor/uploads/1786846...",
       },
     });
@@ -800,10 +800,10 @@ describe("agent deterministic writing tools", () => {
 
     await expect(tool.execute("proposal-imitation-ambiguous-attachments", {
       action: "style_imitation",
-      instruction: "参考附件文风创作一个全新故事。",
+      instruction: "mock_text。",
       imitationCreate: {
-        title: "借来的三分钟",
-        storyIdea: "港口夜班修表师发现全镇的钟每天借走三分钟。",
+        title: "mock_text",
+        storyIdea: "mock_text。",
       },
     })).rejects.toThrow(/referenceText or referencePath/);
   });
@@ -816,16 +816,16 @@ describe("agent deterministic writing tools", () => {
 
     await tool.execute("tool-6", {
       agent: "architect",
-      title: "夜港账本",
-      instruction: "写一本港风商战小说",
+      title: "mock_text",
+      instruction: "mock_text",
     });
 
     expect(pipeline.initBook).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "夜港账本",
+        title: "mock_text",
       }),
       expect.objectContaining({
-        externalContext: "写一本港风商战小说",
+        externalContext: "mock_text",
       }),
     );
   });
@@ -837,7 +837,7 @@ describe("agent deterministic writing tools", () => {
     const tool = createSubAgentTool(pipeline as never, null, undefined, {
       actionPayload: {
         createBook: {
-          title: "夜间派送",
+          title: "mock_text",
           genre: "urban",
           platform: "tomato",
           targetChapters: 100,
@@ -849,22 +849,22 @@ describe("agent deterministic writing tools", () => {
 
     await tool.execute("tool-confirmed-book", {
       agent: "architect",
-      title: "夜间派送",
+      title: "mock_text",
       platform: "other",
       targetChapters: 200,
-      instruction: "创建《夜间派送》，番茄，100章以内。",
+      instruction: "mock_text《mock_text》，mock_text，100mock_text。",
     } as any);
 
     expect(pipeline.initBook).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "夜间派送",
+        title: "mock_text",
         genre: "urban",
         platform: "tomato",
         targetChapters: 100,
         chapterWordCount: 2600,
       }),
       expect.objectContaining({
-        externalContext: "创建《夜间派送》，番茄，100章以内。",
+        externalContext: "mock_text《mock_text》，mock_text，100mock_text。",
       }),
     );
   });
@@ -910,8 +910,8 @@ describe("agent deterministic writing tools", () => {
       initBook: vi.fn(async () => {
         throw new ArchitectIncompleteFoundationError(
           ["roles", "pending_hooks"],
-          "=== SECTION: story_frame ===\n已有世界观草稿",
-          "基础设定没有生成完整。",
+          "=== SECTION: story_frame ===\nmock_text",
+          "mock_text。",
         );
       }),
     });
@@ -919,21 +919,21 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("tool-architect-incomplete", {
       agent: "architect",
-      title: "夜港账本",
-      instruction: "写一本港风商战小说",
+      title: "mock_text",
+      instruction: "mock_text",
     });
 
     expect(result.content[0]?.type).toBe("text");
     if (result.content[0]?.type === "text") {
-      expect(result.content[0].text).toContain("基础设定没有生成完整");
+      expect(result.content[0].text).toContain("mock_text");
       expect(result.content[0].text).toContain("roles");
       expect(result.content[0].text).toContain("pending_hooks");
-      expect(result.content[0].text).toContain("继续补齐");
+      expect(result.content[0].text).toContain("mock_text");
     }
     expect(result.details).toMatchObject({
       kind: "architect_incomplete",
       missing: ["roles", "pending_hooks"],
-      partialContent: expect.stringContaining("已有世界观草稿"),
+      partialContent: expect.stringContaining("mock_text"),
     });
   });
 
@@ -950,14 +950,14 @@ describe("agent deterministic writing tools", () => {
       agent: "writer",
       bookId: "harbor",
       chapterWordCount: 2600,
-      instruction: "继续写，控制在 2600 字",
+      instruction: "mock_text，mock_text 2600  từ",
     } as any);
 
     expect(pipeline.writeNextChapter).toHaveBeenCalledWith(
       "harbor",
       2600,
       undefined,
-      "继续写，控制在 2600 字",
+      "mock_text，mock_text 2600  từ",
     );
   });
 
@@ -965,9 +965,9 @@ describe("agent deterministic writing tools", () => {
     const pipeline = contextPipeline({
       writeNextChapter: vi.fn(),
       writeChapters: vi.fn(async () => [
-        { chapterNumber: 4, title: "第四章", wordCount: 2600, status: "ready-for-review" },
-        { chapterNumber: 5, title: "第五章", wordCount: 2550, status: "ready-for-review" },
-        { chapterNumber: 6, title: "第六章", wordCount: 2490, status: "audit-failed" },
+        { chapterNumber: 4, title: "Chương mock_text", wordCount: 2600, status: "ready-for-review" },
+        { chapterNumber: 5, title: "Chương mock_text", wordCount: 2550, status: "ready-for-review" },
+        { chapterNumber: 6, title: "Chương mock_text", wordCount: 2490, status: "audit-failed" },
       ]),
     });
     const tool = createSubAgentTool(pipeline as never, "harbor");
@@ -977,7 +977,7 @@ describe("agent deterministic writing tools", () => {
       bookId: "harbor",
       chapterCount: 5,
       chapterWordCount: 2600,
-      instruction: "连续写五章",
+      instruction: "mock_text",
     } as any);
 
     expect(pipeline.writeChapters).toHaveBeenCalledWith(
@@ -1004,7 +1004,7 @@ describe("agent deterministic writing tools", () => {
     await tool.execute("tool-writer-abort", {
       agent: "writer",
       bookId: "harbor",
-      instruction: "继续写下一章",
+      instruction: "mock_text",
     } as any, controller.signal);
 
     expect(pipeline.runWithAgentContext).toHaveBeenCalledWith(
@@ -1035,7 +1035,7 @@ describe("agent deterministic writing tools", () => {
       runWithAgentContext: vi.fn(async (_context: unknown, task: () => Promise<unknown>) => task()),
       writeNextChapter: vi.fn(async () => ({ chapterNumber: 4, wordCount: 2600 })),
     };
-    const instruction = "重写节奏方向：这一章先让证据链反噬主角，不要直接揭晓凶手。";
+    const instruction = "mock_text：mock_text，mock_text。";
     const tool = createSubAgentTool(pipeline as never, "harbor", undefined, {
       activeSkills: () => activatedSkills,
     });
@@ -1077,7 +1077,7 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("tool-writer-default-skill", {
       agent: "writer",
-      instruction: "让这一章用一场谈判改变两人的关系。",
+      instruction: "mock_text。",
     } as any);
 
     expect(pipeline.runWithAgentContext).toHaveBeenCalledWith(
@@ -1094,7 +1094,7 @@ describe("agent deterministic writing tools", () => {
     const pipeline = contextPipeline({
       writeNextChapter: vi.fn(async () => ({
         chapterNumber: 1,
-        title: "雨棚账单",
+        title: "mock_text",
         wordCount: 971,
         status: "audit-failed",
       })),
@@ -1104,7 +1104,7 @@ describe("agent deterministic writing tools", () => {
     const result = await tool.execute("tool-writer-audit-failed", {
       agent: "writer",
       bookId: "harbor",
-      instruction: "继续写下一章",
+      instruction: "mock_text",
     } as any);
 
     expect(result.details).toMatchObject({
@@ -1117,7 +1117,7 @@ describe("agent deterministic writing tools", () => {
     expect(result.content[0]?.type).toBe("text");
     if (result.content[0]?.type === "text") {
       expect(result.content[0].text).toContain("audit-failed");
-      expect(result.content[0].text).toContain("需要复核");
+      expect(result.content[0].text).toContain("mock_text");
       expect(result.content[0].text).not.toContain("Chapter written");
     }
   });
@@ -1133,7 +1133,7 @@ describe("agent deterministic writing tools", () => {
     await expect(tool.execute("tool-writer-fails", {
       agent: "writer",
       bookId: "harbor",
-      instruction: "继续写下一章",
+      instruction: "mock_text",
     } as any)).rejects.toThrow("disk write failed");
   });
 
@@ -1151,7 +1151,7 @@ describe("agent deterministic writing tools", () => {
           before: { blockingCount: 2, criticalCount: 1, aiTellCount: 3 },
           after: { blockingCount: 2, criticalCount: 1, aiTellCount: 3 },
           remainingIssues: [
-            { severity: "critical", category: "Chapter Memo Drift", description: "没有按用户要求重修本章。", suggestion: "重写主冲突。" },
+            { severity: "critical", category: "Chapter Memo Drift", description: "mock_text。", suggestion: "mock_text。" },
           ],
         },
       })),
@@ -1163,10 +1163,10 @@ describe("agent deterministic writing tools", () => {
       bookId: "harbor",
       chapterNumber: 1,
       mode: "rewrite",
-      instruction: "整体重写第一章",
+      instruction: "mock_textChương mock_text",
     } as any);
 
-    expect(pipeline.reviseDraft).toHaveBeenCalledWith("harbor", 1, "rewrite", "整体重写第一章");
+    expect(pipeline.reviseDraft).toHaveBeenCalledWith("harbor", 1, "rewrite", "mock_textChương mock_text");
     expect(result.details).toMatchObject({
       kind: "chapter_revision",
       bookId: "harbor",
@@ -1201,14 +1201,14 @@ describe("agent deterministic writing tools", () => {
     await tool.execute("tool-writer-active", {
       agent: "writer",
       chapterWordCount: 2600,
-      instruction: "继续写下一章",
+      instruction: "mock_text",
     } as any);
 
     expect(pipeline.writeNextChapter).toHaveBeenCalledWith(
       "harbor",
       2600,
       undefined,
-      "继续写下一章",
+      "mock_text",
     );
   });
 
@@ -1217,7 +1217,7 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("tool-export-defaults", {
       agent: "exporter",
-      instruction: "请导出 EPUB，并且只要已通过章节",
+      instruction: "mock_text EPUB，mock_text",
     } as any);
 
     expect(result.content[0]?.type).toBe("text");
@@ -1246,7 +1246,7 @@ describe("agent deterministic writing tools", () => {
 
     const result = await tool.execute("tool-writer-no-book", {
       agent: "writer",
-      instruction: "继续写下一章",
+      instruction: "mock_text",
     } as any);
 
     expect(pipeline.writeNextChapter).not.toHaveBeenCalled();
@@ -1323,11 +1323,11 @@ describe("agent deterministic writing tools", () => {
     const result = await tool.execute("tool-architect-revise-active", {
       agent: "architect",
       revise: true,
-      feedback: "把角色目录改成一人一卡",
-      instruction: "重写架构稿",
+      feedback: "mock_text",
+      instruction: "mock_text",
     } as any);
 
-    expect(pipeline.reviseFoundation).toHaveBeenCalledWith("harbor", "把角色目录改成一人一卡");
+    expect(pipeline.reviseFoundation).toHaveBeenCalledWith("harbor", "mock_text");
     expect(result.content[0]?.type).toBe("text");
     if (result.content[0]?.type === "text") {
       expect(result.content[0].text).toContain("harbor");
@@ -1344,8 +1344,8 @@ describe("agent deterministic writing tools", () => {
       agent: "architect",
       bookId: "harbor",
       revise: true,
-      feedback: "把角色目录改成一人一卡",
-      instruction: "重写架构稿",
+      feedback: "mock_text",
+      instruction: "mock_text",
     } as any);
 
     expect(pipeline.reviseFoundation).not.toHaveBeenCalled();
@@ -1372,10 +1372,10 @@ describe("agent deterministic writing tools", () => {
       bookId: "harbor",
       chapterNumber: 3,
       mode: "spot-fix",
-      instruction: "重写第3章",
+      instruction: "mock_textChương 3",
     } as any);
 
-    expect(pipeline.reviseDraft).toHaveBeenCalledWith("harbor", 3, "spot-fix", "重写第3章");
+    expect(pipeline.reviseDraft).toHaveBeenCalledWith("harbor", 3, "spot-fix", "mock_textChương 3");
   });
 
   it("uses explicit exporter params instead of guessing from instruction", async () => {
@@ -1387,7 +1387,7 @@ describe("agent deterministic writing tools", () => {
       bookId: "harbor",
       format: "md",
       approvedOnly: false,
-      instruction: "导出成 epub",
+      instruction: "mock_text epub",
     } as any);
 
     expect(result.content[0]?.type).toBe("text");
@@ -1523,45 +1523,45 @@ describe("agent deterministic writing tools", () => {
     const store = new PlayStore(root);
     await store.createWorld({
       id: "play-edit-session",
-      title: "雨夜合租屋",
-      premise: "我刚搬进合租屋。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "open",
-      worldContract: "时间按动作语义推进。",
-      visualContract: "雨夜冷光，不使用游戏 UI。",
+      worldContract: "mock_text。",
+      visualContract: "mock_text，mock_text UI。",
     });
     await store.ensureRun("play-edit-session", "main");
     await store.saveCurrentState("play-edit-session", "main", {
-      scene: "餐桌上有一只旧瓷杯。",
+      scene: "mock_text。",
     });
     const seedDb = createPlayDB(store.runDir("play-edit-session", "main"));
     seedDb.upsertEntity({
       id: "actor_player",
       type: "actor",
-      label: "新租客",
-      summary: "刚搬进合租屋。",
-      status: "观察",
+      label: "mock_text",
+      summary: "mock_text。",
+      status: "mock_text",
     });
     seedDb.upsertEntity({
       id: "actor_linqing",
       type: "actor",
-      label: "室友林青",
-      summary: "旧目标",
-      status: "观望",
+      label: "mock_text",
+      summary: "mock_text",
+      status: "mock_text",
     });
     seedDb.close?.();
 
     const tool = createPlayEditTool(root, "play-edit-session");
     const result = await tool.execute("play-edit-1", {
-      worldContractAppend: "室友会自主行动，玩家等待时她也会推进自己的目标。",
-      visualContract: "物件情绪重量通过摆放距离、磨损、光线和人物反应体现。",
-      playerPersona: "我是刚搬进来的租客，想查清停电夜。",
+      worldContractAppend: "mock_text，mock_text。",
+      visualContract: "mock_text、mock_text、mock_text。",
+      playerPersona: "mock_text，mock_text。",
       entityUpdates: [{
-        label: "室友林青",
+        label: "mock_text",
         type: "actor",
-        summary: "隐瞒停电夜真相，目标是试探玩家是否可信。",
-        status: "戒备",
+        summary: "Giau giemmock_textSu that，mock_text。",
+        status: "mock_text",
       }],
-      note: "合租屋规则已更新。",
+      note: "mock_text。",
     });
 
     expect(result.content[0]?.type).toBe("text");
@@ -1574,25 +1574,25 @@ describe("agent deterministic writing tools", () => {
       updatedEntities: 2,
     });
     const world = await store.loadWorld("play-edit-session");
-    expect(world?.worldContract).toContain("室友会自主行动");
-    expect(world?.visualContract).toContain("物件情绪重量");
+    expect(world?.worldContract).toContain("mock_text");
+    expect(world?.visualContract).toContain("mock_text");
     const stateJson = JSON.parse(await readFile(join(root, "worlds", "play-edit-session", "runs", "main", "state", "current.json"), "utf-8"));
-    expect(stateJson.worldContract).toContain("室友会自主行动");
-    expect(stateJson.visualContract).toContain("物件情绪重量");
+    expect(stateJson.worldContract).toContain("mock_text");
+    expect(stateJson.visualContract).toContain("mock_text");
     const db = createPlayDB(store.runDir("play-edit-session", "main"));
     const snapshot = db.snapshot();
     db.close?.();
     expect(snapshot.entities).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: "actor_player",
-        label: "新租客",
-        summary: "我是刚搬进来的租客，想查清停电夜。",
+        label: "mock_text",
+        summary: "mock_text，mock_text。",
       }),
       expect.objectContaining({
         id: "actor_linqing",
-        label: "室友林青",
-        summary: "隐瞒停电夜真相，目标是试探玩家是否可信。",
-        status: "戒备",
+        label: "mock_text",
+        summary: "Giau giemmock_textSu that，mock_text。",
+        status: "mock_text",
       }),
     ]));
   });
@@ -1601,25 +1601,25 @@ describe("agent deterministic writing tools", () => {
     const store = new PlayStore(root);
     await store.createWorld({
       id: "play-contract-replace",
-      title: "午夜药房",
-      premise: "实习药剂师值夜班。",
+      title: "mock_text",
+      premise: "mock_text。",
       mode: "open",
-      worldContract: "风险重量：普通差错 / 需要复核 / 可能追责 / 不能公开。时间按动作自然流动。",
-      visualContract: "监控冷光。",
+      worldContract: "mock_text：mock_text / mock_text / mock_text / mock_textCong khai。mock_text。",
+      visualContract: "mock_text。",
     });
     await store.ensureRun("play-contract-replace", "main");
     await store.saveCurrentState("play-contract-replace", "main", {
       turn: 0,
-      worldContract: "风险重量：普通差错 / 需要复核 / 可能追责 / 不能公开。时间按动作自然流动。",
+      worldContract: "mock_text：mock_text / mock_text / mock_text / mock_textCong khai。mock_text。",
     });
 
     const tool = createPlayEditTool(root, "play-contract-replace");
     const result = await tool.execute("play-edit-replace", {
       worldContractReplacements: [{
-        from: "普通差错 / 需要复核 / 可能追责 / 不能公开",
-        to: "普通差错 / 需要复核 / 涉及追责 / 需要主任签字",
+        from: "mock_text / mock_text / mock_text / mock_textCong khai",
+        to: "mock_text / mock_text / mock_text / mock_text từ",
       }],
-      note: "风险重量已替换。",
+      note: "mock_text。",
     });
 
     expect(result.details).toMatchObject({
@@ -1627,11 +1627,11 @@ describe("agent deterministic writing tools", () => {
       updatedWorldContract: true,
     });
     const world = await store.loadWorld("play-contract-replace");
-    expect(world?.worldContract).toContain("普通差错 / 需要复核 / 涉及追责 / 需要主任签字");
-    expect(world?.worldContract).not.toContain("可能追责 / 不能公开");
+    expect(world?.worldContract).toContain("mock_text / mock_text / mock_text / mock_text từ");
+    expect(world?.worldContract).not.toContain("mock_text / mock_textCong khai");
     const stateJson = JSON.parse(await readFile(join(root, "worlds", "play-contract-replace", "runs", "main", "state", "current.json"), "utf-8"));
     expect(stateJson.turn).toBe(0);
-    expect(stateJson.worldContract).toContain("普通差错 / 需要复核 / 涉及追责 / 需要主任签字");
-    expect(stateJson.worldContract).not.toContain("可能追责 / 不能公开");
+    expect(stateJson.worldContract).toContain("mock_text / mock_text / mock_text / mock_text từ");
+    expect(stateJson.worldContract).not.toContain("mock_text / mock_textCong khai");
   });
 });

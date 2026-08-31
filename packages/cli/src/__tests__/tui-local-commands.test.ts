@@ -5,13 +5,13 @@ describe("tui local commands", () => {
   it("recognizes help aliases", () => {
     expect(classifyLocalTuiCommand("/help")).toBe("help");
     expect(classifyLocalTuiCommand("help")).toBe("help");
-    expect(classifyLocalTuiCommand("帮助")).toBe("help");
+    expect(classifyLocalTuiCommand("test_mock")).toBe("help");
   });
 
   it("recognizes status aliases", () => {
     expect(classifyLocalTuiCommand("/status")).toBe("status");
     expect(classifyLocalTuiCommand("status")).toBe("status");
-    expect(classifyLocalTuiCommand("状态")).toBe("status");
+    expect(classifyLocalTuiCommand("test_mock")).toBe("status");
   });
 
   it("recognizes quit aliases", () => {
@@ -20,14 +20,14 @@ describe("tui local commands", () => {
     expect(classifyLocalTuiCommand("quit")).toBe("quit");
     expect(classifyLocalTuiCommand("exit")).toBe("quit");
     expect(classifyLocalTuiCommand("bye")).toBe("quit");
-    expect(classifyLocalTuiCommand("退出")).toBe("quit");
+    expect(classifyLocalTuiCommand("test_mock")).toBe("quit");
   });
 
   it("recognizes config and clear aliases", () => {
     expect(classifyLocalTuiCommand("/config")).toBe("config");
-    expect(classifyLocalTuiCommand("配置")).toBe("config");
+    expect(classifyLocalTuiCommand("test_mock")).toBe("config");
     expect(classifyLocalTuiCommand("/clear")).toBe("clear");
-    expect(classifyLocalTuiCommand("清屏")).toBe("clear");
+    expect(classifyLocalTuiCommand("test_mock")).toBe("clear");
   });
 
   it("returns undefined for normal chat input", () => {
@@ -39,9 +39,9 @@ describe("tui local commands", () => {
     expect(parseDepthCommand("/depth deep")).toBe("deep");
     expect(parseDepthCommand("depth light")).toBe("light");
     expect(parseDepthCommand("/depth normal")).toBe("normal");
-    expect(parseDepthCommand("深度 轻量")).toBe("light");
-    expect(parseDepthCommand("/深度 标准")).toBe("normal");
-    expect(parseDepthCommand("深度 深入")).toBe("deep");
+    expect(parseDepthCommand("test_mock test_mock")).toBe("light");
+    expect(parseDepthCommand("/test_mock test_mock")).toBe("normal");
+    expect(parseDepthCommand("test_mock test_mock")).toBe("deep");
     expect(parseDepthCommand("/depth weird")).toBeUndefined();
   });
 
@@ -49,6 +49,6 @@ describe("tui local commands", () => {
     expect(parseModelCommand("/model")).toEqual({ kind: "show" });
     expect(parseModelCommand("/model deepseek-v4-pro")).toEqual({ kind: "set", model: "deepseek-v4-pro" });
     expect(parseModelCommand("model gemini-3.1-pro-preview")).toBeUndefined();
-    expect(parseModelCommand("我们讨论一下模型选择")).toBeUndefined();
+    expect(parseModelCommand("test_mock")).toBeUndefined();
   });
 });

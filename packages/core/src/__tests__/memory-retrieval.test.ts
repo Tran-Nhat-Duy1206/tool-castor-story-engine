@@ -81,8 +81,8 @@ describe("retrieveMemorySelection", () => {
         [
           "| hook_id | start_chapter | type | status | last_advanced | expected_payoff | payoff_timing | depends_on | pays_off_in_arc | core_hook | half_life | promoted | notes |",
           "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| H-live | 3 | 主线 | open | 8 | 第12章公开账册 | 近期 | 无 | 第一卷 | 是 | 10 | 是 | 已经被读者看见的账册债务 |",
-          "| H-seed | 4 | 小承诺 | open | 0 | 第16章回收 | 中程 | 无 | 第一卷 | 否 | 10 | 否 | 架构阶段预埋、尚未进入读者追踪的种子 |",
+          "| H-live | 3 | mock_text | open | 8 | Chương 12Cong khaimock_text | mock_text | mock_text | Chương mock_text | mock_text | 10 | mock_text | mock_text |",
+          "| H-seed | 4 | mock_text | open | 0 | Chương 16mock_text | mock_text | mock_text | Chương mock_text | mock_text | 10 | mock_text | mock_text、mock_text |",
           "",
         ].join("\n"),
         "utf-8",
@@ -92,8 +92,8 @@ describe("retrieveMemorySelection", () => {
     const result = await retrieveMemorySelection({
       bookDir,
       chapterNumber: 18,
-      goal: "继续处理账册债务。",
-      outlineNode: "推进主线账册。",
+      goal: "mock_text。",
+      outlineNode: "mock_text。",
     });
 
     expect(result.activeHooks.map((hook) => hook.hookId)).toEqual(["H-live"]);
@@ -108,15 +108,15 @@ describe("retrieveMemorySelection", () => {
     await mkdir(storyDir, { recursive: true });
 
     await Promise.all([
-      writeFile(join(storyDir, "current_state.md"), "# 当前状态\n", "utf-8"),
-      writeFile(join(storyDir, "chapter_summaries.md"), "# 章节摘要\n", "utf-8"),
+      writeFile(join(storyDir, "current_state.md"), "# mock_text\n", "utf-8"),
+      writeFile(join(storyDir, "chapter_summaries.md"), "# mock_text\n", "utf-8"),
       writeFile(
         join(storyDir, "pending_hooks.md"),
         [
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 回收节奏 | depends_on | 回收位置 | 核心 | 半衰期 | 升级 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | depends_on | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| H012 | 0 | 单元案（座钟伪证） | deferred | 0 | 第一卷回收 | 立即 | 无 | 第一卷 | 否 | 10 | 否 | 孙玉珍家座钟被回拨，关联高永强不在场证明 |",
-          "| H099 | 0 | 远期人物线 | deferred | 0 | 第五卷回收 | 慢烧 | 无 | 第五卷 | 否 | 30 | 否 | 远期亲属关系秘密 |",
+          "| H012 | 0 | mock_text（mock_text） | deferred | 0 | Chương mock_text | mock_text | mock_text | Chương mock_text | mock_text | 10 | mock_text | mock_text，mock_text |",
+          "| H099 | 0 | mock_text | deferred | 0 | Chương mock_text | mock_text | mock_text | Chương mock_text | mock_text | 30 | mock_text | mock_text |",
           "",
         ].join("\n"),
         "utf-8",
@@ -126,7 +126,7 @@ describe("retrieveMemorySelection", () => {
     const result = await retrieveMemorySelection({
       bookDir,
       chapterNumber: 1,
-      goal: "写孙玉珍抱座钟进店，发现座钟被回拨并牵出不在场证明。",
+      goal: "mock_text，mock_text。",
     });
 
     expect(result.activeHooks).toEqual([]);
@@ -195,7 +195,7 @@ describe("retrieveMemorySelection", () => {
     expect(result.summaries.map((summary) => summary.chapter)).toContain(10);
   });
 
-  it("prefers the explicit 师债回响 chapter over nearby 商会噪音 chapters in Chinese retrieval", async () => {
+  it("prefers the explicit mock_text chapter over nearby mock_text chapters in Chinese retrieval", async () => {
     root = await mkdtemp(join(tmpdir(), "castor-memory-retrieval-zh-test-"));
     const bookDir = join(root, "book");
     const storyDir = join(bookDir, "story");
@@ -205,11 +205,11 @@ describe("retrieveMemorySelection", () => {
       writeFile(
         join(storyDir, "current_state.md"),
         [
-          "| 字段 | 值 |",
+          "|  từmock_text | mock_text |",
           "| --- | --- |",
-          "| 当前章节 | 50 |",
-          "| 当前目标 | 继续追查师债 |",
-          "| 当前冲突 | 师债主线 vs 商会安全路线 |",
+          "| mock_text | 50 |",
+          "| mock_text | mock_text |",
+          "| mock_text | mock_text vs mock_text |",
           "",
         ].join("\n"),
         "utf-8",
@@ -217,10 +217,10 @@ describe("retrieveMemorySelection", () => {
       writeFile(
         join(storyDir, "pending_hooks.md"),
         [
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
-          "| mentor-debt | 1 | relationship | open | 50 | 60 | 师债真相与誓令碎片持续绑定 |",
-          "| guild-route | 1 | mystery | open | 49 | 55 | 商会安全路线仍在诱导主角偏航 |",
+          "| mentor-debt | 1 | relationship | open | 50 | 60 | mock_textSu thatmock_text |",
+          "| guild-route | 1 | mystery | open | 49 | 55 | mock_text |",
           "",
         ].join("\n"),
         "utf-8",
@@ -228,13 +228,13 @@ describe("retrieveMemorySelection", () => {
       writeFile(
         join(storyDir, "chapter_summaries.md"),
         [
-          "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+          "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- | --- |",
-          "| 46 | 商会余波46 | 林月 | 林月处理商会杂务与路引试探 | 继续压住商会支线 | guild-route 试探 | 克制 | 过渡牵制 |",
-          "| 47 | 商会余波47 | 林月 | 林月处理商会杂务与路引试探 | 继续压住商会支线 | guild-route 试探 | 克制 | 过渡牵制 |",
-          "| 48 | 商会余波48 | 林月 | 林月处理商会杂务与路引试探 | 继续压住商会支线 | guild-route 试探 | 克制 | 过渡牵制 |",
-          "| 49 | 商会余波49 | 林月 | 林月处理商会杂务与路引试探 | 继续压住商会支线 | guild-route 试探 | 克制 | 过渡牵制 |",
-          "| 50 | 师债回响50 | 林月 | 林月再次追查师债线索，并核对誓令碎片痕迹 | 对师债真相的执念更强 | mentor-debt 推进 | 紧绷 | 主线推进 |",
+          "| 46 | mock_text46 | mock_text | mock_text | mock_text | guild-route mock_text | mock_text | mock_text |",
+          "| 47 | mock_text47 | mock_text | mock_text | mock_text | guild-route mock_text | mock_text | mock_text |",
+          "| 48 | mock_text48 | mock_text | mock_text | mock_text | guild-route mock_text | mock_text | mock_text |",
+          "| 49 | mock_text49 | mock_text | mock_text | mock_text | guild-route mock_text | mock_text | mock_text |",
+          "| 50 | mock_text50 | mock_text | mock_text，mock_text | mock_textSu thatmock_text | mentor-debt mock_text | mock_text | mock_text |",
           "",
         ].join("\n"),
         "utf-8",
@@ -244,9 +244,9 @@ describe("retrieveMemorySelection", () => {
     const result = await retrieveMemorySelection({
       bookDir,
       chapterNumber: 51,
-      goal: "第51章把注意力拉回师债，不让商会路线盖过主线。",
-      outlineNode: "处理商会噪音，但不允许商会路线盖过师债主线。",
-      mustKeep: ["林月不会放弃师债。"],
+      goal: "Chương 51mock_text，mock_text。",
+      outlineNode: "mock_text，mock_text。",
+      mustKeep: ["mock_text。"],
     });
 
     expect(result.summaries.map((summary) => summary.chapter)).toContain(50);
@@ -918,8 +918,8 @@ describe("retrieveMemorySelection", () => {
     const result = await retrieveMemorySelection({
       bookDir,
       chapterNumber: 1,
-      goal: "稳住开篇压力，不提前展开远期线。",
-      mustKeep: ["匿名来电必须留在开篇。"],
+      goal: "mock_text，mock_text。",
+      mustKeep: ["mock_text。"],
     });
 
     expect(result.hooks.map((hook) => hook.hookId).sort()).toEqual([

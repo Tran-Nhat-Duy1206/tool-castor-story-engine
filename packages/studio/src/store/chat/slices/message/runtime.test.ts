@@ -55,7 +55,7 @@ describe("deriveResolvedProposals", () => {
               kind: "proposed_action",
               action: "play_start",
               targetSessionKind: "play",
-              instruction: "启动旧影院",
+              instruction: "mock_val",
             },
           }),
         ],
@@ -91,7 +91,7 @@ describe("deriveResolvedProposals", () => {
               kind: "proposed_action",
               action: "interactive_film_create",
               targetSessionKind: "interactive-film",
-              instruction: "制作鸦冠之宴",
+              instruction: "mock_val",
             },
           }),
         ],
@@ -127,7 +127,7 @@ describe("deriveResolvedProposals", () => {
               kind: "proposed_action",
               action: "create_book",
               targetSessionKind: "book-create",
-              instruction: "建一本债务悬疑",
+              instruction: "mock_val",
             },
           }),
           exec({ id: "writer-1", tool: "sub_agent", agent: "writer" }),
@@ -153,7 +153,7 @@ describe("deriveResolvedProposals", () => {
               kind: "proposed_action",
               action: "play_start",
               targetSessionKind: "play",
-              instruction: "启动旧广播站",
+              instruction: "mock_val",
             },
           }),
           exec({
@@ -163,7 +163,7 @@ describe("deriveResolvedProposals", () => {
               kind: "proposed_action",
               action: "play_start",
               targetSessionKind: "play",
-              instruction: "启动水文站",
+              instruction: "mock_val",
             },
           }),
         ],
@@ -214,7 +214,7 @@ describe("withToolExecutions", () => {
   it("adds returned tool executions before final text content", () => {
     const message = withToolExecutions({
       role: "assistant",
-      content: "完成。",
+      content: "mock_val。",
       timestamp: 1,
     }, [
       exec({
@@ -226,7 +226,7 @@ describe("withToolExecutions", () => {
 
     expect(message.toolExecutions?.map((execution) => execution.tool)).toEqual(["script_create"]);
     expect(message.parts?.map((part) => part.type)).toEqual(["tool", "text"]);
-    expect(message.content).toBe("完成。");
+    expect(message.content).toBe("mock_val。");
   });
 });
 
@@ -236,14 +236,14 @@ describe("mergeTaskExecution", () => {
       id: "short-task-1",
       tool: "short_fiction_run",
       status: "running",
-      logs: ["正在生成大纲"],
+      logs: ["mock_val"],
       startedAt: 10,
     });
 
     const messages = mergeTaskExecution([], execution);
 
-    // 任务快照必然来自后台生产任务：恢复出的卡带 background 标记，
-    // 供无 id 事件的回退路由跳过它。
+    // mock_val：mock_val background mock_val，
+    // mock_val id mock_val。
     const tagged = { ...execution, background: true };
     expect(messages).toEqual([
       expect.objectContaining({
@@ -261,14 +261,14 @@ describe("mergeTaskExecution", () => {
       id: "task-1",
       tool: "script_create",
       status: "completed",
-      result: "完成",
+      result: "mock_val",
       startedAt: 10,
       completedAt: 20,
     });
 
     const messages = mergeTaskExecution(mergeTaskExecution([], running), completed);
 
-    // 终态快照替换整个 execution 时不能丢 background 标记
+    // mock_val execution mock_val background mock_val
     const tagged = { ...completed, background: true };
     expect(messages).toHaveLength(1);
     expect(messages[0]?.toolExecutions).toEqual([tagged]);
@@ -310,18 +310,18 @@ describe("markRunningToolsFailed", () => {
       parts: [{ type: "tool", execution: running }],
     };
 
-    const messages = markRunningToolsFailed([message], "已由用户停止", 20);
+    const messages = markRunningToolsFailed([message], "mock_val", 20);
 
     expect(messages[0]?.toolExecutions?.[0]).toMatchObject({
       status: "error",
-      error: "已由用户停止",
+      error: "mock_val",
       completedAt: 20,
     });
     expect(messages[0]?.parts?.[0]).toMatchObject({
       type: "tool",
       execution: {
         status: "error",
-        error: "已由用户停止",
+        error: "mock_val",
         completedAt: 20,
       },
     });

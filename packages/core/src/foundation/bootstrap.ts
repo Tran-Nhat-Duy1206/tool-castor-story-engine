@@ -254,7 +254,7 @@ function listHookIds(raw: string): ReadonlyArray<string> {
 }
 
 async function scanRoleSheets(bookDir: string): Promise<ReadonlyArray<{ relPath: string }>> {
-  const tiers = ["主要角色", "major", "次要角色", "minor"];
+  const tiers = ["", "major", "", "minor"];
   const sheets: Array<{ relPath: string }> = [];
   for (const tier of tiers) {
     const dir = join(bookDir, "story", "roles", tier);

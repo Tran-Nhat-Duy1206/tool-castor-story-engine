@@ -76,5 +76,5 @@ export function mergeExactContinuation(prefix: string, continuation: string): st
 function continuationInstruction(language: "vi" | "en"): string {
   return language === "en"
     ? "Continue the same Markdown document exactly where the previous output stopped. Do not restart, summarize, repeat completed sections, or explain. Output only the missing continuation and finish the document."
-    : "从上一段停止处继续完成同一份 Markdown 文档。不要重写开头、不要概括、不要重复已完成小节、不要解释过程；只输出缺失的后续内容，并把文档写完整。";
+    : " Markdown 。、、、；，。";
 }

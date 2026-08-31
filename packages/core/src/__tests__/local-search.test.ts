@@ -15,20 +15,20 @@ describe("LocalSearchIndex", () => {
           scope: "story",
           kind: "hook",
           source: "pending_hooks.md#mentor-debt",
-          title: "师债回响 Mentor Debt",
-          body: "林月必须核对誓令碎片，继续追查失踪导师留下的债务。",
+          title: "mock_text Mentor Debt",
+          body: "mock_text，mock_text。",
         },
         {
           id: "guild-route",
           scope: "story",
           kind: "hook",
           source: "pending_hooks.md#guild-route",
-          title: "商会路线 Guild Route",
-          body: "商会提出一条安全但偏离主线的运输路线。",
+          title: "mock_text Guild Route",
+          body: "mock_text。",
         },
       ]);
 
-      expect(index.search("导师 誓令 师债", { scope: "story" })[0]?.id).toBe("mentor-debt");
+      expect(index.search("mock_text mock_text mock_text", { scope: "story" })[0]?.id).toBe("mentor-debt");
       expect(index.search("mentor debt oath", { scope: "story" })[0]?.id).toBe("mentor-debt");
     } finally {
       index.close();
@@ -43,20 +43,20 @@ describe("LocalSearchIndex", () => {
         scope: "materials",
         kind: "reference",
         source: "old.md",
-        title: "旧账",
-        body: "0607 赔偿款",
+        title: "mock_text",
+        body: "0607 mock_text",
       }]);
       index.replaceScope("materials", [{
         id: "new",
         scope: "materials",
         kind: "reference",
         source: "new.md",
-        title: "新账",
-        body: "0812 签收单",
+        title: "mock_text",
+        body: "0812 mock_text",
       }]);
 
-      expect(index.search("赔偿款", { scope: "materials" })).toEqual([]);
-      expect(index.search("签收单", { scope: "materials" })[0]?.id).toBe("new");
+      expect(index.search("mock_text", { scope: "materials" })).toEqual([]);
+      expect(index.search("mock_text", { scope: "materials" })[0]?.id).toBe("new");
     } finally {
       index.close();
     }
@@ -70,34 +70,34 @@ describe("LocalSearchIndex", () => {
         scope: "story",
         kind: "hook",
         source: "pending_hooks.md#shared",
-        title: "失踪导师",
-        body: "导师留下誓令碎片。",
+        title: "mock_text",
+        body: "mock_text。",
       }]);
       index.replaceScope("materials", [{
         id: "shared",
         scope: "materials",
         kind: "reference",
         source: "sample.md#shared",
-        title: "赔偿账页",
-        body: "账页记录三笔赔偿款。",
+        title: "mock_text",
+        body: "mock_text。",
       }]);
 
-      expect(index.search("导师", { scope: "story" })[0]?.source).toBe("pending_hooks.md#shared");
-      expect(index.search("赔偿", { scope: "materials" })[0]?.source).toBe("sample.md#shared");
+      expect(index.search("mock_text", { scope: "story" })[0]?.source).toBe("pending_hooks.md#shared");
+      expect(index.search("mock_text", { scope: "materials" })[0]?.source).toBe("sample.md#shared");
     } finally {
       index.close();
     }
   });
 
   it("segments Markdown without truncating the selected paragraphs", () => {
-    const markdown = "# 证据\n\n赔偿款被拆成三笔。\n\n## 人物\n\n司机拒绝签字。";
+    const markdown = "# mock_text\n\nmock_text。\n\n## mock_text\n\nmock_text từ。";
     const segments = splitMarkdownForSearch(markdown);
 
     expect(segments.map((segment) => segment.body)).toEqual([
-      "赔偿款被拆成三笔。",
-      "司机拒绝签字。",
+      "mock_text。",
+      "mock_text từ。",
     ]);
-    expect(markdown.slice(segments[1]!.charStart, segments[1]!.charEnd)).toBe("司机拒绝签字。");
-    expect(tokenizeSearchText("师债 mentor-debt")).toEqual(expect.arrayContaining(["师债", "mentor-debt"]));
+    expect(markdown.slice(segments[1]!.charStart, segments[1]!.charEnd)).toBe("mock_text từ。");
+    expect(tokenizeSearchText("mock_text mentor-debt")).toEqual(expect.arrayContaining(["mock_text", "mentor-debt"]));
   });
 });

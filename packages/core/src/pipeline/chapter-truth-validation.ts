@@ -39,7 +39,7 @@ export async function validateChapterTruthPersistence(params: {
    */
   readonly deferStateApplication?: boolean;
   readonly language: LengthLanguage;
-  readonly logWarn: (message: { zh: string; en: string }) => void;
+  readonly logWarn: (message: { vi: string; en: string }) => void;
   readonly logger?: Pick<Logger, "warn">;
 }): Promise<{
   readonly validation: ValidationResult;
@@ -69,14 +69,14 @@ export async function validateChapterTruthPersistence(params: {
     params.logger?.warn(`State validation error for chapter ${params.chapterNumber}: ${String(error)}`);
     const errorDescription = params.language === "en"
       ? `State validation unavailable: ${String(error)}`
-      : `状态校验不可用：${String(error)}`;
+      : `Không thể xác thực trạng thái: ${String(error)}`;
     const errorIssue: AuditIssue = {
       severity: "warning",
       category: "state-validation",
       description: errorDescription,
       suggestion: params.language === "en"
         ? "Repair chapter state from the persisted body before continuing."
-        : "请先基于已保存正文修复本章 state，再继续后续章节。",
+        : "Hãy sửa trạng thái chương dựa trên nội dung đã lưu trước khi tiếp tục.",
     };
     return {
       validation: { passed: true, warnings: [] },
@@ -97,7 +97,7 @@ export async function validateChapterTruthPersistence(params: {
 
   if (validation.warnings.length > 0) {
     params.logWarn({
-      zh: `状态校验：第${params.chapterNumber}章发现 ${validation.warnings.length} 条警告`,
+      vi: `Xác thực trạng thái: phát hiện ${validation.warnings.length} cảnh báo ở chương ${params.chapterNumber}`,
       en: `State validation: ${validation.warnings.length} warning(s) for chapter ${params.chapterNumber}`,
     });
     for (const warning of validation.warnings) {

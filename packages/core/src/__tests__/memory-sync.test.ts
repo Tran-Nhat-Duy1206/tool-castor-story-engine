@@ -30,7 +30,7 @@ async function seedValidBook(): Promise<void> {
     hooks: [{ hookId: "h1", startChapter: 1, type: "core_mystery", status: "open", lastAdvancedChapter: 1, expectedPayoff: "P", notes: "" }],
   });
   await seedStateFile("story/state/chapter_summaries.json", {
-    rows: [{ chapter: 1, title: "t", characters: "c", events: "e", stateChanges: "s", hookActivity: "h", mood: "m", chapterType: "过渡" }],
+    rows: [{ chapter: 1, title: "t", characters: "c", events: "e", stateChanges: "s", hookActivity: "h", mood: "m", chapterType: "mock_text" }],
   });
 }
 

@@ -45,17 +45,17 @@ describe("applyManualCurrentStateEdits (P3A reducer semantics)", () => {
   });
 
   it("resolves slot aliases to the same semantic key and keeps the stored canonical predicate", () => {
-    const location = { subject: "protagonist", predicate: "当前位置", object: "东城公寓", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 };
+    const location = { subject: "protagonist", predicate: "mock_text", object: "mock_text", validFromChapter: 11, validUntilChapter: null, sourceChapter: 11 };
     const before = snapshotWithFacts([location]);
     const after = applyManualCurrentStateEdits({
       snapshot: before,
-      edits: [{ kind: "setFact", subject: "protagonist", predicate: "Current Location", object: "北塔" }],
+      edits: [{ kind: "setFact", subject: "protagonist", predicate: "Current Location", object: "mock_text" }],
       effectiveChapter: 16,
     });
 
     expect(after.currentState.facts).toHaveLength(1);
     expect(after.currentState.facts[0]).toMatchObject({
-      predicate: "当前位置", object: "北塔",
+      predicate: "mock_text", object: "mock_text",
       validFromChapter: 16, validUntilChapter: null, sourceChapter: 16,
     });
   });
@@ -69,7 +69,7 @@ describe("applyManualCurrentStateEdits (P3A reducer semantics)", () => {
   });
 
   it("does not mutate the input snapshot and preserves unrelated structures", () => {
-    const extra = { subject: "林晚", predicate: "身份", object: "卧底记者", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 };
+    const extra = { subject: "mock_text", predicate: "mock_text", object: "mock_text", validFromChapter: 4, validUntilChapter: null, sourceChapter: 4 };
     const before = snapshotWithFacts([age22, extra]);
     const frozen = structuredClone(before);
     Object.freeze(frozen.currentState);
@@ -89,6 +89,6 @@ describe("applyManualCurrentStateEdits (P3A reducer semantics)", () => {
     expect(after.hooks).toBe((frozen as RuntimeStateSnapshot).hooks);
     expect(after.chapterSummaries).toBe((frozen as RuntimeStateSnapshot).chapterSummaries);
     expect(after.currentState.chapter).toBe(before.currentState.chapter);
-    expect(after.currentState.facts.find((f) => f.subject === "林晚")).toEqual(extra);
+    expect(after.currentState.facts.find((f) => f.subject === "mock_text")).toEqual(extra);
   });
 });

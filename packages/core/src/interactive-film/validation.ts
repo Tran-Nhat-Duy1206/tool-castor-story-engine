@@ -29,14 +29,14 @@ export function validateStoryGraph(graph: StoryGraph): ValidationReport {
         issues.push({
           code: "BROKEN_LINK",
           level: "error",
-          message: `节点「${label(node)}」的选项「${c.text}」指向不存在的节点 ${c.targetNodeId}`,
+          message: `Lựa chọn "${c.text}" của nút "${label(node)}" trỏ đến nút không tồn tại ${c.targetNodeId}`,
           nodeIds: [node.id],
         });
       }
     }
   }
 
-  // DEAD_END：非结局节点没有任何指向存在节点的出口
+  // DEAD_END: non-ending node with no exits to existing nodes
   for (const node of graph.nodes) {
     if (node.type === "ending") continue;
     const hasExit = node.choices.some((c) => ids.has(c.targetNodeId));
@@ -44,14 +44,14 @@ export function validateStoryGraph(graph: StoryGraph): ValidationReport {
       issues.push({
         code: "DEAD_END",
         level: "error",
-        message: `节点「${label(node)}」是死路：没有任何有效出口`,
+        message: `Nút phi kết thúc "${label(node)}" không có lối ra nào`,
         nodeIds: [node.id],
       });
     }
   }
 
-  // 可达性 BFS
-  const start = graph.nodes.find((n) => n.type === "start") ?? graph.nodes[0];
+  // UNREACHABLE: not reachable from start via static BFS
+  const start = graph.nodes.find((n) => n.type === "start");
   const reachable = new Set<string>();
   if (start) {
     const queue = [start.id];
@@ -59,38 +59,53 @@ export function validateStoryGraph(graph: StoryGraph): ValidationReport {
       const cur = queue.shift()!;
       if (reachable.has(cur)) continue;
       reachable.add(cur);
-      const n = nodeMap.get(cur);
-      if (!n) continue;
-      for (const c of n.choices) {
-        if (ids.has(c.targetNodeId) && !reachable.has(c.targetNodeId)) queue.push(c.targetNodeId);
+      const node = nodeMap.get(cur);
+      if (!node) continue;
+      for (const c of node.choices) {
+        if (ids.has(c.targetNodeId) && !reachable.has(c.targetNodeId)) {
+          queue.push(c.targetNodeId);
+        }
       }
     }
   }
-
-  // UNREACHABLE
   for (const node of graph.nodes) {
-    if (graph.nodes.length > 1 && !reachable.has(node.id)) {
+    if (!reachable.has(node.id)) {
       issues.push({
         code: "UNREACHABLE",
-        level: "warning",
-        message: `节点「${label(node)}」从开场无法到达`,
+        level: "error",
+        message: `Nút "${label(node)}" không thể tiếp cận từ nút bắt đầu`,
         nodeIds: [node.id],
       });
     }
   }
 
   // NO_PATH_TO_ENDING
-  if (start) {
-    let canEnd = false;
-    for (const id of reachable) {
-      if (nodeMap.get(id)?.type === "ending") { canEnd = true; break; }
+  const endingIds = new Set(graph.endings.map((e) => e.nodeId).filter((id) => ids.has(id)));
+  const canReachEnding = new Set<string>(endingIds);
+  const rev = new Map<string, string[]>();
+  for (const n of graph.nodes) {
+    for (const c of n.choices) {
+      if (!rev.has(c.targetNodeId)) rev.set(c.targetNodeId, []);
+      rev.get(c.targetNodeId)!.push(n.id);
     }
-    if (!canEnd) {
+  }
+  const revQueue = [...endingIds];
+  while (revQueue.length > 0) {
+    const cur = revQueue.shift()!;
+    for (const pred of rev.get(cur) ?? []) {
+      if (!canReachEnding.has(pred)) {
+        canReachEnding.add(pred);
+        revQueue.push(pred);
+      }
+    }
+  }
+  for (const node of graph.nodes) {
+    if (reachable.has(node.id) && !canReachEnding.has(node.id)) {
       issues.push({
         code: "NO_PATH_TO_ENDING",
         level: "error",
-        message: `从开场节点「${label(start)}」出发无法到达任何结局`,
-        nodeIds: [start.id],
+        message: `Nút "${label(node)}" không thể dẫn tới bất kỳ kết thúc nào`,
+        nodeIds: [node.id],
       });
     }
   }
@@ -114,7 +129,7 @@ export function reviewStoryGraph(graph: StoryGraph): ValidationReport {
       issues.push({
         code: "VARIABLE_UNWRITTEN",
         level: "warning",
-        message: `变量「${v}」被选项条件读取，但没有任何选项写入它——该条件门除默认值外永远不会改变`,
+        message: `Biến "${v}" được đọc bởi điều kiện lựa chọn, nhưng không có lựa chọn nào ghi vào nó`,
         nodeIds: [],
       });
     }
@@ -124,7 +139,7 @@ export function reviewStoryGraph(graph: StoryGraph): ValidationReport {
       issues.push({
         code: "VARIABLE_UNUSED",
         level: "info",
-        message: `变量「${v}」声明了但没有任何选项写入、也没有任何条件读取它——这是个多余的声明`,
+        message: `Biến "${v}" đã khai báo nhưng không được sử dụng`,
         nodeIds: [],
       });
     }
@@ -136,7 +151,7 @@ export function reviewStoryGraph(graph: StoryGraph): ValidationReport {
       issues.push({
         code: "ENDING_VARIETY",
         level: "info",
-        message: `${graph.endings.length} 个结局都是同一类型（${[...types][0]}），重玩价值低——考虑设计不同基调的结局`,
+        message: `Tất cả ${graph.endings.length} kết thúc đều cùng một loại (${[...types][0]})`,
         nodeIds: graph.endings.map((e) => e.nodeId),
       });
     }
@@ -147,13 +162,12 @@ export function reviewStoryGraph(graph: StoryGraph): ValidationReport {
       issues.push({
         code: "IMAGE_MISSING",
         level: "info",
-        message: `节点「${node.title || node.id}」还没有配图`,
+        message: `Nút "${node.title || node.id}" chưa có ảnh minh họa`,
         nodeIds: [node.id],
       });
     }
   }
 
-  // --- P6 new rules ---
   const { paths, truncated } = enumerateRuntimePaths(graph);
   const reachedNodeIds = new Set<string>();
   for (const p of paths) {
@@ -161,52 +175,42 @@ export function reviewStoryGraph(graph: StoryGraph): ValidationReport {
   }
   const edgeReachable = computeEdgeReachable(graph);
 
-  // GATED_UNREACHABLE and ENDING_UNREACHABLE rely on a complete path enumeration.
-  // When enumeration is truncated (>200 paths), the reached-node set is incomplete,
-  // so asserting unreachability would be unsound. Skip both loops in that case.
   if (!truncated) {
-    // GATED_UNREACHABLE: edge-reachable but not runtime-reachable (endings are reported by ENDING_UNREACHABLE)
     for (const node of graph.nodes) {
-      if (node.type === "start") continue;
-      if (node.type === "ending") continue;
+      if (node.type === "start" || node.type === "ending") continue;
       if (edgeReachable.has(node.id) && !reachedNodeIds.has(node.id)) {
         issues.push({
           code: "GATED_UNREACHABLE",
           level: "warning",
-          message: `节点「${node.title || node.id}」连边可达，但没有任何满足变量条件的路径能到达——它被一个永远不成立的条件挡住了`,
+          message: `Nút "${node.title || node.id}" bị chặn bởi điều kiện biến không thể thỏa mãn`,
           nodeIds: [node.id],
         });
       }
     }
 
-    // ENDING_UNREACHABLE: check by ending.nodeId presence in reached nodes (handles multiple endings sharing the same node)
     for (const ending of graph.endings) {
       if (!reachedNodeIds.has(ending.nodeId)) {
         issues.push({
           code: "ENDING_UNREACHABLE",
           level: "warning",
-          message: `结局「${ending.title}」没有任何真实路径能到达`,
+          message: `Kết thúc "${ending.title}" không có đường đi thực tế nào dẫn tới`,
           nodeIds: [ending.nodeId],
         });
       }
     }
   }
 
-  // LINEAR_GRAPH: only meaningful when there are intermediate normal nodes (a pure start→ending stub is not a drama)
   const hasBranch = graph.nodes.some((n) => n.choices.length >= 2);
   const hasNormalNode = graph.nodes.some((n) => n.type === "normal");
   if (graph.nodes.some((n) => n.type === "start") && graph.endings.length > 0 && hasNormalNode && !hasBranch) {
     issues.push({
       code: "LINEAR_GRAPH",
       level: "info",
-      message: `整个故事没有任何分叉选择——更像线性剧本而非互动影游，考虑加入分支`,
+      message: "Cốt truyện hoàn toàn tuyến tính, không có phân nhánh",
       nodeIds: [],
     });
   }
 
-  // ISOLATED_NODE (endings are reported by ENDING_UNREACHABLE, not as generic isolated nodes)
-  // Skip nodes that already carry an UNREACHABLE issue from validateStoryGraph — that report
-  // is more informative (BFS-based, not just topology), so the duplicate is noise.
   const incoming = new Set<string>();
   for (const n of graph.nodes) for (const c of n.choices) incoming.add(c.targetNodeId);
   for (const node of graph.nodes) {
@@ -215,13 +219,12 @@ export function reviewStoryGraph(graph: StoryGraph): ValidationReport {
       issues.push({
         code: "ISOLATED_NODE",
         level: "info",
-        message: `节点「${node.title || node.id}」没有任何选项指向它——孤立节点`,
+        message: `Nút "${node.title || node.id}" không có lựa chọn nào trỏ đến`,
         nodeIds: [node.id],
       });
     }
   }
 
-  // ILLUSORY_BRANCH: a branch where all choices share the same target and have no effects
   for (const node of graph.nodes) {
     if (node.choices.length >= 2) {
       const targets = new Set(node.choices.map((c) => c.targetNodeId));
@@ -230,21 +233,20 @@ export function reviewStoryGraph(graph: StoryGraph): ValidationReport {
         issues.push({
           code: "ILLUSORY_BRANCH",
           level: "info",
-          message: `节点「${node.title || node.id}」的所有选项都通向同一个节点且没有不同效果——这是个假分支`,
+          message: `Tất cả lựa chọn của nút "${node.title || node.id}" đều dẫn về cùng một đích mà không có hiệu ứng khác biệt`,
           nodeIds: [node.id],
         });
       }
     }
   }
 
-  // LONG_LINEAR_CHAIN: >=5 consecutive single-choice normal nodes
   const CHAIN_THRESHOLD = 5;
   const longChainHeads = findLongLinearChainHeads(graph, CHAIN_THRESHOLD);
   for (const id of longChainHeads) {
     issues.push({
       code: "LONG_LINEAR_CHAIN",
       level: "info",
-      message: `从节点「${id}」开始有一段较长的无分支直链（≥${CHAIN_THRESHOLD} 个单选项节点）——节奏可能偏拖，考虑插入分支或事件`,
+      message: `Từ nút "${id}" có một chuỗi tuyến tính dài (>= ${CHAIN_THRESHOLD} nút)`,
       nodeIds: [id],
     });
   }

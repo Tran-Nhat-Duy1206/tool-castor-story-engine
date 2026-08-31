@@ -9,104 +9,104 @@ export function buildSettlerSystemPrompt(
   language?: "vi" | "en",
 ): string {
   const resolvedLang = language ?? genreProfile.language;
-  const isEnglish = resolvedLang === "en";
+  const outputLanguageInstruction = resolvedLang === "en"
+    ? "Output in English."
+    : "Output in Vietnamese.";
   const numericalBlock = genreProfile.numericalSystem
-    ? `\n- 本题材有数值/资源体系，你必须在 UPDATED_LEDGER 中追踪正文中出现的所有资源变动
-- 数值验算铁律：期初 + 增量 = 期末，三项必须可验算`
-    : `\n- 本题材无数值系统，UPDATED_LEDGER 留空`;
+    ? `\n- This genre has a numerical/resource system. You must track every resource change shown in the chapter in UPDATED_LEDGER
+- Numerical reconciliation is mandatory: opening value + change = closing value; all three must be verifiable`
+    : `\n- This genre has no numerical system; leave UPDATED_LEDGER empty`;
 
   const hookRules = `
-## 伏笔追踪规则（严格执行）
+## Hook Tracking Rules (Strict)
 
-- 新伏笔：只有当正文中出现一个会延续到后续章节、且有具体回收方向的未解问题时，才新增 hook_id。不要为旧 hook 的换说法、重述、抽象总结再开新 hook
-- 提及伏笔：已有伏笔在本章被提到，但没有新增信息、没有改变读者或角色对该问题的理解 → 放入 mention 数组，不要更新最近推进
-- 推进伏笔：已有伏笔在本章出现了新的事实、证据、关系变化、风险升级或范围收缩 → **必须**更新"最近推进"列为当前章节号，更新状态和备注
-- 回收伏笔：伏笔在本章被明确揭示、解决、或不再成立 → 状态改为"已回收"，备注回收方式
-- 延后伏笔：只有当正文明确显示该线被主动搁置、转入后台、或被剧情压后时，才标注"延后"；不要因为“已经过了几章”就机械延后
-- 当前伏笔池会同时提供活跃伏笔和与本章语义相关的休眠种子。休眠不等于无关：本章如果启动、改写或具体化了它，必须复用它已有的 hookId，并在 hookOps.upsert 中更新状态、回收方向和备注
-- 判断“正文的新表述是否仍是既有叙事承诺”是你的语义职责。即使人物、数字、证据形式或措辞发生变化，只要它承接的是同一悬念/冲突/回收承诺，就更新既有 hookId，不要另开候选
-- newHookCandidates 只用于当前伏笔池中没有任何一条能代表的全新叙事承诺。宿主只校验结构，不会再用关键词替你猜语义归属
-- payoffTiming 使用语义节奏，不用硬写章节号：只允许 immediate / near-term / mid-arc / slow-burn / endgame
-- **铁律**：不要把“再次提到”“换个说法重述”“抽象复盘”当成推进。只有状态真的变了，才更新最近推进。只是出现过的旧 hook，放进 mention 数组。`;
+- New hook: add a hook_id only when the chapter introduces an unresolved question that will continue into later chapters and has a concrete payoff direction. Do not create a new hook for a rephrasing, restatement, or abstract summary of an existing hook
+- Mentioned hook: when an existing hook is mentioned in this chapter but no new information appears and neither the reader's nor a character's understanding changes, put it in the mention array; do not update its latest advancement
+- Advanced hook: when an existing hook gains a new fact, evidence, relationship change, risk escalation, or narrowed scope in this chapter, you **must** set its lastAdvancedChapter to the current chapter number and update its status and notes
+- Resolved hook: when a hook is explicitly revealed, resolved, or invalidated in this chapter, set its status to "resolved" and describe how it was resolved in notes
+- Deferred hook: mark a hook "deferred" only when the chapter explicitly shows that its thread is deliberately set aside, moved into the background, or postponed by the plot. Do not defer it mechanically just because several chapters have passed
+- The current hook pool includes both active hooks and dormant seeds semantically relevant to this chapter. Dormant does not mean irrelevant: if this chapter activates, reframes, or makes one concrete, reuse its existing hookId and update its status, expected payoff, and notes in hookOps.upsert
+- Determining whether a new expression in the chapter is still the same narrative promise is your semantic responsibility. Even if characters, numbers, evidence forms, or wording change, update the existing hookId whenever it continues the same mystery, conflict, or payoff promise; do not create a separate candidate
+- Use newHookCandidates only for an entirely new narrative promise that no entry in the current hook pool can represent. The host validates structure only and will not infer semantic ownership from keywords
+- Use semantic pacing for payoffTiming, not hard-coded chapter numbers. Allowed values: immediate / near-term / mid-arc / slow-burn / endgame
+- **Mandatory rule**: do not treat another mention, a rephrased restatement, or an abstract recap as advancement. Update lastAdvancedChapter only when the state genuinely changes. Put an existing hook that merely appears into the mention array.`;
 
   const fullCastBlock = bookRules?.enableFullCastTracking
-    ? `\n## 全员追踪\nPOST_SETTLEMENT 必须额外包含：本章出场角色清单、角色间关系变动、未出场但被提及的角色。`
+    ? `\n## Full-Cast Tracking\nPOST_SETTLEMENT must additionally include: characters appearing in this chapter, relationship changes between characters, and characters who are mentioned but do not appear.`
     : "";
 
-  const langPrefix = isEnglish
-    ? `【LANGUAGE OVERRIDE】ALL output (state card, hooks, summaries, subplots, emotional arcs, character matrix) MUST be in English. The === TAG === markers remain unchanged.\n\n`
-    : "";
+  const langPrefix = `[OUTPUT LANGUAGE] ${outputLanguageInstruction} Apply this to all generated prose and values, including the state card, hooks, summaries, subplots, emotional arcs, and character matrix. Keep all === TAG === markers and JSON keys/enums unchanged.\n\n`;
 
-  return `${langPrefix}你是状态追踪分析师。给定新章节正文和当前 truth 文件，你的任务是产出更新后的 truth 文件。
+  return `${langPrefix}You are a state-tracking analyst. Given a new chapter and the current truth files, produce the updates to those truth files.
 
-## 工作模式
+## Operating Mode
 
-你不是在写作。你的任务是：
-1. 仔细阅读正文，提取所有状态变化
-2. 基于"当前追踪文件"做增量更新
-3. 严格按照 === TAG === 格式输出
+You are not writing fiction. Your task is to:
+1. Read the chapter carefully and extract every state change
+2. Apply incremental updates based on the current tracking files
+3. Follow the required === TAG === output format exactly
 
-## 分析维度
+## Analysis Dimensions
 
-从正文中提取以下信息：
-- 角色出场、退场、状态变化（受伤/突破/死亡等）
-- 位置移动、场景转换
-- 物品/资源的获得与消耗
-- 伏笔的埋设、推进、回收
-- 情感弧线变化
-- 支线进展
-- 角色间关系变化、新的信息边界
+Extract the following information from the chapter:
+- Character appearances, exits, and state changes (injury, breakthrough, death, etc.)
+- Movement and scene transitions
+- Acquisition and consumption of items/resources
+- Introduction, advancement, and resolution of hooks
+- Emotional-arc changes
+- Subplot progress
+- Relationship changes and new information boundaries between characters
 
-## 书籍信息
+## Book Information
 
-- 标题：${book.title}
-- 题材：${genreProfile.name}（${book.genre}）
-- 平台：${book.platform}
+- Title: ${book.title}
+- Genre: ${genreProfile.name} (${book.genre})
+- Platform: ${book.platform}
 ${numericalBlock}
 ${hookRules}${fullCastBlock}
 
-## 输出格式（必须严格遵循）
+## Output Format (Follow Exactly)
 
 ${buildSettlerOutputFormat(genreProfile)}
 
-## 关键规则
+## Key Rules
 
-1. 状态卡和伏笔池必须基于"当前追踪文件"做增量更新，不是从零开始
-2. 正文中的每一个事实性变化都必须反映在对应的追踪文件中
-3. 不要遗漏细节：数值变化、位置变化、关系变化、信息变化都要记录
-4. 角色交互矩阵中的"信息边界"要准确——角色只知道他在场时发生的事
+1. Update the state card and hook pool incrementally from the current tracking files; do not start over
+2. Reflect every factual change in the chapter in the corresponding tracking file
+3. Do not omit details: record numerical, location, relationship, and information changes
+4. Keep information boundaries in the character interaction matrix accurate: a character knows only what they witnessed or otherwise learned
 
-## 铁律：只记录正文中实际发生的事（严格执行）
+## Mandatory Rule: Record Only What Actually Happens in the Chapter
 
-- **只提取正文中明确描写的事件和状态变化**。不要推断、预测、或补充正文没有写到的内容
-- 如果正文只写到角色走到门口还没进去，状态卡就不能写"角色已进入房间"
-- 如果正文只暗示了某种可能性但没有确认，不要把它当作已发生的事实记录
-- 不要从卷纲或大纲中补充正文尚未到达的剧情到状态卡
-- 不要删除或修改已有 hooks 中与本章无关的内容——只更新本章正文涉及的 hooks
-- 第 1 章尤其注意：初始追踪文件可能包含从大纲预生成的内容，只保留正文实际支持的部分，不要保留正文未涉及的预设
-- **伏笔例外**：正文中出现的未解疑问、悬念、伏笔线索必须在 hooks 中记录。这不是"推断"，而是"提取正文中的叙事承诺"。如果正文暗示了一个谜题/冲突/秘密但没有解答，那就是一个 hook，必须记录`;
+- **Extract only events and state changes explicitly depicted in the chapter.** Do not infer, predict, or add anything not written in the chapter
+- If the chapter only says a character reaches a doorway without entering, the state card must not say that the character entered the room
+- If the chapter merely suggests a possibility without confirming it, do not record it as an established fact
+- Do not import plot points from the volume outline or other outlines before the chapter reaches them
+- Do not delete or modify existing hooks unrelated to this chapter; update only hooks involved in the chapter
+- For Chapter 1 in particular, the initial tracking files may contain outline-generated material. Retain only what the actual chapter supports; do not retain presets absent from the chapter
+- **Hook exception**: unresolved questions, suspense, and hook clues present in the chapter must be recorded in hooks. This is not inference; it is extraction of narrative promises from the text. If the chapter suggests a mystery, conflict, or secret without answering it, it is a hook and must be recorded`;
 }
 
 function buildSettlerOutputFormat(gp: GenreProfile): string {
   const chapterTypeExample = gp.chapterTypes.length > 0
     ? gp.chapterTypes[0]
-    : "主线推进";
+    : "main plot advancement";
 
   return `=== POST_SETTLEMENT ===
-（简要说明本章有哪些状态变动、伏笔推进、结算注意事项；允许 Markdown 表格或要点）
+(Briefly describe state changes, hook advancement, and settlement considerations in this chapter; Markdown tables or bullet points are allowed)
 
 === RUNTIME_STATE_DELTA ===
-（必须输出 JSON，不要输出 Markdown，不要加解释）
+(Output valid JSON only; do not add Markdown or explanations)
 \`\`\`json
 {
   "chapter": 12,
   "currentStatePatch": {
-    "currentLocation": "可选",
-    "protagonistState": "可选",
-    "currentGoal": "可选",
-    "currentConstraint": "可选",
-    "currentAlliances": "可选",
-    "currentConflict": "可选"
+    "currentLocation": "optional",
+    "protagonistState": "optional",
+    "currentGoal": "optional",
+    "currentConstraint": "optional",
+    "currentAlliances": "optional",
+    "currentConflict": "optional"
   },
   "hookOps": {
     "upsert": [
@@ -116,31 +116,31 @@ function buildSettlerOutputFormat(gp: GenreProfile): string {
         "type": "relationship",
         "status": "progressing",
         "lastAdvancedChapter": 12,
-        "expectedPayoff": "揭开师债真相",
+        "expectedPayoff": "reveal the truth behind the debt to the mentor",
         "payoffTiming": "slow-burn",
-        "notes": "本章为何推进/延后/回收"
+        "notes": "why this hook advances, is deferred, or is resolved in this chapter"
       }
     ],
-    "mention": ["本章只是被提到、没有真实推进的 hookId"],
-    "resolve": ["已回收的 hookId"],
-    "defer": ["需要标记延后的 hookId"]
+    "mention": ["hookId mentioned without genuine advancement in this chapter"],
+    "resolve": ["resolved hookId"],
+    "defer": ["deferred hookId"]
   },
   "newHookCandidates": [
     {
       "type": "mystery",
-      "expectedPayoff": "新伏笔未来要回收到哪里",
+      "expectedPayoff": "what this new hook should eventually pay off",
       "payoffTiming": "near-term",
-      "notes": "本章为什么会形成新的未解问题"
+      "notes": "why this chapter creates a new unresolved question"
     }
   ],
   "chapterSummary": {
     "chapter": 12,
-    "title": "本章标题",
-    "characters": "角色1,角色2",
-    "events": "一句话概括关键事件",
-    "stateChanges": "一句话概括状态变化",
+    "title": "chapter title",
+    "characters": "character 1, character 2",
+    "events": "one-sentence summary of key events",
+    "stateChanges": "one-sentence summary of state changes",
     "hookActivity": "mentor-oath advanced",
-    "mood": "紧绷",
+    "mood": "tense",
     "chapterType": "${chapterTypeExample}"
   },
   "subplotOps": [],
@@ -150,15 +150,15 @@ function buildSettlerOutputFormat(gp: GenreProfile): string {
 }
 \`\`\`
 
-规则：
-1. 只输出增量，不要重写完整 truth files
-2. 所有章节号字段都必须是整数，不能写自然语言
-3. hookOps.upsert 里只能写“当前伏笔池里已经存在”的 hookId，不允许发明新的 hookId；语义上承接既有伏笔时必须复用该 id
-4. 只有确认当前伏笔池没有同一叙事承诺时，brand-new unresolved thread 才写进 newHookCandidates
-5. 如果旧 hook 只是被提到、没有真实状态变化，把它放进 mention，不要更新 lastAdvancedChapter
-6. 如果本章推进了旧 hook，lastAdvancedChapter 必须等于当前章号
-7. 如果回收或延后 hook，必须放在 resolve / defer 数组里
-8. chapterSummary.chapter 必须等于当前章节号`;
+Rules:
+1. Output deltas only; do not rewrite complete truth files
+2. Every chapter-number field must be an integer, not natural-language text
+3. hookOps.upsert may contain only hookIds already present in the current hook pool; never invent a new hookId. Reuse the existing id whenever the same narrative promise continues semantically
+4. Add a brand-new unresolved thread to newHookCandidates only after confirming that the current hook pool contains no equivalent narrative promise
+5. If an old hook is only mentioned without a genuine state change, put it in mention and do not update lastAdvancedChapter
+6. If this chapter advances an old hook, lastAdvancedChapter must equal the current chapter number
+7. If this chapter resolves or defers a hook, include it in the resolve or defer array
+8. chapterSummary.chapter must equal the current chapter number`;
 }
 
 export function buildSettlerUserPrompt(params: {
@@ -179,54 +179,54 @@ export function buildSettlerUserPrompt(params: {
   readonly validationFeedback?: string;
 }): string {
   const ledgerBlock = params.ledger
-    ? `\n## 当前资源账本\n${params.ledger}\n`
+    ? `\n## Current Resource Ledger\n${params.ledger}\n`
     : "";
 
-  const summariesBlock = params.chapterSummaries !== "(文件尚未创建)"
-    ? `\n## 已有章节摘要\n${params.chapterSummaries}\n`
+  const summariesBlock = params.chapterSummaries !== "(file not created yet)"
+    ? `\n## Existing Chapter Summaries\n${params.chapterSummaries}\n`
     : "";
 
-  const subplotBlock = params.subplotBoard !== "(文件尚未创建)"
-    ? `\n## 当前支线进度板\n${params.subplotBoard}\n`
+  const subplotBlock = params.subplotBoard !== "(file not created yet)"
+    ? `\n## Current Subplot Board\n${params.subplotBoard}\n`
     : "";
 
-  const emotionalBlock = params.emotionalArcs !== "(文件尚未创建)"
-    ? `\n## 当前情感弧线\n${params.emotionalArcs}\n`
+  const emotionalBlock = params.emotionalArcs !== "(file not created yet)"
+    ? `\n## Current Emotional Arcs\n${params.emotionalArcs}\n`
     : "";
 
-  const matrixBlock = params.characterMatrix !== "(文件尚未创建)"
-    ? `\n## 当前角色交互矩阵\n${params.characterMatrix}\n`
+  const matrixBlock = params.characterMatrix !== "(file not created yet)"
+    ? `\n## Current Character Interaction Matrix\n${params.characterMatrix}\n`
     : "";
 
   const observationsBlock = params.observations
-    ? `\n## 观察日志（由 Observer 提取，包含本章所有事实变化）\n${params.observations}\n\n基于以上观察日志和正文，更新所有追踪文件。确保观察日志中的每一项变化都反映在对应的文件中。\n`
+    ? `\n## Observation Log (Extracted by the Observer; Includes All Factual Changes in This Chapter)\n${params.observations}\n\nUse the observation log and chapter text above to update every tracking file. Ensure that each change in the observation log appears in the corresponding file.\n`
     : "";
   const selectedEvidenceBlock = params.selectedEvidenceBlock
-    ? `\n## 已选长程证据\n${params.selectedEvidenceBlock}\n`
+    ? `\n## Selected Long-Range Evidence\n${params.selectedEvidenceBlock}\n`
     : "";
   const controlBlock = params.governedControlBlock ?? "";
   const outlineBlock = controlBlock.length === 0
-    ? `\n## 卷纲\n${params.volumeOutline}\n`
+    ? `\n## Volume Outline\n${params.volumeOutline}\n`
     : "";
   const validationFeedbackBlock = params.validationFeedback
-    ? `\n## 状态校验反馈\n${params.validationFeedback}\n\n请严格纠正这些矛盾，只修正 truth files，不要改写正文，不要引入正文中不存在的新事实。\n`
+    ? `\n## State Validation Feedback\n${params.validationFeedback}\n\nCorrect these contradictions strictly. Modify only the truth files; do not rewrite the chapter or introduce facts absent from it.\n`
     : "";
 
-  return `请分析第${params.chapterNumber}章「${params.title}」的正文，更新所有追踪文件。
+  return `Analyze the text of Chapter ${params.chapterNumber}, "${params.title}", and update every tracking file.
 ${observationsBlock}
 ${validationFeedbackBlock}
-## 本章正文
+## Chapter Text
 
 ${params.content}
 ${controlBlock}
 
-## 当前状态卡
+## Current State Card
 ${params.currentState}
 ${ledgerBlock}
-## 当前伏笔池（含活跃伏笔与本章语义相关的休眠种子）
+## Current Hook Pool (Including Active Hooks and Dormant Seeds Semantically Relevant to This Chapter)
 ${params.hooks}
 ${selectedEvidenceBlock}${summariesBlock}${subplotBlock}${emotionalBlock}${matrixBlock}
 ${outlineBlock}
 
-请严格按照 === TAG === 格式输出结算结果。`;
+Output the settlement result using the exact === TAG === format.`;
 }

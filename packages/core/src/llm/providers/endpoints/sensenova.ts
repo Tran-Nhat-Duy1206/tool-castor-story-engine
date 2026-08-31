@@ -1,15 +1,9 @@
-/**
- * 商汤日日新 (SenseNova)
- *
- * - 官网：https://platform.sensenova.cn/
- * - 控制台 / API key：https://console.sensecore.cn/aistudio/management/access-key
- * - API 文档：https://platform.sensenova.cn/doc
- */
+// LLM provider configuration and endpoints.
 import type { ProviderEndpoint } from "../types.js";
 
 export const SENSENOVA: ProviderEndpoint = {
   id: "sensenova",
-  label: "商汤日日新",
+  label: "SenseNova",
   group: "china",
   api: "openai-completions",
   baseUrl: "https://api.sensenova.cn/compatible-mode/v1",

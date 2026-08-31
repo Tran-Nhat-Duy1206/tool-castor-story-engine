@@ -55,14 +55,14 @@ describe("analyzeHookHealth", () => {
       language: "vi",
       chapterNumber: 1,
       hooks: [
-        createHook({ hookId: "H001", status: "未开启" as any, lastAdvancedChapter: 0 }),
-        createHook({ hookId: "H002", status: "待推进" as any, lastAdvancedChapter: 0 }),
+        createHook({ hookId: "H001", status: "mock_text" as any, lastAdvancedChapter: 0 }),
+        createHook({ hookId: "H002", status: "mock_text" as any, lastAdvancedChapter: 0 }),
         createHook({ hookId: "H003", status: "dormant" as any, lastAdvancedChapter: 0 }),
       ],
       maxActiveHooks: 1,
     });
 
-    expect(issues.some((issue) => issue.description.includes("活跃伏笔"))).toBe(false);
+    expect(issues.some((issue) => issue.description.includes("mock_text"))).toBe(false);
   });
 
   it("warns when a short-payoff hook is already under payoff pressure without real movement", () => {

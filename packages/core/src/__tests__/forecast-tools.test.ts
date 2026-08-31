@@ -37,14 +37,14 @@ describe("narrative forecast agent tools", () => {
 
   function stubAgent() {
     return vi.spyOn(NarrativeForecastAgent.prototype, "generateBranches").mockResolvedValue({
-      branches: [makeModelBranch({ title: "接受提议" }), makeModelBranch({ title: "拒绝提议" })],
+      branches: [makeModelBranch({ title: "Chap nhan de nghi" }), makeModelBranch({ title: "Tu choi de nghi" })],
     });
   }
 
   async function createForecast(): Promise<string> {
     stubAgent();
     const tool = createNarrativeForecastCreateTool(pipeline, BOOK_ID, root);
-    const result = await tool.execute("call-1", { divergence: "主角是否接受提议", branchCount: 2 });
+    const result = await tool.execute("call-1", { divergence: "mock_textChap nhan de nghi", branchCount: 2 });
     const details = result.details as { forecastId: string };
     return details.forecastId;
   }
@@ -66,13 +66,13 @@ describe("narrative forecast agent tools", () => {
     stubAgent();
     const tool = createNarrativeForecastCreateTool(pipeline, BOOK_ID, root);
 
-    const result = await tool.execute("call-1", { divergence: "主角是否接受提议", branchCount: 2 });
+    const result = await tool.execute("call-1", { divergence: "mock_textChap nhan de nghi", branchCount: 2 });
     const text = textOf(result as never);
 
     expect(text).toMatch(/fc-/);
     expect(text).toContain("branch-1");
     expect(text).toContain("branch-2");
-    expect(text).toContain("接受提议");
+    expect(text).toContain("Chap nhan de nghi");
     expect(text).toContain("select_narrative_branch");
   });
 
@@ -80,7 +80,7 @@ describe("narrative forecast agent tools", () => {
     stubAgent();
     const tool = createNarrativeForecastCreateTool(pipeline, BOOK_ID, root);
 
-    await expect(tool.execute("call-1", { bookId: "other-book", divergence: "分歧" }))
+    await expect(tool.execute("call-1", { bookId: "other-book", divergence: "mock_text" }))
       .rejects.toThrow(/active book/);
   });
 
@@ -91,7 +91,7 @@ describe("narrative forecast agent tools", () => {
     const fresh = textOf(await tool.execute("call-2", { forecastId }) as never);
     expect(fresh).toContain("active");
 
-    await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["变了"] }), "utf-8");
+    await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["mock_text"] }), "utf-8");
     const stale = textOf(await tool.execute("call-3", { forecastId }) as never);
     expect(stale).toContain("stale");
   });
@@ -103,7 +103,7 @@ describe("narrative forecast agent tools", () => {
     const text = textOf(await tool.execute("call-2", { forecastId, branchId: "branch-2" }) as never);
 
     expect(text).toContain("selected-branch-plan.md");
-    expect(text).toContain("拒绝提议");
+    expect(text).toContain("Tu choi de nghi");
   });
 
   it("select propagates a missing-branch error listing available branches", async () => {

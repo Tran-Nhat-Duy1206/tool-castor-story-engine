@@ -32,7 +32,7 @@ describe("session transcript restore", () => {
     await rm(projectRoot, { recursive: true, force: true });
   });
 
-  it("只恢复已 committed request 内的 message", async () => {
+  it("mock_text committed request mock_text message", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
       version: 1,
@@ -90,7 +90,7 @@ describe("session transcript restore", () => {
     expect(restored[0]).toMatchObject({ role: "user", content: "hi" });
   });
 
-  it("恢复 agent 上下文时把 committed toolResult 折叠为历史摘要", async () => {
+  it("mock_text agent mock_text committed toolResult mock_text", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
       version: 1,
@@ -114,7 +114,7 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "需要查资料", signature: "sig" },
+          { type: "thinking", thinking: "mock_text", signature: "sig" },
           { type: "toolCall", id: "tool-1", name: "read", arguments: { path: "a.md" } },
         ],
         api: "anthropic-messages",
@@ -141,7 +141,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "read",
-        content: [{ type: "text", text: "资料" }],
+        content: [{ type: "text", text: "mock_text" }],
         details: { path: "a.md" },
         isError: false,
         timestamp: 3,
@@ -162,17 +162,17 @@ describe("session transcript restore", () => {
     expect(restored).toHaveLength(1);
     expect(restored[0]).toMatchObject({
       role: "system",
-      content: expect.stringContaining("历史状态摘要"),
+      content: expect.stringContaining("mock_text"),
     });
     expect(body).toContain("read");
-    expect(body).toContain("资料");
+    expect(body).toContain("mock_text");
     expect(body).not.toContain("sig");
     expect(body).not.toContain("\"toolCall\"");
     expect(body).not.toContain("\"toolResult\"");
     expect(body).not.toContain(TOOL_RESULT_BRIDGE_TEXT);
   });
 
-  it("恢复旧 transcript 时不会把 use_skill 正文带入后续回合", async () => {
+  it("mock_text transcript mock_text use_skill mock_text", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
       version: 1,
@@ -248,7 +248,7 @@ describe("session transcript restore", () => {
     expect(sessionBody).not.toContain("LEGACY_PRIVATE_SKILL_THINKING");
   });
 
-  it("恢复 agent 上下文时把历史工具回合折叠为 system 摘要而不是继续回放工具消息", async () => {
+  it("mock_text agent mock_text system mock_text", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
       version: 1,
@@ -257,7 +257,7 @@ describe("session transcript restore", () => {
       seq: 1,
       timestamp: 1,
       sessionKind: "book",
-      input: "写下一章",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -269,7 +269,7 @@ describe("session transcript restore", () => {
       seq: 2,
       role: "user",
       timestamp: 2,
-      message: { role: "user", content: "写下一章", timestamp: 2 },
+      message: { role: "user", content: "mock_text", timestamp: 2 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -330,7 +330,7 @@ describe("session transcript restore", () => {
       seq: 6,
       timestamp: 6,
       sessionKind: "book",
-      input: "哪里节奏慢？",
+      input: "mock_text？",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -342,7 +342,7 @@ describe("session transcript restore", () => {
       seq: 7,
       role: "user",
       timestamp: 7,
-      message: { role: "user", content: "哪里节奏慢？", timestamp: 7 },
+      message: { role: "user", content: "mock_text？", timestamp: 7 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -356,7 +356,7 @@ describe("session transcript restore", () => {
       timestamp: 8,
       message: {
         role: "assistant",
-        content: [{ type: "text", text: "第 7 章后半段节奏慢。" }],
+        content: [{ type: "text", text: "Chương 7mock_text。" }],
         api: "openai-completions",
         provider: "openai",
         model: "deepseek-v4-pro",
@@ -378,17 +378,17 @@ describe("session transcript restore", () => {
     const body = JSON.stringify(restored);
 
     expect(restored.map((message) => message.role)).toEqual(["system", "user", "assistant"]);
-    expect(body).toContain("历史状态摘要");
+    expect(body).toContain("mock_text");
     expect(body).toContain("sub_agent");
     expect(body).toContain("Chapter 12 written.");
-    expect(body).toContain("哪里节奏慢");
-    expect(body).toContain("第 7 章后半段节奏慢");
+    expect(body).toContain("mock_text");
+    expect(body).toContain("Chương 7mock_text");
     expect(body).not.toContain("\"toolCall\"");
     expect(body).not.toContain("\"toolResult\"");
     expect(body).not.toContain("[Tool results]");
   });
 
-  it("带 sessionKind 恢复旧 transcript 时保留自然对话但不恢复未知模式的工具结果", async () => {
+  it("mock_text sessionKind mock_text transcript mock_text", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
       version: 1,
@@ -396,7 +396,7 @@ describe("session transcript restore", () => {
       requestId: "legacy",
       seq: 1,
       timestamp: 1,
-      input: "旧会话问题",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -408,7 +408,7 @@ describe("session transcript restore", () => {
       seq: 2,
       role: "user",
       timestamp: 2,
-      message: { role: "user", content: "旧会话问题", timestamp: 2 },
+      message: { role: "user", content: "mock_text", timestamp: 2 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -465,13 +465,13 @@ describe("session transcript restore", () => {
     const restored = await restoreAgentMessagesFromTranscript(projectRoot, "s1", "book");
     const body = JSON.stringify(restored);
 
-    expect(body).toContain("旧会话问题");
+    expect(body).toContain("mock_text");
     expect(body).not.toContain("legacy chapter result should not return");
     expect(body).not.toContain("\"toolCall\"");
     expect(body).not.toContain("\"toolResult\"");
   });
 
-  it("恢复 agent 上下文时只保留最近 12 条自然对话", async () => {
+  it("mock_text agent mock_text 12 mock_text", async () => {
     let seq = 1;
     for (let i = 1; i <= 15; i++) {
       const requestId = `r${i}`;
@@ -483,7 +483,7 @@ describe("session transcript restore", () => {
         seq: seq++,
         timestamp: seq,
         sessionKind: "book",
-        input: `自然对话 ${i}`,
+        input: `mock_text ${i}`,
       });
       await appendTranscriptEvent(projectRoot, {
         type: "message",
@@ -495,7 +495,7 @@ describe("session transcript restore", () => {
         seq: seq++,
         role: "user",
         timestamp: seq,
-        message: { role: "user", content: `自然对话 ${i}`, timestamp: seq },
+        message: { role: "user", content: `mock_text ${i}`, timestamp: seq },
       } as MessageEvent);
       await appendTranscriptEvent(projectRoot, {
         type: "request_committed",
@@ -514,14 +514,14 @@ describe("session transcript restore", () => {
     });
 
     expect(restored).toHaveLength(12);
-    expect(restoredText).not.toContain("自然对话 1");
-    expect(restoredText).not.toContain("自然对话 2");
-    expect(restoredText).not.toContain("自然对话 3");
-    expect(restoredText).toContain("自然对话 4");
-    expect(restoredText).toContain("自然对话 15");
+    expect(restoredText).not.toContain("mock_text 1");
+    expect(restoredText).not.toContain("mock_text 2");
+    expect(restoredText).not.toContain("mock_text 3");
+    expect(restoredText).toContain("mock_text 4");
+    expect(restoredText).toContain("mock_text 15");
   });
 
-  it("恢复 agent 上下文时只保留最近 8 条工具摘要", async () => {
+  it("mock_text agent mock_text 8 mock_text", async () => {
     let seq = 1;
     for (let i = 1; i <= 10; i++) {
       const requestId = `tool-${i}`;
@@ -534,7 +534,7 @@ describe("session transcript restore", () => {
         seq: seq++,
         timestamp: seq,
         sessionKind: "book",
-        input: `工具轮 ${i}`,
+        input: `mock_text ${i}`,
       });
       await appendTranscriptEvent(projectRoot, {
         type: "message",
@@ -574,7 +574,7 @@ describe("session transcript restore", () => {
           role: "toolResult",
           toolCallId,
           toolName: "sub_agent",
-          content: [{ type: "text", text: `工具结果 ${i}` }],
+          content: [{ type: "text", text: `mock_text ${i}` }],
           isError: false,
           timestamp: seq,
         },
@@ -594,14 +594,14 @@ describe("session transcript restore", () => {
     const lines = content.split("\n");
 
     expect(restored).toHaveLength(1);
-    expect(content).toContain("历史状态摘要");
-    expect(lines.some((line) => /工具结果 1$/.test(line))).toBe(false);
-    expect(lines.some((line) => /工具结果 2$/.test(line))).toBe(false);
-    expect(lines.some((line) => /工具结果 3$/.test(line))).toBe(true);
-    expect(lines.some((line) => /工具结果 10$/.test(line))).toBe(true);
+    expect(content).toContain("mock_text");
+    expect(lines.some((line) => /mock_text 1$/.test(line))).toBe(false);
+    expect(lines.some((line) => /mock_text 2$/.test(line))).toBe(false);
+    expect(lines.some((line) => /mock_text 3$/.test(line))).toBe(true);
+    expect(lines.some((line) => /mock_text 10$/.test(line))).toBe(true);
   });
 
-  it("恢复中断工具轮次时只保留历史摘要和后续自然输入", async () => {
+  it("mock_text", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
       version: 1,
@@ -661,7 +661,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "read",
-        content: [{ type: "text", text: "资料" }],
+        content: [{ type: "text", text: "mock_text" }],
         isError: false,
         timestamp: 4,
       },
@@ -703,7 +703,7 @@ describe("session transcript restore", () => {
       requestId: "r2",
       seq: 7,
       timestamp: 7,
-      input: "继续",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -715,7 +715,7 @@ describe("session transcript restore", () => {
       seq: 8,
       role: "user",
       timestamp: 8,
-      message: { role: "user", content: "继续", timestamp: 8 },
+      message: { role: "user", content: "mock_text", timestamp: 8 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "request_committed",
@@ -730,15 +730,15 @@ describe("session transcript restore", () => {
 
     const body = JSON.stringify(restored);
     expect(restored.map((message) => message.role)).toEqual(["system", "user"]);
-    expect(body).toContain("历史状态摘要");
-    expect(body).toContain("资料");
-    expect(body).toContain("继续");
+    expect(body).toContain("mock_text");
+    expect(body).toContain("mock_text");
+    expect(body).toContain("mock_text");
     expect(body).not.toContain("\"toolCall\"");
     expect(body).not.toContain("\"toolResult\"");
     expect(body).not.toContain(TOOL_RESULT_BRIDGE_TEXT);
   });
 
-  it("移除最后 assistant message 的 trailing thinking block", async () => {
+  it("mock_text assistant message mock_text trailing thinking block", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "request_started",
       version: 1,
@@ -761,8 +761,8 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "text", text: "回答" },
-          { type: "thinking", thinking: "尾部", signature: "sig" },
+          { type: "text", text: "mock_text" },
+          { type: "thinking", thinking: "mock_text", signature: "sig" },
         ],
         api: "anthropic-messages",
         provider: "anthropic",
@@ -783,16 +783,16 @@ describe("session transcript restore", () => {
 
     const restored = await restoreAgentMessagesFromTranscript(projectRoot, "s1");
 
-    expect((restored[0] as any).content).toEqual([{ type: "text", text: "回答" }]);
+    expect((restored[0] as any).content).toEqual([{ type: "text", text: "mock_text" }]);
   });
 
-  it("跨模型恢复时移除 provider-specific thinking，但保留正文", () => {
+  it("mock_text provider-specific thinking，mock_text", () => {
     const messages = [
       {
         role: "assistant",
         content: [
           { type: "thinking", thinking: "DeepSeek reasoning", thinkingSignature: "reasoning_content" },
-          { type: "text", text: "可见回答" },
+          { type: "text", text: "mock_text" },
         ],
         api: "openai-completions",
         provider: "openai",
@@ -809,16 +809,16 @@ describe("session transcript restore", () => {
       id: "gemini-pro-latest",
     });
 
-    expect((adapted[0] as any).content).toEqual([{ type: "text", text: "可见回答" }]);
+    expect((adapted[0] as any).content).toEqual([{ type: "text", text: "mock_text" }]);
   });
 
-  it("同模型恢复时保留 thinking continuity", () => {
+  it("mock_text thinking continuity", () => {
     const messages = [
       {
         role: "assistant",
         content: [
           { type: "thinking", thinking: "DeepSeek reasoning", thinkingSignature: "reasoning_content" },
-          { type: "text", text: "可见回答" },
+          { type: "text", text: "mock_text" },
         ],
         api: "openai-completions",
         provider: "openai",
@@ -838,7 +838,7 @@ describe("session transcript restore", () => {
     expect((adapted[0] as any).content).toEqual(messages[0].content);
   });
 
-  it("同模型恢复时也把历史工具回合折叠成 system 状态摘要", () => {
+  it("mock_text system mock_text", () => {
     const messages = [
       {
         role: "assistant",
@@ -857,7 +857,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "read",
-        content: [{ type: "text", text: "资料" }],
+        content: [{ type: "text", text: "mock_text" }],
         isError: false,
         timestamp: 2,
       },
@@ -878,7 +878,7 @@ describe("session transcript restore", () => {
     ]);
     expect(body).toContain("read");
     expect(body).toContain("tool-1");
-    expect(body).toContain("资料");
+    expect(body).toContain("mock_text");
     expect(body).not.toContain("reasoning_content");
     expect(body).not.toContain("\"toolCall\"");
     expect(body).not.toContain("\"toolResult\"");
@@ -951,7 +951,7 @@ describe("session transcript restore", () => {
     expect(body).not.toContain("\"toolResult\"");
   });
 
-  it("跨模型恢复时把原生工具回合降级为 system 历史摘要", () => {
+  it("mock_text system mock_text", () => {
     const messages = [
       {
         role: "assistant",
@@ -969,7 +969,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "read",
-        content: [{ type: "text", text: "资料" }],
+        content: [{ type: "text", text: "mock_text" }],
         isError: false,
         timestamp: 2,
       },
@@ -1002,11 +1002,11 @@ describe("session transcript restore", () => {
     ]);
     expect(body).toContain("read");
     expect(body).toContain("tool-1");
-    expect(body).toContain("资料");
+    expect(body).toContain("mock_text");
     expect(body).not.toContain("I have processed the tool results.");
   });
 
-  it("native Google 同协议恢复时也不把历史工具回合回灌给模型", () => {
+  it("native Google mock_text", () => {
     const messages = [
       {
         role: "assistant",
@@ -1025,7 +1025,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "ls",
-        content: [{ type: "text", text: "主要角色/\n次要角色/" }],
+        content: [{ type: "text", text: "major/\nminor/" }],
         isError: false,
         timestamp: 2,
       },
@@ -1045,13 +1045,13 @@ describe("session transcript restore", () => {
       }),
     ]);
     expect(body).toContain("ls");
-    expect(body).toContain("主要角色");
+    expect(body).toContain("major");
     expect(body).not.toContain("google-signature");
     expect(body).not.toContain("\"toolCall\"");
     expect(body).not.toContain("\"toolResult\"");
   });
 
-  it("切到 native Google 时把旧 OpenAI-compatible Gemini 工具回合文本化", () => {
+  it("mock_text native Google mock_text OpenAI-compatible Gemini mock_text", () => {
     const messages = [
       {
         role: "assistant",
@@ -1067,7 +1067,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "ls",
-        content: [{ type: "text", text: "主要角色/" }],
+        content: [{ type: "text", text: "major/" }],
         isError: false,
         timestamp: 2,
       },
@@ -1089,17 +1089,17 @@ describe("session transcript restore", () => {
       }),
     ]);
     expect(body).toContain("ls");
-    expect(body).toContain("主要角色");
+    expect(body).toContain("major");
   });
 
-  it("切到 native Google 时丢弃 DeepSeek reasoning_content 并文本化工具结果", () => {
+  it("mock_text native Google mock_text DeepSeek reasoning_content mock_text", () => {
     const messages = [
       {
         role: "assistant",
         content: [
           { type: "thinking", thinking: "deepseek reasoning", thinkingSignature: "reasoning_content" },
-          { type: "text", text: "先看角色。" },
-          { type: "toolCall", id: "tool-1", name: "read", arguments: { path: "story/roles/林默.md" } },
+          { type: "text", text: "mock_text。" },
+          { type: "toolCall", id: "tool-1", name: "read", arguments: { path: "story/roles/mock_text.md" } },
         ],
         api: "openai-completions",
         provider: "openai",
@@ -1112,7 +1112,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "read",
-        content: [{ type: "text", text: "林默资料" }],
+        content: [{ type: "text", text: "mock_text" }],
         isError: false,
         timestamp: 2,
       },
@@ -1128,14 +1128,14 @@ describe("session transcript restore", () => {
     expect(body).not.toContain("reasoning_content");
     expect(body).not.toContain("deepseek reasoning");
     expect(body).not.toContain("\"toolCall\"");
-    expect(body).toContain("先看角色。");
+    expect(body).toContain("mock_text。");
     expect(body).toContain("[Historical tool results]");
-    expect(body).toContain("林默资料");
+    expect(body).toContain("mock_text");
   });
 
-  it("给恢复的历史消息追加边界，避免旧工具结果被当成当前轮动作", () => {
+  it("mock_text，mock_text", () => {
     const messages = [
-      { role: "user", content: "写下一章", timestamp: 1 },
+      { role: "user", content: "mock_text", timestamp: 1 },
       {
         role: "assistant",
         content: [{ type: "toolCall", id: "tool-1", name: "sub_agent", arguments: { agent: "writer" } }],
@@ -1161,12 +1161,12 @@ describe("session transcript restore", () => {
     expect(bounded).toHaveLength(4);
     expect(bounded[3]).toMatchObject({
       role: "system",
-      content: expect.stringContaining("以上是已经完成并提交的历史上下文"),
+      content: expect.stringContaining("mock_text"),
     });
-    expect(JSON.stringify(bounded[3])).toContain("优先遵循用户接下来输入的最新指令");
+    expect(JSON.stringify(bounded[3])).toContain("mock_text");
   });
 
-  it("派生 BookSession 时跳过没有正文的 assistant tool-use message", async () => {
+  it("mock_text BookSession mock_text assistant tool-use message", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "session_created",
       version: 1,
@@ -1185,7 +1185,7 @@ describe("session transcript restore", () => {
       requestId: "r1",
       seq: 2,
       timestamp: 2,
-      input: "你好",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1197,7 +1197,7 @@ describe("session transcript restore", () => {
       seq: 3,
       role: "user",
       timestamp: 3,
-      message: { role: "user", content: "你好", timestamp: 3 },
+      message: { role: "user", content: "mock_text", timestamp: 3 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1212,7 +1212,7 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "内部推理" },
+          { type: "thinking", thinking: "mock_text" },
           { type: "toolCall", id: "read-1", name: "read", arguments: { path: "books/a.md" } },
         ],
         api: "openai-completions",
@@ -1234,10 +1234,10 @@ describe("session transcript restore", () => {
 
     const session = await deriveBookSessionFromTranscript(projectRoot, "s1");
 
-    expect(session?.messages).toEqual([{ role: "user", content: "你好", timestamp: 3 }]);
+    expect(session?.messages).toEqual([{ role: "user", content: "mock_text", timestamp: 3 }]);
   });
 
-  it("从 transcript 派生 BookSession UI 视图", async () => {
+  it("mock_text transcript mock_text BookSession UI mock_text", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "session_created",
       version: 1,
@@ -1256,7 +1256,7 @@ describe("session transcript restore", () => {
       requestId: "r1",
       seq: 2,
       timestamp: 2,
-      input: "第一条问题",
+      input: "Chương mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1268,7 +1268,7 @@ describe("session transcript restore", () => {
       seq: 3,
       role: "user",
       timestamp: 3,
-      message: { role: "user", content: "第一条问题", timestamp: 3 },
+      message: { role: "user", content: "Chương mock_text", timestamp: 3 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1283,8 +1283,8 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "思考" },
-          { type: "text", text: "回答" },
+          { type: "thinking", thinking: "mock_text" },
+          { type: "text", text: "mock_text" },
         ],
         api: "anthropic-messages",
         provider: "anthropic",
@@ -1308,15 +1308,15 @@ describe("session transcript restore", () => {
     expect(session).toMatchObject({
       sessionId: "s1",
       bookId: "book-a",
-      title: "第一条问题",
+      title: "Chương mock_text",
       messages: [
-        { role: "user", content: "第一条问题" },
-        { role: "assistant", content: "回答", thinking: "思考" },
+        { role: "user", content: "Chương mock_text" },
+        { role: "assistant", content: "mock_text", thinking: "mock_text" },
       ],
     });
   });
 
-  it("从 transcript 派生 BookSession UI 工具执行记录", async () => {
+  it("mock_text transcript mock_text BookSession UI mock_text", async () => {
     await appendTranscriptEvent(projectRoot, {
       type: "session_created",
       version: 1,
@@ -1335,7 +1335,7 @@ describe("session transcript restore", () => {
       requestId: "r1",
       seq: 2,
       timestamp: 2,
-      input: "查看角色目录",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1347,7 +1347,7 @@ describe("session transcript restore", () => {
       seq: 3,
       role: "user",
       timestamp: 3,
-      message: { role: "user", content: "查看角色目录", timestamp: 3 },
+      message: { role: "user", content: "mock_text", timestamp: 3 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1363,7 +1363,7 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "先列目录" },
+          { type: "thinking", thinking: "mock_text" },
           { type: "toolCall", id: "ls-1", name: "ls", arguments: { bookId: "book-a", subdir: "story/roles" } },
         ],
         api: "google-generative-ai",
@@ -1390,7 +1390,7 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "ls-1",
         toolName: "ls",
-        content: [{ type: "text", text: "主要角色/\n次要角色/" }],
+        content: [{ type: "text", text: "major/\nminor/" }],
         details: { path: "books/book-a/story/roles" },
         isError: false,
         timestamp: 5,
@@ -1408,7 +1408,7 @@ describe("session transcript restore", () => {
       timestamp: 6,
       message: {
         role: "assistant",
-        content: [{ type: "text", text: "角色目录已查看。" }],
+        content: [{ type: "text", text: "mock_text。" }],
         api: "google-generative-ai",
         provider: "google",
         model: "gemini-pro-latest",
@@ -1429,18 +1429,18 @@ describe("session transcript restore", () => {
     const session = await deriveBookSessionFromTranscript(projectRoot, "s1");
 
     expect(session?.messages).toMatchObject([
-      { role: "user", content: "查看角色目录" },
+      { role: "user", content: "mock_text" },
       {
         role: "assistant",
-        content: "角色目录已查看。",
-        thinking: "先列目录",
+        content: "mock_text。",
+        thinking: "mock_text",
         toolExecutions: [{
           id: "ls-1",
           tool: "ls",
-          label: "列目录",
+          label: "mock_text",
           status: "completed",
           args: { bookId: "book-a", subdir: "story/roles" },
-          result: "主要角色/\n次要角色/",
+          result: "major/\nminor/",
           details: { path: "books/book-a/story/roles" },
           startedAt: 4,
           completedAt: 5,
@@ -1468,7 +1468,7 @@ describe("session transcript restore", () => {
       requestId: "r1",
       seq: 2,
       timestamp: 2,
-      input: "先问",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1480,7 +1480,7 @@ describe("session transcript restore", () => {
       seq: 3,
       role: "user",
       timestamp: 100,
-      message: { role: "user", content: "先问", timestamp: 100 },
+      message: { role: "user", content: "mock_text", timestamp: 100 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1494,7 +1494,7 @@ describe("session transcript restore", () => {
       timestamp: 50,
       message: {
         role: "assistant",
-        content: [{ type: "text", text: "后答" }],
+        content: [{ type: "text", text: "mock_text" }],
         api: "anthropic-messages",
         provider: "anthropic",
         model: "claude",
@@ -1514,7 +1514,7 @@ describe("session transcript restore", () => {
 
     const session = await deriveBookSessionFromTranscript(projectRoot, "s1");
 
-    expect(session?.messages.map((message) => message.content)).toEqual(["先问", "后答"]);
+    expect(session?.messages.map((message) => message.content)).toEqual(["mock_text", "mock_text"]);
   });
 
   it("does not carry pending tool executions or thinking across request boundaries", async () => {
@@ -1536,7 +1536,7 @@ describe("session transcript restore", () => {
       requestId: "r1",
       seq: 2,
       timestamp: 2,
-      input: "列目录",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1548,7 +1548,7 @@ describe("session transcript restore", () => {
       seq: 3,
       role: "user",
       timestamp: 3,
-      message: { role: "user", content: "列目录", timestamp: 3 },
+      message: { role: "user", content: "mock_text", timestamp: 3 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1564,7 +1564,7 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "第一轮工具前思考" },
+          { type: "thinking", thinking: "Chương mock_text" },
           { type: "toolCall", id: "ls-1", name: "ls", arguments: { subdir: "story" } },
         ],
         api: "anthropic-messages",
@@ -1611,7 +1611,7 @@ describe("session transcript restore", () => {
       requestId: "r2",
       seq: 7,
       timestamp: 7,
-      input: "继续",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1623,7 +1623,7 @@ describe("session transcript restore", () => {
       seq: 8,
       role: "user",
       timestamp: 8,
-      message: { role: "user", content: "继续", timestamp: 8 },
+      message: { role: "user", content: "mock_text", timestamp: 8 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1637,7 +1637,7 @@ describe("session transcript restore", () => {
       timestamp: 9,
       message: {
         role: "assistant",
-        content: [{ type: "text", text: "第二轮回答" }],
+        content: [{ type: "text", text: "Chương mock_text" }],
         api: "anthropic-messages",
         provider: "anthropic",
         model: "claude",
@@ -1656,9 +1656,9 @@ describe("session transcript restore", () => {
     });
 
     const session = await deriveBookSessionFromTranscript(projectRoot, "s1");
-    const secondAssistant = session?.messages.find((message) => message.content === "第二轮回答");
+    const secondAssistant = session?.messages.find((message) => message.content === "Chương mock_text");
 
-    expect(secondAssistant).toMatchObject({ role: "assistant", content: "第二轮回答" });
+    expect(secondAssistant).toMatchObject({ role: "assistant", content: "Chương mock_text" });
     expect(secondAssistant).not.toHaveProperty("thinking");
     expect(secondAssistant).not.toHaveProperty("toolExecutions");
   });
@@ -1682,7 +1682,7 @@ describe("session transcript restore", () => {
       requestId: "r1",
       seq: 2,
       timestamp: 2,
-      input: "第一轮",
+      input: "Chương mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1723,7 +1723,7 @@ describe("session transcript restore", () => {
       requestId: "r2",
       seq: 5,
       timestamp: 5,
-      input: "第二轮",
+      input: "Chương mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1735,7 +1735,7 @@ describe("session transcript restore", () => {
       seq: 6,
       role: "user",
       timestamp: 6,
-      message: { role: "user", content: "第二轮", timestamp: 6 },
+      message: { role: "user", content: "Chương mock_text", timestamp: 6 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1769,7 +1769,7 @@ describe("session transcript restore", () => {
       timestamp: 8,
       message: {
         role: "assistant",
-        content: [{ type: "text", text: "第二轮回答" }],
+        content: [{ type: "text", text: "Chương mock_text" }],
         api: "anthropic-messages",
         provider: "anthropic",
         model: "claude",
@@ -1788,7 +1788,7 @@ describe("session transcript restore", () => {
     });
 
     const session = await deriveBookSessionFromTranscript(projectRoot, "s1");
-    const secondAssistant = session?.messages.find((message) => message.content === "第二轮回答");
+    const secondAssistant = session?.messages.find((message) => message.content === "Chương mock_text");
 
     expect(secondAssistant?.toolExecutions).toEqual([
       expect.objectContaining({
@@ -1824,7 +1824,7 @@ describe("session transcript restore", () => {
       sessionKind: "play",
       seq: 2,
       timestamp: 2,
-      input: "开一个开放世界",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1839,15 +1839,15 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "text", text: "现在生成启动确认卡。" },
+          { type: "text", text: "mock_text。" },
           {
             type: "toolCall",
             id: "proposal-1",
             name: "propose_action",
             arguments: {
               action: "play_start",
-              instruction: "启动旧影院",
-              title: "确认启动",
+              instruction: "mock_text",
+              title: "mock_text",
             },
           },
         ],
@@ -1874,14 +1874,14 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "proposal-1",
         toolName: "propose_action",
-        content: [{ type: "text", text: "确认启动" }],
+        content: [{ type: "text", text: "mock_text" }],
         details: {
           kind: "proposed_action",
           action: "play_start",
           targetSessionKind: "play",
           sameSession: true,
-          instruction: "启动旧影院",
-          title: "确认启动",
+          instruction: "mock_text",
+          title: "mock_text",
         },
         isError: false,
         timestamp: 4,
@@ -1918,7 +1918,7 @@ describe("session transcript restore", () => {
     });
 
     const session = await deriveBookSessionFromTranscript(projectRoot, "s1");
-    const assistant = session?.messages.find((message) => message.content === "现在生成启动确认卡。");
+    const assistant = session?.messages.find((message) => message.content === "mock_text。");
 
     expect(assistant?.toolExecutions).toEqual([
       expect.objectContaining({
@@ -1928,7 +1928,7 @@ describe("session transcript restore", () => {
           kind: "proposed_action",
           action: "play_start",
           targetSessionKind: "play",
-          instruction: "启动旧影院",
+          instruction: "mock_text",
         }),
       }),
     ]);
@@ -1955,7 +1955,7 @@ describe("session transcript restore", () => {
       sessionKind: "book",
       seq: 2,
       timestamp: 2,
-      input: "重新核验推演",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1967,7 +1967,7 @@ describe("session transcript restore", () => {
       seq: 3,
       role: "user",
       timestamp: 3,
-      message: { role: "user", content: "重新核验推演", timestamp: 3 },
+      message: { role: "user", content: "mock_text", timestamp: 3 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -1983,7 +1983,7 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "核验推演是否过期" },
+          { type: "thinking", thinking: "mock_text" },
           {
             type: "toolCall",
             id: "forecast-1",
@@ -2054,15 +2054,15 @@ describe("session transcript restore", () => {
     const session = await deriveBookSessionFromTranscript(projectRoot, "s1");
 
     expect(session?.messages).toEqual([
-      expect.objectContaining({ role: "user", content: "重新核验推演" }),
+      expect.objectContaining({ role: "user", content: "mock_text" }),
       expect.objectContaining({
         role: "assistant",
         content: "",
-        thinking: "核验推演是否过期",
+        thinking: "mock_text",
         toolExecutions: [expect.objectContaining({
           id: "forecast-1",
           tool: "get_narrative_forecast",
-          label: "核验剧情推演",
+          label: "mock_text",
           args: { forecastId: "fc-1" },
           details: { kind: "narrative_forecast", stale: false },
           status: "completed",
@@ -2093,7 +2093,7 @@ describe("session transcript restore", () => {
       sessionKind: "play",
       seq: 2,
       timestamp: 2,
-      input: "检查维修盖",
+      input: "mock_text",
     });
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -2105,7 +2105,7 @@ describe("session transcript restore", () => {
       seq: 3,
       role: "user",
       timestamp: 3,
-      message: { role: "user", content: "检查维修盖", timestamp: 3 },
+      message: { role: "user", content: "mock_text", timestamp: 3 },
     } as MessageEvent);
     await appendTranscriptEvent(projectRoot, {
       type: "message",
@@ -2121,8 +2121,8 @@ describe("session transcript restore", () => {
       message: {
         role: "assistant",
         content: [
-          { type: "thinking", thinking: "调用 play_step", signature: "sig" },
-          { type: "toolCall", id: "tool-1", name: "play_step", arguments: { input: "检查维修盖" } },
+          { type: "thinking", thinking: "mock_text play_step", signature: "sig" },
+          { type: "toolCall", id: "tool-1", name: "play_step", arguments: { input: "mock_text" } },
         ],
         api: "openai-completions",
         provider: "openai",
@@ -2148,11 +2148,11 @@ describe("session transcript restore", () => {
         role: "toolResult",
         toolCallId: "tool-1",
         toolName: "play_step",
-        content: [{ type: "text", text: "Play advanced.\n工具生成的权威场景。" }],
+        content: [{ type: "text", text: "Play advanced.\nmock_text。" }],
         details: {
           kind: "play_turn_advanced",
-          sceneText: "工具生成的权威场景。",
-          suggestedActions: ["继续检查"],
+          sceneText: "mock_text。",
+          suggestedActions: ["mock_text"],
         },
         isError: false,
         timestamp: 5,
@@ -2170,7 +2170,7 @@ describe("session transcript restore", () => {
       timestamp: 6,
       message: {
         role: "assistant",
-        content: [{ type: "text", text: "模型复述的重复场景。" }],
+        content: [{ type: "text", text: "mock_text。" }],
         api: "openai-completions",
         provider: "openai",
         model: "deepseek-v4-flash",
@@ -2194,7 +2194,7 @@ describe("session transcript restore", () => {
     expect(assistant).toMatchObject({
       role: "assistant",
       content: "",
-      thinking: expect.stringContaining("模型复述的重复场景。"),
+      thinking: expect.stringContaining("mock_text。"),
       toolExecutions: [
         expect.objectContaining({
           tool: "play_step",
@@ -2202,6 +2202,6 @@ describe("session transcript restore", () => {
         }),
       ],
     });
-    expect(session?.messages.some((message) => message.content === "模型复述的重复场景。")).toBe(false);
+    expect(session?.messages.some((message) => message.content === "mock_text。")).toBe(false);
   });
 });

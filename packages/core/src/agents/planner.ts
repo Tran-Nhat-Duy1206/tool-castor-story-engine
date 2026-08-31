@@ -166,8 +166,8 @@ export class PlannerAgent extends BaseAgent {
       intent,
       memo,
       (input.book.language ?? "vi") as "vi" | "en",
-      renderHookSnapshot(memorySelection.hooks, ((input.book.language ?? "vi") === "en" ? "en" : "zh") as unknown as Parameters<typeof renderHookSnapshot>[1]),
-      renderSummarySnapshot(memorySelection.summaries, ((input.book.language ?? "vi") === "en" ? "en" : "zh") as unknown as Parameters<typeof renderSummarySnapshot>[1]),
+      renderHookSnapshot(memorySelection.hooks, ((input.book.language ?? "vi") === "en" ? "en" : "vi") as unknown as Parameters<typeof renderHookSnapshot>[1]),
+      renderSummarySnapshot(memorySelection.summaries, ((input.book.language ?? "vi") === "en" ? "en" : "vi") as unknown as Parameters<typeof renderSummarySnapshot>[1]),
       activeHookCount,
     );
     await writeFile(runtimePath, intentMarkdown, "utf-8");
@@ -393,8 +393,6 @@ export class PlannerAgent extends BaseAgent {
   ): string | undefined {
     if (!outlineNode) return undefined;
     if (volumeOutline === "(Tệp chưa được tạo)") return undefined;
-    // Keep legacy Chinese check for reading old outlines but produce Vietnamese for new output.
-    if (volumeOutline === "(\u6587\u4EF6\u5C1A\u672A\u521B\u5EFA)") return undefined;
     return this.isVietnameseLanguage(language)
       ? `Nút dàn ý tập: ${outlineNode}`
       : `Outline node: ${outlineNode}`;
@@ -435,10 +433,6 @@ export class PlannerAgent extends BaseAgent {
       "tránh",
       "cấm",
       "không nên",
-      // Legacy Chinese outlines (escaped) — keep for reading old files
-      "\u7981\u6b62",
-      "\u907f\u514d",
-      "\u907f\u96f7",
     ]);
     const focusAvoids = avoidSection
       ? this.extractListItems(avoidSection, 10)
@@ -447,7 +441,7 @@ export class PlannerAgent extends BaseAgent {
         .map((line) => line.trim())
         .filter((line) =>
           line.startsWith("-") &&
-          /avoid|don't|do not|không làm|đừng|cấm|tránh|\u4e0d\u8981|\u522b|\u7981\u6b62/i.test(line),
+          /avoid|don't|do not|không làm|đừng|cấm|tránh/i.test(line),
         )
         .map((line) => this.cleanListItem(line))
         .filter((line): line is string => Boolean(line));
@@ -492,16 +486,12 @@ export class PlannerAgent extends BaseAgent {
       "tiêu điểm hiện tại",
       "trọng tâm hiện tại",
       "tiêu điểm gần đây",
-      // Legacy Chinese (escaped)
-      "\u5f53\u524d\u805a\u7126",
-      "\u5f53\u524d\u7126\u70b9",
-      "\u8fd1\u671f\u805a\u7126",
     ]) ?? currentFocus;
     const directives = this.extractFocusStyleItems(focusSection, 3);
     if (directives.length === 0) {
       return this.extractFirstDirective(focusSection);
     }
-    return directives.join(this.containsVietnamese(focusSection) ? "; " : "; ");
+    return directives.join("; ");
   }
 
   private extractLocalOverrideGoal(currentFocus: string): string | undefined {
@@ -514,11 +504,6 @@ export class PlannerAgent extends BaseAgent {
       "ghi đè chương này",
       "ghi đè tạm thời",
       "ghi đè hiện tại",
-      // Legacy Chinese (escaped)
-      "\u5c40\u90e8\u8986\u76d6",
-      "\u672c\u7ae0\u8986\u76d6",
-      "\u4e34\u65f6\u8986\u76d6",
-      "\u5f53\u524d\u8986\u76d6",
     ]);
     if (!overrideSection) {
       return undefined;
@@ -526,7 +511,7 @@ export class PlannerAgent extends BaseAgent {
 
     const directives = this.extractListItems(overrideSection, 3);
     if (directives.length > 0) {
-      return directives.join(this.containsVietnamese(overrideSection) ? "; " : "; ");
+      return directives.join("; ");
     }
 
     return this.extractFirstDirective(overrideSection);
@@ -539,10 +524,6 @@ export class PlannerAgent extends BaseAgent {
       "tiêu điểm hiện tại",
       "trọng tâm hiện tại",
       "tiêu điểm gần đây",
-      // Legacy Chinese (escaped)
-      "\u5f53\u524d\u805a\u7126",
-      "\u5f53\u524d\u7126\u70b9",
-      "\u8fd1\u671f\u805a\u7126",
     ]) ?? currentFocus;
     return this.extractListItems(focusSection, limit);
   }
@@ -615,13 +596,7 @@ export class PlannerAgent extends BaseAgent {
     return (
       /^\((describe|briefly describe|write|mô tả|miêu tả|điền|viết)\b[\s\S]*\)$/i.test(normalized)
       || /^[\(\uFF08](?:describe|briefly describe|write|m\u00F4 t\u1EA3|mi\u00EAu t\u1EA3|\u0111i\u1EC1n|vi\u1EBFt)[\s\S]*[\)\uFF09]$/iu.test(normalized)
-      // Legacy Chinese placeholder (escaped) — keep for reading old files: \uFF08\u5728\u8FD9\u91CC\u63CF\u8FF0 etc.
-      || /^\uFF08(?:\u5728\u8FD9\u91CC\u63CF\u8FF0|\u63CF\u8FF0|\u586B\u5199|\u5199\u4E0B)[\s\S]*\uFF09$/u.test(normalized)
     );
-  }
-
-  private containsVietnamese(content: string): boolean {
-    return /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđĐ]/i.test(content);
   }
 
   private findOutlineNode(volumeOutline: string, chapterNumber: number): string | undefined {
@@ -782,8 +757,6 @@ export class PlannerAgent extends BaseAgent {
     const patterns = [
       new RegExp(`^(?:#+\\s*)?(?:[-*]\\s+)?(?:\\*\\*)?Chương\\s*${chapterNumber}(?!\\d|\\s*[-~–—]\\s*\\d)(?:[:：-])?(?:\\*\\*)?\\s*(.*)$`, "i"),
       new RegExp(`^(?:#+\\s*)?(?:[-*]\\s+)?(?:\\*\\*)?Chapter\\s*${chapterNumber}(?!\\d|\\s*[-~–—]\\s*\\d)(?:[:：-])?(?:\\*\\*)?\\s*(.*)$`, "i"),
-      // Legacy Chinese (escaped) — reading old outlines only
-      new RegExp(`^(?:#+\\s*)?(?:[-*]\\s+)?(?:\\*\\*)?\\u7b2c\\s*${chapterNumber}\\s*\\u7ae0(?!\\d|\\s*[-~–—]\\s*\\d)(?:[:：-])?(?:\\*\\*)?\\s*(.*)$`),
     ];
 
     return patterns
@@ -795,8 +768,6 @@ export class PlannerAgent extends BaseAgent {
     const patterns = [
       /^(?:#+\s*)?(?:[-*]\s+)?(?:\*\*)?Chương\s*\d+(?!\s*[-~–—]\s*\d)(?:[:：-])?(?:\*\*)?\s*(.*)$/i,
       /^(?:#+\s*)?(?:[-*]\s+)?(?:\*\*)?Chapter\s*\d+(?!\s*[-~–—]\s*\d)(?:[:：-])?(?:\*\*)?\s*(.*)$/i,
-      // Legacy Chinese (escaped)
-      /^(?:#+\s*)?(?:[-*]\s+)?(?:\*\*)?\u7b2c\s*\d+\s*\u7ae0(?!\s*[-~–—]\s*\d)(?:[:：-])?(?:\*\*)?\s*(.*)$/i,
     ];
 
     return patterns
@@ -818,11 +789,7 @@ export class PlannerAgent extends BaseAgent {
     const patterns = [
       /^(?:#+\s*)?(?:[-*]\s+)?(?:\*\*)?Chương\s*(\d+)\s*[-~–—]\s*(\d+)\b(?:[:：-])?(?:\*\*)?\s*(.*)$/i,
       /^(?:#+\s*)?(?:[-*]\s+)?(?:\*\*)?Chapter\s*(\d+)\s*[-~–—]\s*(\d+)\b(?:[:：-])?(?:\*\*)?\s*(.*)$/i,
-      // Legacy Chinese (escaped)
-      /^(?:#+\s*)?(?:[-*]\s+)?(?:\*\*)?\u7b2c\s*(\d+)\s*[-~–—]\s*(\d+)\s*\u7ae0(?:[:：-])?(?:\*\*)?\s*(.*)$/i,
       /^(?:[-*]\s+)?(?:\*\*)?Phạm vi chương(?:\*\*)?[：:]\s*(\d+)\s*[-~–—]\s*(\d+)\s*Chương\s*(.*)$/i,
-      // Legacy Chinese escaped for \u7ae0\u8282\u8303\u56f4
-      /^(?:[-*]\s+)?(?:\*\*)?\u7ae0\u8282\u8303\u56f4(?:\*\*)?[：:]\s*(\d+)\s*[-~–—]\s*(\d+)\s*\u7ae0\s*(.*)$/,
       /^(?:[-*]\s+)?(?:\*\*)?Chapter\s*[Rr]ange(?:\*\*)?[：:]\s*(\d+)\s*[-~–—]\s*(\d+)\b\s*(.*)$/i,
     ];
 

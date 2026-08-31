@@ -36,7 +36,7 @@ export class TextRadarSource implements RadarSource {
   async fetch(): Promise<PlatformRankings> {
     return {
       platform: this.name,
-      entries: [{ title: this.text, author: "", category: "", extra: "[外部分析]" }],
+      entries: [{ title: this.text, author: "", category: "", extra: "[]" }],
     };
   }
 }
@@ -46,8 +46,8 @@ export class TextRadarSource implements RadarSource {
 // ---------------------------------------------------------------------------
 
 const FANQIE_RANK_TYPES = [
-  { sideType: 10, label: "热门榜" },
-  { sideType: 13, label: "黑马榜" },
+  { sideType: 10, label: "" },
+  { sideType: 13, label: "" },
 ] as const;
 
 export class FanqieRadarSource implements RadarSource {
@@ -81,7 +81,7 @@ export class FanqieRadarSource implements RadarSource {
       }
     }
 
-    return { platform: "番茄小说", entries };
+    return { platform: "Tomato", entries };
   }
 }
 
@@ -99,7 +99,7 @@ export class QidianRadarSource implements RadarSource {
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         },
       });
-      if (!res.ok) return { platform: "起点中文网", entries };
+      if (!res.ok) return { platform: "Qidian", entries };
       const html = await res.text();
 
       const bookPattern =
@@ -110,7 +110,7 @@ export class QidianRadarSource implements RadarSource {
         const title = match[2].trim();
         if (title && !seen.has(title) && title.length > 1 && title.length < 30) {
           seen.add(title);
-          entries.push({ title, author: "", category: "", extra: "[起点热榜]" });
+          entries.push({ title, author: "", category: "", extra: "[Qidian]" });
         }
         if (entries.length >= 20) break;
       }
@@ -118,6 +118,6 @@ export class QidianRadarSource implements RadarSource {
       // skip on network error
     }
 
-    return { platform: "起点中文网", entries };
+    return { platform: "Qidian", entries };
   }
 }

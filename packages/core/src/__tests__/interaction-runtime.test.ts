@@ -36,7 +36,7 @@ describe("interaction runtime", () => {
         projectRoot: "/tmp/project",
         automationMode: "semi",
         creationDraft: {
-          concept: "港风商战悬疑，主角从灰产洗白。",
+          concept: "mock_text，mock_text。",
           title: "Night Harbor",
           genre: "urban",
           platform: "tomato",
@@ -75,8 +75,8 @@ describe("interaction runtime", () => {
         projectRoot: "/tmp/project",
         automationMode: "semi",
         creationDraft: {
-          concept: "港风商战悬疑，主角从灰产洗白。",
-          title: "夜港账本",
+          concept: "mock_text，mock_text。",
+          title: "mock_text",
           readyToCreate: false,
           missingFields: ["genre"],
         },
@@ -90,7 +90,7 @@ describe("interaction runtime", () => {
     });
 
     expect(result.session.creationDraft).toBeUndefined();
-    expect(result.responseText).toContain("已丢弃");
+    expect(result.responseText).toContain("mock_text");
   });
 
   it("renders the current creation draft when show_book_draft is requested", async () => {
@@ -100,13 +100,13 @@ describe("interaction runtime", () => {
         projectRoot: "/tmp/project",
         automationMode: "semi",
         creationDraft: {
-          concept: "港风商战悬疑，主角从灰产洗白。",
-          title: "夜港账本",
+          concept: "mock_text，mock_text。",
+          title: "mock_text",
           genre: "urban",
-          worldPremise: "近未来港口城，账本牵出多方势力。",
-          protagonist: "林砚，水货账房出身，擅长记账和看人。",
-          conflictCore: "洗白与旧债回潮的对撞。",
-          nextQuestion: "卷一先查账还是先砸场？",
+          worldPremise: "mock_text，mock_text。",
+          protagonist: "mock_text，mock_textPhong so sachmock_text，mock_text。",
+          conflictCore: "mock_text。",
+          nextQuestion: "mock_textKiem tra so sachmock_text？",
           missingFields: ["targetChapters"],
           readyToCreate: false,
         },
@@ -119,9 +119,9 @@ describe("interaction runtime", () => {
       tools: makeTools(),
     });
 
-    expect(result.responseText).toContain("夜港账本");
-    expect(result.responseText).toContain("近未来港口城");
-    expect(result.responseText).toContain("卷一先查账还是先砸场");
+    expect(result.responseText).toContain("mock_text");
+    expect(result.responseText).toContain("mock_text");
+    expect(result.responseText).toContain("mock_textKiem tra so sachmock_text");
   });
 
   it("routes export_book through the shared export tool", async () => {
@@ -251,7 +251,7 @@ describe("interaction runtime", () => {
       "stage.changed",
       "task.completed",
     ]);
-    expect(result.responseText).toContain("等待你的下一步决定");
+    expect(result.responseText).toContain("Đang chờ quyết định tiếp theo của bạn");
   });
 
   it("routes revise_chapter to reviseDraft with local-fix", async () => {
@@ -340,7 +340,7 @@ describe("interaction runtime", () => {
   it("answers chat-style requests without forcing a status summary", async () => {
     const chat = vi.fn(async () => ({
       __interaction: {
-        responseText: "你好，我在。当前没有活动书，要不要先说说你想写什么？",
+        responseText: "mock_text，mock_text。mock_text，mock_text？",
       },
     }));
 
@@ -367,7 +367,7 @@ describe("interaction runtime", () => {
       bookId: "harbor",
       automationMode: "semi",
     });
-    expect(result.responseText).toContain("你好");
+    expect(result.responseText).toContain("mock_text");
     expect(result.responseText).not.toContain("Current status");
     expect(result.session.events.map((event) => event.kind)).toEqual([
       "task.started",
@@ -420,15 +420,15 @@ describe("interaction runtime", () => {
       request: {
         intent: "rename_entity",
         bookId: "harbor",
-        oldValue: "陆尘",
-        newValue: "林砚",
+        oldValue: "mock_text",
+        newValue: "mock_text",
       },
       tools: makeTools({
         renameEntity,
       }),
     });
 
-    expect(renameEntity).toHaveBeenCalledWith("harbor", "陆尘", "林砚");
+    expect(renameEntity).toHaveBeenCalledWith("harbor", "mock_text", "mock_text");
   });
 
   it("routes patch_chapter_text to the chapter patch tool and waits for review", async () => {
@@ -452,15 +452,15 @@ describe("interaction runtime", () => {
         intent: "patch_chapter_text",
         bookId: "harbor",
         chapterNumber: 3,
-        targetText: "旧名字",
-        replacementText: "新名字",
+        targetText: "mock_text từ",
+        replacementText: "mock_text từ",
       },
       tools: makeTools({
         patchChapterText,
       }),
     });
 
-    expect(patchChapterText).toHaveBeenCalledWith("harbor", 3, "旧名字", "新名字");
+    expect(patchChapterText).toHaveBeenCalledWith("harbor", 3, "mock_text từ", "mock_text từ");
     expect(result.session.currentExecution?.status).toBe("waiting_human");
     expect(result.session.pendingDecision?.chapterNumber).toBe(3);
     expect(result.responseText).toContain("marked it for review");
@@ -487,14 +487,14 @@ describe("interaction runtime", () => {
         intent: "replace_chapter_text",
         bookId: "harbor",
         chapterNumber: 3,
-        fullText: "# 第3章 新稿\n\n完整替换正文。",
+        fullText: "# Chương 3 mock_text\n\nmock_text。",
       },
       tools: makeTools({
         replaceChapterText,
       }),
     });
 
-    expect(replaceChapterText).toHaveBeenCalledWith("harbor", 3, "# 第3章 新稿\n\n完整替换正文。");
+    expect(replaceChapterText).toHaveBeenCalledWith("harbor", 3, "# Chương 3 mock_text\n\nmock_text。");
     expect(result.session.currentExecution?.status).toBe("waiting_human");
     expect(result.session.pendingDecision?.chapterNumber).toBe(3);
     expect(result.responseText).toContain("marked it for review");
@@ -560,7 +560,7 @@ describe("interaction runtime", () => {
     });
 
     expect(result.session.currentExecution?.status).toBe("blocked");
-    expect(result.responseText).toContain("已暂停");
+    expect(result.responseText).toContain("mock_text");
     expect(result.session.events.map((event) => event.kind)).toEqual([
       "task.started",
       "task.completed",

@@ -17,10 +17,10 @@ describe("export endpoints", () => {
     await saveStoryGraph(root, "p", StoryGraphSchema.parse({
       schemaVersion: 1, projectId: "p", title: "T", variables: [],
       nodes: [
-        { id: "s", type: "start", title: "开场", imageSlot: { prompt: "x", assetRef: "interactive-films/p/assets/nodes/s.png" }, choices: [{ id: "c", text: "go", targetNodeId: "e" }] },
-        { id: "e", type: "ending", title: "结局", choices: [] },
+        { id: "s", type: "start", title: "Mo dau", imageSlot: { prompt: "x", assetRef: "interactive-films/p/assets/nodes/s.png" }, choices: [{ id: "c", text: "go", targetNodeId: "e" }] },
+        { id: "e", type: "ending", title: "mock_val", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_val", type: "good" }],
     }));
   });
   afterEach(async () => { await rm(root, { recursive: true, force: true }); });
@@ -48,17 +48,17 @@ describe("export endpoints", () => {
     expect(html).toMatch(/data:image\/png;base64,/); // image inlined
   });
   it("exports projects with non-ascii ids without invalid response headers", async () => {
-    const id = "测试项目";
+    const id = "Testmock_val";
     const dir = join(root, "interactive-films", id, "assets", "nodes");
     await mkdir(dir, { recursive: true });
     await writeFile(join(dir, "s.png"), PNG);
     await saveStoryGraph(root, id, StoryGraphSchema.parse({
-      schemaVersion: 1, projectId: id, title: "中文项目", variables: [],
+      schemaVersion: 1, projectId: id, title: "mock_val", variables: [],
       nodes: [
-        { id: "s", type: "start", title: "开场", imageSlot: { prompt: "x", assetRef: `interactive-films/${id}/assets/nodes/s.png` }, choices: [{ id: "c", text: "go", targetNodeId: "e" }] },
-        { id: "e", type: "ending", title: "结局", choices: [] },
+        { id: "s", type: "start", title: "Mo dau", imageSlot: { prompt: "x", assetRef: `interactive-films/${id}/assets/nodes/s.png` }, choices: [{ id: "c", text: "go", targetNodeId: "e" }] },
+        { id: "e", type: "ending", title: "mock_val", choices: [] },
       ],
-      endings: [{ id: "g1", nodeId: "e", title: "好", type: "good" }],
+      endings: [{ id: "g1", nodeId: "e", title: "mock_val", type: "good" }],
     }));
 
     const app = createStudioServer({} as never, root);

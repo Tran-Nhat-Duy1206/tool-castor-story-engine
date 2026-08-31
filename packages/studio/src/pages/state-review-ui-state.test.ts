@@ -30,9 +30,9 @@ const factItem = (overrides: Partial<ReviewItem> = {}): ReviewItem => ({
   id: "item-fact",
   kind: "current-state-fact",
   origin: "ai",
-  title: "Current-state update: 当前位置",
-  proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "北岸灯塔" } },
-  evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "北岸灯塔烧毁账本" },
+  title: "Current-state update: mock_val",
+  proposal: { type: "fact", change: { action: "set", subject: "mock_val", predicate: "mock_val", object: "mock_val" } },
+  evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "mock_val" },
   decision: "undecided",
   ...overrides,
 });
@@ -41,7 +41,7 @@ const hookItem = (overrides: Partial<ReviewItem> = {}): ReviewItem => ({
   id: "item-hook",
   kind: "hook-upsert",
   origin: "ai",
-  title: "Hook update: 灯塔之谜",
+  title: "Hook update: mock_val",
   proposal: {
     type: "hook-upsert",
     hook: {
@@ -50,8 +50,8 @@ const hookItem = (overrides: Partial<ReviewItem> = {}): ReviewItem => ({
       type: "core_mystery",
       status: "progressing",
       lastAdvancedChapter: 13,
-      expectedPayoff: "灯塔守夜人的身份",
-      notes: "与海雾线交织",
+      expectedPayoff: "mock_val",
+      notes: "mock_val",
     },
   },
   decision: "undecided",
@@ -62,13 +62,13 @@ const candidateItem = (overrides: Partial<ReviewItem> = {}): ReviewItem => ({
   id: "item-candidate",
   kind: "new-hook-candidate",
   origin: "ai",
-  title: "New hook candidate: 海雾组织",
+  title: "New hook candidate: mock_val",
   proposal: {
     type: "new-hook-candidate",
     candidate: {
       type: "core_mystery",
-      expectedPayoff: "雾中监视者的身份揭晓",
-      notes: "第13章两次提到雾中灯影",
+      expectedPayoff: "mock_val",
+      notes: "Chương 13mock_val",
     },
   },
   decision: "undecided",
@@ -79,7 +79,7 @@ const opItem = (overrides: Partial<ReviewItem> = {}): ReviewItem => ({
   id: "item-op",
   kind: "hook-resolve",
   origin: "ai",
-  title: "Hook resolve: 账本下落",
+  title: "Hook resolve: mock_val",
   proposal: { type: "hook-op", op: "resolve", hookId: "hook-ledger" },
   decision: "undecided",
   ...overrides,
@@ -89,18 +89,18 @@ const summaryItem = (overrides: Partial<ReviewItem> = {}): ReviewItem => ({
   id: "item-summary",
   kind: "chapter-summary",
   origin: "ai",
-  title: "Chapter summary: ch 13 反转",
+  title: "Chapter summary: ch 13 mock_val",
   proposal: {
     type: "chapter-summary",
     row: {
       chapter: 13,
-      title: "反转",
-      characters: "主角；林秋",
-      events: "林秋在北岸灯塔烧毁了账本",
-      stateChanges: "当前位置→北岸灯塔",
+      title: "mock_val",
+      characters: "mock_val；mock_val",
+      events: "mock_val",
+      stateChanges: "mock_val→mock_val",
       hookActivity: "",
-      mood: "紧张",
-      chapterType: "调查",
+      mood: "mock_val",
+      chapterType: "mock_val",
     },
   },
   decision: "undecided",
@@ -115,7 +115,7 @@ const noteItem = (overrides: Partial<ReviewItem> = {}): ReviewItem => ({
   // A note's ONLY legal payload is {type:"none"} (frozen KIND_CHANGE_COMPAT);
   // its text travels in `detail`.
   proposal: { type: "none" },
-  detail: "作者可能想强调雾的意象",
+  detail: "mock_val",
   decision: "undecided",
   ...overrides,
 });
@@ -171,8 +171,8 @@ describe("reviewKindLabel + describeProposalChange", () => {
   });
 
   it("summarizes typed changes readably and falls back deterministically", () => {
-    expect(describeProposalChange(factItem().proposal, "en")).toContain("当前位置");
-    expect(describeProposalChange(factItem().proposal, "en")).toContain("北岸灯塔");
+    expect(describeProposalChange(factItem().proposal, "en")).toContain("mock_val");
+    expect(describeProposalChange(factItem().proposal, "en")).toContain("mock_val");
     expect(describeProposalChange(opItem().proposal, "en")).toContain("hook-ledger");
     expect(describeProposalChange({ type: "none" }, "vi")).toBeTruthy();
     // Unknown future shape must never crash the page.

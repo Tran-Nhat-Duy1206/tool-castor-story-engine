@@ -34,25 +34,25 @@ describe("Phase 5 hotfix 2 — bookRules.body decoupling", () => {
         "---",
         "version: \"1.0\"",
         "protagonist:",
-        "  name: 主角甲",
-        "  personalityLock: [沉默]",
+        "  name: mock_text",
+        "  personalityLock: [mock_text]",
         "  behavioralConstraints: []",
         "prohibitions:",
-        "  - 禁止美化暴力",
+        "  - mock_text",
         "---",
         "",
-        "## 主题与基调",
-        "这是 story_frame 的散文正文，不应该被当作 book rules body。",
-        "## 主角弧线",
-        "从 A 到 B 的旅程。",
+        "## mock_text",
+        "mock_text story_frame mock_text，mock_text book rules body。",
+        "## mock_text",
+        "mock_text A mock_text B mock_text。",
       ].join("\n"),
       "utf-8",
     );
 
     const parsed = await readBookRules(bookDir);
     expect(parsed).not.toBeNull();
-    expect(parsed?.rules.protagonist?.name).toBe("主角甲");
-    expect(parsed?.rules.prohibitions).toEqual(["禁止美化暴力"]);
+    expect(parsed?.rules.protagonist?.name).toBe("mock_text");
+    expect(parsed?.rules.prohibitions).toEqual(["mock_text"]);
     // The prose MUST NOT leak into body.
     expect(parsed?.body).toBe("");
   });
@@ -60,7 +60,7 @@ describe("Phase 5 hotfix 2 — bookRules.body decoupling", () => {
   it("readBookRules() preserves legacy book_rules.md body for pre-cleanup books (byte-identical)", async () => {
     const storyDir = join(bookDir, "story");
     await mkdir(storyDir, { recursive: true });
-    const legacyBody = "## 叙事视角\n第三人称单一视角。\n\n## 语言风格\n冷静克制。";
+    const legacyBody = "## mock_text\nChương mock_text。\n\n## mock_text\nmock_text。";
     await writeFile(
       join(storyDir, "book_rules.md"),
       [
@@ -93,24 +93,24 @@ describe("Phase 5 hotfix 2 — bookRules.body decoupling", () => {
         "---",
         "version: \"1.0\"",
         "protagonist:",
-        "  name: 林辞",
-        "  personalityLock: [沉默]",
+        "  name: mock_text",
+        "  personalityLock: [mock_text]",
         "  behavioralConstraints: []",
         "prohibitions:",
-        "  - 不得神化主角",
+        "  - mock_text",
         "---",
         "",
-        "## 主题与基调",
-        "独家的五段散文正文内容，planner 不应重复注入。",
+        "## mock_text",
+        "mock_text，planner mock_text。",
       ].join("\n"),
       "utf-8",
     );
 
     const rendered = await readPlannerBookRules(storyDir);
-    expect(rendered).toContain("林辞");
-    expect(rendered).toContain("不得神化主角");
+    expect(rendered).toContain("mock_text");
+    expect(rendered).toContain("mock_text");
     // The story_frame prose must NOT be duplicated via book rules body.
-    expect(rendered).not.toContain("独家的五段散文正文内容");
+    expect(rendered).not.toContain("mock_text");
   });
 });
 
@@ -141,7 +141,7 @@ describe("Phase 5 hotfix 3 — broken frontmatter fallback", () => {
   it("tryParseBookRulesFrontmatter returns null on malformed YAML and invokes onError", () => {
     const onError = vi.fn();
     const result = tryParseBookRulesFrontmatter(
-      "---\nprotagonist: {name: 主角\nno_close_brace: true\n---\n",
+      "---\nprotagonist: {name: mock_text\nno_close_brace: true\n---\n",
       onError,
     );
     expect(result).toBeNull();
@@ -180,7 +180,7 @@ describe("Phase 5 hotfix 3 — broken frontmatter fallback", () => {
         "  - No lazy tropes",
         "---",
         "",
-        "## 叙事视角",
+        "## mock_text",
         "legacy body content",
       ].join("\n"),
       "utf-8",
@@ -207,7 +207,7 @@ describe("Phase 5 hotfix 3 — broken frontmatter fallback", () => {
     );
     await writeFile(
       join(storyDir, "book_rules.md"),
-      "# 本书规则（兼容指针——已废弃）\n\n> 本文件仅为外部读取保留。权威 YAML frontmatter（protagonist / prohibitions / genreLock / ...）已迁移至 outline/story_frame.md 顶部。",
+      "# mock_text（mock_text——mock_text）\n\n> mock_text。mock_text YAML frontmatter（protagonist / prohibitions / genreLock / ...）mock_text outline/story_frame.md mock_text。",
       "utf-8",
     );
 

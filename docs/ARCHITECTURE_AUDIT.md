@@ -108,8 +108,8 @@ books/<bookId>/                         # created atomically (staging dir + rena
 │   └── .trash/                         # soft deletes
 └── story/
     ├── author_intent.md · current_focus.md · style_guide.md · brief.md
-    ├── outline/{story_frame.md,volume_map.md,rhythm_principles.md|节奏原则.md}
-    ├── roles/{主要角色,次要角色,major,minor}/<name>.md        # role cards
+    ├── outline/{story_frame.md,volume_map.md,rhythm_principles.md|.md}
+    ├── roles/{,,major,minor}/<name>.md        # role cards
     ├── book_rules.md
     ├── current_state.md · pending_hooks.md · chapter_summaries.md   # markdown PROJECTIONS
     ├── subplot_board.md · emotional_arcs.md · character_matrix.md · particle_ledger.md
@@ -142,7 +142,7 @@ Shared plumbing for every flow [VERIFIED chain]: every command loads config (`cl
 `castor book create --title --genre [--brief <file>]` (`commands/book.ts:24`) → `deriveBookIdFromTitle` (`utils/book-id.ts`) → `PipelineRunner.initBook` (`runner.ts:758`):
 1. `generateAndReviewFoundation` (:538): `ArchitectAgent.generateFoundation` (`agents/architect.ts:111`; temp 0.8; zh/en prompt builders :202/:408; idea enters solely as `externalContext` block) → `parseSectionsWithRepair`/`parseSections` (:674, `=== SECTION: name ===` markers; missing sections ⇒ repair chat temp 0.2 ⇒ `MissingArchitectSectionsError` aborts).
 2. `FoundationReviewerAgent.review` loop (max `foundationReviewRetries`, default 2; pass = avg ≥80 ∧ no dim <60; parse failure/reject-after-max ⇒ keep current foundation and CONTINUE).
-3. Staging dir `books/.tmp-book-create-*`: `saveBookConfigAt` → `book.json`; `writeFoundationFiles` (:842) writes `outline/story_frame.md`, `outline/volume_map.md`, `roles/{主要角色,次要角色}/<name>.md`, compat shims `story_bible.md`+`character_matrix.md`, `book_rules.md`, seeds truth placeholders; `ensureControlDocumentsAt` seeds control docs; empty `chapters/index.json`; `snapshotStateAt(0)`.
+3. Staging dir `books/.tmp-book-create-*`: `saveBookConfigAt` → `book.json`; `writeFoundationFiles` (:842) writes `outline/story_frame.md`, `outline/volume_map.md`, `roles/{,}/<name>.md`, compat shims `story_bible.md`+`character_matrix.md`, `book_rules.md`, seeds truth placeholders; `ensureControlDocumentsAt` seeds control docs; empty `chapters/index.json`; `snapshotStateAt(0)`.
 4. Atomic rename into `books/<id>` after completeness checks; any error removes staging and aborts.
 Studio trigger: `POST /api/v1/books/create` (`server.ts:2831`) → `processProjectInteractionRequest` intent `create_book` → same `initBook`; progress polled via `/books/:id/create-status`.
 
@@ -213,7 +213,7 @@ Legend: **canonical** = authoritative input to decisions; **derived** = computed
 
 ### 3.2 Human direction layer (canonical, never auto-written)
 - **`story/author_intent.md`**, **`story/current_focus.md`** — freeform markdown; templates in `StateManager.defaultAuthorIntent/defaultCurrentFocus` (`state/manager.ts:49-59`, zh/en variants); created by `ensureControlDocumentsAt` :66-107 via **writeIfMissing** (never clobbers); updated by humans/Studio truth editor/agent tools `update_author_intent`/`update_current_focus`. Classified `"direction"` authority (`interaction/truth-authority.ts:28-33`). Protected prompt sources (never compressed away).
-- **Foundation set** — `story/outline/story_frame.md` (+ YAML frontmatter rules), `story/outline/volume_map.md`, `story/roles/{主要角色|次要角色|majors|minors}/<name>.md`, `story/book_rules.md` (`BookRulesSchema`, `models/book-rules.ts`). Created by `ArchitectAgent.writeFoundationFiles` :842; updated by `reviseFoundation` (which **deletes and regenerates the entire roles directories**, `architect.ts:877-882` [VERIFIED], backup left at `story/.backup-phase5-<ts>/`) and by import/spinoff flows. Read fresh by planner/composer/writer/settler/auditor every run — human edits are respected until a regenerate action runs.
+- **Foundation set** — `story/outline/story_frame.md` (+ YAML frontmatter rules), `story/outline/volume_map.md`, `story/roles/{||majors|minors}/<name>.md`, `story/book_rules.md` (`BookRulesSchema`, `models/book-rules.ts`). Created by `ArchitectAgent.writeFoundationFiles` :842; updated by `reviseFoundation` (which **deletes and regenerates the entire roles directories**, `architect.ts:877-882` [VERIFIED], backup left at `story/.backup-phase5-<ts>/`) and by import/spinoff flows. Read fresh by planner/composer/writer/settler/auditor every run — human edits are respected until a regenerate action runs.
 - **Derivative canon** — `story/fanfic_canon.md`, `story/parent_canon.md` (written at fanfic/spinoff init, `runner.ts:989`/`:2989`; protected context thereafter).
 - **Style assets** — `story/style_guide.md`, `story/style_profile.json` (regenerated wholesale only on explicit `style import`).
 
@@ -256,10 +256,10 @@ Created lazily by `bootstrapStructuredStateFromMarkdown` when absent/invalid; up
 ### 3.9 Requested concepts with NO dedicated structure [VERIFIED]
 | Concept | Closest existing equivalent |
 |---|---|
-| Locations | A projection slot in `current_state.md` ("Current Location"/当前位置, `state-projections.ts:166-168`) + role-sheet state lines |
+| Locations | A projection slot in `current_state.md` ("Current Location"/, `state-projections.ts:166-168`) + role-sheet state lines |
 | Relationships (novel side) | Character-matrix columns / `currentAlliances` slot; typed relations exist only in the Play graph (`models/play.ts`) |
 | Timeline | None. Summaries trail + snapshot progression approximate it |
-| Clues / Secrets / World rules | Clues ≈ hooks; secrets ≈ hook notes; world rules ≈ `book_rules.md` prohibitions + 世界铁律 sections in `story_frame.md` (shim text `architect.ts:822-824`) |
+| Clues / Secrets / World rules | Clues ≈ hooks; secrets ≈ hook notes; world rules ≈ `book_rules.md` prohibitions +  sections in `story_frame.md` (shim text `architect.ts:822-824`) |
 | Continuity files | No such store; `ContinuityAuditor` reads truth files, durable residue = `audit_drift.md` |
 | Governed working set | Not persisted — in-memory selection functions (`utils/governed-working-set.ts`); only its trace lands in `.trace.json` |
 
@@ -330,7 +330,7 @@ Versioning reality: schema pinned `schemaVersion: 2` with `migrationWarnings[]`;
 | `renderHooksProjection(hooks, language, {currentChapter})` :15-72 | `story/pending_hooks.md` | 13-column table (hook_id…promoted) sorted by start/lastAdvanced/id; stale/blocked diagnostic markers appended to the status cell (`computeHookDiagnostics`) |
 | `renderChapterSummariesProjection(summaries, language)` :95-126 | `story/chapter_summaries.md` | 8-column table sorted by chapter |
 
-Language behavior: every renderer takes `language: "zh"|"en"` (default `"zh"`) and switches titles/headers/boolean cells — e.g. `# 伏笔池` vs `# Pending Hooks`; `| 起始章节 | 类型 | 状态 |…` vs `| start_chapter | type | status |…`; 是/否 vs true/false (`state-projections.ts:20-32, 99-108, 132-162`). Mirror parsers in `utils/story-markdown.ts` accept BOTH header sets permanently (`parsePendingHooksMarkdown` :48-52, `isCurrentChapterLabel` 当前位置\|current location :205-210), and `state-reducer.ts#applyCurrentStatePatch` orders alias checks according to `manifest.language` :182-220.
+Language behavior: every renderer takes `language: "zh"|"en"` (default `"zh"`) and switches titles/headers/boolean cells — e.g. `# ` vs `# Pending Hooks`; `|  |  |  |…` vs `| start_chapter | type | status |…`; / vs true/false (`state-projections.ts:20-32, 99-108, 132-162`). Mirror parsers in `utils/story-markdown.ts` accept BOTH header sets permanently (`parsePendingHooksMarkdown` :48-52, `isCurrentChapterLabel` \|current location :205-210), and `state-reducer.ts#applyCurrentStatePatch` orders alias checks according to `manifest.language` :182-220.
 
 Direction of truth (canonical vs view):
 
@@ -382,7 +382,7 @@ Snapshots (`StateManager.snapshotStateAt`, `manager.ts:561-597`) copy 7 truth ma
 
 ## 7. Studio Capability Map
 
-Architecture recap: React/Vite SPA + Hono server inside `packages/studio`; server holds one `StateManager(root)` (`server.ts:2556`) and mixes core abstractions (StateManager, PipelineRunner, session/play/film stores) with direct fs access for truth/config browsing behind allowlists (`TRUTH_FLAT_FILES` :3157, role dirs `主要角色|次要角色|major|minor`).
+Architecture recap: React/Vite SPA + Hono server inside `packages/studio`; server holds one `StateManager(root)` (`server.ts:2556`) and mixes core abstractions (StateManager, PipelineRunner, session/play/film stores) with direct fs access for truth/config browsing behind allowlists (`TRUTH_FLAT_FILES` :3157, role dirs `||major|minor`).
 
 Key verified structural fact: **Studio has NO access to the canonical structured state.** A package-wide search found zero references to `story/state/*.json`, `loadRuntimeStateSnapshot`, or `story/snapshots` anywhere in `packages/studio/src` [VERIFIED]. The UI sees only markdown projections and their lossy client-side parsers.
 
@@ -399,7 +399,7 @@ Capability table:
 | Timeline | ❌ no type exists | ❌ | ❌ | — | Nothing to expose yet |
 | Story Foundation | ✅ frame/map/rules/roles | ✅ cards/browser | ✅ (legacy shims blocked read-only) | ✅ read fresh | |
 | Chapter Plan | ✅ `.plan.md`/`.intent.md` | ✅ readonly diagnostics | ❌ (regenerate via POST /plan) | ✅ reused when no --context | |
-| Chapter Prose | ✅ | ✅ reader/editor | ✅ `PUT .../chapters/:num` → `executeEditTransaction` (version archive + index update) | ✅ | Manual edit resyncs word counts only on explicit 同步/resync |
+| Chapter Prose | ✅ | ✅ reader/editor | ✅ `PUT .../chapters/:num` → `executeEditTransaction` (version archive + index update) | ✅ | Manual edit resyncs word counts only on explicit /resync |
 | Chapter Summaries/Memos | ✅ md+json | ✅ md browser; memo inside plan view | ✅ md (JSON unexposed) | ✅ fed back via retrieval | |
 | Runtime State JSON | ✅ canonical | ❌ | ❌ | ✅ reducer applies deltas | Biggest visibility gap |
 | Snapshots | ✅ per chapter | ❌ (only indirect rollback via reject/delete-latest) | ❌ | ✅ taken every chapter | No browse endpoint |
@@ -490,15 +490,15 @@ Verified language-dependent mechanisms:
 
 | Area | Symbol/File | Behavior |
 |---|---|---|
-| Length counting | `LengthCountingModeSchema` (`length-governance.ts:3`); `countChapterLength`/`resolveLengthCountingMode`/`formatLengthCount` (`utils/length-metrics.ts`; `${count}字` vs `${count} words` :43); defaults `DEFAULT_CHAPTER_LENGTH_ZH=3000`/`EN=2000` | Char-count for zh, word-count for en; mode persisted in telemetry/snapshots; drives write-loop gating |
-| Language inference | `inferLanguage` (`utils/language.ts`) — CJK `[一-鿿]` vs Latin counts, defaults `"zh"` [VERIFIED] | Used at book creation from chat/CLI; three inline duplicates exist (`consolidator.ts:168`, `architect.ts:1281`, `planner.ts containsChinese`) |
+| Length counting | `LengthCountingModeSchema` (`length-governance.ts:3`); `countChapterLength`/`resolveLengthCountingMode`/`formatLengthCount` (`utils/length-metrics.ts`; `${count}` vs `${count} words` :43); defaults `DEFAULT_CHAPTER_LENGTH_ZH=3000`/`EN=2000` | Char-count for zh, word-count for en; mode persisted in telemetry/snapshots; drives write-loop gating |
+| Language inference | `inferLanguage` (`utils/language.ts`) — CJK `[-]` vs Latin counts, defaults `"zh"` [VERIFIED] | Used at book creation from chat/CLI; three inline duplicates exist (`consolidator.ts:168`, `architect.ts:1281`, `planner.ts containsChinese`) |
 | Slugs | `deriveBookIdFromTitle` (`utils/book-id.ts:3-11`) keeps only `[a-z0-9\u4e00-\u9fff]` [VERIFIED]; duplicated in `studio/api/book-create.ts:36`, `server.ts:1689/6058` | **Vietnamese diacritics would be stripped** from book IDs today |
-| Index rebuild | `rebuildChapterIndexFromFilesAt` wordCount = whitespace-stripped CHAR count regardless of language (`state/manager.ts:519` area) [VERIFIED]; default title template `第N章` | English books get char counts after reconstruction (latent inconsistency) |
+| Index rebuild | `rebuildChapterIndexFromFilesAt` wordCount = whitespace-stripped CHAR count regardless of language (`state/manager.ts:519` area) [VERIFIED]; default title template `N` | English books get char counts after reconstruction (latent inconsistency) |
 | Prompts | Parallel zh/en builders for every agent: architect :202/:408, foundation-reviewer, planner-prompts, writer-prompts (+`agents/en-prompt-sections.ts` Royal Road/KU framing), reviser, polisher, observer/settler LANGUAGE-OVERRIDE prefixes, short-fiction/script/storyboard/play/forecast | English is complete end-to-end; zh branches would be the replacement targets for vi |
-| Parsers | Bilingual fallbacks: `chapter-memo-parser.ts` REQUIRED_SECTIONS pins exact zh headings AND their EN translations; `writer-parser.ts` 第N章/正文 vs Chapter N/content; `story-markdown.ts` accepts both header sets | Prompt-wording ↔ parser coupling (§13) |
+| Parsers | Bilingual fallbacks: `chapter-memo-parser.ts` REQUIRED_SECTIONS pins exact zh headings AND their EN translations; `writer-parser.ts` N/ vs Chapter N/content; `story-markdown.ts` accepts both header sets | Prompt-wording ↔ parser coupling (§13) |
 | Projections | `state-projections.ts` zh/en header switching (§5) | File FORMAT is bilingual forever |
 | Bootstrap asymmetry | `resolveRuntimeLanguage` defaults `"en"` when book.json unreadable (`state/bootstrap.ts:374-380`) | Inconsistent with zh-default elsewhere |
-| CLI/TUI/Studio i18n | `localization.ts` (default zh), `tui/i18n.ts` (default zh-CN), `use-i18n.ts` (~400-entry zh/en table), `LanguageSelector.tsx` 中文-first cards | Complete zh+en pairs; defaults matter for the fork |
+| CLI/TUI/Studio i18n | `localization.ts` (default zh), `tui/i18n.ts` (default zh-CN), `use-i18n.ts` (~400-entry zh/en table), `LanguageSelector.tsx` -first cards | Complete zh+en pairs; defaults matter for the fork |
 | Tests | `short-fiction-en.test.ts` asserts zero-CJK in en prompts; localization/TUI/progress tests pin zh defaults | Tripwires for any language change |
 | Anti-fatigue | `EnglishVarianceBrief` (`utils/long-span-fatigue.ts`) — en only | Injected only for en books (`writer.ts:189`) |
 | Translation subsystem | `core/src/translation/*` — free-text source/target languages | Only genuinely language-neutral subsystem today |
@@ -513,22 +513,22 @@ Classification labels (as directed): **A** language-neutral already · **B** Chi
 | 2 | `models/length-governance.ts` `zh_chars`/`en_words` | B | Persisted enum; third mode touches schema + all persisted artifacts |
 | 3 | `utils/length-metrics.ts` count/format + defaults | B | Core of write-loop length gates |
 | 4 | `state/manager.ts:519` rebuild char-count | E | Ignores counting mode; latent bug on non-zh books |
-| 5 | `models/book.ts` `chapterWordCount` floor/calibration; PlatformSchema 番茄/起点/飞卢 | B / D | Platform enum is Chinese-market-specific but harmless legacy data |
+| 5 | `models/book.ts` `chapterWordCount` floor/calibration; PlatformSchema // | B / D | Platform enum is Chinese-market-specific but harmless legacy data |
 | 6 | `agents/architect.ts` `buildChineseFoundationPrompt` :202 / rhythm rubric / localized shims :820-846 | B / D | En branch reusable as template |
-| 7 | `packages/core/genres/*.md` — 5 zh-default genres (恐怖/都市/仙侠/玄幻/通用), 10 en genres | B/D | Mixed-language corpus |
+| 7 | `packages/core/genres/*.md` — 5 zh-default genres (////), 10 en genres | B/D | Mixed-language corpus |
 | 8 | `agents/planner-prompts.ts` zh/en memo templates; `utils/chapter-memo-parser.ts` pinned headings | B | Parser contract coupling (§13) |
 | 9 | `agents/writer-prompts.ts` / `en-prompt-sections.ts` / `writer.ts` localized logs, length blocks, PRE_WRITE needles; `writer-parser.ts` zh fallbacks/placeholders | B | `=== TAG ===` anchors themselves are language-neutral |
-| 10 | `utils/writing-methodology.ts` buildChineseMethodology (去 AI 味/了字控制…) vs buildEnglishMethodology | B | Injected into style_guide at init |
+| 10 | `utils/writing-methodology.ts` buildChineseMethodology ( AI /…) vs buildEnglishMethodology | B | Injected into style_guide at init |
 | 11 | `utils/long-span-fatigue.ts` EnglishVarianceBrief (en-only) | B | No vi equivalent exists |
-| 12 | `agents/continuity.ts` zh audit rubric (12 结构类雷点) + en variant; `tryParseAuditJson(json, language)` | B | Rubric authored in Chinese; severity vocabulary is downstream-coupled (§13) |
+| 12 | `agents/continuity.ts` zh audit rubric (12 ) + en variant; `tryParseAuditJson(json, language)` | B | Rubric authored in Chinese; severity vocabulary is downstream-coupled (§13) |
 | 13 | `agents/foundation-reviewer.ts` zh/en review prompts + localized dimension labels | B | |
 | 14 | `agents/post-write-validator.ts` per-language rules, ngram 6-char zh, title-qualifier extractors | B | Nothing for Vietnamese diacritics |
 | 15 | `agents/sensitive-words.ts` China regulatory wordlists | C | China-censorship-specific |
 | 16 | `agents/ai-tells.ts` {zh,en} lexicons + 。！？ sentence split; `agents/style-analyzer.ts` char-based TTR for zh | B | Lexicon extension point |
-| 17 | `agents/polisher.ts` buildChineseSystemPrompt ±15% 字数 rule | B | Agent currently unwired (§12) |
+| 17 | `agents/polisher.ts` buildChineseSystemPrompt ±15%  rule | B | Agent currently unwired (§12) |
 | 18 | `agents/reviser.ts` isEnglish branches + legacy prompt :502 | B/D | |
 | 19 | `agents/settler-prompts.ts` / `observer-prompts.ts` 【LANGUAGE OVERRIDE】prefixes + zh defaults | B | |
-| 20 | Short-fiction stack: `prompts/short-fiction.ts`, `pipeline/short-fiction-runner.ts` (zh defaults, 中文封面 cover briefs), `agents/short-fiction.ts` counting modes | B | |
+| 20 | Short-fiction stack: `prompts/short-fiction.ts`, `pipeline/short-fiction-runner.ts` (zh defaults,  cover briefs), `agents/short-fiction.ts` counting modes | B | |
 | 21 | Script/storyboard/interactive-film stacks: language params, `interactive-film/export-html.ts:86` hardcoded `<html lang="zh">` | B | Cosmetic-but-baked-in labels; epub exporter emits lang per language |
 | 22 | Play subsystem: `play-store.ts` persisted world language, four zh/en prompt-builder families | B/D | Persisted worlds pin language |
 | 23 | Forecast: `schema.ts` language enum; `prompts.ts:65` passes hardcoded `"zh"` | E | Suspicion: en-book forecasts may receive zh-shaped instructions — unproven |
@@ -536,15 +536,15 @@ Classification labels (as directed): **A** language-neutral already · **B** Chi
 | 25 | `models/runtime-state.ts` persisted `manifest.language` | D | Data-format compat |
 | 26 | `state/bootstrap.ts` runtime-language default "en" asymmetry | E | |
 | 27 | Name/ID utilities keeping CJK: `utils/book-id.ts`, `utils/context-filter.ts` cnRegex, `utils/hook-ledger-validator.ts`, `utils/hook-arbiter.ts` chineseTerms, `utils/memory-retrieval.ts` aliases, `utils/chapter-cadence.ts`, `utils/governed-working-set.ts#containsHan` | B | Slug issue is the highest-impact item (four slugifier sites) |
-| 28 | Import/platform: `第X回` classical heading splits, full-width （） parsing, `agents/radar-source.ts` 起点/番茄 scrapers | B / C | Radar is platform-specific scraping |
-| 29 | Providers: 18 `group:"china"` endpoint tags; studio `constants/service-groups.ts` 国产原厂 labels | D | Harmless catalog; tests assert it |
+| 28 | Import/platform: `X` classical heading splits, full-width （） parsing, `agents/radar-source.ts` / scrapers | B / C | Radar is platform-specific scraping |
+| 29 | Providers: 18 `group:"china"` endpoint tags; studio `constants/service-groups.ts`  labels | D | Harmless catalog; tests assert it |
 | 30 | Translation subsystem | A | Free-text languages; only multilingual-ready subsystem |
 | 31 | CLI: `localization.ts` (~40 bilingual formatters, default zh); `--lang` options across init/config/book/fanfic/genre/short-fiction (default zh) | B | |
 | 32 | TUI: `tui/i18n.ts` locale resolution default zh-CN; effects/setup/dashboard locale branches | B | |
-| 33 | Studio: `hooks/use-i18n.ts` zh/en table; `lib/app-language.ts`; `pages/LanguageSelector.tsx` 中文创作 cards; `BookCreate.tsx` PLATFORMS_ZH/EN + 3000/2000 defaults; `ImportManager.tsx` 中文 option; ~20 `book.language==="en"` ternaries; `lib/truth-display.ts` zh relabeling | B | |
+| 33 | Studio: `hooks/use-i18n.ts` zh/en table; `lib/app-language.ts`; `pages/LanguageSelector.tsx`  cards; `BookCreate.tsx` PLATFORMS_ZH/EN + 3000/2000 defaults; `ImportManager.tsx`  option; ~20 `book.language==="en"` ternaries; `lib/truth-display.ts` zh relabeling | B | |
 | 34 | Studio↔server protocol: `server.ts` PIPELINE_STAGES/AGENT_LABELS/TOOL_LABELS keyed by zh strings; `ProgressSection.tsx` matches backend SSE log text by exact zh string (:8-31) [VERIFIED bilingual tables]; chat store zh stage-name keys | B | De-facto protocol; localizing one side breaks the other (§13) |
 | 35 | Agent system prompt/tool descriptions: `agent-system-prompt.ts` giant zh prompt + en variants; `agent-tools.ts` zh-biased descriptions, charsPerChapter ranges | B | |
-| 36 | Tests asserting Chinese behavior (progress-text, localization, tui-i18n, dashboard, genre-command, writer-parser, chapter-splitter 第X回, consolidator full-width parens, draft-directive 每章字数, agent-tools-params zh inference, providers-group china, models normalize 起点, state-projections, short-fiction-en zero-CJK assertions…) | B | Intentional tripwires; update intentionally in any migration |
+| 36 | Tests asserting Chinese behavior (progress-text, localization, tui-i18n, dashboard, genre-command, writer-parser, chapter-splitter X, consolidator full-width parens, draft-directive , agent-tools-params zh inference, providers-group china, models normalize , state-projections, short-fiction-en zero-CJK assertions…) | B | Intentional tripwires; update intentionally in any migration |
 | 37 | Docs: `README.md` (zh primary) + `README.en.md` + `README.ja.md`; CHANGELOG zh/en; CONTRIBUTING (stale: "Node ≥ 20", "22 commands" vs actual ≥22/34 commands) | B/C | ja likely remove later |
 | 38 | `llm/provider.ts:865` non-ASCII API-key error mentioning pasted Chinese notes | A | Message text only |
 
@@ -661,7 +661,7 @@ Open questions code alone cannot answer (recorded, not invented):
 | Studio audit divergence | `server.ts:5321` constructs `ContinuityAuditor` :5338; nearby `saveChapterIndex` calls belong to approve/reject |
 | Language enums/defaults | `models/project.ts:134`, `models/book.ts:63`, `models/runtime-state.ts:3`, `models/length-governance.ts:3`, `test-project/castor.json` |
 | Slugifier CJK-only class | `utils/book-id.ts:3-11`; `inferLanguage` in `utils/language.ts` |
-| Index-rebuild char counting | `state/manager.ts` rebuild path (`wordCount: content.replace(/\s+/g,"").length`, default title `第N章`) |
+| Index-rebuild char counting | `state/manager.ts` rebuild path (`wordCount: content.replace(/\s+/g,"").length`, default title `N`) |
 | PolisherAgent unwired | grep across `packages/` — only barrel export + tests |
 | `models/state.ts` vestigial | grep — only `core/src/index.ts:5` references |
 | Broken benchmark script | `Test-Path scripts/studio-e2e-benchmark.mjs` = False; root package.json script present |

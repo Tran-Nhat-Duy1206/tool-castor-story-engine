@@ -12,10 +12,10 @@ function makeHook(overrides: Partial<StoredHook>): StoredHook {
   return {
     hookId: "H01",
     startChapter: 1,
-    type: "主线",
+    type: "mock_text",
     status: "open",
     lastAdvancedChapter: 0,
-    expectedPayoff: "回收",
+    expectedPayoff: "mock_text",
     notes: "",
     ...overrides,
   };
@@ -32,9 +32,9 @@ function makeContext(overrides: Partial<PromotionContext>): PromotionContext {
 }
 
 const VOL_MAP: ReadonlyArray<VolumeBoundary> = [
-  { name: "第一卷", startCh: 1, endCh: 20 },
-  { name: "第二卷", startCh: 21, endCh: 40 },
-  { name: "第三卷", startCh: 41, endCh: 60 },
+  { name: "Chương mock_text", startCh: 1, endCh: 20 },
+  { name: "Chương mock_text", startCh: 21, endCh: 40 },
+  { name: "Chương mock_text", startCh: 41, endCh: 60 },
 ];
 
 describe("shouldPromoteHook — Phase 7 four-rule promotion", () => {
@@ -107,7 +107,7 @@ describe("shouldPromoteHook — Phase 7 four-rule promotion", () => {
   it("promotes when pays_off_in_arc mentions a different volume in Chinese", () => {
     const hook = makeHook({
       startChapter: 5,
-      paysOffInArc: "第二卷中段揭晓",
+      paysOffInArc: "Chương mock_text",
     });
     const decision = shouldPromoteHook(
       hook,

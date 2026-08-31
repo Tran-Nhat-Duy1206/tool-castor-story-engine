@@ -242,7 +242,7 @@ Use this when you have an existing novel (or partial novel) and want Castor to p
    ```bash
    castor import chapters book-id --from novel.txt
    ```
-   - Automatically splits by `第X章` pattern
+   - Automatically splits by `X` pattern
    - Custom split pattern: `--split "Chapter\\s+\\d+"`
 
 2. **Import from a directory** of separate chapter files:
@@ -380,8 +380,8 @@ castor fanfic init --title "What If" --from source.txt --mode au --genre other
 Use Studio Chat or `castor interact` for small, explicit edits to generated text artifacts. Treat the chat layer like an external editor: it may edit persisted files, then the writing pipeline can continue from the updated state.
 
 ```bash
-castor interact --book my-book --json --message "把第 3 章里那句过长的解释删短一点，但不要改剧情事实"
-castor interact --json --message "把 covers/demo/cover-prompt.md 里的人物拉近一点，标题字更大"
+castor interact --book my-book --json --message " 3 ，"
+castor interact --json --message " covers/demo/cover-prompt.md ，"
 ```
 - Use for clear text edits, cover prompt edits, and control-document edits.
 - Do not infer success from the assistant's prose; check the tool result or changed file.
@@ -392,8 +392,8 @@ castor interact --json --message "把 covers/demo/cover-prompt.md 里的人物�
 When the user asks for a rename or targeted replacement, keep the request explicit and scoped. Prefer Studio Chat / `castor interact` over hidden slash shortcuts; the agent should route the edit through the shared action surface and report which file changed.
 
 Examples:
-- "把当前书里角色 林烬 改成 张三，先说明会影响哪些文件。"
-- "只改第 5 章，把这句旧文本换成新文本，改完标记需要复核。"
+- "   ，。"
+- " 5 ，，。"
 
 ### Workflow 14: Interactive TUI Dashboard
 
@@ -581,7 +581,7 @@ The **Studio Chat** surface shares the same action kernel as TUI and CLI. It can
 For flexible, conversational requests:
 
 ```bash
-castor agent "写一部都市题材的小说，主角是一个年轻律师，第一章三千字"
+castor agent "，，"
 ```
 - Agent interprets natural language and invokes appropriate commands
 - Useful for complex multi-step requests

@@ -26,10 +26,10 @@ import { buildStateReviewItems } from "../state/state-review-items.js";
 const LONG_VALUE = `${"A very long location description that keeps going. ".repeat(6)}END-OF-LONG-VALUE`;
 
 const ZH_PROSE = [
-  "夜色沉了下来。",
-  "她推开门，走进了东城公寓，屋里还亮着一盏旧灯。",
-  "她的目标很明确：追查旧账的下落。",
-  "雨夜码头的灯火仍未熄灭。",
+  "Bong demmock_text。",
+  "mock_text，mock_text，mock_text。",
+  "mock_text：mock_text。",
+  "mock_text。",
 ].join("\n");
 
 /** Prose containing multi-space/newline variants and a decomposed accent. */
@@ -96,12 +96,12 @@ const HOOK_RECORD = {
 
 describe("shared current-state slot vocabulary (characterization)", () => {
   const SLOT_VALUES: Record<CurrentStateSlotKey, string> = {
-    currentLocation: "东城公寓",
-    protagonistState: "轻伤但清醒",
-    currentGoal: "追查旧账",
-    currentConstraint: "不能暴露身份",
-    currentAlliances: "与陈探长合作",
-    currentConflict: "被码头帮盯上",
+    currentLocation: "mock_text",
+    protagonistState: "mock_text",
+    currentGoal: "mock_text",
+    currentConstraint: "mock_text",
+    currentAlliances: "mock_text",
+    currentConflict: "mock_text",
   };
 
   it.each(["vi", "en"] as const)("reducer and describeCurrentStateSlot agree for every slot (%s)", (language) => {
@@ -126,15 +126,15 @@ describe("shared current-state slot vocabulary (characterization)", () => {
   it("pins the exact language-first predicates for representative slots", () => {
     expect(describeCurrentStateSlot("currentLocation", "vi")).toEqual({
       subject: "protagonist",
-      predicate: "当前位置",
+      predicate: "mock_text",
     });
     expect(describeCurrentStateSlot("currentLocation", "en")).toEqual({
       subject: "protagonist",
       predicate: "Current Location",
     });
-    expect(describeCurrentStateSlot("currentAlliances", "vi").predicate).toBe("当前敌我");
+    expect(describeCurrentStateSlot("currentAlliances", "vi").predicate).toBe("mock_text");
     expect(describeCurrentStateSlot("currentAlliances", "en").predicate).toBe("Current Alliances");
-    expect(describeCurrentStateSlot("protagonistState", "vi").predicate).toBe("主角状态");
+    expect(describeCurrentStateSlot("protagonistState", "vi").predicate).toBe("mock_text");
     expect(describeCurrentStateSlot("currentConflict", "en").predicate).toBe("Current Conflict");
   });
 
@@ -142,16 +142,16 @@ describe("shared current-state slot vocabulary (characterization)", () => {
     // zh book carrying a legacy EN-labelled fact: the patch must STILL remove it.
     const result = applyRuntimeStateDelta({
       snapshot: minimalSnapshot("vi", [
-        { predicate: "Current Location", object: "老码头" },
+        { predicate: "Current Location", object: "mock_text" },
       ]),
-      delta: zhDelta({ currentLocation: "东城公寓" }),
+      delta: zhDelta({ currentLocation: "mock_text" }),
     });
     const openFacts = result.currentState.facts.filter(
       (fact) => fact.validUntilChapter === null
-        && fact.predicate === "当前位置",
+        && fact.predicate === "mock_text",
     );
     expect(openFacts).toHaveLength(1);
-    expect(openFacts[0]?.object).toBe("东城公寓");
+    expect(openFacts[0]?.object).toBe("mock_text");
     expect(
       result.currentState.facts.some(
         (fact) => fact.validUntilChapter === null && fact.predicate === "Current Location",
@@ -174,7 +174,7 @@ describe("buildStateReviewItems", () => {
   });
 
   it("maps one patch slot to exactly one ai-origin undecided current-state-fact using the SHARED vocabulary", () => {
-    const items = buildStateReviewItems(zhDelta({ currentLocation: "东城公寓" }), {
+    const items = buildStateReviewItems(zhDelta({ currentLocation: "mock_text" }), {
       chapterContent: ZH_PROSE,
       language: "vi",
     });
@@ -186,16 +186,16 @@ describe("buildStateReviewItems", () => {
     const described = describeCurrentStateSlot("currentLocation", "vi");
     expect(item.proposal).toEqual({
       type: "fact",
-      change: { action: "set", subject: described.subject, predicate: described.predicate, object: "东城公寓" },
+      change: { action: "set", subject: described.subject, predicate: described.predicate, object: "mock_text" },
     });
   });
 
   it("maps multiple supported slots to one item each in deterministic slot order", () => {
     const items = buildStateReviewItems(
       zhDelta({
-        currentConflict: "被码头帮盯上",
-        currentLocation: "东城公寓",
-        currentGoal: "追查旧账",
+        currentConflict: "mock_text",
+        currentLocation: "mock_text",
+        currentGoal: "mock_text",
       }),
       { chapterContent: "", language: "vi" },
     );
@@ -203,13 +203,13 @@ describe("buildStateReviewItems", () => {
     expect(items.every((item) => item.kind === "current-state-fact")).toBe(true);
     // Canonical SLOT_DEFS order, independent of patch insertion order.
     expect(factItems(items).map((proposal) => proposal.change.predicate)).toEqual([
-      "当前位置",
-      "当前目标",
-      "当前冲突",
+      "mock_text",
+      "mock_text",
+      "mock_text",
     ]);
-    expect(factItems(items)[0]?.change.object).toBe("东城公寓");
-    expect(factItems(items)[1]?.change.object).toBe("追查旧账");
-    expect(factItems(items)[2]?.change.object).toBe("被码头帮盯上");
+    expect(factItems(items)[0]?.change.object).toBe("mock_text");
+    expect(factItems(items)[1]?.change.object).toBe("mock_text");
+    expect(factItems(items)[2]?.change.object).toBe("mock_text");
     expect(new Set(items.map((item) => item.id)).size).toBe(3);
   });
 
@@ -295,7 +295,7 @@ describe("buildStateReviewItems", () => {
     const items = buildStateReviewItems(
       RuntimeStateDeltaSchema.parse({
         chapter: 13,
-        currentStatePatch: { currentGoal: "追查旧账" },
+        currentStatePatch: { currentGoal: "mock_text" },
         hookOps: {
           upsert: [HOOK_RECORD, { ...HOOK_RECORD, hookId: "lighthouse", type: "mystery" }],
           mention: ["harbor-toll"],
@@ -305,17 +305,17 @@ describe("buildStateReviewItems", () => {
         newHookCandidates: [{ type: "mystery", expectedPayoff: "", notes: "" }],
         chapterSummary: {
           chapter: 13,
-          title: "混浊的潮水",
-          characters: "林越",
-          events: "林越找到了旧账本。",
+          title: "mock_text",
+          characters: "mock_text",
+          events: "mock_text。",
           stateChanges: "",
           hookActivity: "",
-          mood: "紧张",
-          chapterType: "主线",
+          mood: "mock_text",
+          chapterType: "mock_text",
         },
         subplotOps: [{ op: "insert", id: "smuggling" }],
         emotionalArcOps: [{ op: "shift", id: "trust" }],
-        characterMatrixOps: [{ op: "update", pair: ["林越", "陈探长"] }],
+        characterMatrixOps: [{ op: "update", pair: ["mock_text", "mock_text"] }],
         notes: ["Settler flagged an ambiguous alliance label."],
       }),
       { chapterContent: "", language: "vi" },
@@ -377,7 +377,7 @@ describe("buildStateReviewItems", () => {
   it("is deterministic: two invocations yield identical ids in identical order", () => {
     const delta = RuntimeStateDeltaSchema.parse({
       chapter: 13,
-      currentStatePatch: { currentGoal: "追查旧账", currentLocation: "东城公寓" },
+      currentStatePatch: { currentGoal: "mock_text", currentLocation: "mock_text" },
       hookOps: { upsert: [HOOK_RECORD], mention: ["a"], resolve: [], defer: ["b"] },
       newHookCandidates: [{ type: "mystery", expectedPayoff: "p", notes: "n" }],
       chapterSummary: {
@@ -400,11 +400,11 @@ describe("buildStateReviewItems", () => {
   });
 
   it("makes ids payload-sensitive: changing one semantic value changes that item's id", () => {
-    const before = buildStateReviewItems(zhDelta({ currentGoal: "追查旧账" }), {
+    const before = buildStateReviewItems(zhDelta({ currentGoal: "mock_text" }), {
       chapterContent: "",
       language: "vi",
     });
-    const after = buildStateReviewItems(zhDelta({ currentGoal: "守护旧账" }), {
+    const after = buildStateReviewItems(zhDelta({ currentGoal: "mock_text" }), {
       chapterContent: "",
       language: "vi",
     });
@@ -438,7 +438,7 @@ describe("buildStateReviewItems", () => {
   });
 
   it("marks absent semantic text as inferred WITHOUT fabricating a quote", () => {
-    const items = buildStateReviewItems(zhDelta({ currentGoal: "这句话绝不在正文里出现" }), {
+    const items = buildStateReviewItems(zhDelta({ currentGoal: "mock_text" }), {
       chapterContent: ZH_PROSE,
       language: "vi",
     });
@@ -450,12 +450,12 @@ describe("buildStateReviewItems", () => {
   });
 
   it("verifies contiguous CJK phrases in prose", () => {
-    const items = buildStateReviewItems(zhDelta({ currentLocation: "走进了东城公寓" }), {
+    const items = buildStateReviewItems(zhDelta({ currentLocation: "mock_text" }), {
       chapterContent: ZH_PROSE,
       language: "vi",
     });
     expect(items[0]!.evidence?.verifiedLevel).toBe("explicit");
-    expect(items[0]!.evidence?.quote).toBe("走进了东城公寓");
+    expect(items[0]!.evidence?.quote).toBe("mock_text");
   });
 
   it("matches across newline/space normalization exactly like Task 2", () => {
@@ -472,7 +472,7 @@ describe("buildStateReviewItems", () => {
   });
 
   it("does NOT fake-match CJK values with internal spacing against contiguous prose", () => {
-    const items = buildStateReviewItems(zhDelta({ currentLocation: "东城 公寓" }), {
+    const items = buildStateReviewItems(zhDelta({ currentLocation: "mock_text mock_text" }), {
       chapterContent: ZH_PROSE,
       language: "vi",
     });

@@ -63,8 +63,8 @@ function alreadyProposed(
 
 /**
  * Returns a deterministic AssistantMessageEventStream that either emits a
- * propose_action toolCall (when the latest user text mentions "结构/骨架/structure"
- * and propose_action hasn't run yet) or a plain "好的。" text reply.
+ * propose_action toolCall (when the latest user text mentions "structure"
+ * and propose_action hasn't run yet) or a plain "OK." text reply.
  *
  * Mirrors localAssistantStopStream in agent-session.ts exactly — same
  * createAssistantMessageEventStream() + queueMicrotask pattern.
@@ -75,7 +75,7 @@ export function stubAgentStream(model: Model<Api>, context: unknown): AssistantM
   const proposed = alreadyProposed(
     context as { messages?: Array<{ role: string; content: unknown; toolName?: string }> },
   );
-  const wantStructure = !proposed && /结构|骨架|structure/i.test(text);
+  const wantStructure = !proposed && /structure|frame/i.test(text);
 
   const content = wantStructure
     ? [
@@ -85,14 +85,14 @@ export function stubAgentStream(model: Model<Api>, context: unknown): AssistantM
           name: "propose_action",
           arguments: {
             action: "draft_structure",
-            title: "搭建结构",
-            summary: "确认后生成三幕骨架",
-            instruction: "搭建一个三幕分支结构",
-            draftStructure: { instruction: "三幕分支结构" },
+            title: "Build Structure",
+            summary: "Generate 3-act structure upon confirmation",
+            instruction: "Build a 3-act branching structure",
+            draftStructure: { instruction: "3-act branching structure" },
           },
         },
       ]
-    : [{ type: "text" as const, text: "好的。" }];
+    : [{ type: "text" as const, text: "OK." }];
 
   const stopReason = wantStructure ? ("toolUse" as const) : ("stop" as const);
 
@@ -120,36 +120,36 @@ const STRUCTURE_JSON = JSON.stringify({
     {
       id: "s",
       type: "start",
-      title: "开场",
-      sceneDesc: "宫门前",
-      choices: [{ id: "c1", text: "查账", targetNodeId: "b" }],
+      title: "Opening",
+      sceneDesc: "Palace Gate",
+      choices: [{ id: "c1", text: "Audit", targetNodeId: "b" }],
     },
     {
       id: "b",
       type: "branch",
-      title: "抉择",
-      sceneDesc: "账房",
+      title: "Choice",
+      sceneDesc: "Accounting Room",
       choices: [
-        { id: "c2", text: "公开", targetNodeId: "e1" },
-        { id: "c3", text: "隐瞒", targetNodeId: "e2" },
+        { id: "c2", text: "Disclose", targetNodeId: "e1" },
+        { id: "c3", text: "Conceal", targetNodeId: "e2" },
       ],
     },
-    { id: "e1", type: "ending", title: "真相", choices: [] },
-    { id: "e2", type: "ending", title: "沉沦", choices: [] },
+    { id: "e1", type: "ending", title: "Truth", choices: [] },
+    { id: "e2", type: "ending", title: "Downfall", choices: [] },
   ],
 });
 
 const NODE_JSON = JSON.stringify({
   type: "branch",
-  title: "新场景",
-  sceneDesc: "夜色",
-  dialogue: [{ speaker: "阿梅", text: "账不能错", emotion: "坚定" }],
+  title: "New Scene",
+  sceneDesc: "Nightfall",
+  dialogue: [{ speaker: "A Mei", text: "The books must not be wrong", emotion: "determined" }],
   choices: [],
 });
 
 /**
  * Deterministic replacement for the chatCompletion network call.
- * Returns STRUCTURE_JSON when the prompt mentions structure/骨架/nodes,
+ * Returns STRUCTURE_JSON when the prompt mentions structure/nodes,
  * otherwise a single node JSON.
  */
 export function stubChatCompletion(
@@ -157,7 +157,7 @@ export function stubChatCompletion(
   _model: string,
 ): LLMResponse {
   const joined = messages.map((m) => m.content).join("\n");
-  const content = /骨架|nodes|结构/i.test(joined) ? STRUCTURE_JSON : NODE_JSON;
+  const content = /structure|nodes|frame/i.test(joined) ? STRUCTURE_JSON : NODE_JSON;
   return {
     content,
     usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },

@@ -3,7 +3,7 @@ import { seedFilmImageGraph, E2E_IMG_ID } from "./fixtures/seed-film-image";
 
 test.beforeAll(async () => { await seedFilmImageGraph(); });
 
-test("node image renders in the tree and the player (图+文)", async ({ page }) => {
+test("node image renders in the tree and the player (mock_val+mock_val)", async ({ page }) => {
   await page.goto(`/#/film/${E2E_IMG_ID}`);
   const thumb = page.getByTestId("node-image-s");
   await expect(thumb).toBeVisible();

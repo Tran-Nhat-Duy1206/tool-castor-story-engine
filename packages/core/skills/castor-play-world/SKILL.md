@@ -1,6 +1,6 @@
 ---
 name: castor-play-world
-description: 品类中立的开放世界与分支互动推进方法。Used by Castor Play workers for coherent action, state, time, and scene progression.
+description: Genre-neutral open world and branching interactive progression methodology. Used by Castor Play workers for coherent action, state, time, and scene progression.
 ---
 # Interactive world play
 

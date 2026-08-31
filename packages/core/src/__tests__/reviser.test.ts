@@ -129,30 +129,30 @@ describe("ReviserAgent", () => {
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "原始正文。",
+        "mock_text。",
         "REPLACEMENT_TEXT:",
-        "修订后的正文。",
+        "mock_text。",
         "--- END PATCH ---",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
 
     try {
-      await agent.reviseChapter(bookDir, "原始正文。", 1, [CRITICAL_ISSUE], "rewrite", "xuanhuan");
+      await agent.reviseChapter(bookDir, "mock_text。", 1, [CRITICAL_ISSUE], "rewrite", "xuanhuan");
 
       const messages = chatSpy.mock.calls[0]?.[0] as
         | ReadonlyArray<{ content: string }>
         | undefined;
       const systemPrompt = messages?.[0]?.content ?? "";
 
-      expect(systemPrompt).toContain("优先保留原文的绝大部分句段");
-      expect(systemPrompt).toContain("除非问题跨越整章");
+      expect(systemPrompt).toContain("mock_text");
+      expect(systemPrompt).toContain("mock_text");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -187,16 +187,16 @@ describe("ReviserAgent", () => {
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "原始正文。",
+        "mock_text。",
         "REPLACEMENT_TEXT:",
-        "修订后的正文。",
+        "mock_text。",
         "--- END PATCH ---",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -204,7 +204,7 @@ describe("ReviserAgent", () => {
     try {
       await agent.reviseChapter(
         bookDir,
-        "原始正文。",
+        "mock_text。",
         1,
         [CRITICAL_ISSUE],
         "spot-fix",
@@ -220,11 +220,11 @@ describe("ReviserAgent", () => {
       const systemPrompt = messages?.[0]?.content ?? "";
       const userPrompt = messages?.[1]?.content ?? "";
 
-      expect(systemPrompt).toContain("保持章节字数在目标区间内");
+      expect(systemPrompt).toContain("mock_text từmock_text");
       expect(systemPrompt).toContain("=== PATCHES ===");
       expect(systemPrompt).not.toContain("=== REVISED_CONTENT ===");
-      expect(userPrompt).toContain("目标字数：220");
-      expect(userPrompt).toContain("允许区间：190-250");
+      expect(userPrompt).toContain("mock_text từmock_text：220");
+      expect(userPrompt).toContain("mock_text：190-250");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -254,32 +254,32 @@ describe("ReviserAgent", () => {
     vi.spyOn(ReviserAgent.prototype as never, "chat" as never).mockResolvedValue({
       content: [
         "=== FIXED_ISSUES ===",
-        "- 收紧了开头动作句。",
+        "- mock_text。",
         "",
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "林越没有立刻进去。",
+        "mock_text。",
         "REPLACEMENT_TEXT:",
-        "林越先停在门槛外，侧耳听了一息。",
+        "mock_text，mock_text。",
         "--- END PATCH ---",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
 
     const original = [
-      "门轴轻轻响了一下。",
-      "林越没有立刻进去。",
+      "mock_text。",
+      "mock_text。",
       "",
-      "巷子尽头的风还在吹。",
-      "他把手按在潮冷的门框上，没有出声。",
-      "更远处传来极轻的脚步回响，又很快断掉。",
+      "mock_text。",
+      "mock_text，mock_text。",
+      "mock_text，mock_text。",
     ].join("\n");
 
     try {
@@ -293,14 +293,14 @@ describe("ReviserAgent", () => {
       );
 
       expect(result.revisedContent).toBe([
-        "门轴轻轻响了一下。",
-        "林越先停在门槛外，侧耳听了一息。",
+        "mock_text。",
+        "mock_text，mock_text。",
         "",
-        "巷子尽头的风还在吹。",
-        "他把手按在潮冷的门框上，没有出声。",
-        "更远处传来极轻的脚步回响，又很快断掉。",
+        "mock_text。",
+        "mock_text，mock_text。",
+        "mock_text，mock_text。",
       ].join("\n"));
-      expect(result.fixedIssues).toEqual(["- 收紧了开头动作句。"]);
+      expect(result.fixedIssues).toEqual(["- mock_text。"]);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -335,19 +335,19 @@ describe("ReviserAgent", () => {
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "他仿佛听见门外有响动。",
+        "mock_text。",
         "REPLACEMENT_TEXT:",
-        "他听见门外像有一点轻响。",
+        "mock_text。",
         "--- END PATCH ---",
         "",
         "=== REVISED_CONTENT ===",
-        "整章重写后的版本，不应该被局部问题采用。",
+        "mock_text，mock_text。",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -355,21 +355,21 @@ describe("ReviserAgent", () => {
     try {
       const result = await agent.reviseChapter(
         bookDir,
-        "他仿佛听见门外有响动。\n\n他没有回头。",
+        "mock_text。\n\nmock_text。",
         1,
         [{
           severity: "warning",
-          category: "套话密度",
-          description: "仿佛用得太直接",
-          suggestion: "改成更具体的感官描写",
+          category: "mock_text",
+          description: "mock_text",
+          suggestion: "mock_text",
           repairScope: "local",
         }],
         "auto",
         "xuanhuan",
       );
 
-      expect(result.revisedContent).toContain("他听见门外像有一点轻响。");
-      expect(result.revisedContent).not.toContain("整章重写后的版本");
+      expect(result.revisedContent).toContain("mock_text。");
+      expect(result.revisedContent).not.toContain("mock_text");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -404,19 +404,19 @@ describe("ReviserAgent", () => {
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "第一段。",
+        "Chương mock_text。",
         "REPLACEMENT_TEXT:",
-        "第一段（局部修补）。",
+        "Chương mock_text（mock_text）。",
         "--- END PATCH ---",
         "",
         "=== REVISED_CONTENT ===",
-        "整章重写后的版本，处理了整体节奏与结构。",
+        "mock_text，mock_text。",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -424,19 +424,19 @@ describe("ReviserAgent", () => {
     try {
       const result = await agent.reviseChapter(
         bookDir,
-        "第一段。\n\n第二段。\n\n第三段。",
+        "Chương mock_text。\n\nChương mock_text。\n\nChương mock_text。",
         1,
         [{
           severity: "critical",
           category: "Outline Drift Check",
-          description: "整章结构已经偏离",
-          suggestion: "重建当前章节奏与组织",
+          description: "mock_text",
+          suggestion: "mock_text",
         }],
         "auto",
         "xuanhuan",
       );
 
-      expect(result.revisedContent).toContain("整章重写后的版本");
+      expect(result.revisedContent).toContain("mock_text");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -471,16 +471,16 @@ describe("ReviserAgent", () => {
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "原始正文。",
+        "mock_text。",
         "REPLACEMENT_TEXT:",
-        "修订后的正文。",
+        "mock_text。",
         "--- END PATCH ---",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -488,7 +488,7 @@ describe("ReviserAgent", () => {
     try {
       await agent.reviseChapter(
         bookDir,
-        "原始正文。",
+        "mock_text。",
         1,
         [CRITICAL_ISSUE],
         "auto",
@@ -501,8 +501,8 @@ describe("ReviserAgent", () => {
             "Bring the focus back to the mentor oath conflict.",
             "",
             "## Must Avoid",
-            "- 前几章回顾式总结",
-            "- 本章要做的是把 H001/H002 推下去",
+            "- mock_text",
+            "- mock_text H001/H002 mock_text",
             "",
             "## Hook Agenda",
             "### Resolve",
@@ -539,8 +539,8 @@ describe("ReviserAgent", () => {
       expect(userPrompt).not.toContain("## Hook Agenda");
       expect(userPrompt).not.toContain("H001");
       expect(userPrompt).not.toContain("H002");
-      expect(userPrompt).not.toContain("前几章");
-      expect(userPrompt).not.toContain("本章要做的");
+      expect(userPrompt).not.toContain("mock_text");
+      expect(userPrompt).not.toContain("mock_text");
       expect(userPrompt).toContain("Bring the focus back to the mentor oath conflict.");
     } finally {
       await rm(root, { recursive: true, force: true });
@@ -560,7 +560,7 @@ describe("ReviserAgent", () => {
         [
           "# Pending Hooks",
           "",
-          "| hook_id | 起始章节 | 类型 | 状态 | 最近推进 | 预期回收 | 备注 |",
+          "| hook_id | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- |",
           "| guild-route | 1 | mystery | open | 2 | 6 | Merchant guild trail |",
           "| mentor-oath | 8 | relationship | open | 99 | 101 | Mentor oath debt with Lin Yue |",
@@ -594,10 +594,10 @@ describe("ReviserAgent", () => {
       writeFile(
         join(storyDir, "character_matrix.md"),
         [
-          "# 角色交互矩阵",
+          "# mock_text",
           "",
-          "### 角色档案",
-          "| 角色 | 核心标签 | 反差细节 | 说话风格 | 性格底色 | 与主角关系 | 核心动机 | 当前目标 |",
+          "### mock_text",
+          "| mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text | mock_text |",
           "| --- | --- | --- | --- | --- | --- | --- | --- |",
           "| Lin Yue | oath | restraint | clipped | stubborn | self | repay debt | find mentor |",
           "| Guildmaster Ren | guild | swagger | loud | opportunistic | rival | stall Mara | seize seal |",
@@ -632,16 +632,16 @@ describe("ReviserAgent", () => {
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "原始正文。",
+        "mock_text。",
         "REPLACEMENT_TEXT:",
-        "修订后的正文。",
+        "mock_text。",
         "--- END PATCH ---",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -649,7 +649,7 @@ describe("ReviserAgent", () => {
     try {
       await agent.reviseChapter(
         bookDir,
-        "原始正文。",
+        "mock_text。",
         100,
         [CRITICAL_ISSUE],
         "spot-fix",
@@ -746,16 +746,16 @@ describe("ReviserAgent", () => {
         "=== PATCHES ===",
         "--- PATCH 1 ---",
         "TARGET_TEXT:",
-        "原文。",
+        "mock_text。",
         "REPLACEMENT_TEXT:",
-        "局部替换。",
+        "mock_text。",
         "--- END PATCH ---",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -763,14 +763,14 @@ describe("ReviserAgent", () => {
     try {
       const out = await agent.reviseChapter(
         bookDir,
-        "原文。",
+        "mock_text。",
         1,
         [
 	          {
 	            severity: "critical",
-	            category: "模型审稿判断",
-	            description: "未兑现 memo 的 goal",
-	            suggestion: "重写全章",
+	            category: "mock_text",
+	            description: "mock_text memo mock_text goal",
+	            suggestion: "mock_text",
 	            repairScope: "structural",
 	          },
         ],
@@ -784,10 +784,10 @@ describe("ReviserAgent", () => {
       const systemPrompt = messages?.[0]?.content ?? "";
 
       // System prompt directs model to REVISED_CONTENT for structural issues.
-      expect(systemPrompt).toContain("分流指令");
-      expect(systemPrompt).toContain("必须输出 REVISED_CONTENT");
+      expect(systemPrompt).toContain("mock_text");
+      expect(systemPrompt).toContain("mock_text REVISED_CONTENT");
       // Parser rejects stray PATCHES in rewrite-only mode.
-      expect(out.revisedContent).toBe("原文。");
+      expect(out.revisedContent).toBe("mock_text。");
       expect(out.fixedIssues).toEqual([]);
     } finally {
       await rm(root, { recursive: true, force: true });
@@ -823,13 +823,13 @@ describe("ReviserAgent", () => {
         "- rewrote whole chapter",
         "",
         "=== REVISED_CONTENT ===",
-        "整章重写的正文。",
+        "mock_text。",
         "",
         "=== UPDATED_STATE ===",
-        "状态卡",
+        "mock_text",
         "",
         "=== UPDATED_HOOKS ===",
-        "伏笔池",
+        "mock_text",
       ].join("\n"),
       usage: ZERO_USAGE,
     });
@@ -837,14 +837,14 @@ describe("ReviserAgent", () => {
     try {
       const out = await agent.reviseChapter(
         bookDir,
-        "原文。",
+        "mock_text。",
         1,
         [
 	          {
 	            severity: "warning",
-	            category: "模型审稿判断",
-	            description: "'不禁' 密度过高",
-	            suggestion: "替换成具体动作",
+	            category: "mock_text",
+	            description: "'mock_text' mock_text",
+	            suggestion: "mock_text",
 	            repairScope: "local",
 	          },
         ],
@@ -857,10 +857,10 @@ describe("ReviserAgent", () => {
         | undefined;
       const systemPrompt = messages?.[0]?.content ?? "";
 
-      expect(systemPrompt).toContain("分流指令");
-      expect(systemPrompt).toContain("必须只输出 PATCHES");
+      expect(systemPrompt).toContain("mock_text");
+      expect(systemPrompt).toContain("mock_text PATCHES");
       // Parser rejects REVISED_CONTENT in patch-only mode.
-      expect(out.revisedContent).toBe("原文。");
+      expect(out.revisedContent).toBe("mock_text。");
       expect(out.fixedIssues).toEqual([]);
     } finally {
       await rm(root, { recursive: true, force: true });

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// C1 (v2.0.0 breaking): `maxTokens` 字段已被 providers bank 接管；zod 用 strip mode 静默丢弃老配置里的 `maxTokens`。
+// Core narrative engine processing.
 const LLMServiceEntrySchema = z.object({
   service: z.string().min(1),
   name: z.string().min(1).optional(),
@@ -17,9 +17,9 @@ const LLMCoverConfigSchema = z.object({
   baseUrl: z.string().url().optional(),
 }).optional();
 
-// C1 (v2.0.0 breaking): 删除 maxTokens / maxTokensCap 字段。
-// 每个模型的真实 maxOutput 来自 providers/<name>.ts 的 ProviderModel.maxOutput；
-// 老配置里写的 maxTokens / maxTokensCap 会被 zod strip 静默丢弃（不报错）。
+// Core narrative engine processing.
+// Core narrative engine processing.
+// Core narrative engine processing.
 export const LLMConfigSchema = z.object({
   provider: z.enum(["anthropic", "openai", "custom"]),
   service: z.string().default("custom"),

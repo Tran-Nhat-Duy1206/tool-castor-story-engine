@@ -1,6 +1,6 @@
 ---
 name: castor-short-story-analysis
-description: 商业短篇拆稿、情绪链、证据链和反转机制分析。Use to deconstruct a short story into transferable craft.
+description: Commercial short story deconstruction, emotion chain, evidence chain, and reversal mechanism analysis. Use to deconstruct a short story into transferable craft.
 ---
 # Short-story analysis
 

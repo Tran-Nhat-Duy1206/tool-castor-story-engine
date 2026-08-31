@@ -118,7 +118,7 @@ export function buildChapterFileContent(
 ): string {
   const heading = language === "en"
     ? `# Chapter ${chapterNumber}: ${title}`
-    : `# 第${chapterNumber}章 ${title}`;
+    : `# Chapter ${chapterNumber}: ${title}`;
   return [
     heading,
     "",
@@ -159,22 +159,22 @@ export class WriterAgent extends BaseAgent {
     return "writer";
   }
 
-  private localize(language: "vi" | "en", messages: { zh: string; en: string }): string {
-    return language === "en" ? messages.en : messages.zh;
+  private localize(language: "vi" | "en", messages: { vi: string; en: string }): string {
+    return language === "en" ? messages.en : messages.vi;
   }
 
-  private logInfo(language: "vi" | "en", messages: { zh: string; en: string }): void {
+  private logInfo(language: "vi" | "en", messages: { vi: string; en: string }): void {
     this.ctx.logger?.info(this.localize(language, messages));
   }
 
-  private logWarn(language: "vi" | "en", messages: { zh: string; en: string }): void {
+  private logWarn(language: "vi" | "en", messages: { vi: string; en: string }): void {
     this.ctx.logger?.warn(this.localize(language, messages));
   }
 
   async writeChapter(input: WriteChapterInput): Promise<WriteChapterOutput> {
     const { book, bookDir, chapterNumber } = input;
 
-    const placeholder = "(文件尚未创建)";
+    const placeholder = "(file not created yet)";
     const [
       volumeOutline, styleGuide, currentState, ledger, hooks,
       chapterSummaries, subplotBoard, emotionalArcs, characterMatrix, styleProfileRaw,
@@ -208,7 +208,7 @@ export class WriterAgent extends BaseAgent {
 
     const styleFingerprint = this.buildStyleFingerprint(styleProfileRaw);
 
-    const hasFanficCanon = fanficCanonRaw !== "(文件尚未创建)";
+    const hasFanficCanon = fanficCanonRaw !== "(file not created yet)";
     const resolvedLanguage = book.language ?? genreProfile.language;
     const targetWords = input.lengthSpec?.target ?? input.wordCountOverride ?? book.chapterWordCount;
     const resolvedLengthSpec = input.lengthSpec ?? buildLengthSpec(targetWords, resolvedLanguage);
@@ -256,7 +256,7 @@ export class WriterAgent extends BaseAgent {
     const creativeTemperature = input.temperatureOverride ?? 0.7;
 
     this.logInfo(resolvedLanguage, {
-      zh: `阶段 1：创作正文（第${chapterNumber}章）`,
+      vi: `Giai đoạn 1: Sáng tác nội dung (Chương ${chapterNumber})`,
       en: `Phase 1: creative writing for chapter ${chapterNumber}`,
     });
 
@@ -280,7 +280,7 @@ export class WriterAgent extends BaseAgent {
 
     // ── Phase 2: State settlement (temperature 0.3) ──
     this.logInfo(resolvedLanguage, {
-      zh: `阶段 2：状态结算（第${chapterNumber}章，${creative.wordCount}字）`,
+      vi: `Giai đoạn 2: Quyết toán trạng thái (Chương ${chapterNumber}, ${creative.wordCount} từ)`,
       en: `Phase 2: state settlement for chapter ${chapterNumber} (${creative.wordCount} words)`,
     });
     const filteredHooksForSettlement = buildGovernedHookWorkingSet({
@@ -372,7 +372,7 @@ export class WriterAgent extends BaseAgent {
 
     if (ruleViolations.length > 0) {
       this.logWarn(resolvedLanguage, {
-        zh: `后写校验：第${chapterNumber}章 ${postWriteErrors.length} 个错误，${postWriteWarnings.length} 个警告`,
+        vi: `Kiểm tra sau viết: Chương ${chapterNumber} ${postWriteErrors.length}  lỗi, ${postWriteWarnings.length}  cảnh báo`,
         en: `Post-write: ${postWriteErrors.length} errors, ${postWriteWarnings.length} warnings in chapter ${chapterNumber}`,
       });
       for (const v of ruleViolations) {
@@ -381,7 +381,7 @@ export class WriterAgent extends BaseAgent {
     }
     if (aiTellIssues.length > 0) {
       this.logWarn(resolvedLanguage, {
-        zh: `AI 味检查：第${chapterNumber}章发现 ${aiTellIssues.length} 个问题`,
+        vi: `Kiểm tra AI: Chương ${chapterNumber}phát hiện ${aiTellIssues.length} vấn đề`,
         en: `AI-tell check: ${aiTellIssues.length} issues in chapter ${chapterNumber}`,
       });
       for (const issue of aiTellIssues) {
@@ -390,7 +390,7 @@ export class WriterAgent extends BaseAgent {
     }
     if (hookHealthIssues.length > 0) {
       this.logWarn(resolvedLanguage, {
-        zh: `伏笔健康：第${chapterNumber}章发现 ${hookHealthIssues.length} 条警告`,
+        vi: `Sức khỏe hook: Chương ${chapterNumber}phát hiện ${hookHealthIssues.length} cảnh báo`,
         en: `Hook health: ${hookHealthIssues.length} warning(s) in chapter ${chapterNumber}`,
       });
       for (const issue of hookHealthIssues) {
@@ -446,7 +446,7 @@ export class WriterAgent extends BaseAgent {
       volumeOutline,
     ] = await Promise.all([
       input.baselineChapter === undefined
-        ? readCurrentStateWithFallback(input.bookDir, "(文件尚未创建)")
+        ? readCurrentStateWithFallback(input.bookDir, "(file not created yet)")
         : this.readFileOrDefault(join(baselineStoryDir, "current_state.md")),
       this.readFileOrDefault(join(baselineStoryDir, "particle_ledger.md")),
       this.readFileOrDefault(join(baselineStoryDir, "pending_hooks.md")),
@@ -454,9 +454,9 @@ export class WriterAgent extends BaseAgent {
       this.readFileOrDefault(join(baselineStoryDir, "subplot_board.md")),
       this.readFileOrDefault(join(baselineStoryDir, "emotional_arcs.md")),
       input.baselineChapter === undefined
-        ? readCharacterContext(input.bookDir, "(文件尚未创建)")
+        ? readCharacterContext(input.bookDir, "(file not created yet)")
         : this.readSnapshotCharacterContext(input.bookDir, baselineStoryDir),
-      readVolumeMap(input.bookDir, "(文件尚未创建)"),
+      readVolumeMap(input.bookDir, "(file not created yet)"),
     ]);
 
     const { profile: genreProfile } = await readGenreProfile(this.ctx.projectRoot, input.book.genre);
@@ -581,7 +581,7 @@ export class WriterAgent extends BaseAgent {
     const observerUser = buildObserverUserPrompt(params.chapterNumber, params.title, params.content, resolvedLang);
 
     this.logInfo(resolvedLang, {
-      zh: `阶段 2a：提取第${params.chapterNumber}章事实`,
+      vi: `Giai đoạn 2a: Trích xuất chương ${params.chapterNumber} sự thật`,
       en: `Phase 2a: observing facts for chapter ${params.chapterNumber}`,
     });
     const observerResponse = await this.chat(
@@ -595,7 +595,7 @@ export class WriterAgent extends BaseAgent {
 
     // Phase 2b: Reflector — merge observations into truth files
     this.logInfo(resolvedLang, {
-      zh: "阶段 2b：把观察结果回写到真相文件",
+      vi: "Giai đoạn 2b: Ghi kết quả quan sát vào tệp sự thật",
       en: "Phase 2b: reflecting observations into truth files",
     });
     const settlerSystem = buildSettlerSystemPrompt(
@@ -833,7 +833,7 @@ export class WriterAgent extends BaseAgent {
     const userDirectionBlock = directionEntries.length > 0
       ? (language === "en"
           ? `## User direction (overrides model defaults — must follow)\n${renderNarrativeSelectedContext(directionEntries, language)}\n`
-          : `## 用户方向（优先于模型默认，必须遵循）\n${renderNarrativeSelectedContext(directionEntries, language)}\n`)
+          : `## User Direction (Must follow)\n${renderNarrativeSelectedContext(directionEntries, language)}\n`)
       : "";
 
     const diagnosticLines = params.ruleStack.sections.diagnostic.length > 0
@@ -873,26 +873,26 @@ ${lengthRequirementBlock}
 - Output only PRE_WRITE_CHECK, CHAPTER_TITLE, and CHAPTER_CONTENT blocks`;
     }
 
-    return `请续写第${params.chapterNumber}章。
+    return `Please draft Chapter ${params.chapterNumber}.
 
 ${chapterContextBlock}
 
 ${userDirectionBlock}
 ${briefNarrative}
 
-## 已选上下文
-${contextSections || "(无)"}
+## Selected Context
+${contextSections || "()"}
 ${selectedEvidenceBlock}
 
-## 规则栈
-- 硬护栏：${params.ruleStack.sections.hard.join("、") || "(无)"}
-- 软约束：${params.ruleStack.sections.soft.join("、") || "(无)"}
-- 诊断规则：${diagnosticLines}
+## Rule Stack
+- Hard Guardrails: ${params.ruleStack.sections.hard.join("、") || "()"}
+- Soft Constraints: ${params.ruleStack.sections.soft.join("、") || "()"}
+- Diagnostic Rules: ${diagnosticLines}
 
 ${varianceBlock}
 ${lengthRequirementBlock}
-- 先输出写作自检表，再写正文
-- 只需输出 PRE_WRITE_CHECK、CHAPTER_TITLE、CHAPTER_CONTENT 三个区块`;
+- Output the pre-write self check table first, then the prose
+- Output only PRE_WRITE_CHECK, CHAPTER_TITLE, and CHAPTER_CONTENT blocks`;
   }
 
   private buildChapterContextBlock(externalContext: string | undefined, language: "vi" | "en"): string {
@@ -904,10 +904,10 @@ ${trimmed}
 
 Obey this direct instruction for the current chapter. If it specifies a chapter title, use that title exactly in CHAPTER_TITLE. Keep continuity, but do not replace this instruction with the outline fallback.`;
     }
-    return `## 本章用户指令（最高优先级）
+    return `## Chapter User Directive (Highest Priority)
 ${trimmed}
 
-这是用户对当前章节的直接指令。若其中指定章节标题，CHAPTER_TITLE 必须原样使用该标题。保持连续性，但不要用卷纲兜底替换这条指令。`;
+Direct user instruction for this chapter. If a chapter title is specified, CHAPTER_TITLE must use it verbatim. Maintain continuity.`;
   }
 
   private joinGovernedEvidenceBlocks(blocks: ReturnType<typeof buildGovernedMemoryEvidenceBlocks> | undefined): string | undefined {
@@ -961,24 +961,24 @@ ${selectedContext || "- none"}
 ${overrides}\n`;
     }
 
-    return `\n## 本章控制输入
-${narrativeIntent || "(无)"}
+    return `\n## Chapter Control Input
+${narrativeIntent || "()"}
 
-### 已选上下文
+### Selected Context
 ${selectedContext || "- none"}
 
-### 规则栈
-- 硬护栏：${ruleStack.sections.hard.join("、") || "(无)"}
-- 软约束：${ruleStack.sections.soft.join("、") || "(无)"}
-- 诊断规则：${ruleStack.sections.diagnostic.join("、") || "(无)"}
+### Rule Stack
+- Hard Guardrails: ${ruleStack.sections.hard.join("、") || "()"}
+- Soft Constraints: ${ruleStack.sections.soft.join("、") || "()"}
+- Diagnostic Rules: ${ruleStack.sections.diagnostic.join("、") || "()"}
 
-### 当前覆盖
+### Current Overrides
 ${overrides}\n`;
   }
 
   /**
    * Soft-check that the LLM's PRE_WRITE_CHECK output references the three
-   * non-negotiable memo sections: 当前任务, 不要做, 章尾必须发生的改变.
+   * non-negotiable memo sections: Nhiệm vụ hiện tại, Không làm, Thay đổi bắt buộc cuối chương.
    *
    * This is NOT a hard gate — the memo was already parse-validated in the
    * planner, and the writer prompt already tells the LLM to align to memo.
@@ -991,7 +991,7 @@ ${overrides}\n`;
   ): void {
     if (!preWriteCheck || preWriteCheck.trim().length === 0) {
       this.logWarn(language, {
-        zh: `第${chapterNumber}章 PRE_WRITE_CHECK 为空，无法对齐 chapter_memo`,
+        vi: `Chương ${chapterNumber}Chương PRE_WRITE_CHECK trống, không thể đồng bộ chapter_memo`,
         en: `Chapter ${chapterNumber} PRE_WRITE_CHECK is empty; cannot verify memo alignment`,
       });
       return;
@@ -1004,15 +1004,15 @@ ${overrides}\n`;
           { needle: "end-of-chapter", label: "Required end-of-chapter change" },
         ]
       : [
-          { needle: "当前任务", label: "当前任务" },
-          { needle: "不要做", label: "不要做" },
-          { needle: "章尾", label: "章尾必须发生的改变" },
+          { needle: "Nhiệm vụ hiện tại", label: "Nhiệm vụ hiện tại" },
+          { needle: "Không làm", label: "Không làm" },
+          { needle: "Required end-of-chapter change", label: "Thay đổi bắt buộc cuối chương" },
         ];
     const missing = required.filter((r) => !preWriteCheck.includes(r.needle)).map((r) => r.label);
 
     if (missing.length > 0) {
       this.logWarn(language, {
-        zh: `第${chapterNumber}章 PRE_WRITE_CHECK 缺少 memo 章节检查：${missing.join("、")}`,
+        vi: `Chương ${chapterNumber}Chương PRE_WRITE_CHECK thiếu kiểm tra chương memo: ${missing.join("、")}`,
         en: `Chapter ${chapterNumber} PRE_WRITE_CHECK missing memo sections: ${missing.join(", ")}`,
       });
     }
@@ -1025,9 +1025,9 @@ ${overrides}\n`;
 - Acceptable range: ${lengthSpec.softMin}-${lengthSpec.softMax} words`;
     }
 
-    return `要求：
-- 目标字数：${lengthSpec.target}字
-- 允许区间：${lengthSpec.softMin}-${lengthSpec.softMax}字`;
+    return `：
+- ：${lengthSpec.target}
+- ：${lengthSpec.softMin}-${lengthSpec.softMax}`;
   }
 
   private async loadRecentChapters(
@@ -1062,7 +1062,7 @@ ${overrides}\n`;
     try {
       return await readFile(path, "utf-8");
     } catch {
-      return "(文件尚未创建)";
+      return "(file not created yet)";
     }
   }
 
@@ -1071,8 +1071,8 @@ ${overrides}\n`;
     snapshotStoryDir: string,
   ): Promise<string> {
     const snapshotMatrix = await this.readFileOrDefault(join(snapshotStoryDir, "character_matrix.md"));
-    if (snapshotMatrix !== "(文件尚未创建)") return snapshotMatrix;
-    return readCharacterContext(bookDir, "(文件尚未创建)");
+    if (snapshotMatrix !== "(file not created yet)") return snapshotMatrix;
+    return readCharacterContext(bookDir, "(file not created yet)");
   }
 
   private renderDeltaSummaryRow(delta: RuntimeStateDelta): string {
@@ -1224,7 +1224,7 @@ ${overrides}\n`;
       // File doesn't exist yet — start with header
       existing = language === "en"
         ? "# Chapter Summaries\n\n| Chapter | Title | Characters | Key Events | State Changes | Hook Activity | Mood | Chapter Type |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n"
-        : "# 章节摘要\n\n| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |\n|------|------|----------|----------|----------|----------|----------|----------|\n";
+        : "# Chapter Summary\n\n| Chapter | Title | Characters | Key events | State change | Hook dynamics | Emotional tone | Chapter type |\n|------|------|----------|----------|----------|----------|----------|----------|\n";
     }
 
     // Extract only the data row(s) from the summary (skip header lines)
@@ -1232,7 +1232,7 @@ ${overrides}\n`;
       .split("\n")
       .filter((line) =>
         line.startsWith("|")
-        && !line.startsWith("| 章节")
+        && !line.startsWith("| Chapter")
         && !line.startsWith("| Chapter")
         && !line.startsWith("|--")
         && !line.startsWith("| ---"),
@@ -1260,17 +1260,17 @@ ${overrides}\n`;
   }
 
   private buildStyleFingerprint(styleProfileRaw: string): string | undefined {
-    if (!styleProfileRaw || styleProfileRaw === "(文件尚未创建)") return undefined;
+    if (!styleProfileRaw || styleProfileRaw === "(file not created yet)") return undefined;
     try {
       const profile = JSON.parse(styleProfileRaw);
       const lines: string[] = [];
-      if (profile.avgSentenceLength) lines.push(`- 平均句长：${profile.avgSentenceLength}字`);
-      if (profile.sentenceLengthStdDev) lines.push(`- 句长标准差：${profile.sentenceLengthStdDev}`);
-      if (profile.avgParagraphLength) lines.push(`- 平均段落长度：${profile.avgParagraphLength}字`);
-      if (profile.paragraphLengthRange) lines.push(`- 段落长度范围：${profile.paragraphLengthRange.min}-${profile.paragraphLengthRange.max}字`);
-      if (profile.vocabularyDiversity) lines.push(`- 词汇多样性(TTR)：${profile.vocabularyDiversity}`);
-      if (profile.topPatterns?.length > 0) lines.push(`- 高频句式：${profile.topPatterns.join("、")}`);
-      if (profile.rhetoricalFeatures?.length > 0) lines.push(`- 修辞特征：${profile.rhetoricalFeatures.join("、")}`);
+      if (profile.avgSentenceLength) lines.push(`- Avg sentence length: ${profile.avgSentenceLength}`);
+      if (profile.sentenceLengthStdDev) lines.push(`- Sentence length stddev: ${profile.sentenceLengthStdDev}`);
+      if (profile.avgParagraphLength) lines.push(`- Avg paragraph length: ${profile.avgParagraphLength}`);
+      if (profile.paragraphLengthRange) lines.push(`- Paragraph length range: ${profile.paragraphLengthRange.min}-${profile.paragraphLengthRange.max}`);
+      if (profile.vocabularyDiversity) lines.push(`- Vocabulary diversity (TTR): ${profile.vocabularyDiversity}`);
+      if (profile.topPatterns?.length > 0) lines.push(`- High frequency patterns: ${profile.topPatterns.join("、")}`);
+      if (profile.rhetoricalFeatures?.length > 0) lines.push(`- Rhetorical features: ${profile.rhetoricalFeatures.join("、")}`);
       return lines.length > 0 ? lines.join("\n") : undefined;
     } catch {
       return undefined;

@@ -41,39 +41,39 @@ describe("state projections", () => {
     ].join("\n"));
   });
 
-  it("renders chapter summaries projection with deterministic Chinese ordering", () => {
+  it("renders chapter summaries projection with deterministic Vietnamese ordering", () => {
     const markdown = renderChapterSummariesProjection({
       rows: [
         {
           chapter: 12,
-          title: "河埠对账",
-          characters: "林月",
-          events: "林月核对货单与誓令碎片",
-          stateChanges: "师债线索进一步收束",
-          hookActivity: "mentor-debt 推进",
-          mood: "紧绷",
-          chapterType: "主线推进",
+          title: "mock_text",
+          characters: "mock_text",
+          events: "mock_text",
+          stateChanges: "mock_text",
+          hookActivity: "mentor-debt mock_text",
+          mood: "mock_text",
+          chapterType: "mock_text",
         },
         {
           chapter: 11,
-          title: "雨巷旧账",
-          characters: "林月",
-          events: "林月查到旧账册断页",
-          stateChanges: "师债线被重新钉牢",
-          hookActivity: "mentor-debt 推进",
-          mood: "压抑",
-          chapterType: "主线推进",
+          title: "mock_text",
+          characters: "mock_text",
+          events: "mock_text",
+          stateChanges: "mock_text",
+          hookActivity: "mentor-debt mock_text",
+          mood: "mock_text",
+          chapterType: "mock_text",
         },
       ],
     }, "vi");
 
     expect(markdown).toBe([
-      "# 章节摘要",
+      "# Tóm tắt chương",
       "",
-      "| 章节 | 标题 | 出场人物 | 关键事件 | 状态变化 | 伏笔动态 | 情绪基调 | 章节类型 |",
+      "| Chương | Tiêu đề | Nhân vật | Sự kiện chính | Thay đổi trạng thái | Hoạt động gợi mở | Tông cảm xúc | Loại chương |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
-      "| 11 | 雨巷旧账 | 林月 | 林月查到旧账册断页 | 师债线被重新钉牢 | mentor-debt 推进 | 压抑 | 主线推进 |",
-      "| 12 | 河埠对账 | 林月 | 林月核对货单与誓令碎片 | 师债线索进一步收束 | mentor-debt 推进 | 紧绷 | 主线推进 |",
+      "| 11 | mock_text | mock_text | mock_text | mock_text | mentor-debt mock_text | mock_text | mock_text |",
+      "| 12 | mock_text | mock_text | mock_text | mock_text | mentor-debt mock_text | mock_text | mock_text |",
       "",
     ].join("\n"));
   });

@@ -82,72 +82,72 @@ describe("interaction models", () => {
 
   it("validates structured script and storyboard creation payloads", () => {
     expect(ScriptCreateActionPayloadSchema.parse({
-      title: "冷库账页",
+      title: "mock_text",
       targetFormat: "vertical_short_drama",
       episodeCount: 12,
-      episodeDuration: "2分钟",
-      requirements: "保留调查线七成、家怨三成。",
+      episodeDuration: "2mock_text",
+      requirements: "mock_text、mock_text。",
     })).toMatchObject({
-      title: "冷库账页",
+      title: "mock_text",
       targetFormat: "vertical_short_drama",
       episodeCount: 12,
     });
 
     expect(StoryboardCreateActionPayloadSchema.parse({
-      title: "冷库账页分镜",
-      visualStyle: "写实冷色",
+      title: "mock_text",
+      visualStyle: "mock_text",
       aspectRatio: "9:16",
-      granularity: "按关键镜头拆分",
+      granularity: "mock_text",
       maxShots: 18,
     })).toMatchObject({
-      title: "冷库账页分镜",
-      visualStyle: "写实冷色",
+      title: "mock_text",
+      visualStyle: "mock_text",
       maxShots: 18,
     });
 
     expect(InteractiveFilmCreateActionPayloadSchema.parse({
-      title: "盛世账页",
-      requirements: "多分支，多结局，变量记录关键抉择。",
-      targetAudience: "欧美互动影游用户",
-      budget: "5000元",
-      referenceMode: "盛世天下式多走向",
+      title: "mock_text",
+      requirements: "mock_text，mock_text，mock_textQuyet dinh。",
+      targetAudience: "mock_text",
+      budget: "5000mock_text",
+      referenceMode: "mock_text",
     })).toMatchObject({
-      title: "盛世账页",
-      budget: "5000元",
+      title: "mock_text",
+      budget: "5000mock_text",
     });
   });
 
   it("validates derivative-work payloads without magic routes", () => {
     expect(FanficCreateActionPayloadSchema.parse({
-      title: "霜港来信",
+      title: "mock_text",
       sourcePath: ".castor/uploads/canon.pdf",
       mode: "canon",
-    })).toMatchObject({ title: "霜港来信", mode: "canon" });
-    expect(FanficCreateActionPayloadSchema.safeParse({ title: "缺少正典" }).success).toBe(false);
+    })).toMatchObject({ title: "mock_text", mode: "canon" });
+    expect(FanficCreateActionPayloadSchema.safeParse({ title: "mock_text" }).success).toBe(false);
 
     expect(ContinuationImportActionPayloadSchema.parse({
-      title: "雾港续章",
+      title: "mock_text",
       sourcePath: ".castor/uploads/novel.txt",
-    })).toMatchObject({ title: "雾港续章" });
+    })).toMatchObject({ title: "mock_text" });
     expect(ContinuationImportActionPayloadSchema.safeParse({
       sourcePath: "novel.txt",
       targetRoute: "import:continuation",
     }).success).toBe(false);
 
     expect(SpinoffCreateActionPayloadSchema.parse({
-      title: "雨夜番外",
+      title: "mock_text",
       parentBookId: "harbor",
-      direction: "老船工视角",
+      direction: "mock_text",
     })).toMatchObject({ parentBookId: "harbor" });
 
     expect(ImitationCreateActionPayloadSchema.parse({
-      title: "纸灯新案",
-      referenceText: "参考文风片段",
-      storyIdea: "原创县城悬疑",
-    })).toMatchObject({ storyIdea: "原创县城悬疑" });
+      title: "mock_text",
+      referenceText: "mock_text",
+      storyIdea: "mock_text",
+    })).toMatchObject({ storyIdea: "mock_text" });
     expect(ImitationCreateActionPayloadSchema.safeParse({
-      title: "缺少参考",
-      storyIdea: "原创故事",
+      title: "mock_text",
+      storyIdea: "mock_text",
     }).success).toBe(false);
   });
 
@@ -195,10 +195,10 @@ describe("interaction models", () => {
       pendingProposedAction: {
         action: "interactive_film_create",
         targetSessionKind: "interactive-film",
-        instruction: "生成三幕互动影游",
+        instruction: "mock_text",
         requestedSkills: ["interactive-film-authoring"],
         actionPayload: {
-          interactiveFilmCreate: { title: "回声航线", episodeCount: 3 },
+          interactiveFilmCreate: { title: "mock_text", episodeCount: 3 },
         },
       },
     });
@@ -283,8 +283,8 @@ describe("interaction models", () => {
 
   it("stores and clears a creation draft inside the shared session", () => {
     const draft = BookCreationDraftSchema.parse({
-      concept: "港风商战悬疑，主角从灰产洗白。",
-      title: "夜港账本",
+      concept: "mock_text，mock_text。",
+      title: "mock_text",
       genre: "urban",
       readyToCreate: false,
     });
@@ -298,7 +298,7 @@ describe("interaction models", () => {
     });
 
     const withDraft = updateCreationDraft(session, draft);
-    expect(withDraft.creationDraft?.title).toBe("夜港账本");
+    expect(withDraft.creationDraft?.title).toBe("mock_text");
     expect(clearCreationDraft(withDraft).creationDraft).toBeUndefined();
   });
 });
