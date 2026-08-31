@@ -138,7 +138,7 @@ describe("state-review-regenerate", () => {
         proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前目标", object: "查账" } },
         decision: "accepted" as const,
       }],
-      createdAt: CREATED_AT, language: "zh",
+      createdAt: CREATED_AT, language: "vi",
     });
     await addUserStateReviewItem({
       bookDir: fixture.bookDir, chapter: 16, expectedReviewRevision: 2,
@@ -150,7 +150,7 @@ describe("state-review-regenerate", () => {
 
     let analyzedContent = "";
     const { artifact } = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async (input) => { analyzedContent = input.chapterContent; return factDelta(16, "北岸灯塔"); },
     });
     const after = await captureBookMetadata(fixture.root);
@@ -172,7 +172,7 @@ describe("state-review-regenerate", () => {
     // Items come ONLY from Task 4 over the fresh delta — fresh undecided AI
     // items; old accepted decisions and the old user-added item NOT carried.
     const expectedItems = buildStateReviewItems(factDelta(16, "北岸灯塔"), {
-      chapterContent: durableP2, language: "zh",
+      chapterContent: durableP2, language: "vi",
     });
     const shape = (items: ReadonlyArray<ReviewItem>) =>
       items.map((item) => ({ id: item.id, kind: item.kind, origin: item.origin, decision: item.decision }));
@@ -204,7 +204,7 @@ describe("state-review-regenerate", () => {
       throw new Error("analyzer offline");
     };
     await expect(rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh", analyze: failing,
+      bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: failing,
     })).rejects.toMatchObject({ code: "state_review_rebuild_failed" });
     const failedShell = await loadStateReview(fixture.bookDir, 16);
     expect(failedShell?.status).toBe("rebuild_failed");
@@ -230,7 +230,7 @@ describe("state-review-regenerate", () => {
     let retryContent = "";
     let retryCanon = "";
     const { artifact } = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async (input) => {
         retryContent = input.chapterContent;
         retryCanon = (await readStoryCanon(fixture.bookDir)).revision;
@@ -256,7 +256,7 @@ describe("state-review-regenerate", () => {
     const before = await captureBookMetadata(fixture.root);
 
     await expect(rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => { throw new Error("provider exploded"); },
     })).rejects.toMatchObject({
       code: "state_review_rebuild_failed",
@@ -287,24 +287,24 @@ describe("state-review-regenerate", () => {
   it("(R7/O) repeated failures stay failed without consuming a reviewId; success mints a fresh one each time", async () => {
     await saveViaTask9(fixture, PROSE_P2);
     const failing = async (): Promise<RuntimeStateDelta> => { throw new Error("down again"); };
-    await expect(rebuildStateReview({ bookDir: fixture.bookDir, chapter: 16, language: "zh", analyze: failing }))
+    await expect(rebuildStateReview({ bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: failing }))
       .rejects.toMatchObject({ code: "state_review_rebuild_failed" });
-    await expect(rebuildStateReview({ bookDir: fixture.bookDir, chapter: 16, language: "zh", analyze: failing }))
+    await expect(rebuildStateReview({ bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: failing }))
       .rejects.toMatchObject({ code: "state_review_rebuild_failed" });
     expect((await loadStateReview(fixture.bookDir, 16))?.status).toBe("rebuild_failed");
 
     const first = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => factDelta(16, "北岸灯塔"),
     });
     expect(first.artifact.status).toBe("active");
 
     // Full second generation cycle: invalidate → fail → succeed ⇒ yet another id.
     await saveViaTask9(fixture, `${PROSE_P2}\n\n续写。`);
-    await expect(rebuildStateReview({ bookDir: fixture.bookDir, chapter: 16, language: "zh", analyze: failing }))
+    await expect(rebuildStateReview({ bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: failing }))
       .rejects.toMatchObject({ code: "state_review_rebuild_failed" });
     const second = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => factDelta(16, "南岸仓库"),
     });
     expect(second.artifact.reviewId).not.toBe(first.artifact.reviewId);
@@ -317,11 +317,11 @@ describe("state-review-regenerate", () => {
     await publishActiveProposal(fixture.bookDir, {
       schemaVersion: 1, status: "active", reviewId: REVIEW_ID_R1, sourceChapter: 16,
       effectiveChapter: 13, proseRevision: "0123456789abcdef", baseCanonRevision: "fedcba9876543210",
-      reviewRevision: 1, items: [], createdAt: CREATED_AT, language: "zh",
+      reviewRevision: 1, items: [], createdAt: CREATED_AT, language: "vi",
     });
     const beforeActive = await captureBookMetadata(fixture.root);
     await expect(rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh", analyze: async () => factDelta(16, "x"),
+      bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: async () => factDelta(16, "x"),
     })).rejects.toMatchObject({ code: "state_review_already_resolved" });
     expect(await captureBookMetadata(fixture.root)).toEqual(beforeActive);
 
@@ -335,7 +335,7 @@ describe("state-review-regenerate", () => {
     }, null, 2), "utf-8");
     const beforeStale = await captureBookMetadata(fixture.root);
     await expect(rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh", analyze: async () => factDelta(16, "x"),
+      bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: async () => factDelta(16, "x"),
     })).rejects.toMatchObject({ code: "state_review_stale" });
     expect(await captureBookMetadata(fixture.root)).toEqual(beforeStale);
 
@@ -343,7 +343,7 @@ describe("state-review-regenerate", () => {
     await rm(join(fixture.bookDir, SHELL_RELPATH));
     const beforeMissing = await captureBookMetadata(fixture.root);
     await expect(rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh", analyze: async () => factDelta(16, "x"),
+      bookDir: fixture.bookDir, chapter: 16, language: "vi", analyze: async () => factDelta(16, "x"),
     })).rejects.toMatchObject({ code: "state_review_not_found" });
     expect(await captureBookMetadata(fixture.root)).toEqual(beforeMissing);
   });
@@ -352,7 +352,7 @@ describe("state-review-regenerate", () => {
     await saveViaTask9(fixture, PROSE_P2);
     const before = await captureBookMetadata(fixture.root);
     const { artifact } = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => RuntimeStateDeltaSchema.parse({ chapter: 16 }),
     });
     expect(artifact.status).toBe("active");
@@ -365,12 +365,12 @@ describe("state-review-regenerate", () => {
   it("(PART H) identical semantic payload across generations keeps deterministic Task 4 item IDs while identity stays per-generation", async () => {
     await saveViaTask9(fixture, PROSE_P2);
     const first = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => factDelta(16, "北岸灯塔"),
     });
     await saveViaTask9(fixture, `${PROSE_P2}\n\n微调一句。`);
     const second = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => factDelta(16, "北岸灯塔"),
     });
     expect(second.artifact.reviewId).not.toBe(first.artifact.reviewId);
@@ -398,7 +398,7 @@ describe("state-review-regenerate", () => {
     await saveViaTask9(fixture, PROSE_P2);
 
     const { artifact } = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => factDelta(16, "北岸灯塔"),
     });
     expect(artifact.sourceChapter).toBe(16);
@@ -411,7 +411,7 @@ describe("state-review-regenerate", () => {
 
     armedPublishFailures = 1;
     await expect(rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => factDelta(16, "北岸灯塔"),
     })).rejects.toThrow(/injected active-publication failure/);
 
@@ -487,7 +487,7 @@ describe("state-review-regenerate", () => {
         release();
       };
     });
-    vi.spyOn(stateAny.state, "loadBookConfig").mockResolvedValue({ language: "zh" } as never);
+    vi.spyOn(stateAny.state, "loadBookConfig").mockResolvedValue({ language: "vi" } as never);
     // Guard: the impossible analyzer path must NEVER be exercised.
     const analyzerSpy = vi.spyOn(ChapterAnalyzerAgent.prototype, "analyzeChapter")
       .mockRejectedValue(new Error("analyzer must not be the proposal provider"));
@@ -522,7 +522,7 @@ describe("state-review-regenerate", () => {
     const stateAny = runner as unknown as {
       state: { loadBookConfig: (bookId: string) => Promise<unknown> };
     };
-    vi.spyOn(stateAny.state, "loadBookConfig").mockResolvedValue({ language: "zh" } as never);
+    vi.spyOn(stateAny.state, "loadBookConfig").mockResolvedValue({ language: "vi" } as never);
 
     for (const mode of ["missing-delta", "invalid-delta"] as const) {
       const probe: SettleProbe = { calls: [], settledContents: [], settledCanonRevisions: [] };
@@ -564,7 +564,7 @@ describe("state-review-regenerate", () => {
     await saveViaTask9(fixture, "# 第26章 反转\n\n林秋烧毁了账本。", 26);
 
     const { artifact } = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 26, language: "zh",
+      bookDir: fixture.bookDir, chapter: 26, language: "vi",
       analyze: async () => factDelta(26, "北岸灯塔"),
     });
 
@@ -589,7 +589,7 @@ describe("state-review-regenerate", () => {
     await saveViaTask9(fixture, PROSE_P2); // source 16 <= confirmed head 25
 
     const { artifact } = await rebuildStateReview({
-      bookDir: fixture.bookDir, chapter: 16, language: "zh",
+      bookDir: fixture.bookDir, chapter: 16, language: "vi",
       analyze: async () => factDelta(16, "北岸灯塔"),
     });
     expect(artifact.sourceChapter).toBe(16);

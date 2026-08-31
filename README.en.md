@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">中文</a> | English | <a href="README.ja.md">日本語</a>
+  <a href="README.md">Tiếng Việt</a> | English | <a href="README.ja.md">日本語</a>
 </p>
 
 ---
@@ -312,7 +312,7 @@ Castor ships with 10 English-native genre profiles. Each includes genre-specific
 | **Tower Climber** | Numerical system, floor progression |
 | **Cozy Fantasy** | Low-stakes pacing, comfort-first tone |
 
-Also supports 5 Chinese web novel genres (xuanhuan, xianxia, urban, horror, other) for bilingual creators.
+Also supports 5 Vietnamese web novel genres (huyền ảo, tiên hiệp, đô thị, kinh dị, khác) for bilingual creators.
 
 Every genre includes a **fatigue word list** (e.g., "delve", "tapestry", "testament", "intricate", "pivotal" for LitRPG) — the auditor flags these automatically so your prose doesn't read like every other AI-generated novel.
 

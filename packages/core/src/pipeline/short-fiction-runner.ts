@@ -165,7 +165,7 @@ async function produceShort(
   outDir: string,
   providedStoryId: string | undefined,
 ): Promise<ShortFictionRunResult> {
-  const language = options.language ?? "zh";
+  const language = options.language ?? "vi";
   const chapterCount = boundedInteger(
     options.chapterCount,
     SHORT_FICTION_DEFAULT_CHAPTERS,
@@ -539,7 +539,7 @@ async function writeDraftArtifacts(
   baseDir: string,
   version: string,
   draft: ShortFictionBatchDraft,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): Promise<void> {
   const draftDir = join(baseDir, "drafts", version);
   await commitAtomicFileSet({
@@ -563,7 +563,7 @@ async function writeFinalArtifacts(
   root: string,
   baseDir: string,
   draft: ShortFictionBatchDraft,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): Promise<void> {
   const finalDir = join(baseDir, "final");
   const markdown = renderShortFictionDraftMarkdown(draft, language);
@@ -589,7 +589,7 @@ async function writePackageArtifacts(
   root: string,
   baseDir: string,
   salesPackage: ShortFictionSalesPackage,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): Promise<void> {
   const finalDir = join(baseDir, "final");
   const headings = language === "en"
@@ -1042,7 +1042,7 @@ function resolveCoverEndpoint(coverEndpoint?: string, coverBaseUrl?: string): st
 function buildCoverImagePrompt(
   salesPackage: ShortFictionSalesPackage,
   mode: CoverPromptMode,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     const base = [

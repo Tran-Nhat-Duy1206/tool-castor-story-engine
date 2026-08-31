@@ -51,7 +51,7 @@ describe("analyzeLongSpanFatigue", () => {
         chapterNumber: 3,
         chapterContent: "夜色像潮水一样漫到院墙根。林越没有立刻翻墙，而是先贴着墙根听了一阵。最后，他把手按在那道旧债印上。",
         chapterSummary: "| 3 | 试探 | 林越 | 继续潜伏 | 目标未变 | 债印未解 | 克制 | 布局 |",
-        language: "zh",
+        language: "vi",
       });
 
       expect(result.issues.some((issue) => issue.category === "节奏单调")).toBe(true);
@@ -148,7 +148,7 @@ describe("analyzeLongSpanFatigue", () => {
         chapterNumber: 3,
         chapterContent: "墙角的灰一直没落定。周谨川盯着名单最后一行，喉结很轻地滚了一下，还是没有把气松出来。",
         chapterSummary: "| 3 | 名单未落 | 周谨川 | 名单追查继续推进 | 目标未变 | 名单线继续发酵 | 压迫、窒息 | 调查章 |",
-        language: "zh",
+        language: "vi",
       });
 
       expect(result.issues.some((issue) => issue.category === "标题重复")).toBe(true);

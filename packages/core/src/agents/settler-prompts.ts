@@ -6,7 +6,7 @@ export function buildSettlerSystemPrompt(
   book: BookConfig,
   genreProfile: GenreProfile,
   bookRules: BookRules | null,
-  language?: "zh" | "en",
+  language?: "vi" | "en",
 ): string {
   const resolvedLang = language ?? genreProfile.language;
   const isEnglish = resolvedLang === "en";

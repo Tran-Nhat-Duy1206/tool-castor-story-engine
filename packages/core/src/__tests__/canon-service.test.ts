@@ -111,7 +111,7 @@ describe("describeCurrentState", () => {
     const { bookDir } = await createCanonBook();
     const view = await readStoryCanon(bookDir);
 
-    const described = describeCurrentState(view.currentState, "zh");
+    const described = describeCurrentState(view.currentState, "vi");
 
     expect(described.chapter).toBe(12);
     expect(described.slots).toHaveLength(6);
@@ -139,7 +139,7 @@ describe("describeCurrentState", () => {
     const { bookDir } = await createCanonBook();
     const view = await readStoryCanon(bookDir);
 
-    const described = describeCurrentState(view.currentState, "zh");
+    const described = describeCurrentState(view.currentState, "vi");
 
     expect(described.additionalFacts).toHaveLength(1);
     expect(described.additionalFacts[0]).toMatchObject({

@@ -30,7 +30,7 @@ export interface PlayActionInterpreterLike {
   readonly interpret: (input: {
     readonly input: string;
     readonly sceneBrief: string;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
   }) => Promise<PlayActionIntentInput>;
 }
 
@@ -40,7 +40,7 @@ export interface PlayWorldMutatorLike {
     readonly input: string;
     readonly action: PlayActionIntentInput;
     readonly context: string;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
   }) => Promise<PlayMutationInput>;
 }
 
@@ -53,7 +53,7 @@ export interface PlaySceneRendererLike {
     readonly stateBrief: string;
     readonly replayContext?: string;
     readonly mode?: "open" | "guided";
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
     readonly worldPremise?: string;
   }) => Promise<PlaySceneRender>;
 }
@@ -67,7 +67,7 @@ export interface PlaySceneReconcilerLike {
     readonly sceneText: string;
     readonly context: string;
     readonly stateBrief: string;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
     readonly worldPremise?: string;
   }) => Promise<PlayMutationInput>;
 }
@@ -162,7 +162,7 @@ export class PlayRunner {
     }
 
     const world = await this.store.loadWorld(this.options.worldId);
-    const language = world?.language ?? "zh";
+    const language = world?.language ?? "vi";
     const action: PlayActionIntent = {
       actionKind: "look",
       intent: language === "en" ? "Seed the opening state for the first playable scene." : "播种第一幕已成立的开场状态。",
@@ -262,7 +262,7 @@ export class PlayRunner {
     options: { readonly replayContext?: string },
   ): Promise<PlayStepResult> {
     const world = await this.store.loadWorld(this.options.worldId);
-    const language = world?.language ?? "zh";
+    const language = world?.language ?? "vi";
     const sceneBrief = await this.readOptionalProjection("projections/scene.md");
     const action = PlayActionIntentSchema.parse(await this.actionInterpreter.interpret({
       input: rawInput,
@@ -432,7 +432,7 @@ export class PlayRunner {
       replayContext: buildReplayContext({
         originalInput: last.rawInput,
         replacementInput: input?.trim(),
-        language: (await this.store.loadWorld(this.options.worldId))?.language ?? "zh",
+        language: (await this.store.loadWorld(this.options.worldId))?.language ?? "vi",
       }),
     });
     const nextGraph = readGraphSnapshot(this.db);
@@ -473,7 +473,7 @@ export class PlayRunner {
     };
   }
 
-  private async buildContextBrief(sceneBrief: string, language: "zh" | "en", world: PlayWorld | null): Promise<string> {
+  private async buildContextBrief(sceneBrief: string, language: "vi" | "en", world: PlayWorld | null): Promise<string> {
     const stateBrief = await this.readOptionalProjection("projections/state.md");
     const isEn = language === "en";
     const worldContext = renderPlayWorldContext(world, language);
@@ -506,7 +506,7 @@ function isOpeningGraphReady(graph: PlayGraphSnapshot | null): boolean {
 function buildOpeningSeedInput(input: {
   readonly sceneText: string;
   readonly suggestedActions: readonly string[];
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly premise?: string;
 }): string {
   const isEn = input.language === "en";
@@ -533,7 +533,7 @@ function buildOpeningSeedInput(input: {
 function buildReplayContext(input: {
   readonly originalInput: string;
   readonly replacementInput?: string;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
 }): string {
   const replacement = input.replacementInput?.trim();
   if (input.language === "en") {
@@ -558,7 +558,7 @@ function buildReplayContext(input: {
   ].filter(Boolean).join("\n");
 }
 
-function renderPlayWorldContext(world: PlayWorld | null | undefined, language: "zh" | "en"): string {
+function renderPlayWorldContext(world: PlayWorld | null | undefined, language: "vi" | "en"): string {
   if (!world) return "";
   const premise = world.premise?.trim();
   const worldContract = world.worldContract?.trim();
@@ -667,7 +667,7 @@ function isEmptyMutationSupplement(mutation: PlayMutation): boolean {
     && !mutation.blocked;
 }
 
-function renderEntityRoster(entities: ReadonlyArray<PlayEntity>, language: "zh" | "en"): string {
+function renderEntityRoster(entities: ReadonlyArray<PlayEntity>, language: "vi" | "en"): string {
   if (entities.length === 0) {
     return "";
   }

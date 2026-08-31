@@ -30,17 +30,17 @@ describe("PolisherAgent", () => {
     vi.restoreAllMocks();
   });
 
-  it("encodes file-layer scope boundary and six prose 雷点 in the zh system prompt", async () => {
+  it("encodes file-layer scope boundary and six prose checks in the vi system prompt (English canonical)", async () => {
     const agent = makeAgent();
     const chatSpy = vi.spyOn(PolisherAgent.prototype as never, "chat" as never).mockResolvedValue({
-      content: "润色后的正文。",
+      content: "Nội dung đã được trau chuốt.",
       usage: ZERO_USAGE,
     });
 
     await agent.polishChapter({
-      chapterContent: "原始正文。",
+      chapterContent: "Nội dung gốc.",
       chapterNumber: 7,
-      language: "zh",
+      language: "vi",
     });
 
     const messages = chatSpy.mock.calls[0]?.[0] as
@@ -48,31 +48,31 @@ describe("PolisherAgent", () => {
       | undefined;
     const systemPrompt = messages?.[0]?.content ?? "";
 
-    // Hard scope boundary.
-    expect(systemPrompt).toContain("润色边界");
-    expect(systemPrompt).toContain("禁止增删情节");
-    expect(systemPrompt).toContain("结构的事归 Reviewer");
-    // File-layer 雷点 subset.
-    expect(systemPrompt).toContain("描写无效");
-    expect(systemPrompt).toContain("文笔华丽过度");
-    expect(systemPrompt).toContain("排版不规范");
+    // Hard scope boundary - now English canonical for vi as well.
+    expect(systemPrompt).toContain("Polisher Scope");
+    expect(systemPrompt).toContain("FORBIDDEN from adding or removing plot beats");
+    expect(systemPrompt).toContain("Structure is the Reviewer's job");
+    // File-layer checks subset.
+    expect(systemPrompt).toContain("Ineffective description");
+    expect(systemPrompt).toContain("Over-purple prose");
+    expect(systemPrompt).toContain("Bad formatting");
     // Hard text-layer rules.
-    expect(systemPrompt).toContain("3-5 行/段");
-    expect(systemPrompt).toContain("五感代入");
-    expect(systemPrompt).toContain("对话自然度");
+    expect(systemPrompt).toContain("3-5 lines");
+    expect(systemPrompt).toContain("Five senses");
+    expect(systemPrompt).toContain("Dialogue naturalness");
   });
 
   it("routes plot/structure findings to [polisher-note] lines instead of rewriting", async () => {
     const agent = makeAgent();
     const chatSpy = vi.spyOn(PolisherAgent.prototype as never, "chat" as never).mockResolvedValue({
-      content: "润色后的正文。",
+      content: "Nội dung đã được trau chuốt.",
       usage: ZERO_USAGE,
     });
 
     await agent.polishChapter({
-      chapterContent: "原始正文。",
+      chapterContent: "Nội dung gốc.",
       chapterNumber: 7,
-      language: "zh",
+      language: "vi",
     });
 
     const messages = chatSpy.mock.calls[0]?.[0] as
@@ -86,19 +86,19 @@ describe("PolisherAgent", () => {
   it("injects the chapter memo so polish stays anchored to the memo goal", async () => {
     const agent = makeAgent();
     const chatSpy = vi.spyOn(PolisherAgent.prototype as never, "chat" as never).mockResolvedValue({
-      content: "润色后的正文。",
+      content: "Nội dung đã được trau chuốt.",
       usage: ZERO_USAGE,
     });
 
     await agent.polishChapter({
-      chapterContent: "原始正文。",
+      chapterContent: "Nội dung gốc.",
       chapterNumber: 7,
-      language: "zh",
+      language: "vi",
       chapterMemo: {
         chapter: 7,
-        goal: "陆焚拿回残刃",
+        goal: "Lục Phần lấy lại tàn nhẫn",
         isGoldenOpening: false,
-        body: "## 当前任务\n陆焚拿回残刃。",
+        body: "## Nhiệm vụ hiện tại\nLục Phần lấy lại tàn nhẫn.",
         threadRefs: [],
       },
     });
@@ -108,24 +108,24 @@ describe("PolisherAgent", () => {
       | undefined;
     const userPrompt = messages?.[1]?.content ?? "";
 
-    expect(userPrompt).toContain("## 章节备忘（润色不得偏离此目标）");
-    expect(userPrompt).toContain("goal：陆焚拿回残刃");
+    expect(userPrompt).toContain("## Chapter Memo");
+    expect(userPrompt).toContain("Goal: Lục Phần lấy lại tàn nhẫn");
   });
 
   it("returns polished content and flags 'changed' when output differs", async () => {
     const agent = makeAgent();
     vi.spyOn(PolisherAgent.prototype as never, "chat" as never).mockResolvedValue({
-      content: "润色后的正文。",
+      content: "Nội dung đã được trau chuốt.",
       usage: ZERO_USAGE,
     });
 
     const out = await agent.polishChapter({
-      chapterContent: "原始正文。",
+      chapterContent: "Nội dung gốc.",
       chapterNumber: 1,
-      language: "zh",
+      language: "vi",
     });
 
-    expect(out.polishedContent).toBe("润色后的正文。");
+    expect(out.polishedContent).toBe("Nội dung đã được trau chuốt.");
     expect(out.changed).toBe(true);
   });
 
@@ -137,29 +137,29 @@ describe("PolisherAgent", () => {
     });
 
     const out = await agent.polishChapter({
-      chapterContent: "原始正文。",
+      chapterContent: "Nội dung gốc.",
       chapterNumber: 1,
-      language: "zh",
+      language: "vi",
     });
 
-    expect(out.polishedContent).toBe("原始正文。");
+    expect(out.polishedContent).toBe("Nội dung gốc.");
     expect(out.changed).toBe(false);
   });
 
   it("strips a surrounding fenced-code-block wrapper if the model adds one", async () => {
     const agent = makeAgent();
     vi.spyOn(PolisherAgent.prototype as never, "chat" as never).mockResolvedValue({
-      content: "```markdown\n润色后的正文。\n```",
+      content: "```markdown\nNội dung đã được trau chuốt.\n```",
       usage: ZERO_USAGE,
     });
 
     const out = await agent.polishChapter({
-      chapterContent: "原始正文。",
+      chapterContent: "Nội dung gốc.",
       chapterNumber: 1,
-      language: "zh",
+      language: "vi",
     });
 
-    expect(out.polishedContent).toBe("润色后的正文。");
+    expect(out.polishedContent).toBe("Nội dung đã được trau chuốt.");
     expect(out.changed).toBe(true);
   });
 

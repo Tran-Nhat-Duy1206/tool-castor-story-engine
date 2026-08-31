@@ -44,7 +44,7 @@ function shellRequired(sourceChapter = 13): StateReviewShellArtifact {
     status: "rebuild_required",
     sourceChapter,
     createdAt: CREATED_AT,
-    language: "zh",
+    language: "vi",
     reason: "",
   };
 }
@@ -61,7 +61,7 @@ function activeProposal(overrides: Partial<ActiveStateReviewArtifact> = {}): Act
     reviewRevision: 1,
     items: [evidenceItem()],
     createdAt: CREATED_AT,
-    language: "zh",
+    language: "vi",
     ...overrides,
   };
 }

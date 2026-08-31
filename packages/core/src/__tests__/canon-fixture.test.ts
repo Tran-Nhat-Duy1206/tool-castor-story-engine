@@ -10,7 +10,7 @@ describe("createCanonBook fixture", () => {
 
     expect(snapshot.manifest).toMatchObject({
       schemaVersion: 2,
-      language: "zh",
+      language: "vi",
       lastAppliedChapter: 12,
       projectionVersion: 3,
     });
@@ -31,6 +31,6 @@ describe("createCanonBook fixture", () => {
     await expect(
       loadRuntimeStateSnapshot(bookDir),
     ).resolves.toBeTruthy();
-    expect(snapshot.manifest.language).toBe("zh");
+    expect(snapshot.manifest.language).toBe("vi");
   });
 });

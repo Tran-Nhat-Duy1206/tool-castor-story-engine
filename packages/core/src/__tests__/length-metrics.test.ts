@@ -17,7 +17,7 @@ describe("length metrics", () => {
   });
 
   it("defaults chapter length to the language-native unit", () => {
-    expect(defaultChapterLength("zh")).toBe(3000);
+    expect(defaultChapterLength("vi")).toBe(3000);
     expect(defaultChapterLength("en")).toBe(2000);
     expect(defaultChapterLength()).toBe(3000);
   });
@@ -37,7 +37,7 @@ describe("length metrics", () => {
   });
 
   it("builds a conservative length spec for Chinese chapters", () => {
-    const spec = buildLengthSpec(2200, "zh");
+    const spec = buildLengthSpec(2200, "vi");
 
     expect(spec).toEqual({
       target: 2200,
@@ -60,7 +60,7 @@ describe("length metrics", () => {
   });
 
   it("scales the conservative bands for smaller targets", () => {
-    const spec = buildLengthSpec(220, "zh");
+    const spec = buildLengthSpec(220, "vi");
 
     expect(spec.softMin).toBe(190);
     expect(spec.softMax).toBe(250);
@@ -69,7 +69,7 @@ describe("length metrics", () => {
   });
 
   it("detects soft and hard range drift", () => {
-    const spec = buildLengthSpec(2200, "zh");
+    const spec = buildLengthSpec(2200, "vi");
 
     expect(isOutsideSoftRange(1800, spec)).toBe(true);
     expect(isOutsideSoftRange(2200, spec)).toBe(false);

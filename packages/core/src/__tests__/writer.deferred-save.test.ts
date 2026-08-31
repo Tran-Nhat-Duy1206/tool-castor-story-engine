@@ -101,7 +101,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
   });
 
   it("LEGACY DEFAULT: persists prose plus runtime state exactly as before", async () => {
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh");
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi");
 
     expect(await readFile(join(fixture.bookDir, "chapters", "0013_雨夜提案.md"), "utf-8"))
       .toContain("第13章正文");
@@ -120,7 +120,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
     const beforeProjection = await readFile(join(fixture.bookDir, "story", "current_state.md"), "utf-8");
     const treeBefore = await captureBookMetadata(fixture.root);
 
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh", deferredOptions);
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", deferredOptions);
 
     expect(await readFile(join(fixture.bookDir, "chapters", "0013_雨夜提案.md"), "utf-8"))
       .toContain("第13章正文");
@@ -139,7 +139,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
   });
 
   it("UPDATED INDEX PARTICIPATES: chapters/index.json equals the exact supplied bytes", async () => {
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh", {
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", {
       deferStateApplication: true,
       updatedChapterIndexJson: INDEX_JSON,
     });
@@ -153,7 +153,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
     const before = await captureBookMetadata(fixture.root);
     const indexKey = Object.keys(before).find((key) => key.replace(/\\/g, "/").endsWith("chapters/index.json"))!;
 
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh", deferredOptions);
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", deferredOptions);
 
     const after = await captureBookMetadata(fixture.root);
     expect((after[indexKey] as { sha256: string; mtimeMs: number }).sha256)
@@ -164,7 +164,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
   });
 
   it("STATE REVIEW ARTIFACT SEAM: supplied artifact joins the same commit at the canonical path", async () => {
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh", {
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", {
       deferStateApplication: true,
       stateReviewJson: ARTIFACT_JSON,
       updatedChapterIndexJson: INDEX_JSON,
@@ -173,7 +173,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
   });
 
   it("SINGLE COMMIT: index/prose/artifact ride ONE commitAtomicFileSet invocation", async () => {
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh", {
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", {
       deferStateApplication: true,
       stateReviewJson: ARTIFACT_JSON,
       updatedChapterIndexJson: INDEX_JSON,
@@ -204,7 +204,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
     };
 
     await expect(
-      agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh", {
+      agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", {
         deferStateApplication: true,
         updatedChapterIndexJson: INDEX_JSON,
       }),
@@ -220,7 +220,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
   });
 
   it("DEFERRED MODE EXCLUDES the state-application path from the authoritative set entirely", async () => {
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "zh", {
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), false, "vi", {
       deferStateApplication: true,
       updatedChapterIndexJson: INDEX_JSON,
     });
@@ -248,7 +248,7 @@ describe("WriterAgent.saveChapter deferred publication", () => {
   });
 
   it("LEGACY REGRESSION: non-deferred save still writes runtime-state artifacts as before", async () => {
-    await agent.saveChapter(fixture.bookDir, chapterOutput(), true, "zh");
+    await agent.saveChapter(fixture.bookDir, chapterOutput(), true, "vi");
     const manifest = JSON.parse(
       await readFile(join(fixture.bookDir, "story", "state", "manifest.json"), "utf-8"),
     );

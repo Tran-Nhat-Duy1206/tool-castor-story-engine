@@ -118,7 +118,7 @@ describe("chapter-state-recovery", () => {
       oldState: "old state",
       oldHooks: "old hooks",
       originalValidation: createValidationResult(),
-      language: "zh",
+      language: "vi",
       logWarn,
       logger: { warn } as never,
     });
@@ -159,7 +159,7 @@ describe("chapter-state-recovery", () => {
       originalValidation: createValidationResult({
         warnings: [validatorWarning],
       }),
-      language: "zh",
+      language: "vi",
       logWarn: vi.fn(),
       logger: { warn: vi.fn() } as never,
     });

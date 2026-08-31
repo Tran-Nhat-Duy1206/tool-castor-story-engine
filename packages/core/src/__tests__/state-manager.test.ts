@@ -910,7 +910,7 @@ describe("StateManager", () => {
         status: "outlining",
         targetChapters: 100,
         chapterWordCount: 2200,
-        language: "zh",
+        language: "vi",
         createdAt: "2026-03-24T00:00:00Z",
         updatedAt: "2026-03-24T00:00:00Z",
       });

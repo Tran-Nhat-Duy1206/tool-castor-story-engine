@@ -38,7 +38,7 @@ export interface ScriptCreationRunOptions {
   readonly requirements?: string;
   readonly episodeCount?: number;
   readonly episodeDuration?: string;
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly projectId?: string;
   readonly outDir?: string;
   readonly onProgress?: (message: string) => void;
@@ -57,7 +57,7 @@ export interface StoryboardCreationRunOptions {
   readonly aspectRatio?: string;
   readonly granularity?: string;
   readonly maxShots?: number;
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly projectId?: string;
   readonly outDir?: string;
   readonly onProgress?: (message: string) => void;
@@ -77,7 +77,7 @@ export interface InteractiveFilmCreationRunOptions {
   readonly episodeDuration?: string;
   readonly budget?: string;
   readonly referenceMode?: string;
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly projectId?: string;
   readonly outDir?: string;
   readonly onProgress?: (message: string) => void;
@@ -172,7 +172,7 @@ export async function runScriptCreation(
   options.onProgress?.("Writing script draft...");
   const agent = new ScriptCreationAgent(options.runtime);
   const script = normalizeScriptEpisodeEndLabels(await agent.writeScript(input));
-  assertScriptDeliverable(script, options.language ?? "zh");
+  assertScriptDeliverable(script, options.language ?? "vi");
   const artifacts = [
     textArtifact(join(baseDir, "script-spec.md"), spec),
     textArtifact(join(baseDir, "script.md"), script),
@@ -200,7 +200,7 @@ export async function runScriptCreation(
   };
 }
 
-function assertScriptDeliverable(script: string, language: "zh" | "en"): void {
+function assertScriptDeliverable(script: string, language: "vi" | "en"): void {
   const characterHeadings = language === "en" ? ["Characters"] : ["人物", "Characters"];
   const scriptHeadings = language === "en" ? ["Script"] : ["剧本正文", "Script"];
   const body = extractMarkdownSection(
@@ -530,7 +530,7 @@ function buildInteractiveFilmGraphPremise(
   script: string,
   imagePrompts: string,
 ): string {
-  if ((input.language ?? "zh") === "en") {
+  if ((input.language ?? "vi") === "en") {
     return [
       `Creation brief: ${input.requirements}`,
       input.targetAudience ? `Target audience: ${input.targetAudience}` : "",
@@ -638,7 +638,7 @@ async function ensureProjectDir(projectRoot: string, relativePath: string): Prom
 function mergeRequirements(
   instruction: string,
   requirements: string | undefined,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): string {
   const extraLabel = language === "en" ? "Additional requirements:" : "补充要求：";
   return [

@@ -85,12 +85,12 @@ const DIMENSION_LABELS: Record<number, { readonly vi: string; readonly en: strin
   37: { vi: "Kiểm tra Nhất quán Sự kiện Chính điển", en: "Canon Event Consistency Check" },
 };
 
-function containsChinese(text: string): boolean {
+function containsVietnamese(text: string): boolean {
   return /[\u4e00-\u9fff]/u.test(text);
 }
 
 function resolveGenreLabel(genreId: string, profileName: string, _language: PromptLanguage): string {
-  if (!containsChinese(profileName)) {
+  if (!containsVietnamese(profileName)) {
     return profileName;
   }
 
@@ -452,7 +452,7 @@ Score holistically — do not let a single minor issue tank the score.`;
     const filteredHooks = filterHooks(hooks);
 
     const governedMemoryBlocks = options?.contextPackage
-      ? buildGovernedMemoryEvidenceBlocks(options.contextPackage, (resolvedLanguage === "en" ? "en" : "zh") as any)
+      ? buildGovernedMemoryEvidenceBlocks(options.contextPackage, (resolvedLanguage === "en" ? "en" : "vi") as any)
       : undefined;
 
     const hooksBlock = governedMemoryBlocks?.hooksBlock

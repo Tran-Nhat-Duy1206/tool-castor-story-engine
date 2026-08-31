@@ -23,7 +23,7 @@ const PlayWorldSchema = z.object({
   worldContract: z.string().default(""),
   visualContract: z.string().default(""),
   mode: z.enum(["open", "guided"]).default("open"),
-  language: z.enum(["zh", "en"]).default("zh"),
+  language: z.enum(["vi", "en"]).default("vi"),
   createdAt: z.string().min(1),
   updatedAt: z.string().min(1),
 });

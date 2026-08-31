@@ -426,7 +426,7 @@ async function listStaleRuntimeFiles(root: string, chapterNumber: number): Promi
 
 /** Resolve the review language from the book manifest. Missing manifest ⇒
  * legacy default "en"; corrupt manifest fails closed. */
-async function resolveBookLanguage(bookDir: string): Promise<"zh" | "en"> {
+async function resolveBookLanguage(bookDir: string): Promise<"vi" | "en"> {
   let raw: string;
   try {
     raw = await readFile(join(bookDir, "story", "state", "manifest.json"), "utf-8");

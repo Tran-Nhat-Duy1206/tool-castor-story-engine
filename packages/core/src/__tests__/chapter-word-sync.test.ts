@@ -22,7 +22,7 @@ function chapterEntry(number: number, title: string, wordCount: number): Chapter
 
 async function setupBook(params: {
   readonly bookId: string;
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly chapters: ReadonlyArray<{ readonly file: string; readonly content: string }>;
   readonly index: ReadonlyArray<ChapterMeta>;
 }): Promise<{ readonly root: string; readonly bookDir: string }> {
@@ -31,7 +31,7 @@ async function setupBook(params: {
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await writeFile(
     join(bookDir, "book.json"),
-    JSON.stringify({ id: params.bookId, title: params.bookId, language: params.language ?? "zh" }),
+    JSON.stringify({ id: params.bookId, title: params.bookId, language: params.language ?? "vi" }),
     "utf-8",
   );
   for (const chapter of params.chapters) {

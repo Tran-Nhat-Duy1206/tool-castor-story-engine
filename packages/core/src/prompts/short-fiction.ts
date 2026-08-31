@@ -1,4 +1,4 @@
-export type ShortFictionLanguage = "zh" | "en";
+export type ShortFictionLanguage = "vi" | "en";
 
 export interface ShortFictionReferencePromptInput {
   readonly text?: string;
@@ -52,7 +52,7 @@ export interface ShortFictionPackagePromptInput {
   readonly draftTitle: string;
 }
 
-export function buildShortFictionOutlineSystemPrompt(language: ShortFictionLanguage = "zh"): string {
+export function buildShortFictionOutlineSystemPrompt(language: ShortFictionLanguage = "vi"): string {
   if (language === "en") {
     return [
       "You are the managing editor for short web fiction. Your job is to turn one creative direction into a complete short-story plan.",
@@ -75,7 +75,7 @@ export function buildShortFictionOutlineSystemPrompt(language: ShortFictionLangu
 
 export function buildShortFictionOutlineUserPrompt(
   input: ShortFictionOutlinePromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     return [
@@ -119,7 +119,7 @@ export function buildShortFictionOutlineUserPrompt(
   ].filter(Boolean).join("\n");
 }
 
-export function buildShortFictionOutlineReviewSystemPrompt(language: ShortFictionLanguage = "zh"): string {
+export function buildShortFictionOutlineReviewSystemPrompt(language: ShortFictionLanguage = "vi"): string {
   if (language === "en") {
     return [
       "You are a short-fiction outline reviewer. You do not assign scores and you do not police plagiarism.",
@@ -138,7 +138,7 @@ export function buildShortFictionOutlineReviewSystemPrompt(language: ShortFictio
 
 export function buildShortFictionOutlineReviewUserPrompt(
   input: ShortFictionOutlineReviewPromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     return [
@@ -176,7 +176,7 @@ export function buildShortFictionOutlineReviewUserPrompt(
 
 export function buildShortFictionOutlineRevisionFollowup(
   input: ShortFictionOutlineRevisionPromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     return [
@@ -212,7 +212,7 @@ export function buildShortFictionOutlineRevisionFollowup(
   ].join("\n");
 }
 
-export function buildShortFictionWriterSystemPrompt(language: ShortFictionLanguage = "zh"): string {
+export function buildShortFictionWriterSystemPrompt(language: ShortFictionLanguage = "vi"): string {
   if (language === "en") {
     return [
       "You are an English short-fiction BatchWriter. You write the complete short story in one API pass, following the story plan.",
@@ -236,7 +236,7 @@ export function buildShortFictionWriterSystemPrompt(language: ShortFictionLangua
 
 export function buildShortFictionWriterUserPrompt(
   input: ShortFictionDraftPromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     return [
@@ -300,7 +300,7 @@ export function buildShortFictionWriterUserPrompt(
 
 export function buildShortFictionDraftContinuationUserPrompt(
   input: ShortFictionDraftContinuationPromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   const missing = input.missingChapters.join(", ");
   if (language === "en") {
@@ -357,7 +357,7 @@ export function buildShortFictionDraftContinuationUserPrompt(
   ].join("\n");
 }
 
-export function buildShortFictionDraftReviewSystemPrompt(language: ShortFictionLanguage = "zh"): string {
+export function buildShortFictionDraftReviewSystemPrompt(language: ShortFictionLanguage = "vi"): string {
   if (language === "en") {
     return [
       "You are a short-fiction draft reviewer.",
@@ -376,7 +376,7 @@ export function buildShortFictionDraftReviewSystemPrompt(language: ShortFictionL
 
 export function buildShortFictionDraftReviewUserPrompt(
   input: ShortFictionDraftReviewPromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     return [
@@ -412,7 +412,7 @@ export function buildShortFictionDraftReviewUserPrompt(
 
 export function buildShortFictionDraftRevisionFollowup(
   input: ShortFictionDraftRevisionPromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     return [
@@ -476,7 +476,7 @@ export function buildShortFictionDraftRevisionFollowup(
   ].join("\n");
 }
 
-export function buildShortFictionPackageSystemPrompt(language: ShortFictionLanguage = "zh"): string {
+export function buildShortFictionPackageSystemPrompt(language: ShortFictionLanguage = "vi"): string {
   if (language === "en") {
     return [
       "You are a short-fiction packaging editor. From the final draft you produce the synopsis, the selling points, and the cover-image prompt.",
@@ -493,7 +493,7 @@ export function buildShortFictionPackageSystemPrompt(language: ShortFictionLangu
 
 export function buildShortFictionPackageUserPrompt(
   input: ShortFictionPackagePromptInput,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   if (language === "en") {
     return [
@@ -539,7 +539,7 @@ export function buildShortFictionPackageUserPrompt(
   ].join("\n");
 }
 
-function buildShortFictionCraftPrompt(language: ShortFictionLanguage = "zh"): string {
+function buildShortFictionCraftPrompt(language: ShortFictionLanguage = "vi"): string {
   if (language === "en") {
     return [
       "## Craft Reminders",

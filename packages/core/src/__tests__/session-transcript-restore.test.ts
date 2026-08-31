@@ -1156,7 +1156,7 @@ describe("session transcript restore", () => {
       },
     ] as any;
 
-    const bounded = appendRestoredHistoryBoundary(messages, "zh");
+    const bounded = appendRestoredHistoryBoundary(messages, "vi");
 
     expect(bounded).toHaveLength(4);
     expect(bounded[3]).toMatchObject({

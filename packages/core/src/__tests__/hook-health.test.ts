@@ -52,7 +52,7 @@ describe("analyzeHookHealth", () => {
 
   it("does not count dormant seed aliases as active hook debt", () => {
     const issues = analyzeHookHealth({
-      language: "zh",
+      language: "vi",
       chapterNumber: 1,
       hooks: [
         createHook({ hookId: "H001", status: "未开启" as any, lastAdvancedChapter: 0 }),

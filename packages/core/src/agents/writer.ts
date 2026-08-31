@@ -114,7 +114,7 @@ export function buildChapterFileContent(
   chapterNumber: number,
   title: string,
   content: string,
-  language: "zh" | "en",
+  language: "vi" | "en",
 ): string {
   const heading = language === "en"
     ? `# Chapter ${chapterNumber}: ${title}`
@@ -159,15 +159,15 @@ export class WriterAgent extends BaseAgent {
     return "writer";
   }
 
-  private localize(language: "zh" | "en", messages: { zh: string; en: string }): string {
+  private localize(language: "vi" | "en", messages: { zh: string; en: string }): string {
     return language === "en" ? messages.en : messages.zh;
   }
 
-  private logInfo(language: "zh" | "en", messages: { zh: string; en: string }): void {
+  private logInfo(language: "vi" | "en", messages: { zh: string; en: string }): void {
     this.ctx.logger?.info(this.localize(language, messages));
   }
 
-  private logWarn(language: "zh" | "en", messages: { zh: string; en: string }): void {
+  private logWarn(language: "vi" | "en", messages: { zh: string; en: string }): void {
     this.ctx.logger?.warn(this.localize(language, messages));
   }
 
@@ -682,7 +682,7 @@ export class WriterAgent extends BaseAgent {
     bookDir: string,
     output: WriteChapterOutput,
     numericalSystem: boolean = true,
-    language: "zh" | "en" = "zh",
+    language: "vi" | "en" = "vi",
     options?: {
       readonly deferStateApplication?: boolean;
       readonly stateReviewJson?: string;
@@ -814,11 +814,11 @@ export class WriterAgent extends BaseAgent {
     readonly ruleStack: RuleStack;
     readonly externalContext?: string;
     readonly lengthSpec: LengthSpec;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
     readonly varianceBrief?: string;
     readonly selectedEvidenceBlock?: string;
   }): string {
-    const language = params.language ?? "zh";
+    const language = params.language ?? "vi";
     // The user's steering docs (author_intent = long-term direction, current_focus =
     // short-term focus) must land as a prominent, binding block near the top — not
     // buried among generic "evidence" entries where the model treats them as optional.
@@ -840,7 +840,7 @@ export class WriterAgent extends BaseAgent {
       ? params.ruleStack.sections.diagnostic.join(", ")
       : "none";
 
-    const lengthRequirementBlock = this.buildLengthRequirementBlock(params.lengthSpec, params.language ?? "zh");
+    const lengthRequirementBlock = this.buildLengthRequirementBlock(params.lengthSpec, params.language ?? "vi");
     const varianceBlock = params.varianceBrief
       ? `\n${params.varianceBrief}\n`
       : "";
@@ -895,7 +895,7 @@ ${lengthRequirementBlock}
 - 只需输出 PRE_WRITE_CHECK、CHAPTER_TITLE、CHAPTER_CONTENT 三个区块`;
   }
 
-  private buildChapterContextBlock(externalContext: string | undefined, language: "zh" | "en"): string {
+  private buildChapterContextBlock(externalContext: string | undefined, language: "vi" | "en"): string {
     const trimmed = externalContext?.trim();
     if (!trimmed) return "";
     if (language === "en") {
@@ -934,7 +934,7 @@ ${trimmed}
     chapterIntent: string,
     contextPackage: ContextPackage,
     ruleStack: RuleStack,
-    language: "zh" | "en",
+    language: "vi" | "en",
   ): string {
     const selectedContext = renderNarrativeSelectedContext(contextPackage.selectedContext, language)
       .replace(/^### /gm, "- ");
@@ -987,7 +987,7 @@ ${overrides}\n`;
   private verifyPreWriteCheckAlignsWithMemo(
     preWriteCheck: string,
     chapterNumber: number,
-    language: "zh" | "en",
+    language: "vi" | "en",
   ): void {
     if (!preWriteCheck || preWriteCheck.trim().length === 0) {
       this.logWarn(language, {
@@ -1018,7 +1018,7 @@ ${overrides}\n`;
     }
   }
 
-  private buildLengthRequirementBlock(lengthSpec: LengthSpec, language: "zh" | "en"): string {
+  private buildLengthRequirementBlock(lengthSpec: LengthSpec, language: "vi" | "en"): string {
     if (language === "en") {
       return `Requirements:
 - Target length: ${lengthSpec.target} words
@@ -1145,7 +1145,7 @@ ${overrides}\n`;
   private async buildRuntimeStateArtifactsIfPresent(
     bookDir: string,
     delta: RuntimeStateDelta | undefined,
-    language: "zh" | "en",
+    language: "vi" | "en",
     authoritativeChapterNumber?: number,
     allowReapply?: boolean,
     baselineChapter?: number,
@@ -1181,7 +1181,7 @@ ${overrides}\n`;
   private async resolveRuntimeStateArtifactsForOutput(
     bookDir: string,
     output: WriteChapterOutput,
-    language: "zh" | "en",
+    language: "vi" | "en",
   ): Promise<RuntimeStateArtifacts | null> {
     if (!output.runtimeStateDelta) return null;
     const safeDelta = this.normalizeRuntimeStateDeltaChapter(
@@ -1214,7 +1214,7 @@ ${overrides}\n`;
   private async renderAppendedChapterSummary(
     bookDir: string,
     summary: string,
-    language: "zh" | "en",
+    language: "vi" | "en",
   ): Promise<string | undefined> {
     const summaryPath = join(bookDir, "story", "chapter_summaries.md");
     let existing = "";

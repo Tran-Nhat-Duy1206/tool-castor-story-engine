@@ -67,7 +67,7 @@ function makeBook(now: string): BookConfig {
     title: "回声协议",
     platform: "other",
     genre: "urban",
-    language: "zh",
+    language: "vi",
     status: "active",
     targetChapters: 100,
     chapterWordCount: 3000,
@@ -174,7 +174,7 @@ async function seedPostCorrectionBook(options?: { readonly semanticHead?: number
 
   // Structured Canon agreeing at the semantic head (bootstrap preservation).
   const manifest = {
-    schemaVersion: 2, language: "zh", lastAppliedChapter: semanticHead,
+    schemaVersion: 2, language: "vi", lastAppliedChapter: semanticHead,
     projectionVersion: 3, migrationWarnings: [] as string[],
   };
   const currentState = {

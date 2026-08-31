@@ -838,7 +838,7 @@ describe("retrieveMemorySelection", () => {
         join(stateDir, "manifest.json"),
         JSON.stringify({
           schemaVersion: 2,
-          language: "zh",
+          language: "vi",
           lastAppliedChapter: 0,
           projectionVersion: 1,
           migrationWarnings: [],

@@ -183,7 +183,7 @@ async function publishActiveReview(
     schemaVersion: 1,
     sourceChapter: options.sourceChapter,
     createdAt: CREATED_AT,
-    language: "zh",
+    language: "vi",
     reviewId,
     effectiveChapter: options.effectiveChapter,
     proseRevision: computeProseRevision(proseText),
@@ -511,7 +511,7 @@ describe("state-review-confirm PREPARE (pure)", () => {
     await writeFile(
       join(fixture.bookDir, ACTIVE_REVIEW_RELPATH(16)),
       JSON.stringify({
-        schemaVersion: 1, sourceChapter: 16, createdAt: CREATED_AT, language: "zh",
+        schemaVersion: 1, sourceChapter: 16, createdAt: CREATED_AT, language: "vi",
         status: "rebuild_required", reason: "",
       }),
       "utf-8",

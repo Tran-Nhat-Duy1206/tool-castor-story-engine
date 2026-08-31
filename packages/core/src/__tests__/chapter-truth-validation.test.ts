@@ -89,7 +89,7 @@ describe("validateChapterTruthPersistence", () => {
       persistenceOutput: createWriterOutput({ updatedState: "车站" }),
       auditResult: createAuditResult(),
       previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
-      language: "zh",
+      language: "vi",
       logWarn: vi.fn(),
     });
 
@@ -141,7 +141,7 @@ describe("validateChapterTruthPersistence", () => {
         oldHooks: "stable hooks",
         oldLedger: "stable ledger",
       },
-      language: "zh",
+      language: "vi",
       logWarn,
       logger,
     });
@@ -188,7 +188,7 @@ describe("validateChapterTruthPersistence", () => {
         oldHooks: "old hooks",
         oldLedger: "old ledger",
       },
-      language: "zh",
+      language: "vi",
       logWarn,
       logger,
     });
@@ -260,7 +260,7 @@ describe("validateChapterTruthPersistence", () => {
         oldHooks: "stable hooks",
         oldLedger: "stable ledger",
       },
-      language: "zh",
+      language: "vi",
       logWarn: vi.fn(),
       logger: { warn: vi.fn() },
     });
@@ -312,7 +312,7 @@ describe("validateChapterTruthPersistence", () => {
       persistenceOutput: createWriterOutput({ updatedState: "车站" }),
       auditResult: createAuditResult(),
       previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
-      language: "zh",
+      language: "vi",
       logWarn: vi.fn(),
       deferStateApplication: true,
     });
@@ -347,7 +347,7 @@ describe("validateChapterTruthPersistence", () => {
       persistenceOutput: createWriterOutput({ updatedState: "车站" }),
       auditResult: createAuditResult(),
       previousTruth: { oldState: "车站", oldHooks: "hooks", oldLedger: "ledger" },
-      language: "zh",
+      language: "vi",
       logWarn: vi.fn(),
     });
 

@@ -7,11 +7,11 @@ describe("inferLanguage", () => {
   });
 
   it("infers zh for Chinese briefs", () => {
-    expect(inferLanguage("一个修仙者重生回到宗门入门那年。")).toBe("zh");
+    expect(inferLanguage("一个修仙者重生回到宗门入门那年。")).toBe("vi");
   });
 
   it("stays zh when CJK dominates despite an English name", () => {
-    expect(inferLanguage("主角叫 Jack，一部都市重生爽文。")).toBe("zh");
+    expect(inferLanguage("主角叫 Jack，一部都市重生爽文。")).toBe("vi");
   });
 
   it("treats incidental CJK in an English brief as en", () => {
@@ -19,8 +19,8 @@ describe("inferLanguage", () => {
   });
 
   it("defaults to zh for empty or missing input", () => {
-    expect(inferLanguage("")).toBe("zh");
-    expect(inferLanguage(undefined)).toBe("zh");
-    expect(inferLanguage(null)).toBe("zh");
+    expect(inferLanguage("")).toBe("vi");
+    expect(inferLanguage(undefined)).toBe("vi");
+    expect(inferLanguage(null)).toBe("vi");
   });
 });

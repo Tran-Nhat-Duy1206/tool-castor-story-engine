@@ -5,7 +5,7 @@ import type { CanonEdit } from "../models/canon-edits.js";
 
 function snapshotWithFacts(facts: Array<{ subject: string; predicate: string; object: string; validFromChapter: number; validUntilChapter: number | null; sourceChapter: number }>): RuntimeStateSnapshot {
   return {
-    manifest: { schemaVersion: 2, language: "zh", lastAppliedChapter: 15, projectionVersion: 3, migrationWarnings: [] },
+    manifest: { schemaVersion: 2, language: "vi", lastAppliedChapter: 15, projectionVersion: 3, migrationWarnings: [] },
     currentState: { chapter: 15, facts },
     hooks: { hooks: [] },
     chapterSummaries: { rows: [] },

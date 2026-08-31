@@ -47,7 +47,7 @@ export class FoundationReviewerAgent extends BaseAgent {
     readonly mode: "original" | "fanfic" | "series";
     readonly sourceCanon?: string;
     readonly styleGuide?: string;
-    readonly language: "zh" | "en";
+    readonly language: "vi" | "en";
     readonly targetChapters?: number;
     /** Task 10 requires a durable exact-unit findings payload; legacy callers may omit it. */
     readonly structuredFindings?: boolean;
@@ -77,7 +77,7 @@ export class FoundationReviewerAgent extends BaseAgent {
     return this.parseReviewResult(response.content, dimensions, params.structuredFindings === true);
   }
 
-  private originalDimensions(language: "zh" | "en", targetChapters?: number): ReadonlyArray<string> {
+  private originalDimensions(language: "vi" | "en", targetChapters?: number): ReadonlyArray<string> {
     const target = Number.isFinite(targetChapters) && targetChapters && targetChapters > 0
       ? Math.round(targetChapters)
       : 40;
@@ -100,7 +100,7 @@ export class FoundationReviewerAgent extends BaseAgent {
         ];
   }
 
-  private derivativeDimensions(language: "zh" | "en", mode: "fanfic" | "series"): ReadonlyArray<string> {
+  private derivativeDimensions(language: "vi" | "en", mode: "fanfic" | "series"): ReadonlyArray<string> {
     const modeLabel = mode === "fanfic"
       ? (language === "en" ? "Fan Fiction" : "同人")
       : (language === "en" ? "Series" : "系列");
@@ -202,7 +202,7 @@ ${canonBlock}${styleBlock}
 Be strict. 80 means "ready to write without changes."`;
   }
 
-  private buildFoundationExcerpt(foundation: ArchitectOutput, language: "zh" | "en"): string {
+  private buildFoundationExcerpt(foundation: ArchitectOutput, language: "vi" | "en"): string {
     return language === "en"
       ? `## Story Bible\n${foundation.storyBible}\n\n## Volume Outline\n${foundation.volumeOutline}\n\n## Book Rules\n${foundation.bookRules}\n\n## Initial State\n${foundation.currentState}\n\n## Initial Hooks\n${foundation.pendingHooks}`
       : `## 世界设定\n${foundation.storyBible}\n\n## 卷纲\n${foundation.volumeOutline}\n\n## 规则\n${foundation.bookRules}\n\n## 初始状态\n${foundation.currentState}\n\n## 初始伏笔\n${foundation.pendingHooks}`;

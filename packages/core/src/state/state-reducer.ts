@@ -266,7 +266,7 @@ function preferRicherText(primary: string, fallback: string): string {
 
 function applyCurrentStatePatch(
   currentState: CurrentStateState,
-  language: "zh" | "en",
+  language: "vi" | "en",
   delta: RuntimeStateDelta,
 ): CurrentStateState {
   if (!delta.currentStatePatch) {

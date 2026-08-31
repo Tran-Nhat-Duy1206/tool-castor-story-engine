@@ -93,7 +93,7 @@ function buildAgentBookConfig(input: {
   readonly title: string;
   readonly genre?: string;
   readonly platform?: string;
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly targetChapters?: number;
   readonly chapterWordCount?: number;
   readonly parentBookId?: string;
@@ -111,8 +111,8 @@ function buildAgentBookConfig(input: {
     targetChapters: input.targetChapters ?? defaults.targetChapters ?? 200,
     chapterWordCount: input.chapterWordCount
       ?? defaults.chapterWordCount
-      ?? defaultChapterLength(input.language === "en" ? "en" : "zh"),
-    ...(input.language ? { language: input.language } : {}),
+      ?? defaultChapterLength((input.language === "en" ? "en" : "zh") as any),
+    ...(input.language ? { language: input.language as any } : {}),
     ...(input.parentBookId ? { parentBookId: input.parentBookId } : {}),
     ...(input.fanficMode ? { fanficMode: input.fanficMode } : {}),
     createdAt: now,
@@ -259,7 +259,7 @@ const ProposeActionParams = Type.Object({
       Type.Literal("other"),
     ], { description: "Confirmed target platform, e.g. tomato for 番茄." })),
     language: Type.Optional(Type.Union([
-      Type.Literal("zh"),
+      Type.Literal("vi"),
       Type.Literal("en"),
     ], { description: "Confirmed writing language." })),
     targetChapters: Type.Optional(Type.Number({
@@ -283,16 +283,16 @@ const ProposeActionParams = Type.Object({
       description: "Optional confirmed output id under shorts/.",
     })),
     language: Type.Optional(Type.Union([
-      Type.Literal("zh"),
+      Type.Literal("vi"),
       Type.Literal("en"),
-    ], { description: "Output language of the short fiction. Fill the language the user asked the story to be written in; it may differ from the conversation language (e.g. a Chinese chat asking for an English short => en). When the user does not name one, it defaults to the conversation language." })),
+    ], { description: "Output language of the short fiction. Fill the language the user asked the story to be written in; it may differ from the conversation language (e.g. a Vietnamese chat asking for an English short => en). When the user does not name one, it defaults to the conversation language." })),
     chapters: Type.Optional(Type.Number({
       description: "Confirmed complete short chapter count, 12-18.",
     })),
     charsPerChapter: Type.Optional(Type.Number({
       minimum: 600,
       maximum: 1200,
-      description: "Confirmed per-chapter length in the story language's native unit. zh shorts only accept 900-1200 Chinese characters; en shorts only accept 600-800 English words. Values outside the selected language's range are rejected before the task starts. Do not put total story length here.",
+      description: "Confirmed per-chapter length in the story language's native unit. vi shorts only accept 900-1200 characters; en shorts only accept 600-800 English words. Values outside the selected language's range are rejected before the task starts. Do not put total story length here.",
     })),
     cover: Type.Optional(Type.Boolean({
       description: "Whether to attempt cover generation.",
@@ -392,7 +392,7 @@ const ProposeActionParams = Type.Object({
     platform: Type.Optional(Type.Union([
       Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
     ])),
-    language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+    language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
     targetChapters: Type.Optional(Type.Number({ description: "Confirmed total chapter count." })),
     chapterWordCount: Type.Optional(Type.Number({ description: "Confirmed per-chapter length." })),
   }, { description: "Structured execution args for action=fanfic_init. This creates the book directly after confirmation." })),
@@ -406,7 +406,7 @@ const ProposeActionParams = Type.Object({
     platform: Type.Optional(Type.Union([
       Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
     ])),
-    language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+    language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
     targetChapters: Type.Optional(Type.Number({ description: "Target total chapters for a new book." })),
     chapterWordCount: Type.Optional(Type.Number({ description: "Per-chapter length for a new book." })),
   }, { description: "Structured execution args for action=continuation_import. This imports and rebuilds state directly after confirmation." })),
@@ -418,7 +418,7 @@ const ProposeActionParams = Type.Object({
     platform: Type.Optional(Type.Union([
       Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
     ])),
-    language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+    language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
     targetChapters: Type.Optional(Type.Number({ description: "Optional chapter count; defaults to the parent book." })),
     chapterWordCount: Type.Optional(Type.Number({ description: "Optional chapter length; defaults to the parent book." })),
   }, { description: "Structured execution args for action=spinoff_create. This creates the side-story directly after confirmation." })),
@@ -432,7 +432,7 @@ const ProposeActionParams = Type.Object({
     platform: Type.Optional(Type.Union([
       Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
     ])),
-    language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+    language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
     targetChapters: Type.Optional(Type.Number({ description: "Confirmed total chapter count." })),
     chapterWordCount: Type.Optional(Type.Number({ description: "Confirmed per-chapter length." })),
   }, { description: "Structured execution args for action=style_imitation. This creates an original book and style guide directly after confirmation." })),
@@ -457,44 +457,44 @@ function proposedActionSessionKind(action: ProposeActionParamsType["action"]): "
   return "short";
 }
 
-function proposedActionFallbackTitle(action: ProposeActionParamsType["action"], isZh: boolean): string {
+function proposedActionFallbackTitle(action: ProposeActionParamsType["action"], isVi: boolean): string {
   switch (action) {
     case "create_book":
-      return isZh ? "创建长篇书籍" : "Create a long-form book";
+      return isVi ? "Tạo sách dài" : "Create a long-form book";
     case "short_run":
-      return isZh ? "生成 Castor Short" : "Generate Castor Short";
+      return isVi ? "Tạo Castor Short" : "Generate Castor Short";
     case "play_start":
-      return isZh ? "启动 Castor Play" : "Start Castor Play";
+      return isVi ? "Khởi động Castor Play" : "Start Castor Play";
     case "generate_cover":
-      return isZh ? "生成封面" : "Generate cover";
+      return isVi ? "Tạo bìa" : "Generate cover";
     case "fanfic_init":
-      return isZh ? "创建同人作品" : "Create fanfiction";
+      return isVi ? "Tạo truyện đồng nhân" : "Create fanfiction";
     case "continuation_import":
-      return isZh ? "导入并续写作品" : "Import and continue a work";
+      return isVi ? "Nhập và viết tiếp" : "Import and continue a work";
     case "spinoff_create":
-      return isZh ? "创建番外作品" : "Create a side story";
+      return isVi ? "Tạo ngoại truyện" : "Create a side story";
     case "style_imitation":
-      return isZh ? "创建仿写作品" : "Create a style-imitation work";
+      return isVi ? "Tạo bản nhái phong cách" : "Create a style-imitation work";
     case "script_create":
-      return isZh ? "创建剧本" : "Create script";
+      return isVi ? "Tạo kịch bản" : "Create script";
     case "storyboard_create":
-      return isZh ? "创建分镜" : "Create storyboard";
+      return isVi ? "Tạo storyboard" : "Create storyboard";
     case "interactive_film_create":
-      return isZh ? "创建互动影游" : "Create interactive film";
+      return isVi ? "Tạo phim tương tác" : "Create interactive film";
     case "translation_create":
-      return isZh ? "创建翻译项目" : "Create translation project";
+      return isVi ? "Tạo dự án dịch thuật" : "Create translation project";
     case "draft_structure":
-      return isZh ? "生成故事结构" : "Draft story structure";
+      return isVi ? "Tạo cấu trúc truyện" : "Draft story structure";
     case "connect_choice":
-      return isZh ? "连接选项" : "Connect choice";
+      return isVi ? "Kết nối lựa chọn" : "Connect choice";
     case "remove_node":
-      return isZh ? "删除节点" : "Remove node";
+      return isVi ? "Xóa nút" : "Remove node";
   }
 }
 
-function proposedActionFallbackSummary(action: ProposeActionParamsType["action"], isZh: boolean): string {
-  return isZh
-    ? "确认后将直接执行这条需求；不会要求你再去另一个表单重复填写。"
+function proposedActionFallbackSummary(action: ProposeActionParamsType["action"], isVi: boolean): string {
+  return isVi
+    ? "Sau khi xác nhận, Castor sẽ thực hiện yêu cầu này ngay mà không yêu cầu bạn nhập lại ở biểu mẫu khác."
     : "After confirmation, Castor will run this request directly without asking you to repeat it in another form.";
 }
 
@@ -545,16 +545,16 @@ function compactPlayStartPayload(value: ProposeActionParamsType["playStart"]): N
 
 function proposedActionPayload(
   params: ProposeActionParamsType,
-  language: "zh" | "en",
+  language: "vi" | "en",
 ): ActionPayload | undefined {
   const payload: ActionPayload = {};
   if (params.action === "create_book") {
     const createBook = compactObject(params.createBook);
-    if (createBook) payload.createBook = createBook;
+    if (createBook) payload.createBook = createBook as any;
   }
   if (params.action === "short_run") {
     const shortRun = compactObject(params.shortRun);
-    if (shortRun) payload.shortRun = { language, ...shortRun };
+    if (shortRun) payload.shortRun = { language: language as any, ...shortRun } as any;
   }
   if (params.action === "play_start") {
     const playStart = compactPlayStartPayload(params.playStart);
@@ -582,19 +582,19 @@ function proposedActionPayload(
   }
   if (params.action === "fanfic_init") {
     const fanficCreate = compactObject(params.fanficCreate);
-    if (fanficCreate) payload.fanficCreate = fanficCreate;
+    if (fanficCreate) payload.fanficCreate = fanficCreate as any;
   }
   if (params.action === "continuation_import") {
     const continuationImport = compactObject(params.continuationImport);
-    if (continuationImport) payload.continuationImport = continuationImport;
+    if (continuationImport) payload.continuationImport = continuationImport as any;
   }
   if (params.action === "spinoff_create") {
     const spinoffCreate = compactObject(params.spinoffCreate);
-    if (spinoffCreate) payload.spinoffCreate = spinoffCreate;
+    if (spinoffCreate) payload.spinoffCreate = spinoffCreate as any;
   }
   if (params.action === "style_imitation") {
     const imitationCreate = compactObject(params.imitationCreate);
-    if (imitationCreate) payload.imitationCreate = imitationCreate;
+    if (imitationCreate) payload.imitationCreate = imitationCreate as any;
   }
   return Object.keys(payload).length > 0 ? payload : undefined;
 }
@@ -723,7 +723,7 @@ function assertExecutableProposedAction(params: ProposeActionParamsType, payload
 }
 
 export function createProposeActionTool(
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
   options: ProposeActionToolOptions = {},
 ): AgentTool<typeof ProposeActionParams> {
   return {
@@ -735,9 +735,9 @@ export function createProposeActionTool(
     parameters: ProposeActionParams,
     async execute(_toolCallId: string, params: ProposeActionParamsType): Promise<AgentToolResult<unknown>> {
       const targetSessionKind = proposedActionSessionKind(params.action);
-      const isZh = language === "zh";
-      const title = params.title?.trim() || proposedActionFallbackTitle(params.action, isZh);
-      const summary = params.summary?.trim() || proposedActionFallbackSummary(params.action, isZh);
+      const isVi = language === "vi";
+      const title = params.title?.trim() || proposedActionFallbackTitle(params.action, isVi);
+      const summary = params.summary?.trim() || proposedActionFallbackSummary(params.action, isVi);
       const proposedPayload = validateProposedActionPayload(withSingleAttachmentFallback(
         params,
         proposedActionPayload(params, language),
@@ -816,16 +816,16 @@ const SubAgentParams = Type.Object({
     Type.Literal("other"),
   ], { description: "architect only: target platform. Default: other" })),
   language: Type.Optional(Type.Union([
-    Type.Literal("zh"),
+    Type.Literal("vi"),
     Type.Literal("en"),
-  ], { description: "architect only: writing language. Default: zh" })),
+  ], { description: "architect only: writing language. Default: vi" })),
   targetChapters: Type.Optional(Type.Number({ description: "architect only: total chapter count. Default: 200" })),
-  chapterWordCount: Type.Optional(Type.Number({ description: "architect/writer: per-chapter length in the book's native unit (zh characters / en words). Default: 3000 zh, 2000 en" })),
+  chapterWordCount: Type.Optional(Type.Number({ description: "architect/writer: per-chapter length in the book's native unit (vi characters / en words). Default: 3000 vi, 2000 en" })),
   revise: Type.Optional(Type.Boolean({
-    description: "architect only: true 表示在当前 active book 上重新生成架构稿，而不是新建书籍。no-book creation sessions cannot revise an existing book.",
+    description: "architect only: true means regenerate the foundation on the current active book instead of creating a new book. no-book creation sessions cannot revise an existing book.",
   })),
   feedback: Type.Optional(Type.String({
-    description: "architect only: revise 模式下的调整要求。举例：把架构稿从条目式升级成段落式架构稿、某个角色设定需要重新设计、主线冲突表达太弱需要加强等。如果是架构稿评审未通过要求重写的场景，把评审意见的 overallFeedback 原样传入即可",
+    description: "architect only: requirements for revise mode. Example: upgrade the foundation from itemized to paragraph form, redesign a character, strengthen the main conflict, etc. If the foundation review failed and requires rewrite, pass the overallFeedback from the review as is",
   })),
   // -- reviser params --
   mode: Type.Optional(Type.Union([
@@ -861,11 +861,11 @@ const ArchitectCreateSubAgentParams = Type.Object({
     Type.Literal("other"),
   ], { description: "Confirmed target platform. Default: other" })),
   language: Type.Optional(Type.Union([
-    Type.Literal("zh"),
+    Type.Literal("vi"),
     Type.Literal("en"),
-  ], { description: "Confirmed writing language. Default: zh" })),
+  ], { description: "Confirmed writing language. Default: vi" })),
   targetChapters: Type.Optional(Type.Number({ description: "Confirmed total chapter count. Default: 200" })),
-  chapterWordCount: Type.Optional(Type.Number({ description: "Confirmed per-chapter length in the book's native unit. Default: 3000 zh, 2000 en" })),
+  chapterWordCount: Type.Optional(Type.Number({ description: "Confirmed per-chapter length in the book's native unit. Default: 3000 vi, 2000 en" })),
 });
 
 function prepareSubAgentArguments(args: unknown): SubAgentParamsType {
@@ -923,12 +923,12 @@ export function createSubAgentTool(
   options: {
     readonly actionPayload?: ActionPayload;
     readonly architectCreateOnly?: boolean;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
     readonly activeSkills?: () => ReadonlyArray<ActivatedSkillGuidance>;
     readonly workerSkills?: (agent: string) => ReadonlyArray<ActivatedSkillGuidance>;
   } = {},
 ): AgentTool<any> {
-  const sessionIsZh = (options.language ?? "zh") !== "en";
+  const sessionIsVi = (options.language ?? "vi") !== "en";
   return {
     name: "sub_agent",
     description: options.architectCreateOnly
@@ -966,8 +966,8 @@ export function createSubAgentTool(
           }
           if (activeBookId && agent === "architect" && !revise) {
             return textResult(
-              sessionIsZh
-                ? "当前已有书籍，不需要建书。如果你想创建新书，请先回到首页。"
+              sessionIsVi
+                ? "Phiên này đã có sách, không cần tạo sách mới. Để tạo sách mới, hãy quay lại trang chủ trước."
                 : "This session already has a book, so no new book is needed. To create a new book, go back to the home page first.",
             );
           }
@@ -989,8 +989,8 @@ export function createSubAgentTool(
               );
               progress(`Foundation revised for "${targetBookId}".`);
               return textResult(
-                sessionIsZh
-                  ? `Book "${targetBookId}" 架构稿已按要求重写。原书的条目式架构稿已备份到 story/.backup-phase4-<时间戳>/。`
+                sessionIsVi
+                  ? `Sách "${targetBookId}" đã được viết lại dàn ý theo yêu cầu. Dàn ý dạng danh mục cũ đã được sao lưu vào story/.backup-phase4-<timestamp>/.`
                   : `Book "${targetBookId}" foundation has been rewritten as requested. The previous itemized foundation was backed up to story/.backup-phase4-<timestamp>/.`,
               );
             }
@@ -1020,7 +1020,7 @@ export function createSubAgentTool(
                   language: resolvedLanguage as any,
                   status: "outlining" as any,
                   targetChapters: createBookPayload?.targetChapters ?? targetChapters ?? 200,
-                  chapterWordCount: createBookPayload?.chapterWordCount ?? chapterWordCount ?? defaultChapterLength(resolvedLanguage),
+                  chapterWordCount: createBookPayload?.chapterWordCount ?? chapterWordCount ?? defaultChapterLength((resolvedLanguage === "en" ? "en" : "zh") as any),
                   createdAt: now,
                   updatedAt: now,
                 },
@@ -1055,11 +1055,11 @@ export function createSubAgentTool(
               const stoppedStatus = last?.status !== "ready-for-review" ? last?.status : undefined;
               const output = textResult(
                 stoppedStatus
-                  ? sessionIsZh
-                    ? `已完成 ${results.length}/${requestedCount} 章；第 ${last?.chapterNumber} 章状态为 ${stoppedStatus}，批量写作已停止，请复核后再继续。`
+                  ? sessionIsVi
+                    ? `Đã hoàn thành ${results.length}/${requestedCount} chương; chương ${last?.chapterNumber} có trạng thái ${stoppedStatus}, đã dừng viết hàng loạt, vui lòng kiểm tra lại trước khi tiếp tục.`
                     : `Writer completed ${results.length} of ${requestedCount} requested chapters for "${targetBookId}" and stopped because chapter ${last?.chapterNumber} ended with status "${stoppedStatus}".`
-                  : sessionIsZh
-                    ? `已连续完成 ${results.length} 章（第 ${results[0]?.chapterNumber} 章至第 ${last?.chapterNumber} 章）。`
+                  : sessionIsVi
+                    ? `Đã hoàn thành liên tiếp ${results.length} chương (từ chương ${results[0]?.chapterNumber} đến chương ${last?.chapterNumber}).`
                     : `Writer completed ${results.length} consecutive chapters for "${targetBookId}".`,
                 {
                   kind: "chapters_written",
@@ -1093,16 +1093,16 @@ export function createSubAgentTool(
             const titleResult = (result as any).title;
             const needsReview = Boolean(resultStatus && resultStatus !== "ready-for-review" && resultStatus !== "active");
             const chapterRef = chapterNumberResult
-              ? sessionIsZh
-                ? `第 ${chapterNumberResult} 章${titleResult ? `《${titleResult}》` : ""}`
+              ? sessionIsVi
+                ? `Chương ${chapterNumberResult}${titleResult ? ` "${titleResult}"` : ""}`
                 : `chapter ${chapterNumberResult}${titleResult ? ` "${titleResult}"` : ""}`
-              : sessionIsZh ? "下一章" : "the next chapter";
+              : sessionIsVi ? "chương tiếp theo" : "the next chapter";
             const message = needsReview
-              ? sessionIsZh
-                ? `已为 ${targetBookId} 写出${chapterRef}，字数 ${wordCount}，但审稿未通过，状态 ${resultStatus}，需要复核后再继续。`
+              ? sessionIsVi
+                ? `Đã viết ${chapterRef} cho ${targetBookId}, số từ ${wordCount}, nhưng chưa qua kiểm duyệt, trạng thái ${resultStatus}, cần xem xét lại trước khi tiếp tục.`
                 : `Wrote ${chapterRef} for ${targetBookId}: ${wordCount} words, but review did not pass (status: ${resultStatus}). Manual review is required before continuing.`
-              : sessionIsZh
-                ? `已为 ${targetBookId} 完成${chapterRef}，字数 ${wordCount}，状态 ${resultStatus ?? "ready-for-review"}。`
+              : sessionIsVi
+                ? `Đã hoàn thành ${chapterRef} cho ${targetBookId}, số từ ${wordCount}, trạng thái ${resultStatus ?? "ready-for-review"}.`
                 : `Completed ${chapterRef} for ${targetBookId}: ${wordCount} words, status ${resultStatus ?? "ready-for-review"}.`;
             const output = textResult(
               message,
@@ -1232,8 +1232,8 @@ export function createSubAgentTool(
               [
                 err.message,
                 "",
-                `缺失 section: ${missing}`,
-                "我会把已生成的部分保留下来，并继续补齐缺失 section；不要重新发明一本书。",
+                `Thiếu section: ${missing}`,
+                "Tôi sẽ giữ lại phần đã tạo và tiếp tục bổ sung các section còn thiếu; đừng tạo lại một cuốn sách mới.",
               ].join("\n"),
               {
                 kind: "architect_incomplete",
@@ -1725,7 +1725,7 @@ const FanficCreateParams = Type.Object({
   platform: Type.Optional(Type.Union([
     Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
   ])),
-  language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+  language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
   targetChapters: Type.Optional(Type.Integer({ minimum: 1 })),
   chapterWordCount: Type.Optional(Type.Integer({ minimum: 1 })),
 });
@@ -1785,7 +1785,7 @@ const SpinoffCreateParams = Type.Object({
   platform: Type.Optional(Type.Union([
     Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
   ])),
-  language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+  language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
   targetChapters: Type.Optional(Type.Integer({ minimum: 1 })),
   chapterWordCount: Type.Optional(Type.Integer({ minimum: 1 })),
 });
@@ -1811,7 +1811,7 @@ export function createSpinoffBookTool(
         parentBookId,
         genre: params.genre ?? parent.genre,
         platform: params.platform ?? parent.platform,
-        language: params.language ?? parent.language,
+        language: (params.language ?? (parent.language as string === "zh" ? "vi" : parent.language)) as any,
         targetChapters: params.targetChapters ?? parent.targetChapters,
         chapterWordCount: params.chapterWordCount ?? parent.chapterWordCount,
       });
@@ -1846,7 +1846,7 @@ const ImitationCreateParams = Type.Object({
   platform: Type.Optional(Type.Union([
     Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
   ])),
-  language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+  language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
   targetChapters: Type.Optional(Type.Integer({ minimum: 1 })),
   chapterWordCount: Type.Optional(Type.Integer({ minimum: 1 })),
 });
@@ -1903,7 +1903,7 @@ const ContinuationImportParams = Type.Object({
   platform: Type.Optional(Type.Union([
     Type.Literal("tomato"), Type.Literal("qidian"), Type.Literal("feilu"), Type.Literal("other"),
   ])),
-  language: Type.Optional(Type.Union([Type.Literal("zh"), Type.Literal("en")])),
+  language: Type.Optional(Type.Union([Type.Literal("vi"), Type.Literal("en")])),
   targetChapters: Type.Optional(Type.Integer({ minimum: 1 })),
   chapterWordCount: Type.Optional(Type.Integer({ minimum: 1 })),
 });
@@ -2016,7 +2016,7 @@ const ShortFictionRunParams = Type.Object({
     description: "Target complete short chapter count, 12-18. Default 12.",
   })),
   charsPerChapter: Type.Optional(Type.Number({
-    description: "Per-chapter length in the story language's native unit: 900-1200 Chinese characters (default 1000) for zh, or 600-800 English words (default 650) for en. Values outside the story language's range are rejected before the pipeline starts. Do not use total story length here.",
+    description: "Per-chapter length in the story language's native unit: 900-1200 characters (default 1000) for vi, or 600-800 English words (default 650) for en. Values outside the story language's range are rejected before the pipeline starts. Do not use total story length here.",
   })),
   cover: Type.Optional(Type.Boolean({
     description: "Whether to attempt cover image generation after synopsis and cover prompt. Default true; use false if the user only wants text assets.",
@@ -2040,18 +2040,19 @@ const ShortFictionRunParams = Type.Object({
 
 type ShortFictionRunParamsType = Static<typeof ShortFictionRunParams>;
 
-// 启动 pipeline 之前校验 charsPerChapter 是否落在最终语言的合法区间：
-// 确认卡 payload 在 language 缺省时只能做 600-1200 并集校验，这里能拿到最终
-// 语言（payload.language ?? 会话语言 ?? zh，与 runner 的默认一致），越界立即
-// 抛出带合法范围的双语错误，不让任务开跑后才在 runner 中途失败。
+// Validate charsPerChapter against the final language's valid range before starting the pipeline:
+// The confirmation card payload can only validate the 600-1200 union when language is missing;
+// here we have the final language (payload.language ?? session language ?? vi, consistent with runner defaults)
+// and throw a bilingual error with the valid range immediately if out of bounds, instead of failing mid-runner.
 function assertShortRunCharsPerChapter(
   value: number | undefined,
-  language: "zh" | "en",
+  language: "vi" | "en",
 ): void {
   if (value === undefined) return;
-  const { min, max } = shortRunCharsPerChapterRange(language);
+  const mappedLanguage = language === "en" ? "en" as const : "vi" as const;
+  const { min, max } = shortRunCharsPerChapterRange(mappedLanguage);
   if (Number.isInteger(value) && value >= min && value <= max) return;
-  throw new Error(shortRunCharsPerChapterError(value, language));
+  throw new Error(shortRunCharsPerChapterError(value, mappedLanguage));
 }
 
 export function createShortFictionRunTool(
@@ -2059,7 +2060,7 @@ export function createShortFictionRunTool(
   projectRoot: string,
   options: {
     readonly actionPayload?: ActionPayload;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
   } & SkillAwareProductionOptions = {},
 ): AgentTool<typeof ShortFictionRunParams> {
   return {
@@ -2081,7 +2082,7 @@ export function createShortFictionRunTool(
       const language = shortPayload?.language ?? options.language;
       const charsPerChapter = shortPayload?.charsPerChapter ?? params.charsPerChapter;
       const activatedSkills = resolveProductionToolSkills(options);
-      assertShortRunCharsPerChapter(charsPerChapter, language ?? "zh");
+      assertShortRunCharsPerChapter(charsPerChapter, (language as "vi" | "en" | undefined) ?? "vi");
       const result = await runPipelineWithAgentContext(
         pipeline,
         _signal,
@@ -2102,7 +2103,7 @@ export function createShortFictionRunTool(
           storyId: shortPayload?.storyId ?? params.storyId,
           chapterCount: shortPayload?.chapters ?? params.chapters,
           charsPerChapter,
-          language,
+          language: language as any,
           cover: shortPayload?.cover ?? params.cover,
           coverBaseUrl: params.coverBaseUrl,
           coverEndpoint: params.coverEndpoint,
@@ -2257,7 +2258,7 @@ export function createScriptCreationTool(
   projectRoot: string,
   options: {
     readonly actionPayload?: ActionPayload;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
   } & SkillAwareProductionOptions = {},
 ): AgentTool<typeof ScriptCreateParams> {
   return {
@@ -2288,7 +2289,7 @@ export function createScriptCreationTool(
         requirements: payload?.requirements ?? params.requirements,
         episodeCount: payload?.episodeCount ?? params.episodeCount,
         episodeDuration: payload?.episodeDuration ?? params.episodeDuration,
-        language: options.language,
+        language: options.language as any,
         projectId: payload?.projectId ?? params.projectId,
         outDir: payload?.outDir ?? params.outDir,
         onProgress: progress,
@@ -2352,7 +2353,7 @@ export function createStoryboardCreationTool(
   projectRoot: string,
   options: {
     readonly actionPayload?: ActionPayload;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
   } & SkillAwareProductionOptions = {},
 ): AgentTool<typeof StoryboardCreateParams> {
   return {
@@ -2384,7 +2385,7 @@ export function createStoryboardCreationTool(
         aspectRatio: payload?.aspectRatio ?? params.aspectRatio,
         granularity: payload?.granularity ?? params.granularity,
         maxShots: payload?.maxShots ?? params.maxShots,
-        language: options.language,
+        language: options.language as any,
         projectId: payload?.projectId ?? params.projectId,
         outDir: payload?.outDir ?? params.outDir,
         onProgress: progress,
@@ -2453,7 +2454,7 @@ export function createInteractiveFilmCreationTool(
   projectRoot: string,
   options: {
     readonly actionPayload?: ActionPayload;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
   } & SkillAwareProductionOptions = {},
 ): AgentTool<typeof InteractiveFilmCreateParams> {
   return {
@@ -2486,7 +2487,7 @@ export function createInteractiveFilmCreationTool(
         episodeDuration: payload?.episodeDuration ?? params.episodeDuration,
         budget: payload?.budget ?? params.budget,
         referenceMode: payload?.referenceMode ?? params.referenceMode,
-        language: options.language,
+        language: options.language as any,
         projectId: payload?.projectId ?? params.projectId,
         outDir: payload?.outDir ?? params.outDir,
         onProgress: progress,
@@ -2681,14 +2682,14 @@ export function createPlayStartTool(
         worldContract: worldContract?.trim() ?? "",
         visualContract: visualContract?.trim() ?? "",
         mode: playMode ?? params.mode ?? "open",
-        language: playLanguage,
+        language: playLanguage as any,
       });
       await store.ensureRun(world.id, runId);
 
       const existingTranscript = await store.readTranscript(world.id, runId);
       const sceneText = (initialScene?.trim() || (world.language === "en"
         ? [`You enter "${world.title}".`, world.premise || "The scene is set. Make your first move."].join("\n")
-        : [`你进入「${world.title}」。`, world.premise || "场景已经就位，等待你的第一个动作。"].join("\n"))).trim();
+        : [`Bạn bước vào "${world.title}".`, world.premise || "Khung cảnh đã sẵn sàng, đang chờ hành động đầu tiên của bạn."].join("\n"))).trim();
       const suggestedActions = normalizeSuggestedActions(playPayload?.suggestedActions ?? params.suggestedActions);
       let seed: PlayOpeningSeedResult | null = null;
       let graph;
@@ -2727,7 +2728,7 @@ export function createPlayStartTool(
           || !graph.entities.some((entity) => entity.id !== "actor_player")) {
           throw new Error(world.language === "en"
             ? "Play opening state is incomplete: no usable player/world graph was created."
-            : "互动世界开场状态不完整：没有生成可用的玩家与世界图谱。");
+            : "Trạng thái mở đầu thế giới tương tác không đầy đủ: chưa tạo được đồ thị người chơi và thế giới khả dụng.");
         }
 
         if (existingTranscript.length === 0) {
@@ -2784,7 +2785,7 @@ const PlayStepParams = Type.Object({
 type PlayStepParamsType = Static<typeof PlayStepParams>;
 
 export interface PlayStepToolOptions extends SkillAwareProductionOptions {
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly runnerFactory?: (input: {
     readonly projectRoot: string;
     readonly worldId: string;
@@ -2815,7 +2816,7 @@ const PlayReviseParams = Type.Object({
 type PlayReviseParamsType = Static<typeof PlayReviseParams>;
 
 export interface PlayReviseToolOptions extends SkillAwareProductionOptions {
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly runnerFactory?: (input: {
     readonly projectRoot: string;
     readonly worldId: string;
@@ -2906,7 +2907,7 @@ type PlayEditParamsType = Static<typeof PlayEditParams>;
 export function createPlayEditTool(
   projectRoot: string,
   sessionId: string,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): AgentTool<typeof PlayEditParams> {
   return {
     name: "play_edit",
@@ -2927,10 +2928,10 @@ export function createPlayEditTool(
         return textResult(
           language === "en"
             ? "There is no interactive world to edit yet. Start one with play_start first."
-            : "还没有可编辑的互动世界。先用 play_start 开一局。",
+            : "Chưa có thế giới tương tác nào để chỉnh sửa. Hãy bắt đầu một thế giới bằng play_start trước.",
         );
       }
-      const isZh = (world.language ?? "zh") !== "en";
+      const isVi = (world.language ?? "vi") !== "en";
 
       const patch: Parameters<PlayStore["updateWorld"]>[1] = {};
       const nextWorldContract = mergeContract(
@@ -2963,9 +2964,9 @@ export function createPlayEditTool(
           upsertPlayEditEntity(db, {
             id: "actor_player",
             type: "actor",
-            label: existingPlayer?.label ?? (isZh ? "玩家" : "Player"),
+            label: existingPlayer?.label ?? (isVi ? "Người chơi" : "Player"),
             summary: playerPersona,
-            status: isZh ? "已更新" : "Updated",
+            status: isVi ? "Đã cập nhật" : "Updated",
           });
           updatedEntities += 1;
         }
@@ -2982,7 +2983,7 @@ export function createPlayEditTool(
           graphEditedAt: new Date().toISOString(),
         });
         return textResult(
-          params.note?.trim() || (isZh ? "互动世界设定已更新。" : "Interactive world settings updated."),
+          params.note?.trim() || (isVi ? "Đã cập nhật cài đặt thế giới tương tác." : "Interactive world settings updated."),
           {
             kind: "play_world_updated",
             worldId,
@@ -3032,7 +3033,7 @@ export function createPlayStepTool(
         return textResult(
           options.language === "en"
             ? "There is no interactive world to advance yet. Start one with play_start first."
-            : "还没有可推进的互动世界。先用 play_start 开一局。",
+            : "Chưa có thế giới tương tác nào để tiếp tục. Hãy bắt đầu một thế giới bằng play_start trước.",
         );
       }
       const target = { worldId, runId, world };
@@ -3061,10 +3062,10 @@ export function createPlayStepTool(
         // Never hand a raw tool error to the outer agent — it improvises a fake
         // "service unavailable / reload your save" message. Return a fixed, graceful
         // structured failure so the turn fails honestly and recoverably instead.
-        const isZh = (target.world?.language ?? "zh") !== "en";
+        const isVi = (target.world?.language ?? "vi") !== "en";
         return textResult(
-          isZh
-            ? "（系统刚才卡了一下，这一步没能展开。把你刚才想做的再说一遍，我就接着推进。）"
+          isVi
+            ? "(Hệ thống vừa gặp sự cố, bước này chưa được xử lý. Hãy nói lại hành động vừa rồi, tôi sẽ tiếp tục.)"
             : "(The system hiccuped and this step didn't resolve. Say what you just did again and I'll continue.)",
           {
             kind: "play_step_failed",
@@ -3134,10 +3135,10 @@ export function createPlayReviseTool(
         return textResult(
           options.language === "en"
             ? "There is no interactive world to redo yet. Start one with play_start first."
-            : "还没有可重做的互动世界。先用 play_start 开一局。",
+            : "Chưa có thế giới tương tác nào để làm lại. Hãy bắt đầu một thế giới bằng play_start trước.",
         );
       }
-      const isZh = (world.language ?? "zh") !== "en";
+      const isVi = (world.language ?? "vi") !== "en";
       const activatedSkills = resolveProductionToolSkills(options);
       let runner: ({
         regenerateLastTurn(input?: string): Promise<PlayReplayResult>;
@@ -3158,15 +3159,15 @@ export function createPlayReviseTool(
       });
 
       let replay: PlayReplayResult;
-      // finally 关闭 runner 自建的 play.db 连接：句柄不关闭时 Windows 上无法删除数据库文件。
+      // finally close the play.db connection created by runner: handle not closed prevents deleting DB file on Windows.
       try {
         if (params.action === "restore_variant") {
           const turn = params.turn;
           const variantId = params.variantId?.trim();
           if (typeof turn !== "number" || !Number.isFinite(turn) || !variantId) {
             return textResult(
-              isZh
-                ? "恢复版本需要 turn 和 variantId。"
+              isVi
+                ? "Khôi phục phiên bản cần có turn và variantId."
                 : "Restoring a variant requires both turn and variantId.",
             );
           }
@@ -3176,7 +3177,7 @@ export function createPlayReviseTool(
             variantId,
           }));
           return textResult(
-            restored.sceneText || (isZh ? "已切换到指定互动回合版本。" : "Switched to the requested play turn variant."),
+            restored.sceneText || (isVi ? "Đã chuyển sang phiên bản vòng tương tác được chỉ định." : "Switched to the requested play turn variant."),
             {
               kind: "play_variant_restored",
               worldId,
@@ -3193,8 +3194,8 @@ export function createPlayReviseTool(
         const replacement = params.action === "edit_last_input" ? params.input?.trim() : undefined;
         if (params.action === "edit_last_input" && !replacement) {
           return textResult(
-            isZh
-              ? "编辑上一条玩家动作需要提供新的 input。"
+            isVi
+              ? "Chỉnh sửa hành động người chơi trước đó cần cung cấp input mới."
               : "Editing the previous player action requires a new input.",
           );
         }
@@ -3203,8 +3204,8 @@ export function createPlayReviseTool(
           replay = await runWithPlayRunner((activeRunner) => activeRunner.regenerateLastTurn(replacement));
         } catch (err) {
           return textResult(
-            isZh
-              ? "（上一回合暂时不能安全重做。继续输入新的动作，我会从当前状态推进。）"
+            isVi
+              ? "(Vòng trước tạm thời không thể tạo lại một cách an toàn. Hãy nhập hành động mới, tôi sẽ tiếp tục từ trạng thái hiện tại.)"
               : "(The previous turn cannot be safely regenerated yet. Enter a new action and I will continue from the current state.)",
             {
               kind: "play_revise_failed",
@@ -3494,7 +3495,7 @@ const ResyncChapterStateParams = Type.Object({
 export function createResyncChapterStateTool(
   pipeline: PipelineRunner,
   activeBookId: string | null,
-  options: SkillAwareProductionOptions & { readonly language?: "zh" | "en" } = {},
+  options: SkillAwareProductionOptions & { readonly language?: "vi" | "en" } = {},
 ): AgentTool<typeof ResyncChapterStateParams> {
   return {
     name: "resync_chapter_state",
@@ -3515,14 +3516,14 @@ export function createResyncChapterStateTool(
         }),
       );
       const issues = result.audit.issues;
-      const zh = options.language !== "en";
+      const isVi = options.language !== "en";
       const summary = result.audit.passed
-        ? (zh
-            ? `第 ${result.chapter.chapterNumber} 章正文未改动；状态、摘要与伏笔已从上一章快照重建，重新审稿通过。`
+        ? (isVi
+            ? `Chương ${result.chapter.chapterNumber} giữ nguyên văn bản; trạng thái, tóm tắt và hook đã được dựng lại từ snapshot chương trước và đã qua kiểm duyệt lại.`
             : `Chapter ${result.chapter.chapterNumber} prose was unchanged; state, summaries, and hooks were rebuilt from the previous snapshot, and the fresh audit passed.`)
         : [
-            zh
-              ? `第 ${result.chapter.chapterNumber} 章正文未改动；状态、摘要与伏笔已重建，但重新审稿仍有 ${issues.length} 个问题：`
+            isVi
+              ? `Chương ${result.chapter.chapterNumber} giữ nguyên văn bản; trạng thái, tóm tắt và hook đã được dựng lại, nhưng kiểm duyệt lại vẫn còn ${issues.length} vấn đề:`
               : `Chapter ${result.chapter.chapterNumber} prose was unchanged; state, summaries, and hooks were rebuilt, but the fresh audit still found ${issues.length} issue(s):`,
             ...issues.map((issue) => `- [${issue.severity}] ${issue.description}${issue.suggestion ? ` (${issue.suggestion})` : ""}`),
           ].join("\n");

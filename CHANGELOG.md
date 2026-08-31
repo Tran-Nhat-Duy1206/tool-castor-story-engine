@@ -1,6 +1,6 @@
 # Changelog
 
-[English](CHANGELOG.en.md) | 中文
+[English](CHANGELOG.en.md) | Tiếng Việt
 
 ## v1.8.0
 
@@ -275,7 +275,7 @@ Studio 服务与聚合模型接入更新：新增 kkaiapi 服务选项，修复�
 ### Bug Fixes
 
 - 修复建书过程中工具调用报 `Validation failed for tool "sub_agent": - platform: must be equal to constant`，导致无法生成书籍文件的问题
-- 统一 Studio、CLI、TUI、agent create-book 链路的平台别名归一化，`番茄` / `fanqie` / `番茄小说` 等输入会落到合法枚举
+- 统一 Studio、CLI、TUI、agent create-book 链路的平台别名归一化，`番茄` (Cà Chua) / `fanqie` / `番茄小说` (Cà Chua Tiểu Thuyết) 等输入会落到合法枚举
 - 对未知平台值降级为 `other`，避免错误平台 id 写入书籍配置后继续影响后续流程
 - 更新 README 微信交流群二维码为 13 群
 

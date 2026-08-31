@@ -236,7 +236,7 @@ function extractRowsByRelation(
 export function formatRelevantThreads(
   hooks: ReadonlyArray<StoredHook>,
   subplotBoardRaw: string,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): string {
   const hookRows = hooks.map((hook) => `- ${hook.hookId}: ${[
     hook.type,
@@ -264,7 +264,7 @@ export function formatRelevantThreads(
 export function formatRecyclableHooks(
   hooks: ReadonlyArray<StoredHook>,
   chapterNumber: number,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): string {
   if (hooks.length === 0) {
     return language === "en"

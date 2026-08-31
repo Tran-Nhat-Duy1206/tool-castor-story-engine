@@ -12,7 +12,7 @@ export function buildGovernedHookWorkingSet(params: {
   readonly contextPackage: ContextPackage;
   readonly chapterIntent?: string;
   readonly chapterNumber: number;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly keepRecent?: number;
 }): string {
   const { hooksMarkdown } = params;

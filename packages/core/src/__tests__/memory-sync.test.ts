@@ -24,7 +24,7 @@ function factRow(object: string, from: number) {
 
 async function seedValidBook(): Promise<void> {
   await writeFile(join(bookDir, "chapters", "0001_c1.md"), "# c1", "utf-8");
-  await seedStateFile("story/state/manifest.json", { schemaVersion: 2, language: "zh", lastAppliedChapter: 1, projectionVersion: 3, migrationWarnings: [] });
+  await seedStateFile("story/state/manifest.json", { schemaVersion: 2, language: "vi", lastAppliedChapter: 1, projectionVersion: 3, migrationWarnings: [] });
   await seedStateFile("story/state/current_state.json", { chapter: 1, facts: [factRow("22", 1)] });
   await seedStateFile("story/state/hooks.json", {
     hooks: [{ hookId: "h1", startChapter: 1, type: "core_mystery", status: "open", lastAdvancedChapter: 1, expectedPayoff: "P", notes: "" }],

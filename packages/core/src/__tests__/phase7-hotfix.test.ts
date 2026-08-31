@@ -68,7 +68,7 @@ describe("Phase 7 hotfix 1 — half_life roundtrip", () => {
       },
     ];
 
-    const rendered = renderHookSnapshot(hooks, "zh");
+    const rendered = renderHookSnapshot(hooks, "vi");
     expect(rendered).toContain("| 半衰期 |");
     expect(rendered).toContain("| H-explicit | 5 | 主线 | open | 0 | 终章揭晓 | 终局 | 无 |  | 否 | 45 |  | 带半衰期的钩子 |");
     expect(rendered).toContain("| H-implicit | 7 | 谜团 | open | 0 | 15章 | 近期 | 无 |  | 否 |  |  | 不带半衰期 |");
@@ -112,7 +112,7 @@ describe("Phase 7 hotfix 1 — half_life roundtrip", () => {
       },
     ];
 
-    const rendered = renderHookSnapshot(hooks, "zh");
+    const rendered = renderHookSnapshot(hooks, "vi");
     const parsed = parsePendingHooksMarkdown(rendered);
 
     // distance 40 vs halfLife 60 → not stale (would have been stale with the
@@ -127,7 +127,7 @@ describe("Phase 7 hotfix 1 — half_life roundtrip", () => {
 // Hotfix 2: promotion wiring
 // ---------------------------------------------------------------------------
 
-function buildPhase7Response(language: "zh" = "zh"): string {
+function buildPhase7Response(language: "vi" = "vi"): string {
   // zh-only for brevity — we care about the promoted flag logic, not language.
   void language;
   return [
@@ -217,7 +217,7 @@ function baseBook(): BookConfig {
     status: "active",
     targetChapters: 60,
     chapterWordCount: 2000,
-    language: "zh",
+    language: "vi",
     createdAt: "2026-04-15T00:00:00.000Z",
     updatedAt: "2026-04-15T00:00:00.000Z",
   };
@@ -300,7 +300,7 @@ describe("Phase 7 hotfix 2 — consolidator re-promotes advancedCount>=2", () =>
       },
     ];
     const ledgerPath = join(bookDir, "story", "pending_hooks.md");
-    await writeFile(ledgerPath, renderHookSnapshot(seededHooks, "zh"), "utf-8");
+    await writeFile(ledgerPath, renderHookSnapshot(seededHooks, "vi"), "utf-8");
 
     // chapter_summaries mentions H-slept in 3 chapters (>=2 → promote).
     // H-cold mentioned in only 1 chapter (below threshold).
@@ -347,7 +347,7 @@ describe("Phase 7 hotfix 2 — consolidator re-promotes advancedCount>=2", () =>
       },
     ];
     const ledgerPath = join(bookDir, "story", "pending_hooks.md");
-    const before = renderHookSnapshot(hooks, "zh");
+    const before = renderHookSnapshot(hooks, "vi");
     await writeFile(ledgerPath, before, "utf-8");
 
     const agent = new ConsolidatorAgent({
@@ -386,7 +386,7 @@ describe("Phase 7 hotfix 2 — reviewer gates critical severity on promoted", ()
           chapterWordCount: 2000,
           targetChapters: 60,
           status: "active",
-          language: "zh",
+          language: "vi",
           createdAt: "2026-04-15T00:00:00.000Z",
           updatedAt: "2026-04-15T00:00:00.000Z",
         }, null, 2),
@@ -559,7 +559,7 @@ describe("Phase 7 hotfix 3 — blocked distance embeds 已阻 N 章 token", () =
 
     expect(diag.blocked).toBe(true);
     expect(diag.blockedDistance).toBe(9);
-    expect(renderHookDiagnosticMarker(diag, "zh")).toContain("已阻 9 章");
+    expect(renderHookDiagnosticMarker(diag, "vi")).toContain("已阻 9 章");
     expect(renderHookDiagnosticMarker(diag, "en")).toContain("blocked 9 chapters");
   });
 
@@ -583,7 +583,7 @@ describe("Phase 7 hotfix 3 — blocked distance embeds 已阻 N 章 token", () =
 
     expect(diag.blocked).toBe(true);
     expect(diag.blockedDistance).toBe(7); // 11 - 4
-    expect(renderHookDiagnosticMarker(diag, "zh")).toContain("已阻 7 章");
+    expect(renderHookDiagnosticMarker(diag, "vi")).toContain("已阻 7 章");
   });
 
   it("blockedDistance is 0 when hook is not blocked", () => {
@@ -609,6 +609,6 @@ describe("Phase 7 hotfix 3 — blocked distance embeds 已阻 N 章 token", () =
     const diag = computeHookDiagnostics({ hooks: [upstream, downstream], currentChapter: 10 }).get("D")!;
     expect(diag.blocked).toBe(false);
     expect(diag.blockedDistance).toBe(0);
-    expect(renderHookDiagnosticMarker(diag, "zh")).toBe("");
+    expect(renderHookDiagnosticMarker(diag, "vi")).toBe("");
   });
 });

@@ -91,7 +91,7 @@ describe("loadProjectConfig local provider auth", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "service-project",
       version: "0.1.0",
-      language: "zh",
+      language: "vi",
       llm: {
         services: [
           { service: "moonshot", temperature: 1, maxTokens: 4096 },
@@ -127,7 +127,7 @@ describe("loadProjectConfig local provider auth", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "minimax-project",
       version: "0.1.0",
-      language: "zh",
+      language: "vi",
       llm: {
         services: [
           { service: "minimax", temperature: 0.9, maxTokens: 4096 },
@@ -162,7 +162,7 @@ describe("loadProjectConfig local provider auth", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "custom-project",
       version: "0.1.0",
-      language: "zh",
+      language: "vi",
       llm: {
         services: [
           { service: "custom", name: "内网GPT", baseUrl: "https://llm.internal.corp/v1", temperature: 0.9, apiFormat: "responses", stream: false },
@@ -200,7 +200,7 @@ describe("loadProjectConfig local provider auth", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "studio-source-project",
       version: "0.1.0",
-      language: "zh",
+      language: "vi",
       llm: {
         configSource: "studio",
         services: [
@@ -242,7 +242,7 @@ describe("loadProjectConfig local provider auth", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "studio-stale-project",
       version: "0.1.0",
-      language: "zh",
+      language: "vi",
       llm: {
         configSource: "studio",
         service: "google",
@@ -300,7 +300,7 @@ describe("loadProjectConfig local provider auth", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "studio-bootstrap-project",
       version: "0.1.0",
-      language: "zh",
+      language: "vi",
       llm: {
         provider: "openai",
         service: "custom",

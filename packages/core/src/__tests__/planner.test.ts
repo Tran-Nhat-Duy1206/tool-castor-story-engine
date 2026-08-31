@@ -87,7 +87,7 @@ function makeBook(): BookConfig {
     genre: "urban",
     platform: "qidian",
     status: "active",
-    language: "zh",
+    language: "vi",
     targetChapters: 120,
     chapterWordCount: 3000,
     createdAt: "2026-04-01T00:00:00.000Z",

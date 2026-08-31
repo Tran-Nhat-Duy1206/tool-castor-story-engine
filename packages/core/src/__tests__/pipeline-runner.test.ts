@@ -60,7 +60,7 @@ describe("buildImportFoundationSource", () => {
     });
     const fullText = chapters.map((chapter, index) => `第${index + 1}章 ${chapter.title}\n\n${chapter.content}`).join("\n\n---\n\n");
 
-    const source = buildImportFoundationSource(chapters, "zh", {
+    const source = buildImportFoundationSource(chapters, "vi", {
       maxFullTextChars: 20_000,
     });
 
@@ -192,7 +192,7 @@ function createSettledRevisionOutput(
     runtimeStateSnapshot: {
       manifest: {
         schemaVersion: 2,
-        language: input.book.language ?? "zh",
+        language: input.book.language ?? "vi",
         lastAppliedChapter: input.chapterNumber,
         projectionVersion: 1,
         migrationWarnings: [],
@@ -644,16 +644,16 @@ describe("PipelineRunner", () => {
           readonly generate: (reviewFeedback?: string) => Promise<typeof foundation>;
           readonly reviewer: FoundationReviewerAgent;
           readonly mode: "original";
-          readonly language: "zh";
-          readonly stageLanguage: "zh";
+          readonly language: "vi";
+          readonly stageLanguage: "vi";
           readonly maxRetries: number;
         }) => Promise<typeof foundation>;
       }).generateAndReviewFoundation({
         generate,
         reviewer,
         mode: "original",
-        language: "zh",
-        stageLanguage: "zh",
+        language: "vi",
+        stageLanguage: "vi",
         maxRetries: 2,
       });
 
@@ -699,15 +699,15 @@ describe("PipelineRunner", () => {
           readonly generate: () => Promise<typeof foundation>;
           readonly reviewer: FoundationReviewerAgent;
           readonly mode: "original";
-          readonly language: "zh";
-          readonly stageLanguage: "zh";
+          readonly language: "vi";
+          readonly stageLanguage: "vi";
         }) => Promise<typeof foundation>;
       }).generateAndReviewFoundation({
         generate,
         reviewer,
         mode: "original",
-        language: "zh",
-        stageLanguage: "zh",
+        language: "vi",
+        stageLanguage: "vi",
       });
 
       expect(result).toBe(foundation);
@@ -760,15 +760,15 @@ describe("PipelineRunner", () => {
           readonly generate: (reviewFeedback?: string) => Promise<typeof foundation>;
           readonly reviewer: FoundationReviewerAgent;
           readonly mode: "original";
-          readonly language: "zh";
-          readonly stageLanguage: "zh";
+          readonly language: "vi";
+          readonly stageLanguage: "vi";
         }) => Promise<typeof foundation>;
       }).generateAndReviewFoundation({
         generate,
         reviewer,
         mode: "original",
-        language: "zh",
-        stageLanguage: "zh",
+        language: "vi",
+        stageLanguage: "vi",
       });
 
       expect(generate).toHaveBeenCalledTimes(5);
@@ -5256,7 +5256,7 @@ describe("PipelineRunner", () => {
           bookDir: string;
           chapterContent: string;
           chapterNumber: number;
-          language: "zh" | "en";
+          language: "vi" | "en";
         }) => Promise<{
           auditResult: AuditResult;
           aiTellCount: number;
@@ -5278,7 +5278,7 @@ describe("PipelineRunner", () => {
       bookDir,
       chapterContent: "林越把纸页摊平，先看角上的水痕，再看最末那道被抹掉的签名。",
       chapterNumber: 3,
-      language: "zh",
+      language: "vi",
     });
 
     expect(result.auditResult.issues.some((issue) => issue.category === "节奏单调")).toBe(true);
@@ -5313,7 +5313,7 @@ describe("PipelineRunner", () => {
           bookDir: string;
           chapterContent: string;
           chapterNumber: number;
-          language: "zh" | "en";
+          language: "vi" | "en";
         }) => Promise<{
           auditResult: AuditResult;
           aiTellCount: number;
@@ -5340,7 +5340,7 @@ describe("PipelineRunner", () => {
       bookDir,
       chapterContent: "林越把纸页摊平，先看角上的水痕，再看最末那道被抹掉的签名。",
       chapterNumber: 3,
-      language: "zh",
+      language: "vi",
     });
 
     expect(result.auditResult.issues.filter((issue) => issue.category === "节奏单调")).toHaveLength(2);

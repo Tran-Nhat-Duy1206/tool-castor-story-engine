@@ -98,7 +98,7 @@ async function setupBook(): Promise<void> {
     join(bookDir, "story", "state", "manifest.json"),
     JSON.stringify({
       schemaVersion: 2,
-      language: "zh",
+      language: "vi",
       lastAppliedChapter: 3,
       projectionVersion: 1,
       migrationWarnings: [],

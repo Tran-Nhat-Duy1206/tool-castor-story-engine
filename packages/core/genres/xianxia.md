@@ -1,46 +1,46 @@
 ---
-name: 仙侠
+name: Tiên Hiệp
 id: xianxia
-chapterTypes: ["战斗章", "悟道章", "布局章", "过渡章", "回收章"]
-fatigueWords: ["冷笑", "蝼蚁", "倒吸凉气", "瞳孔骤缩", "天道", "大道", "因果", "气运", "仿佛", "不禁", "宛如", "竟然"]
+chapterTypes: ["Chương Chiến Đấu", "Chương Ngộ Đạo", "Chương Bố Cục", "Chương Quá Độ", "Chương Thu Hoạch"]
+fatigueWords: ["cười lạnh", "kiến cỏ", "hít khí lạnh", "đồng tử co rút", "thiên đạo", "đại đạo", "nhân quả", "khí vận", "dường như", "không kìm được", "như thể", "vậy mà"]
 numericalSystem: true
 powerScaling: true
 eraResearch: false
-pacingRule: "修炼/悟道与战斗交替，每3-5章一次小突破或关键收获"
-satisfactionTypes: ["悟道突破", "斗法碾压", "法宝收获", "身份揭示", "天劫渡过", "因果了结"]
+pacingRule: "Tu luyện/ngộ đạo xen kẽ chiến đấu, mỗi 3–5 chương có một đột phá nhỏ hoặc thu hoạch then chốt"
+satisfactionTypes: ["Ngộ đạo đột phá", "Áp đảo đấu pháp", "Thu hoạch pháp bảo", "Lộ diện thân phận", "Vượt qua thiên kiếp", "Kết thúc nhân quả"]
 auditDimensions: [1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,24,25,26]
 ---
 
-## 题材禁忌
+## Điều cấm kỵ của thể loại
 
-- 主角为推剧情突然仁慈、犯蠢
-- 修为无铺垫跳跃式突破
-- 法宝凭空出现解决危机
-- 天道规则前后矛盾
-- 用"大道无形""天道感应"跳过具体修炼过程
-- 同质资源不写衰减默认全额结算
-- 风格混入都市腔、游戏系统播报腔
+- Nhân vật chính vì thúc đẩy cốt truyện mà đột nhiên nhân từ, phạm sai lầm ngu ngốc
+- Tu vi nhảy vọt đột phá mà không có铺垫
+- Pháp bảo xuất hiện từ hư không để giải quyết khủng hoảng
+- Quy tắc thiên đạo trước sau mâu thuẫn
+- Dùng "đại đạo vô hình", "cảm ứng thiên đạo" để bỏ qua quá trình tu luyện cụ thể
+- Tài nguyên đồng chất không viết hao hụt, mặc định quyết toán toàn phần
+- Phong cách lẫn giọng đô thị, giọng thông báo hệ thống trò chơi
 
-## 修炼规则
+## Quy tắc tu luyện
 
-- 境界突破必须有积累过程：悟道、丹药、战斗领悟、机缘
-- 同质资源重复炼化必须写明衰减
-- 法宝体系分品级，使用有代价（灵力、寿元、因果）
-- 金手指/功法四维约束：
-  - 能力上限：有明确的境界/品阶天花板
-  - 附加代价：修炼/使用伴随代价（寿元、因果、心魔）
-  - 触发条件：突破/觉醒需要特定条件（悟道、机缘、天劫）
-  - 成长路径：功法随修为递进，不可跳阶获得
-- 天道规则一旦设定不可违反，除非有明确的特殊机制
-- 期初修为/资源从账本取，增量逐笔列出
-- 跨大境界突破需要天劫或特殊条件
+- Đột phá cảnh giới phải có quá trình tích lũy: ngộ đạo, đan dược, lĩnh ngộ trong chiến đấu, cơ duyên
+- Tài nguyên đồng chất luyện hóa lặp lại phải ghi rõ hao hụt
+- Hệ thống pháp bảo phân phẩm cấp, sử dụng có cái giá (linh lực, thọ nguyên, nhân quả)
+- Ràng buộc bốn chiều của ngón tay vàng / công pháp:
+  - Giới hạn năng lực: có trần cảnh giới / phẩm giai rõ ràng
+  - Cái giá kèm theo: tu luyện / sử dụng đi kèm cái giá (thọ nguyên, nhân quả, tâm ma)
+  - Điều kiện kích hoạt: đột phá / thức tỉnh cần điều kiện cụ thể (ngộ đạo, cơ duyên, thiên kiếp)
+  - Lộ trình trưởng thành: công pháp递进 theo tu vi, không thể nhảy cấp để có được
+- Quy tắc thiên đạo một khi đã đặt ra không được vi phạm, trừ khi có cơ chế đặc thù rõ ràng
+- Tu vi / tài nguyên đầu kỳ lấy từ sổ sách, mức tăng liệt kê từng khoản
+- Vượt đại cảnh giới cần có thiên kiếp hoặc điều kiện đặc thù
 
-## 叙事指导
+## Chỉ dẫn tự sự
 
-修炼与悟道是叙事核心，但必须融入剧情而非独立说教。
-悟道场景用五感描写，不用抽象哲理灌输。
-仙侠世界的规则感要强：因果、天劫、气运都是叙事工具。
+Tu luyện và ngộ đạo là cốt lõi tự sự, nhưng phải hòa vào cốt truyện chứ không thuyết giáo độc lập.
+Cảnh ngộ đạo dùng miêu tả năm giác quan, không灌輸 triết lý trừu tượng.
+Cảm giác quy tắc của thế giới tiên hiệp phải mạnh: nhân quả, thiên kiếp, khí vận đều là công cụ tự sự.
 
-人情债与道义约束是仙侠特有的驱动力。
-门派政治、宗门博弈是重要的布局手段。
-战斗以法术、法宝、阵法为核心，注重空间感和规模感。
+Món nợ nhân tình và ràng buộc đạo nghĩa là động lực đặc thù của tiên hiệp.
+Chính trị môn phái,博弈 tông môn là thủ đoạn布 cục quan trọng.
+Chiến đấu lấy pháp thuật, pháp bảo, trận pháp làm cốt lõi, chú trọng cảm giác không gian và quy mô.

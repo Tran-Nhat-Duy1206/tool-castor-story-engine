@@ -7,7 +7,7 @@ import type { SessionKind } from "../interaction/session.js";
 // when CASTOR_LIVE_E2E=1 is set.
 type PromptCase = readonly [
   name: string,
-  language: "zh" | "en",
+  language: "vi" | "en",
   sessionKind: SessionKind,
   bookId: string | null,
   options: AgentSystemPromptOptions | undefined,
@@ -16,21 +16,21 @@ type PromptCase = readonly [
 ];
 
 const CASES: readonly PromptCase[] = [
-  ["chat/free-text proposes only", "zh", "chat", null, undefined, ["普通聊天助手", "propose_action"], ["sub_agent", "short_fiction_run", "play_start：", "play_revise：", "play_step：", "generate_cover："]],
+  ["chat/free-text proposes only", "vi", "chat", null, undefined, ["普通聊天助手", "propose_action"], ["sub_agent", "short_fiction_run", "play_start：", "play_revise：", "play_step：", "generate_cover："]],
   ["chat/en/free-text proposes only", "en", "chat", null, undefined, ["general chat assistant", "propose_action"], ["sub_agent", "short_fiction_run", "play_start:", "play_revise:", "play_step:", "generate_cover:"]],
-  ["book-create/free-text proposes creation", "zh", "book-create", null, undefined, ["propose_action", "create_book"], ["sub_agent", "architect"]],
-  ["book-create/confirmed runs architect", "zh", "book-create", null, { actionSource: "button", requestedIntent: "create_book" }, ["sub_agent", "architect"], ["short_fiction_run", "play_start", "play_step", "agent=\"writer\""]],
-  ["short/free-text proposes only", "zh", "short", null, undefined, ["propose_action", "short_run"], ["short_fiction_run：", "short_fiction_run:"]],
-  ["short/confirmed-run exposes runner", "zh", "short", null, { actionSource: "button", requestedIntent: "short_run" }, ["short_fiction_run"], ["propose_action", "generate_cover：", "sub_agent", "play_start"]],
-  ["short/confirmed-cover exposes cover only", "zh", "short", null, { actionSource: "button", requestedIntent: "generate_cover" }, ["generate_cover", "不要重跑正文"], ["short_fiction_run", "sub_agent", "play_start"]],
-  ["play/new-world proposes start", "zh", "play", null, { playWorldExists: false }, ["propose_action"], ["play_step：", "play_step:", "唯一要做的就是立即调用 play_step"]],
+  ["book-create/free-text proposes creation", "vi", "book-create", null, undefined, ["propose_action", "create_book"], ["sub_agent", "architect"]],
+  ["book-create/confirmed runs architect", "vi", "book-create", null, { actionSource: "button", requestedIntent: "create_book" }, ["sub_agent", "architect"], ["short_fiction_run", "play_start", "play_step", "agent=\"writer\""]],
+  ["short/free-text proposes only", "vi", "short", null, undefined, ["propose_action", "short_run"], ["short_fiction_run：", "short_fiction_run:"]],
+  ["short/confirmed-run exposes runner", "vi", "short", null, { actionSource: "button", requestedIntent: "short_run" }, ["short_fiction_run"], ["propose_action", "generate_cover：", "sub_agent", "play_start"]],
+  ["short/confirmed-cover exposes cover only", "vi", "short", null, { actionSource: "button", requestedIntent: "generate_cover" }, ["generate_cover", "不要重跑正文"], ["short_fiction_run", "sub_agent", "play_start"]],
+  ["play/new-world proposes start", "vi", "play", null, { playWorldExists: false }, ["propose_action"], ["play_step：", "play_step:", "唯一要做的就是立即调用 play_step"]],
   ["play/en/new-world proposes start", "en", "play", null, { playWorldExists: false }, ["propose_action"], ["play_step:", "ONLY action this turn is to call play_step"]],
-  ["play/active-world edit/revise/step only", "zh", "play", null, { playWorldExists: true }, ["play_edit", "play_revise", "play_step"], ["propose_action", "play_start：", "play_start:", "启动一个可玩的互动世界"]],
+  ["play/active-world edit/revise/step only", "vi", "play", null, { playWorldExists: true }, ["play_edit", "play_revise", "play_step"], ["propose_action", "play_start：", "play_start:", "启动一个可玩的互动世界"]],
   ["play/en/active-world edit/revise/step only", "en", "play", null, { playWorldExists: true }, ["play_edit", "play_revise", "play_step"], ["propose_action", "play_start:", "start a playable interactive world"]],
-  ["play/confirmed-start runs start only", "zh", "play", null, { actionSource: "button", requestedIntent: "play_start", playWorldExists: false }, ["play_start"], ["propose_action", "play_revise", "play_step：", "play_step:"]],
-  ["book/active can write/edit only", "zh", "book", "demo-book", undefined, ["sub_agent", "writer", "auditor", "reviser"], ["agent=\"architect\"", "short_fiction_run", "play_start", "play_revise", "play_step"]],
+  ["play/confirmed-start runs start only", "vi", "play", null, { actionSource: "button", requestedIntent: "play_start", playWorldExists: false }, ["play_start"], ["propose_action", "play_revise", "play_step：", "play_step:"]],
+  ["book/active can write/edit only", "vi", "book", "demo-book", undefined, ["sub_agent", "writer", "auditor", "reviser"], ["agent=\"architect\"", "short_fiction_run", "play_start", "play_revise", "play_step"]],
   ["book/en active can write/edit only", "en", "book", "demo-book", undefined, ["sub_agent", "writer", "auditor", "reviser"], ["agent=\"architect\"", "short_fiction_run", "play_start", "play_revise", "play_step"]],
-  ["edit/active deterministic only", "zh", "edit", "demo-book", undefined, ["read", "write_truth_file", "rename_entity", "patch_chapter_text"], ["sub_agent", "generate_cover", "short_fiction_run", "play_start", "play_revise", "play_step"]],
+  ["edit/active deterministic only", "vi", "edit", "demo-book", undefined, ["read", "write_truth_file", "rename_entity", "patch_chapter_text"], ["sub_agent", "generate_cover", "short_fiction_run", "play_start", "play_revise", "play_step"]],
 ];
 
 describe("instruction adherence prompt boundary", () => {

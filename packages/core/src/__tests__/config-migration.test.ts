@@ -25,7 +25,7 @@ describe("config migration", () => {
         baseUrl: "https://api.moonshot.cn/v1",
         apiKey: "sk-old-key",
       },
-      language: "zh",
+      language: "vi",
     };
     await writeFile(join(root, "castor.json"), JSON.stringify(oldConfig));
 
@@ -54,7 +54,7 @@ describe("config migration", () => {
         services: [{ service: "moonshot" }],
         defaultModel: "kimi-k2.5",
       },
-      language: "zh",
+      language: "vi",
     };
     await writeFile(join(root, "castor.json"), JSON.stringify(newConfig));
 

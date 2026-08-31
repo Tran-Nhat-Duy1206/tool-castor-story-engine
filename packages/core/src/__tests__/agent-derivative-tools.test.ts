@@ -43,11 +43,11 @@ describe("derivative-work agent tools", () => {
     state = new StateManager(root);
     await state.saveBookConfig("harbor", {
       id: "harbor",
-      title: "雾港账页",
+      title: "Trang Sổ Cảng Sương",
       platform: "tomato",
       genre: "suspense",
       status: "active",
-      language: "zh",
+      language: "vi",
       targetChapters: 80,
       chapterWordCount: 2400,
       createdAt: "2026-08-14T00:00:00.000Z",
@@ -65,23 +65,23 @@ describe("derivative-work agent tools", () => {
     const tool = createFanficBookTool(pipeline as never, root);
 
     const result = await tool.execute("fanfic-1", {
-      title: "霜港来信",
-      sourceText: "原作中林鹿守着一座废弃灯塔。",
-      sourceName: "霜港正典",
+      title: "Thư Gửi Cảng Sương",
+      sourceText: "Trong nguyên tác, Lâm Lộc canh giữ một ngọn hải đăng bỏ hoang.",
+      sourceName: "Chính Điển Cảng Sương",
       mode: "canon",
       targetChapters: 24,
-      language: "zh",
+      language: "vi",
     }, controller.signal);
 
     expect(pipeline.initFanficBook).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: "霜港来信",
-        title: "霜港来信",
+        id: "th-g-i-c-ng-s-ng",
+        title: "Thư Gửi Cảng Sương",
         fanficMode: "canon",
         targetChapters: 24,
       }),
-      "原作中林鹿守着一座废弃灯塔。",
-      "霜港正典",
+      "Trong nguyên tác, Lâm Lộc canh giữ một ngọn hải đăng bỏ hoang.",
+      "Chính Điển Cảng Sương",
       "canon",
     );
     expect(pipeline.runWithAgentContext).toHaveBeenCalledWith(
@@ -91,7 +91,7 @@ describe("derivative-work agent tools", () => {
     expect(result.details).toMatchObject({
       kind: "book_created",
       creationKind: "fanfic",
-      bookId: "霜港来信",
+      bookId: "th-g-i-c-ng-s-ng",
     });
   });
 
@@ -100,14 +100,14 @@ describe("derivative-work agent tools", () => {
     const tool = createSpinoffBookTool(pipeline as never, root);
 
     const result = await tool.execute("spinoff-1", {
-      title: "雨夜旧账",
+      title: "Sổ Cũ Đêm Mưa",
       parentBookId: "harbor",
-      direction: "老船工失踪前最后一夜",
+      direction: "Đêm cuối cùng trước khi lão thuyền công mất tích",
     });
 
     expect(pipeline.initSpinoffBook).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: "雨夜旧账",
+        id: "s-c-m-m-a",
         parentBookId: "harbor",
         platform: "tomato",
         genre: "suspense",
@@ -115,7 +115,7 @@ describe("derivative-work agent tools", () => {
         chapterWordCount: 2400,
       }),
       "harbor",
-      "老船工失踪前最后一夜",
+      "Đêm cuối cùng trước khi lão thuyền công mất tích",
     );
     expect(result.details).toMatchObject({
       kind: "book_created",
@@ -129,23 +129,23 @@ describe("derivative-work agent tools", () => {
     const tool = createImitationBookTool(pipeline as never, root);
 
     const result = await tool.execute("imitation-1", {
-      title: "纸灯新案",
-      referenceText: "雨从檐角一滴滴落下来，像一只迟疑的钟。",
-      sourceName: "参考散文",
-      storyIdea: "县城档案员调查一批被替换的死亡证明",
+      title: "Vụ Án Đèn Giấy Mới",
+      referenceText: "Mưa rơi từng giọt từ mái hiên, như một chiếc chuông ngập ngừng.",
+      sourceName: "Tản Văn Tham Khảo",
+      storyIdea: "Nhân viên lưu trữ huyện điều tra loạt giấy chứng tử bị đánh tráo",
       genre: "suspense",
     });
 
     expect(pipeline.initImitationBook).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "纸灯新案", title: "纸灯新案" }),
-      "雨从檐角一滴滴落下来，像一只迟疑的钟。",
-      "县城档案员调查一批被替换的死亡证明",
-      "参考散文",
+      expect.objectContaining({ id: "v-n-n-gi-y-m-i", title: "Vụ Án Đèn Giấy Mới" }),
+      "Mưa rơi từng giọt từ mái hiên, như một chiếc chuông ngập ngừng.",
+      "Nhân viên lưu trữ huyện điều tra loạt giấy chứng tử bị đánh tráo",
+      "Tản Văn Tham Khảo",
     );
     expect(result.details).toMatchObject({
       kind: "book_created",
       creationKind: "imitation",
-      bookId: "纸灯新案",
+      bookId: "v-n-n-gi-y-m-i",
     });
   });
 
@@ -153,35 +153,35 @@ describe("derivative-work agent tools", () => {
     await mkdir(join(root, ".castor", "uploads", "continuation"), { recursive: true });
     await writeFile(
       join(root, ".castor", "uploads", "continuation", "novel.txt"),
-      "第一章 雨港\n\n林鹿在旧码头找到一本账簿。\n\n第二章 空号\n\n电话那头只有潮声。\n",
+      "Chapter 1 Cảng Mưa\n\nLâm Lộc tìm thấy một cuốn sổ ở bến cảng cũ.\n\nChapter 2 Số Trống\n\nĐầu dây bên kia chỉ có tiếng sóng.\n",
       "utf-8",
     );
     const pipeline = mockPipeline();
     const tool = createContinuationImportTool(pipeline as never, null, root);
 
     const result = await tool.execute("continuation-1", {
-      title: "雾港续章",
+      title: "Cảng Sương Phần Tiếp",
       sourcePath: ".castor/uploads/continuation/novel.txt",
-      language: "zh",
+      language: "vi",
     });
 
     expect(pipeline.importChapters).toHaveBeenCalledWith({
-      bookId: "雾港续章",
+      bookId: "c-ng-s-ng-ph-n-ti-p",
       chapters: [
-        { title: "雨港", content: "林鹿在旧码头找到一本账簿。" },
-        { title: "空号", content: "电话那头只有潮声。" },
+        { title: "Cảng Mưa", content: "Lâm Lộc tìm thấy một cuốn sổ ở bến cảng cũ." },
+        { title: "Số Trống", content: "Đầu dây bên kia chỉ có tiếng sóng." },
       ],
       resumeFrom: undefined,
       importMode: "continuation",
     });
-    await expect(state.loadBookConfig("雾港续章")).resolves.toMatchObject({
-      id: "雾港续章",
-      title: "雾港续章",
+    await expect(state.loadBookConfig("c-ng-s-ng-ph-n-ti-p")).resolves.toMatchObject({
+      id: "c-ng-s-ng-ph-n-ti-p",
+      title: "Cảng Sương Phần Tiếp",
     });
     expect(result.details).toMatchObject({
       kind: "book_created",
       creationKind: "continuation",
-      bookId: "雾港续章",
+      bookId: "c-ng-s-ng-ph-n-ti-p",
       importedCount: 2,
     });
   });
@@ -191,7 +191,7 @@ describe("derivative-work agent tools", () => {
     const tool = createContinuationImportTool(pipeline as never, null, root);
 
     await expect(tool.execute("continuation-absolute", {
-      title: "不安全路径",
+      title: "Đường Dẫn Không An Toàn",
       sourcePath: join(root, "novel.txt"),
     })).rejects.toThrow("must be project-relative");
     expect(pipeline.importChapters).not.toHaveBeenCalled();

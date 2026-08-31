@@ -71,7 +71,7 @@ describe("ContinuityAuditor", () => {
         suggestion: "重写场面",
       }],
       summary: "needs rewrite",
-    }), "zh");
+    }), "vi");
 
     expect(result.issues[0]).toMatchObject({
       repairScope: "structural",

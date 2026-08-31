@@ -49,7 +49,7 @@ export function computeAnalytics(
   for (const ch of chapters) {
     for (const issue of ch.auditIssues) {
       const catMatch = issue.match(/\[(?:critical|warning|info)\]\s*(.+?)[:：]/);
-      const category = catMatch?.[1] ?? "未分类";
+      const category = catMatch?.[1] ?? "Chưa Phân Loại";
       categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
     }
   }

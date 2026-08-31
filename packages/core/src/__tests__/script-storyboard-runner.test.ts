@@ -35,7 +35,7 @@ describe("storyboard creation runner", () => {
       _client: unknown,
       _model: string,
       input: { projectId: string; title: string },
-      options?: { language?: "zh" | "en" },
+      options?: { language?: "vi" | "en" },
     ) => {
       const en = options?.language === "en";
       return Promise.resolve({

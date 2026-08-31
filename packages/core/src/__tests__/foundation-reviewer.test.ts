@@ -54,7 +54,7 @@ describe("FoundationReviewerAgent", () => {
     });
 
     await agent.review({
-      language: "zh",
+      language: "vi",
       mode: "original",
       targetChapters: 8,
       foundation: {
@@ -110,7 +110,7 @@ describe("FoundationReviewerAgent", () => {
     });
 
     await agent.review({
-      language: "zh",
+      language: "vi",
       mode: "fanfic",
       sourceCanon: `${"正典".repeat(9000)}\nSOURCE_CANON_TAIL_MARKER`,
       styleGuide: `${"文风".repeat(3000)}\nSTYLE_GUIDE_TAIL_MARKER`,
@@ -242,7 +242,7 @@ describe("FoundationReviewerAgent", () => {
     });
 
     await expect(agent.review({
-      language: "zh",
+      language: "vi",
       mode: "original",
       targetChapters: 60,
       foundation: {

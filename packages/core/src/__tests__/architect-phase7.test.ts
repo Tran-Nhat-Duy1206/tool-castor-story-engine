@@ -40,7 +40,7 @@ function baseBook(): BookConfig {
     status: "active",
     targetChapters: 80,
     chapterWordCount: 2200,
-    language: "zh",
+    language: "vi",
     createdAt: "2026-04-15T00:00:00.000Z",
     updatedAt: "2026-04-15T00:00:00.000Z",
   };
@@ -154,7 +154,7 @@ describe("ArchitectAgent — Phase 7 extended hook frontmatter", () => {
       .mockResolvedValue({ content: PHASE7_RESPONSE, usage: ZERO_USAGE });
 
     const result = await agent.generateFoundation(baseBook());
-    await agent.writeFoundationFiles(bookDir, result, false, "zh");
+    await agent.writeFoundationFiles(bookDir, result, false, "vi");
 
     const disk = await readFile(join(bookDir, "story", "pending_hooks.md"), "utf-8");
     expect(disk).toContain("上游依赖");

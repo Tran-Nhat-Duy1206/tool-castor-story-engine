@@ -136,7 +136,7 @@ async function createGatedFixture() {
     title: "Test Book",
     platform: "tomato",
     genre: "xuanhuan",
-    language: "zh",
+    language: "vi",
     status: "active",
     targetChapters: 10,
     chapterWordCount: 3000,
@@ -152,7 +152,7 @@ async function createGatedFixture() {
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   const canonA: Record<string, string> = {
     "manifest.json": JSON.stringify({
-      schemaVersion: 2, language: "zh", lastAppliedChapter: 0, projectionVersion: 1, migrationWarnings: [],
+      schemaVersion: 2, language: "vi", lastAppliedChapter: 0, projectionVersion: 1, migrationWarnings: [],
     }, null, 2),
     "current_state.json": JSON.stringify({ chapter: 0, facts: [] }, null, 2),
     "hooks.json": JSON.stringify({ hooks: [] }, null, 2),
@@ -298,14 +298,14 @@ describe("PipelineRunner gated Phase 4 publication", () => {
       expect(artifact.sourceChapter).toBe(1);
       expect(artifact.effectiveChapter).toBe(1);
       expect(artifact.reviewRevision).toBe(1);
-      expect(artifact.language).toBe("zh");
+      expect(artifact.language).toBe("vi");
       expect(artifact.reviewId).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
       );
       expect(artifact.proseRevision).toBe(computeProseRevision(durableProse));
       expect(artifact.baseCanonRevision).toBe(canonBefore.revision);
       expect(artifact.items).toEqual(
-        buildStateReviewItems(gatedDelta(), { chapterContent: durableProse, language: "zh" }),
+        buildStateReviewItems(gatedDelta(), { chapterContent: durableProse, language: "vi" }),
       );
       expect(artifact.items.length).toBeGreaterThan(0);
       for (const item of artifact.items) {
@@ -621,7 +621,7 @@ describe("PipelineRunner gated Phase 4 publication", () => {
       ));
       expect(artifact.proseRevision).toBe(computeProseRevision(durableProse));
       expect(artifact.items).toEqual(
-        buildStateReviewItems(finalDelta, { chapterContent: durableProse, language: "zh" }),
+        buildStateReviewItems(finalDelta, { chapterContent: durableProse, language: "vi" }),
       );
       expect(JSON.stringify(artifact.items)).toContain("留守伦敦追查遗嘱");
       expect(JSON.stringify(artifact.items)).not.toContain("前往巴黎核对账本");

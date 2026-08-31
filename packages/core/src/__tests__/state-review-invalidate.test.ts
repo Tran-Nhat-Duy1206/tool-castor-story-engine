@@ -125,7 +125,7 @@ describe("state-review-invalidation", () => {
     const result = await handleStateRelevantProseSave({
       bookDir: fixture.bookDir,
       chapter: 16,
-      language: "zh",
+      language: "vi",
     });
 
     expect(result.receiptWrites).toEqual([]);
@@ -157,7 +157,7 @@ describe("state-review-invalidation", () => {
       reviewRevision: 3,
       items: [],
       createdAt: CREATED_AT,
-      language: "zh",
+      language: "vi",
     });
     const before = await captureBookMetadata(fixture.root);
 
@@ -212,7 +212,7 @@ describe("state-review-invalidation", () => {
         },
       ],
       createdAt: CREATED_AT,
-      language: "zh",
+      language: "vi",
     });
     await decideStateReviewItem({ bookDir: fixture.bookDir, chapter: 16, itemId: "current-state-fact:0:a", decision: "accept", expectedReviewRevision: 1 });
     const withEdit = await editStateReviewItem({
@@ -275,7 +275,7 @@ describe("state-review-invalidation", () => {
     await publishActiveProposal(fixture.bookDir, {
       schemaVersion: 1, status: "active", reviewId: REVIEW_ID, sourceChapter: 16,
       effectiveChapter: 17, proseRevision: "0123456789abcdef", baseCanonRevision: "fedcba9876543210",
-      reviewRevision: 2, items: [], createdAt: CREATED_AT, language: "zh",
+      reviewRevision: 2, items: [], createdAt: CREATED_AT, language: "vi",
     });
     const beforeBytes = {
       prose: await readFile(join(fixture.bookDir, "chapters", "0016_旧.md"), "utf-8"),
@@ -462,7 +462,7 @@ describe("state-review-invalidation", () => {
       status: "stale",
       sourceChapter: 16,
       createdAt: CREATED_AT,
-      language: "zh",
+      language: "vi",
       reviewId: REVIEW_ID,
       effectiveChapter: 17,
       proseRevision: "0123456789abcdef",

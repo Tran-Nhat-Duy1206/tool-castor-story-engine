@@ -97,7 +97,7 @@ async function seedActive(
     reviewRevision: 1,
     items: baseItems(),
     createdAt: CREATED_AT,
-    language: "zh",
+    language: "vi",
     ...overrides,
   };
   await publishActiveProposal(fixture.bookDir, artifact);
@@ -575,7 +575,7 @@ describe("state-review-decisions", () => {
           status,
           sourceChapter: 13,
           createdAt: CREATED_AT,
-          language: "zh",
+          language: "vi",
           reason: status === "rebuild_failed" ? "settler failed" : "",
         });
         const before = await captureBookMetadata(fixture.root);
@@ -601,7 +601,7 @@ describe("state-review-decisions", () => {
         reviewRevision: 1,
         items: baseItems(),
         createdAt: CREATED_AT,
-        language: "zh",
+        language: "vi",
       });
       const before = await captureBookMetadata(fixture.root);
 

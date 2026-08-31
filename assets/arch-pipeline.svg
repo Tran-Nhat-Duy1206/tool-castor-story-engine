@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 1040 430" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',system-ui,sans-serif">
+<svg viewBox="0 0 1040 430" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',system-ui,sans-serif">
   <defs>
     <marker id="a1" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 Z" fill="#cdbfa3"/></marker>
     <marker id="a1g" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 Z" fill="#cf9a52"/></marker>
@@ -21,44 +21,44 @@
     </style>
   </defs>
   <rect x="0" y="0" width="1040" height="430" fill="#fdf8ec" rx="18"/>
-  <text class="t" x="44" y="56">章节生产管线</text>
+  <text class="t" x="44" y="56">Dây chuyền sản xuất chương</text>
   <rect x="46" y="68" width="58" height="3" rx="1.5" fill="#e76f51"/>
 
   <rect class="opt" x="540" y="36" width="300" height="28" rx="14"/>
-  <text class="d" x="558" y="54">建筑师 · 建书 / 导入 / 番外时生成设定</text>
+  <text class="d" x="558" y="54">Kiến trúc sư · Tạo sách / Nhập liệu / Ngoại truyện</text>
   <rect class="opt" x="852" y="36" width="148" height="28" rx="14"/>
-  <text class="d" x="870" y="54">雷达 · 趋势（可跳过）</text>
+  <text class="d" x="870" y="54">Ra-đa · Xu hướng (có thể bỏ qua)</text>
 
   <rect class="c" x="44" y="120" width="166" height="78" filter="url(#s1)"/>
-  <text class="nm" x="66" y="156">规划师</text><text class="d" x="66" y="180">章节意图 · 取舍</text>
+  <text class="nm" x="66" y="156">Hoạch định viên</text><text class="d" x="66" y="180">Ý đồ chương · Đánh đổi</text>
   <rect class="c" x="246" y="120" width="166" height="78" filter="url(#s1)"/>
-  <text class="nm" x="268" y="156">编排师</text><text class="d" x="268" y="180">上下文 · 规则栈</text>
+  <text class="nm" x="268" y="156">Điều phối viên</text><text class="d" x="268" y="180">Ngữ cảnh · Ngăn xếp quy tắc</text>
   <rect class="c ck" x="448" y="120" width="166" height="78" filter="url(#s1)"/>
-  <text class="nmk" x="470" y="156">写手</text><text class="d" x="470" y="180">生成正文 · 字数治理</text>
+  <text class="nmk" x="470" y="156">Người viết</text><text class="d" x="470" y="180">Sinh văn bản · Quản trị số chữ</text>
   <rect class="c" x="650" y="120" width="166" height="78" filter="url(#s1)"/>
-  <text class="nm" x="672" y="156">审计员</text><text class="d" x="672" y="180">三十七维度连续性</text>
+  <text class="nm" x="672" y="156">Kiểm duyệt viên</text><text class="d" x="672" y="180">Tính liên tục 37 chiều</text>
   <rect class="c" x="852" y="120" width="148" height="78" filter="url(#s1)"/>
-  <text class="nm" x="874" y="156">修订者</text><text class="d" x="874" y="180">修复关键问题</text>
+  <text class="nm" x="874" y="156">Người tu chỉnh</text><text class="d" x="874" y="180">Sửa lỗi cốt lõi</text>
 
   <path class="ln" d="M210,159 L244,159"/>
   <path class="ln" d="M412,159 L446,159"/>
   <path class="ln" d="M614,159 L648,159"/>
   <path class="ln" d="M816,159 L850,159"/>
-  <text class="al" x="752" y="152">未过</text>
+  <text class="al" x="752" y="152">Chưa đạt</text>
   <path class="ln" d="M924,198 C924,236 735,236 733,200"/>
-  <text class="al" x="788" y="232">再审 · 至多一轮</text>
+  <text class="al" x="788" y="232">Tái thẩm · Tối đa một vòng</text>
 
   <rect class="c" x="246" y="300" width="166" height="74" filter="url(#s1)"/>
-  <text class="nm" x="268" y="334">观察者</text><text class="d" x="268" y="357">提取九类事实</text>
+  <text class="nm" x="268" y="334">Quan sát viên</text><text class="d" x="268" y="357">Trích xuất 9 loại sự kiện</text>
   <rect class="c" x="448" y="300" width="166" height="74" filter="url(#s1)"/>
-  <text class="nm" x="470" y="334">反射器</text><text class="d" x="470" y="357">结构化增量</text>
+  <text class="nm" x="470" y="334">Bộ phản chiếu</text><text class="d" x="470" y="357">Gia tăng có cấu trúc</text>
   <rect class="c cg" x="650" y="300" width="200" height="74" filter="url(#s1)"/>
-  <text class="nmg" x="672" y="334">状态结算</text><text class="d" x="672" y="357">校验后写回权威状态</text>
+  <text class="nmg" x="672" y="334">Quyết toán trạng thái</text><text class="d" x="672" y="357">Ghi lại trạng thái chính thống sau kiểm định</text>
 
   <path class="ln" d="M500,198 C500,272 360,262 348,298"/>
-  <text class="al" x="506" y="262">正文</text>
+  <text class="al" x="506" y="262">Văn bản</text>
   <path class="ln" d="M412,337 L446,337"/>
   <path class="ln" d="M614,337 L648,337"/>
   <path class="lng" d="M650,345 C320,384 128,300 127,200"/>
-  <text class="alg" x="300" y="402">写下一章前 · 按相关性检索记忆</text>
+  <text class="alg" x="300" y="402">Trước khi viết chương tiếp theo · Truy xuất ký ức theo mức liên quan</text>
 </svg>

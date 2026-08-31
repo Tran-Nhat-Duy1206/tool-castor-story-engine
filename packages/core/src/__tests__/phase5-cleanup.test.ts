@@ -130,7 +130,7 @@ function baseBook(): BookConfig {
     status: "active",
     targetChapters: 40,
     chapterWordCount: 2000,
-    language: "zh",
+    language: "vi",
     createdAt: "2026-04-15T00:00:00.000Z",
     updatedAt: "2026-04-15T00:00:00.000Z",
   };
@@ -154,7 +154,7 @@ describe("Phase 5 cleanup (1) — volume_outline.md mirror removed", () => {
       .mockResolvedValue({ content: SAMPLE_RESPONSE, usage: ZERO_USAGE });
 
     const output = await agent.generateFoundation(baseBook());
-    await agent.writeFoundationFiles(bookDir, output, false, "zh");
+    await agent.writeFoundationFiles(bookDir, output, false, "vi");
 
     await expect(
       readFile(join(bookDir, "story/volume_outline.md"), "utf-8"),
@@ -258,7 +258,7 @@ describe("Phase 5 cleanup (2) — architect no longer seeds runtime log files", 
 
     const output = await agent.generateFoundation(baseBook());
     // numericalSystem=true would previously seed particle_ledger.md
-    await agent.writeFoundationFiles(bookDir, output, true, "zh");
+    await agent.writeFoundationFiles(bookDir, output, true, "vi");
 
     await expect(
       readFile(join(bookDir, "story/particle_ledger.md"), "utf-8"),
@@ -287,7 +287,7 @@ describe("Phase 5 cleanup (3) — book_rules is authoritative Markdown", () => {
       .mockResolvedValue({ content: SAMPLE_RESPONSE, usage: ZERO_USAGE });
 
     const output = await agent.generateFoundation(baseBook());
-    await agent.writeFoundationFiles(bookDir, output, false, "zh");
+    await agent.writeFoundationFiles(bookDir, output, false, "vi");
 
     const storyFrame = await readFile(join(bookDir, "story/outline/story_frame.md"), "utf-8");
     expect(storyFrame.trimStart().startsWith("---")).toBe(false);
@@ -306,7 +306,7 @@ describe("Phase 5 cleanup (3) — book_rules is authoritative Markdown", () => {
       .mockResolvedValue({ content: SAMPLE_RESPONSE, usage: ZERO_USAGE });
 
     const output = await agent.generateFoundation(baseBook());
-    await agent.writeFoundationFiles(bookDir, output, false, "zh");
+    await agent.writeFoundationFiles(bookDir, output, false, "vi");
 
     const parsed = await readStructuredBookRules(bookDir);
     expect(parsed).not.toBeNull();

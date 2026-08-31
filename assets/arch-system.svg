@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 1040 600" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',system-ui,sans-serif">
+<svg viewBox="0 0 1040 600" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',system-ui,sans-serif">
   <defs>
     <marker id="a3" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 Z" fill="#cdbfa3"/></marker>
     <marker id="a3g" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 Z" fill="#cf9a52"/></marker>
@@ -22,14 +22,14 @@
     </style>
   </defs>
   <rect x="0" y="0" width="1040" height="600" fill="#fdf8ec" rx="18"/>
-  <text class="t3" x="44" y="56">整体系统</text>
+  <text class="t3" x="44" y="56">Hệ thống tổng thể</text>
   <rect x="46" y="68" width="58" height="3" rx="1.5" fill="#e76f51"/>
   <rect class="share" x="664" y="36" width="336" height="28" rx="14"/>
-  <text class="d3" x="682" y="54">底层共享：模型配置 · 多模型路由 · 封面 / 图片服务</text>
+  <text class="d3" x="682" y="54">Chia sẻ nền tảng: Cấu hình mô hình · Định tuyến đa mô hình · Dịch vụ bìa / hình ảnh</text>
 
-  <rect class="pill" x="150" y="92" width="170" height="46" filter="url(#s3)"/><text class="pl" x="200" y="120">Studio 对话</text>
-  <rect class="pill" x="345" y="92" width="150" height="46" filter="url(#s3)"/><text class="pl" x="395" y="120">命令行</text>
-  <rect class="pill" x="520" y="92" width="150" height="46" filter="url(#s3)"/><text class="pl" x="558" y="120">终端面板</text>
+  <rect class="pill" x="150" y="92" width="170" height="46" filter="url(#s3)"/><text class="pl" x="200" y="120">Đối thoại Studio</text>
+  <rect class="pill" x="345" y="92" width="150" height="46" filter="url(#s3)"/><text class="pl" x="395" y="120">Dòng lệnh</text>
+  <rect class="pill" x="520" y="92" width="150" height="46" filter="url(#s3)"/><text class="pl" x="558" y="120">Bảng điều khiển</text>
   <rect class="pill" x="695" y="92" width="170" height="46" filter="url(#s3)"/><text class="pl" x="748" y="120">OpenClaw</text>
 
   <path class="ln3" d="M235,138 L 470,178"/>
@@ -38,33 +38,33 @@
   <path class="ln3" d="M780,138 L 570,178"/>
 
   <rect class="band" x="120" y="180" width="800" height="76" filter="url(#s3)"/>
-  <text class="bandt" x="150" y="215">统一执行面</text>
-  <text class="d3" x="150" y="239">重动作先确认 · 完成态来自真实工具结果 · 生成物可预览可编辑</text>
+  <text class="bandt" x="150" y="215">Mặt thực thi thống nhất</text>
+  <text class="d3" x="150" y="239">Hành động trọng yếu xác nhận trước · Trạng thái hoàn tất từ kết quả công cụ thực · Sản phẩm có thể xem trước và chỉnh sửa</text>
 
   <path class="ln3" d="M380,256 L 320,294"/>
   <path class="ln3" d="M660,256 L 720,294"/>
 
   <rect class="c3" x="120" y="296" width="382" height="118" filter="url(#s3)"/>
-  <text class="nm3k" x="146" y="330">长篇 / 短篇生产线</text>
-  <text class="d3" x="146" y="358">规划 → 编排 → 写作 → 审计 → 修订 → 结算</text>
-  <text class="d3" x="146" y="382">产出：书 · 章节 · 短篇 · 封面 · 审稿记录</text>
-  <text class="d3" x="146" y="406">权威状态存为结构化文件，可长期续写</text>
+  <text class="nm3k" x="146" y="330">Dây chuyền truyện dài / ngắn</text>
+  <text class="d3" x="146" y="358">Hoạch định → Điều phối → Viết → Kiểm duyệt → Tu chỉnh → Quyết toán</text>
+  <text class="d3" x="146" y="382">Đầu ra: Sách · Chương · Truyện ngắn · Bìa · Hồ sơ thẩm duyệt</text>
+  <text class="d3" x="146" y="406">Trạng thái chính thống lưu dạng tệp có cấu trúc, có thể viết tiếp lâu dài</text>
 
   <rect class="c3" x="538" y="296" width="382" height="118" filter="url(#s3)"/>
-  <text class="nm3k" x="564" y="330">互动世界运行线</text>
-  <text class="d3" x="564" y="358">开放世界 / 分支互动 · 世界契约 · 时间推进</text>
-  <text class="d3" x="564" y="382">自由动作或可点击选择，每回合写回世界</text>
-  <text class="d3" x="564" y="406">状态：角色 · 物品 · 证据 · 关系 · 面板 · 配图</text>
+  <text class="nm3k" x="564" y="330">Tuyến vận hành thế giới tương tác</text>
+  <text class="d3" x="564" y="358">Thế giới mở / Tương tác rẽ nhánh · Khế ước thế giới · Thúc đẩy thời gian</text>
+  <text class="d3" x="564" y="382">Hành động tự do hoặc lựa chọn bấm được, mỗi lượt ghi lại vào thế giới</text>
+  <text class="d3" x="564" y="406">Trạng thái: Nhân vật · Vật phẩm · Bằng chứng · Quan hệ · Bảng · Hình minh họa</text>
 
   <path class="ln3g" d="M280,414 L 280,470"/>
   <path class="ln3g" d="M342,470 L 342,416"/>
-  <text class="al3g" x="200" y="448">装配 ↑ / 写回 ↓</text>
+  <text class="al3g" x="200" y="448">Lắp ráp ↑ / Ghi lại ↓</text>
   <path class="ln3g" d="M698,414 L 698,470"/>
   <path class="ln3g" d="M760,470 L 760,416"/>
-  <text class="al3g" x="772" y="448">↑ 装配 / ↓ 写回</text>
+  <text class="al3g" x="772" y="448">↑ Lắp ráp / ↓ Ghi lại</text>
 
   <rect class="mem" x="120" y="472" width="800" height="96" filter="url(#s3)"/>
-  <text class="memt" x="150" y="508">记忆与上下文 · 按需插拔</text>
-  <text class="d3" x="150" y="534">按相关性检索装配 · 常驻 / 可压缩分层 · 接近上下文窗口才语义压缩</text>
-  <text class="d3" x="150" y="556">权威状态 story/state · 可读投影 story/*.md · 时序检索 story/memory.db</text>
+  <text class="memt" x="150" y="508">Ký ức và ngữ cảnh · Cắm rút theo nhu cầu</text>
+  <text class="d3" x="150" y="534">Lắp ráp truy xuất theo mức liên quan · Thường trú / Phân tầng nén được · Chỉ nén ngữ nghĩa khi gần chạm cửa sổ ngữ cảnh</text>
+  <text class="d3" x="150" y="556">Trạng thái chính thống story/state · Hình chiếu đọc được story/*.md · Truy xuất trình tự story/memory.db</text>
 </svg>

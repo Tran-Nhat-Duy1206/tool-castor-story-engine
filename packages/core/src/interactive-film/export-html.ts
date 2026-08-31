@@ -83,7 +83,7 @@ export function buildPlayableHtml(
   const graphJson = esc(JSON.stringify(graph));
   const assetsJson = esc(JSON.stringify(opts?.assetDataUris ?? {}));
   return `<!doctype html>
-<html lang="zh"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<html lang="vi"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>${escHtml(title)}</title><style>${CSS}</style></head>
 <body><div id="wrap"><h1>${escHtml(title)}</h1><div id="if-player" data-if-player></div></div>
 <script>var GRAPH=${graphJson};var ASSETS=${assetsJson};</script>

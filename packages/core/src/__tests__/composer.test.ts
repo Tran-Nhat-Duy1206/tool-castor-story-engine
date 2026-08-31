@@ -132,7 +132,7 @@ describe("ComposerAgent", () => {
           chapterNumber: 4,
           goal: "Bring the focus back to the mentor conflict.",
           outlineNode: "Track the merchant guild trail.",
-          language: "zh",
+          language: "vi",
         });
         expect(request.mustKeep).toContain("The jade seal cannot be destroyed.");
         return {

@@ -86,7 +86,7 @@ describe("castor.json canonical config (migration scenarios)", () => {
   it("4. both exist with conflicting values → castor wins, non-secret key-name warning, no merge", async () => {
     const root = await tempRoot();
     const castorConfig = { ...VALID_CONFIG, language: "en" };
-    const legacyConfig = { ...VALID_CONFIG, language: "zh", name: "other-name" };
+    const legacyConfig = { ...VALID_CONFIG, language: "vi", name: "other-name" };
     await writeFile(join(root, "castor.json"), JSON.stringify(castorConfig, null, 2), "utf-8");
     await writeFile(join(root, "castor.json"), JSON.stringify(legacyConfig, null, 2), "utf-8");
 

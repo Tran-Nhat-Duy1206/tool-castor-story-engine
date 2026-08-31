@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 1040 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',system-ui,sans-serif">
+<svg viewBox="0 0 1040 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',system-ui,sans-serif">
   <defs>
     <marker id="a2" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 Z" fill="#cdbfa3"/></marker>
     <marker id="a2g" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 Z" fill="#cf9a52"/></marker>
@@ -25,19 +25,19 @@
     </style>
   </defs>
   <rect x="0" y="0" width="1040" height="420" fill="#fdf8ec" rx="18"/>
-  <text class="t2" x="44" y="56">长期记忆与状态</text>
+  <text class="t2" x="44" y="56">Ký ức dài hạn và trạng thái</text>
   <rect x="46" y="68" width="58" height="3" rx="1.5" fill="#e76f51"/>
 
   <rect class="c2 c2k" x="44" y="92" width="150" height="56" filter="url(#s2)"/>
-  <text class="nm2k" x="64" y="125">写手正文</text>
+  <text class="nm2k" x="64" y="125">Văn bản người viết</text>
   <rect class="c2" x="232" y="92" width="150" height="56" filter="url(#s2)"/>
-  <text class="nm2" x="252" y="125">提取九类事实</text>
+  <text class="nm2" x="252" y="125">Trích xuất 9 loại sự kiện</text>
   <rect class="c2" x="420" y="92" width="150" height="56" filter="url(#s2)"/>
-  <text class="nm2" x="440" y="125">结构化增量</text>
+  <text class="nm2" x="440" y="125">Gia tăng có cấu trúc</text>
   <rect class="c2" x="608" y="92" width="150" height="56" filter="url(#s2)"/>
-  <text class="nm2" x="628" y="125">不可变写入</text>
+  <text class="nm2" x="628" y="125">Ghi bất biến</text>
   <rect class="c2 c2g" x="796" y="92" width="160" height="56" filter="url(#s2)"/>
-  <text class="nm2g" x="816" y="125">结构校验 ✓</text>
+  <text class="nm2g" x="816" y="125">Kiểm định cấu trúc ✓</text>
 
   <path class="ln2" d="M194,120 L230,120"/>
   <path class="ln2" d="M382,120 L418,120"/>
@@ -45,30 +45,30 @@
   <path class="ln2" d="M758,120 L794,120"/>
 
   <rect class="lay layk" x="44" y="216" width="296" height="150" filter="url(#s2)"/>
-  <text class="hd2" x="66" y="248">权威结构化状态</text>
+  <text class="hd2" x="66" y="248">Trạng thái có cấu trúc chính thống</text>
   <text class="pth" x="66" y="276">story/state/*.json</text>
-  <text class="d2" x="66" y="304">当前状态 · 伏笔 · 章节摘要</text>
-  <text class="d2" x="66" y="326">逐字段校验，坏数据直接拒绝</text>
-  <text class="d2" x="66" y="348">本书唯一权威来源</text>
+  <text class="d2" x="66" y="304">Trạng thái hiện tại · Mầm truyện · Tóm tắt chương</text>
+  <text class="d2" x="66" y="326">Kiểm định từng trường, dữ liệu hỏng bị từ chối ngay</text>
+  <text class="d2" x="66" y="348">Nguồn chính thống duy nhất của sách này</text>
 
   <rect class="lay" x="372" y="216" width="296" height="150" filter="url(#s2)"/>
-  <text class="hd2" x="394" y="248">人类可读投影</text>
+  <text class="hd2" x="394" y="248">Hình chiếu đọc được cho người</text>
   <text class="pthn" x="394" y="276">story/*.md</text>
-  <text class="d2" x="394" y="304">当前状态 · 待兑现伏笔</text>
-  <text class="d2" x="394" y="326">章节摘要 · 角色矩阵</text>
-  <text class="d2" x="394" y="348">从权威状态渲染，给人看</text>
+  <text class="d2" x="394" y="304">Trạng thái hiện tại · Mầm truyện chờ thu hoạch</text>
+  <text class="d2" x="394" y="326">Tóm tắt chương · Ma trận nhân vật</text>
+  <text class="d2" x="394" y="348">Kết xuất từ trạng thái chính thống, dành cho người đọc</text>
 
   <rect class="lay" x="700" y="216" width="296" height="150" filter="url(#s2)"/>
-  <text class="hd2" x="722" y="248">时序记忆库</text>
+  <text class="hd2" x="722" y="248">Kho ký ức trình tự</text>
   <text class="pthn" x="722" y="276">story/memory.db</text>
-  <text class="d2" x="722" y="304">本地数据库，22 版以上自动启用</text>
-  <text class="d2" x="722" y="326">按相关性检索事实 / 伏笔 / 摘要</text>
-  <text class="d2" x="722" y="348">避免全量注入撑爆上下文</text>
+  <text class="d2" x="722" y="304">Cơ sở dữ liệu cục bộ, tự động bật từ phiên bản 22 trở lên</text>
+  <text class="d2" x="722" y="326">Truy xuất sự kiện / mầm truyện / tóm tắt theo mức liên quan</text>
+  <text class="d2" x="722" y="348">Tránh bơm toàn bộ làm tràn ngữ cảnh</text>
 
   <path class="ln2" d="M876,148 C876,184 192,184 192,214"/>
-  <text class="al2" x="430" y="180">校验通过 · 写入权威状态</text>
-  <path class="ln2" d="M340,290 L370,290"/><text class="al2" x="343" y="283">渲染</text>
-  <path class="ln2" d="M668,290 L698,290"/><text class="al2" x="668" y="283">索引</text>
+  <text class="al2" x="430" y="180">Kiểm định đạt · Ghi vào trạng thái chính thống</text>
+  <path class="ln2" d="M340,290 L370,290"/><text class="al2" x="343" y="283">Kết xuất</text>
+  <path class="ln2" d="M668,290 L698,290"/><text class="al2" x="668" y="283">Lập chỉ mục</text>
   <path class="ln2g" d="M848,366 C848,398 192,398 192,368"/>
-  <text class="alg2" x="430" y="412">写下一章前 · 按相关性检索</text>
+  <text class="alg2" x="430" y="412">Trước khi viết chương tiếp theo · Truy xuất theo mức liên quan</text>
 </svg>

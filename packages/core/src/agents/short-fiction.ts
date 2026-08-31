@@ -268,7 +268,7 @@ export class ShortFictionPackagingAgent extends BaseAgent {
 
 export function parseShortFictionOutline(
   rawContent: string,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): ShortFictionOutline {
   const fallbackTitle = untitledShortTitle(language);
   const storyTitle = normalizeTitle(
@@ -285,7 +285,7 @@ export function parseShortFictionBatchDraft(
   options?: { readonly expectedChapters?: number; readonly language?: ShortFictionLanguage },
 ): ShortFictionBatchDraft {
   const expectedChapters = options?.expectedChapters ?? SHORT_FICTION_DEFAULT_CHAPTERS;
-  const language = options?.language ?? "zh";
+  const language = options?.language ?? "vi";
   const countingMode = resolveLengthCountingMode(language);
   const fallbackTitle = untitledShortTitle(language);
   const storyTitle = normalizeTitle(
@@ -350,7 +350,7 @@ export function findEmptyShortFictionChapters(draft: ShortFictionBatchDraft): nu
 
 export function renderShortFictionDraftMarkdown(
   draft: ShortFictionBatchDraft,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   const hookHeading = language === "en" ? "## Opening Hook" : "## 开篇钩子";
   return [
@@ -467,7 +467,7 @@ function normalizeTitle(raw: string): string {
     .trim() ?? "";
 }
 
-function normalizeChapterTitle(raw: string, number: number, language: ShortFictionLanguage = "zh"): string {
+function normalizeChapterTitle(raw: string, number: number, language: ShortFictionLanguage = "vi"): string {
   const prefixPattern = language === "en"
     ? new RegExp(`^Chapter\\s*${number}\\s*[:：.\\-–—]?\\s*`, "i")
     : new RegExp(`^第\\s*${number}\\s*章\\s*`);
@@ -478,7 +478,7 @@ function normalizeChapterTitle(raw: string, number: number, language: ShortFicti
 export function formatShortFictionChapterHeading(
   number: number,
   title: string,
-  language: ShortFictionLanguage = "zh",
+  language: ShortFictionLanguage = "vi",
 ): string {
   const trimmed = title.trim();
   if (!trimmed) return fallbackChapterTitle(number, language);

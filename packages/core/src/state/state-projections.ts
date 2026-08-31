@@ -16,7 +16,7 @@ import {
 
 export function renderHooksProjection(
   state: HooksState,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
   options?: { readonly currentChapter?: number },
 ): string {
   const title = language === "en" ? "# Pending Hooks" : "# 伏笔池";
@@ -73,12 +73,12 @@ export function renderHooksProjection(
   return [title, "", ...headers, ...rows, ""].join("\n");
 }
 
-function renderDependsOnCell(ids: ReadonlyArray<string>, language: "zh" | "en"): string {
+function renderDependsOnCell(ids: ReadonlyArray<string>, language: "vi" | "en"): string {
   if (ids.length === 0) return language === "en" ? "none" : "无";
   return `[${ids.join(", ")}]`;
 }
 
-function renderCoreHookCell(isCore: boolean, language: "zh" | "en"): string {
+function renderCoreHookCell(isCore: boolean, language: "vi" | "en"): string {
   if (language === "en") return isCore ? "true" : "false";
   return isCore ? "是" : "否";
 }
@@ -88,7 +88,7 @@ function renderHalfLifeCell(value: number | undefined): string {
   return String(Math.trunc(value));
 }
 
-function renderPromotedCell(value: boolean | undefined, language: "zh" | "en"): string {
+function renderPromotedCell(value: boolean | undefined, language: "vi" | "en"): string {
   if (value === undefined) return "";
   if (language === "en") return value ? "true" : "false";
   return value ? "是" : "否";
@@ -96,7 +96,7 @@ function renderPromotedCell(value: boolean | undefined, language: "zh" | "en"): 
 
 export function renderChapterSummariesProjection(
   state: ChapterSummariesState,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): string {
   const title = language === "en" ? "# Chapter Summaries" : "# 章节摘要";
   const headers = language === "en"
@@ -139,21 +139,21 @@ const CURRENT_STATE_SLOT_ALIASES: Readonly<Record<
   RuntimeStateLanguage,
   Readonly<Record<CurrentStateSlotKey, ReadonlyArray<string>>>
 >> = {
-  zh: {
-    currentLocation: ["当前位置", "Current Location"],
-    protagonistState: ["主角状态", "Protagonist State"],
-    currentGoal: ["当前目标", "Current Goal"],
-    currentConstraint: ["当前限制", "Current Constraint"],
-    currentAlliances: ["当前敌我", "Current Alliances", "Current Relationships"],
-    currentConflict: ["当前冲突", "Current Conflict"],
+  vi: {
+    currentLocation: ["Vị trí hiện tại", "Current Location", "当前位置"],
+    protagonistState: ["Trạng thái nhân vật chính", "Protagonist State", "主角状态"],
+    currentGoal: ["Mục tiêu hiện tại", "Current Goal", "当前目标"],
+    currentConstraint: ["Ràng buộc hiện tại", "Current Constraint", "当前限制"],
+    currentAlliances: ["Quan hệ hiện tại", "Current Alliances", "Current Relationships", "当前敌我"],
+    currentConflict: ["Xung đột hiện tại", "Current Conflict", "当前冲突"],
   },
   en: {
-    currentLocation: ["Current Location", "当前位置"],
-    protagonistState: ["Protagonist State", "主角状态"],
-    currentGoal: ["Current Goal", "当前目标"],
-    currentConstraint: ["Current Constraint", "当前限制"],
-    currentAlliances: ["Current Alliances", "Current Relationships", "当前敌我"],
-    currentConflict: ["Current Conflict", "当前冲突"],
+    currentLocation: ["Current Location", "Vị trí hiện tại", "当前位置"],
+    protagonistState: ["Protagonist State", "Trạng thái nhân vật chính", "主角状态"],
+    currentGoal: ["Current Goal", "Mục tiêu hiện tại", "当前目标"],
+    currentConstraint: ["Current Constraint", "Ràng buộc hiện tại", "当前限制"],
+    currentAlliances: ["Current Alliances", "Current Relationships", "Quan hệ hiện tại", "当前敌我"],
+    currentConflict: ["Current Conflict", "Xung đột hiện tại", "当前冲突"],
   },
 };
 
@@ -202,11 +202,11 @@ export const CURRENT_STATE_SLOT_DEFS: ReadonlyArray<CurrentStateSlotDef> =
     aliases: CURRENT_STATE_SLOT_ALIASES.en[key]!,
   }));
 
-const CURRENT_STATE_SLOT_LABELS: Record<"zh" | "en", Record<CurrentStateSlotKey, string>> = {
-  zh: Object.fromEntries(
-    (Object.keys(CURRENT_STATE_SLOT_ALIASES.zh) as CurrentStateSlotKey[]).map((key) => [
+const CURRENT_STATE_SLOT_LABELS: Record<"vi" | "en", Record<CurrentStateSlotKey, string>> = {
+  vi: Object.fromEntries(
+    (Object.keys(CURRENT_STATE_SLOT_ALIASES.vi) as CurrentStateSlotKey[]).map((key) => [
       key,
-      CURRENT_STATE_SLOT_ALIASES.zh[key]![0],
+      CURRENT_STATE_SLOT_ALIASES.vi[key]![0],
     ]),
   ) as Record<CurrentStateSlotKey, string>,
   en: Object.fromEntries(
@@ -219,7 +219,7 @@ const CURRENT_STATE_SLOT_LABELS: Record<"zh" | "en", Record<CurrentStateSlotKey,
 
 export function renderCurrentStateProjection(
   state: CurrentStateState,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): string {
   const layout = language === "en"
     ? {
@@ -233,14 +233,14 @@ export function renderCurrentStateProjection(
       additionalTitle: "## Additional State",
     }
     : {
-      title: "# 当前状态",
-      tableHeader: "| 字段 | 值 |",
+      title: "# Trạng thái hiện tại",
+      tableHeader: "| Trường | Giá trị |",
       labels: {
-        chapter: "当前章节",
-        ...CURRENT_STATE_SLOT_LABELS.zh,
+        chapter: "Chương hiện tại",
+        ...CURRENT_STATE_SLOT_LABELS.vi,
       },
-      placeholders: "（未设定）",
-      additionalTitle: "## 其他状态",
+      placeholders: "(chưa thiết lập)",
+      additionalTitle: "## Trạng thái bổ sung",
     };
 
   const slots = CURRENT_STATE_SLOT_DEFS.map((def) => ({
@@ -346,7 +346,7 @@ export interface CurrentStateDescription {
 
 export function describeCurrentState(
   state: CurrentStateState,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): CurrentStateDescription {
   const labels = CURRENT_STATE_SLOT_LABELS[language];
   const knownPredicates = new Set(

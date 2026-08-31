@@ -1,7 +1,7 @@
 // Bilingual prompt builders for the narrative forecast agent, organized the
 // same way as prompts/short-fiction.ts: each builder switches on language.
 
-export type ForecastLanguage = "zh" | "en";
+export type ForecastLanguage = "vi" | "en";
 
 export interface ForecastPromptInput {
   readonly contextMarkdown: string;
@@ -62,7 +62,7 @@ export function buildForecastUserPrompt(input: ForecastPromptInput, language: Fo
     "",
     `生成恰好 ${input.branchCount} 个候选分支。每个分支覆盖从第 ${firstChapter} 章开始、约 ${input.horizon} 章的未来走向。`,
     "输出 JSON，结构如下（字段名必须完全一致）：",
-    forecastJsonShape(firstChapter, "zh"),
+    forecastJsonShape(firstChapter, "vi"),
   ].join("\n");
 }
 

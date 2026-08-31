@@ -14,7 +14,7 @@ import { BookRulesSchema } from "../models/book-rules.js";
 const baseProfile: GenreProfile = {
   id: "test",
   name: "测试",
-  language: "zh",
+  language: "vi",
   chapterTypes: [],
   fatigueWords: [],
   pacingRule: "",
@@ -141,7 +141,7 @@ describe("validatePostWrite", () => {
       content: string,
       genreProfile: GenreProfile,
       bookRules: null,
-      languageOverride?: "zh" | "en",
+      languageOverride?: "vi" | "en",
     ) => ReadonlyArray<PostWriteViolation>;
 
     const result = validateWithLanguage(content, baseProfile, null, "en");
@@ -303,7 +303,7 @@ describe("validatePostWrite", () => {
       "屋里很冷。",
     ].join("\n\n");
 
-    const result = detectParagraphLengthDrift(current, recent, "zh");
+    const result = detectParagraphLengthDrift(current, recent, "vi");
     expect(findRule(result, "段落密度漂移")).toBeDefined();
     expect(findRule(result, "段落密度漂移")?.severity).toBe("warning");
   });
@@ -318,7 +318,7 @@ describe("validatePostWrite", () => {
       "屋里很冷。",
     ].join("\n\n");
 
-    const result = detectParagraphShapeWarnings(current, "zh");
+    const result = detectParagraphShapeWarnings(current, "vi");
     expect(findRule(result, "段落过碎")).toBeDefined();
     expect(findRule(result, "连续短段")).toBeDefined();
   });
@@ -337,7 +337,7 @@ describe("validatePostWrite", () => {
     const result = resolveDuplicateTitle(
       "回声",
       ["旧路", "回声"],
-      "zh",
+      "vi",
       {
         content: "塔楼里的铜铃只响了一声，风从缺口灌进来，守夜人没有回头。",
       },
@@ -351,7 +351,7 @@ describe("validatePostWrite", () => {
     const result = resolveDuplicateTitle(
       "名单未落",
       ["名单之前", "名单之后", "名单还在"],
-      "zh",
+      "vi",
       {
         content: "塔楼里的铜铃只响了一声，守夜人没有回头，风从缺口灌进来。",
       },

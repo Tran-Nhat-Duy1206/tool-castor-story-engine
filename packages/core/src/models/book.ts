@@ -4,6 +4,21 @@ import { GovernanceMarkersSchema } from "../governance/contracts.js";
 export const PlatformSchema = z.enum(["tomato", "feilu", "qidian", "other"]);
 export type Platform = z.infer<typeof PlatformSchema>;
 
+/**
+ * Legacy compat: old books/configs may store platform as Chinese literals
+ * "番茄", "起点", "飞卢", "其他"/"其它". We keep escaped \uXXXX checks so
+ * existing data still normalizes correctly, but new code must not introduce
+ * new literal Chinese — use canonical ids "tomato"/"qidian"/"feilu"/"other".
+ *
+ * Escaped forms:
+ *  番茄 = \u756a\u8304
+ *  起点 = \u8d77\u70b9
+ *  飞卢 = \u98de\u5362
+ *  其他 = \u5176\u4ed6
+ *  其它 = \u5176\u5b83
+ * Keeping \uXXXX here is intentional: it lets us read legacy books without
+ * putting literal Han in new source. Do not add new Chinese literals.
+ */
 export function normalizePlatformId(platform: unknown): Platform | undefined {
   if (typeof platform !== "string") {
     return undefined;
@@ -17,16 +32,16 @@ export function normalizePlatformId(platform: unknown): Platform | undefined {
   const lowered = raw.toLowerCase();
   const compact = lowered.replace(/[\s_-]+/g, "");
 
-  if (compact === "tomato" || compact === "fanqie" || compact === "fanqienovel" || raw.includes("番茄")) {
+  if (compact === "tomato" || compact === "fanqie" || compact === "fanqienovel" || raw.includes("\u756a\u8304")) {
     return "tomato";
   }
-  if (compact === "qidian" || compact === "qidianzhongwenwang" || raw.includes("起点")) {
+  if (compact === "qidian" || compact === "qidianzhongwenwang" || raw.includes("\u8d77\u70b9")) {
     return "qidian";
   }
-  if (compact === "feilu" || raw.includes("飞卢")) {
+  if (compact === "feilu" || raw.includes("\u98de\u5362")) {
     return "feilu";
   }
-  if (compact === "other" || compact === "others" || raw.includes("其他") || raw.includes("其它")) {
+  if (compact === "other" || compact === "others" || raw.includes("\u5176\u4ed6") || raw.includes("\u5176\u5b83")) {
     return "other";
   }
 
@@ -61,7 +76,7 @@ export const BookConfigSchema = z.object({
   status: BookStatusSchema,
   targetChapters: z.number().int().min(1).default(200),
   chapterWordCount: z.number().int().min(1000).default(3000),
-  language: z.enum(["zh", "en"]).optional(),
+  language: z.enum(["vi", "en"]).optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   parentBookId: z.string().optional(),

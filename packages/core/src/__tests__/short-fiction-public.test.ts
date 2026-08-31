@@ -162,7 +162,7 @@ describe("public short-fiction chain", () => {
       await writeFile(join(root, "castor.json"), JSON.stringify({
         name: "cover-test",
         version: "0.1.0",
-        language: "zh",
+        language: "vi",
         llm: {
           provider: "openai",
           service: "kkaiapi",
@@ -200,7 +200,7 @@ describe("public short-fiction chain", () => {
       await writeFile(join(root, "castor.json"), JSON.stringify({
         name: "cover-test",
         version: "0.1.0",
-        language: "zh",
+        language: "vi",
         llm: {
           provider: "openai",
           service: "kkaiapi",

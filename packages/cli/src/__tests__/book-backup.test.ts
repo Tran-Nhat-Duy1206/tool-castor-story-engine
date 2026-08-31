@@ -25,8 +25,8 @@ async function setupBook(bookId: string): Promise<string> {
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await mkdir(join(bookDir, "story"), { recursive: true });
   await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: bookId, title: bookId, language: "zh" }), "utf-8");
-  await writeFile(join(bookDir, "chapters", "0001_起风.md"), "第一章原文。", "utf-8");
-  await writeFile(join(bookDir, "story", "current_state.md"), "原始状态", "utf-8");
+  await writeFile(join(bookDir, "chapters", "0001_Gió Nổi.md"), "Nội dung gốc Chương 1.", "utf-8");
+  await writeFile(join(bookDir, "story", "current_state.md"), "Trạng thái gốc", "utf-8");
   return bookDir;
 }
 
@@ -40,8 +40,8 @@ describe("book backup module", () => {
 
     expect(result.backupId).toBe("20260715-081233");
     const backupDir = join(projectRoot, ".castor", "backups", "backbook", "20260715-081233");
-    await expect(readFile(join(backupDir, "chapters", "0001_起风.md"), "utf-8")).resolves.toBe("第一章原文。");
-    await expect(readFile(join(backupDir, "story", "current_state.md"), "utf-8")).resolves.toBe("原始状态");
+    await expect(readFile(join(backupDir, "chapters", "0001_Gió Nổi.md"), "utf-8")).resolves.toBe("Nội dung gốc Chương 1.");
+    await expect(readFile(join(backupDir, "story", "current_state.md"), "utf-8")).resolves.toBe("Trạng thái gốc");
     // The original book stays in place.
     await expect(exists(join(bookDir, "book.json"))).resolves.toBe(true);
   });
@@ -77,8 +77,8 @@ describe("book backup module", () => {
     const bookDir = await setupBook("restorebook");
     const backup = await createBookBackup(projectRoot, "restorebook", { now: fixedClock("2026-07-15T08:00:00Z") });
 
-    await writeFile(join(bookDir, "chapters", "0001_起风.md"), "改坏了的第一章。", "utf-8");
-    await writeFile(join(bookDir, "chapters", "0002_多余.md"), "多写的一章。", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0001_Gió Nổi.md"), "Chương 1 bị sửa hỏng.", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0002_Chương Thừa.md"), "Chương thừa được viết thêm.", "utf-8");
 
     const result = await restoreBookBackup(projectRoot, "restorebook", backup.backupId, {
       now: fixedClock("2026-07-15T09:00:00Z"),
@@ -88,13 +88,13 @@ describe("book backup module", () => {
     expect(result.preRestoreBackupId).toBe("20260715-090000-pre-restore");
 
     // Content is back to the backup point, including removal of extra files.
-    await expect(readFile(join(bookDir, "chapters", "0001_起风.md"), "utf-8")).resolves.toBe("第一章原文。");
-    await expect(exists(join(bookDir, "chapters", "0002_多余.md"))).resolves.toBe(false);
+    await expect(readFile(join(bookDir, "chapters", "0001_Gió Nổi.md"), "utf-8")).resolves.toBe("Nội dung gốc Chương 1.");
+    await expect(exists(join(bookDir, "chapters", "0002_Chương Thừa.md"))).resolves.toBe(false);
 
     // The pre-restore auto-backup preserves the botched state.
     const preRestoreDir = join(projectRoot, ".castor", "backups", "restorebook", "20260715-090000-pre-restore");
-    await expect(readFile(join(preRestoreDir, "chapters", "0001_起风.md"), "utf-8")).resolves.toBe("改坏了的第一章。");
-    await expect(readFile(join(preRestoreDir, "chapters", "0002_多余.md"), "utf-8")).resolves.toBe("多写的一章。");
+    await expect(readFile(join(preRestoreDir, "chapters", "0001_Gió Nổi.md"), "utf-8")).resolves.toBe("Chương 1 bị sửa hỏng.");
+    await expect(readFile(join(preRestoreDir, "chapters", "0002_Chương Thừa.md"), "utf-8")).resolves.toBe("Chương thừa được viết thêm.");
   });
 
   it("rejects backing up a book that does not exist", async () => {
@@ -135,7 +135,7 @@ describe("castor book backup / restore commands", () => {
     };
     expect(listed.backups.map((b) => b.id)).toContain(created.backupId);
 
-    await writeFile(join(bookDir, "chapters", "0001_起风.md"), "改坏了。", "utf-8");
+    await writeFile(join(bookDir, "chapters", "0001_Gió Nổi.md"), "Nội dung bị hỏng.", "utf-8");
 
     await bookCommand.parseAsync(["node", "book", "restore", "cliflow", created.backupId, "--json"], { from: "node" });
     expect(logErrorMock).not.toHaveBeenCalled();
@@ -146,7 +146,7 @@ describe("castor book backup / restore commands", () => {
     expect(restored.restoredFrom).toBe(created.backupId);
     expect(restored.preRestoreBackupId).not.toBeNull();
 
-    await expect(readFile(join(bookDir, "chapters", "0001_起风.md"), "utf-8")).resolves.toBe("第一章原文。");
+    await expect(readFile(join(bookDir, "chapters", "0001_Gió Nổi.md"), "utf-8")).resolves.toBe("Nội dung gốc Chương 1.");
   });
 
   it("fails with exit code 1 when restoring a backup that does not exist", async () => {

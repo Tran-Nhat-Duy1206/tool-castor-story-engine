@@ -37,9 +37,9 @@ shortCommand
   .option("--reference <path>", "Optional reference notes/text")
   .option("--story-id <id>", "Output story id under shorts/")
   .option("--out-dir <path>", "Output directory", "shorts")
-  .option("--lang <language>", "Writing language: zh or en", "zh")
+  .option("--lang <language>", "Writing language: vi or en", "vi")
   .option("--chapters <n>", "Complete short chapter count (12-18)", String(SHORT_FICTION_DEFAULT_CHAPTERS))
-  .option("--chars <n>", "Per-chapter length: zh characters (900-1200) or en words (600-800)")
+  .option("--chars <n>", "Per-chapter length: vi characters (900-1200) or en words (600-800)")
   .option("--llm-base-url <url>", "Override LLM base URL")
   .option("--model <model>", "Fallback model for all short stages")
   .option("--planner-model <model>", "Model for outline creation/revision")
@@ -182,8 +182,8 @@ interface ShortRunOptions {
 }
 
 function parseShortFictionLanguage(value: string): ShortFictionLanguage {
-  if (value === "zh" || value === "en") return value;
-  throw new Error("lang must be zh or en.");
+  if (value === "vi" || value === "en") return value;
+  throw new Error("lang must be vi or en.");
 }
 
 interface ShortRuntime {

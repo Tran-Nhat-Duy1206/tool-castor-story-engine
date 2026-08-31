@@ -74,7 +74,7 @@ describe("play agents", () => {
       input: "问母亲孩子的药还能撑多久",
       action: { actionKind: "say", intent: "询问孩子的药量" },
       context: "actor_mother 是 actor_child 的母亲；缺的是孩子的哮喘药。",
-      language: "zh",
+      language: "vi",
     });
 
     expect(submit).toHaveBeenCalledTimes(2);
@@ -96,7 +96,7 @@ describe("play agents", () => {
       input: "继续问清楚",
       action: { actionKind: "say", intent: "追问关键信息" },
       context: "当前场景。",
-      language: "zh",
+      language: "vi",
     });
 
     expect(submit).toHaveBeenCalledTimes(2);
@@ -118,7 +118,7 @@ describe("play agents", () => {
       input: "我问老陈",
       action: { actionKind: "say", intent: "追问旧账" },
       context: "当前实体名册：actor_afu [actor]: 阿福",
-      language: "zh",
+      language: "vi",
     });
 
     const messages = submit.mock.calls[0]?.[0] as ReadonlyArray<{ readonly role: string; readonly content: string }>;
@@ -140,7 +140,7 @@ describe("play agents", () => {
       input: "我检查背包里的车票",
       action: { actionKind: "look", intent: "检查车票" },
       context: "当前实体名册：actor_player [actor]: 临时维修员",
-      language: "zh",
+      language: "vi",
     });
 
     const messages = submit.mock.calls[0]?.[0] as ReadonlyArray<{ readonly role: string; readonly content: string }>;
@@ -181,7 +181,7 @@ describe("play agents", () => {
         "世界契约（高优先级，先于题材惯例）：",
         "不要 RPG、战斗、数值或等级。证据可信度只用自然语言表达，不要游戏面板。",
       ].join("\n"),
-      language: "zh",
+      language: "vi",
     });
 
     const messages = submit.mock.calls[0]?.[0] as ReadonlyArray<{ readonly role: string; readonly content: string }>;
@@ -204,7 +204,7 @@ describe("play agents", () => {
         input: "我检查蓝色提灯",
         action: { actionKind: "look", intent: "检查蓝色提灯" },
         context: "世界契约：稀有度通过氛围表达。",
-        language: "zh",
+        language: "vi",
       });
 
       const messages = submit.mock.calls[0]?.[0] as ReadonlyArray<{ readonly role: string; readonly content: string }>;
@@ -225,7 +225,7 @@ describe("play agents", () => {
       input: "我冲下台阶去拔那把战斧",
       action: { actionKind: "do", intent: "冲下台阶并拔起战斧" },
       context: "当前场景：敌人正在合围，战斧在庭院废墟中。",
-      language: "zh",
+      language: "vi",
     });
 
     const messages = submit.mock.calls[0]?.[0] as ReadonlyArray<{ readonly role: string; readonly content: string }>;
@@ -236,13 +236,13 @@ describe("play agents", () => {
   });
 
   it("renderer treats player negation and applied time as canonical", async () => {
-    const prompt = buildSceneRendererSystemPrompt("open", "zh");
+    const prompt = buildSceneRendererSystemPrompt("open", "vi");
     expect(prompt).toContain("elapsed 和 anchor 是权威时间");
     expect(prompt).toContain("不得另写");
   });
 
   it("leaves scene-writing methodology to the Play Skill", () => {
-    const prompt = buildSceneRendererSystemPrompt("open", "zh");
+    const prompt = buildSceneRendererSystemPrompt("open", "vi");
     expect(prompt).not.toContain("先承接玩家动作");
     expect(prompt).not.toContain("不要写总结性尾声");
     expect(prompt).toContain("suggestedActions");
@@ -337,7 +337,7 @@ describe("play agents", () => {
       sceneText: "抽屉夹层里卡着一只黑色U盘。",
       context: "当前实体名册：actor_player [actor]: 玩家",
       stateBrief: "# Play State\n- summary: 检查抽屉。\n",
-      language: "zh",
+      language: "vi",
     }));
 
     expect(mutation.entities.upsert[0]?.label).toBe("黑色U盘");
@@ -355,7 +355,7 @@ describe("play agents", () => {
       sceneText: "母亲低头看了一眼怀里的孩子。",
       context: "actor_mother 是 actor_child 的母亲。",
       stateBrief: "# Play State\n- summary: 追问药量。\n",
-      language: "zh",
+      language: "vi",
     }));
 
     expect(mutation).toMatchObject({ eventId: "evt-4", turn: 4, actionKind: "say" });
@@ -373,7 +373,7 @@ describe("play agents", () => {
       sceneText: "抽屉里只有灰。",
       context: "当前实体名册：actor_player [actor]: 玩家",
       stateBrief: "# Play State\n- summary: 检查抽屉。\n",
-      language: "zh",
+      language: "vi",
     }));
 
     expect(mutation.entities.upsert).toEqual([]);

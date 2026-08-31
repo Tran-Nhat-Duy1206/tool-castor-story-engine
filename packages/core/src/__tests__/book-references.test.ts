@@ -135,7 +135,7 @@ describe("book reference context selection", () => {
       goal: "让主角在开篇失去退路",
       outlineNode: "事故发生",
       mustKeep: ["第一人称"],
-      language: "zh",
+      language: "vi",
     }, selector);
 
     expect(selector).toHaveBeenCalledOnce();
@@ -158,7 +158,7 @@ describe("book reference context selection", () => {
       goal: "推进中段",
       outlineNode: "第二次受挫",
       mustKeep: [],
-      language: "zh",
+      language: "vi",
     }, async () => {
       throw new Error("selector unavailable");
     });
@@ -177,7 +177,7 @@ describe("book reference context selection", () => {
       goal: "主角独自调查仓库",
       outlineNode: "发现旧账",
       mustKeep: [],
-      language: "zh",
+      language: "vi",
     }, selector);
 
     expect(selector).toHaveBeenCalledOnce();

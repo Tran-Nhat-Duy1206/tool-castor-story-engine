@@ -308,8 +308,9 @@ function formatTaskElapsed(ms: number, lang: StudioLanguage): string {
 }
 
 /**
- * 把正在后台运行的生产任务状态渲染成一段系统提示词附录，注入聊天 agent 的上下文。
- * 没有这段信息时，用户在任务运行期间问"在写吗"，agent 会答"没有任务在运行"。
+ * Render trạng thái tác vụ sản xuất đang chạy nền thành một đoạn phụ lục system prompt,
+ * tiêm vào ngữ cảnh của chat agent. Nếu không có đoạn này, khi người dùng hỏi
+ * "đang viết à?" trong lúc tác vụ chạy, agent sẽ trả lời "không có tác vụ nào đang chạy".
  */
 function buildRunningTaskContextBlock(task: StudioTaskSnapshot, lang: StudioLanguage): string {
   const exec = task.execution;
@@ -324,12 +325,12 @@ function buildRunningTaskContextBlock(task: StudioTaskSnapshot, lang: StudioLang
   return pick(
     lang,
     [
-      "## 后台任务状态",
-      "本会话有一个正在后台运行的生产任务：",
-      `- 任务：${exec.label}（${exec.tool}）`,
-      `- 状态：${status}`,
-      `- 已运行：${elapsed}${logsBlock}`,
-      "该任务在后台独立运行，本轮对话不会打断它。用户询问任务进展时，基于以上信息如实回答。不要再次发起同类生产任务，也不要声称没有任务在运行。生产类工具已临时不可用，任务结束后恢复。",
+      "## Trạng thái tác vụ nền",
+      "Phiên này có một tác vụ sản xuất đang chạy nền:",
+      `- Tác vụ: ${exec.label} (${exec.tool})`,
+      `- Trạng thái: ${status}`,
+      `- Đã chạy: ${elapsed}${logsBlock}`,
+      "Tác vụ chạy độc lập trong nền; lượt trò chuyện này không làm gián đoạn nó. Khi người dùng hỏi về tiến độ, hãy trả lời trung thực dựa trên thông tin trên. Đừng khởi tạo thêm tác vụ sản xuất cùng loại, và đừng nói rằng không có tác vụ nào đang chạy. Các công cụ sản xuất tạm thời không khả dụng và sẽ được khôi phục khi tác vụ kết thúc.",
     ].join("\n"),
     [
       "## Background task status",

@@ -55,7 +55,7 @@ function activeProposal(overrides: Record<string, unknown> = {}) {
     reviewRevision: 1,
     items: [factItem()],
     createdAt: CREATED_AT,
-    language: "zh",
+    language: "vi",
     ...overrides,
   };
 }
@@ -67,7 +67,7 @@ describe("state review workflow shells", () => {
       status: "rebuild_required",
       sourceChapter: 13,
       createdAt: CREATED_AT,
-      language: "zh",
+      language: "vi",
     });
     expect(parsed.status).toBe("rebuild_required");
     expect(parsed).not.toHaveProperty("reviewId");
@@ -97,7 +97,7 @@ describe("state review workflow shells", () => {
         status: "rebuild_failed",
         sourceChapter: 16,
         createdAt: CREATED_AT,
-        language: "zh",
+        language: "vi",
       }),
     ).toThrow();
   });
@@ -436,7 +436,7 @@ describe("receipt evidence preservation (spec §7/§23)", () => {
 
 describe("language reuse and error surface", () => {
   it("reuses the canonical RuntimeStateLanguageSchema instead of a local union", () => {
-    expect(RuntimeStateLanguageSchema.options).toContain("zh");
+    expect(RuntimeStateLanguageSchema.options).toContain("vi");
     expect(RuntimeStateLanguageSchema.options).toContain("en");
     expect(() =>
       StateReviewArtifactSchema.parse(activeProposal({ language: "fr" })),

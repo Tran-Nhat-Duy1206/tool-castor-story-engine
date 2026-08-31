@@ -5,7 +5,7 @@ import { createSkillRegistry } from "../skills/index.js";
 describe("buildAgentSystemPrompt", () => {
   describe("mode isolation", () => {
     it("defaults no-book sessions to plain chat, not book creation", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh");
+      const prompt = buildAgentSystemPrompt(null, "vi");
       expect(prompt).toContain("普通聊天助手");
       expect(prompt).toContain("这里不是自动生产入口");
       expect(prompt).toContain("propose_action");
@@ -17,7 +17,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("defaults active-book sessions to book mode", () => {
-      const prompt = buildAgentSystemPrompt("my-book", "zh");
+      const prompt = buildAgentSystemPrompt("my-book", "vi");
       expect(prompt).toContain("当前正在处理书籍「my-book」");
       expect(prompt).toContain("sub_agent");
       expect(prompt).toContain("writer");
@@ -37,7 +37,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("edit mode treats role cards as editable truth files", () => {
-      const prompt = buildAgentSystemPrompt("my-book", "zh", "edit");
+      const prompt = buildAgentSystemPrompt("my-book", "vi", "edit");
       expect(prompt).toContain("外部编辑助手");
       expect(prompt).toContain("角色卡也是可编辑设定文件");
       expect(prompt).toContain("roles/major/<name>.md");
@@ -45,16 +45,16 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("requires self-contained proposed action instructions", () => {
-      const zhPrompt = buildAgentSystemPrompt(null, "zh", "chat");
+      const viPrompt = buildAgentSystemPrompt(null, "vi", "chat");
       const enPrompt = buildAgentSystemPrompt(null, "en", "chat");
-      expect(zhPrompt).toContain("instruction 必须自包含");
-      expect(zhPrompt).toContain("不要让下一条 session 依赖上一轮聊天上下文猜");
+      expect(viPrompt).toContain("instruction must be self-contained");
+      expect(viPrompt).toContain("Do not let the next session guess from previous chat context");
       expect(enPrompt).toContain("instruction must be self-contained");
       expect(enPrompt).toContain("Do not make the next session infer missing context");
     });
 
     it("treats derivative works as confirmed production actions instead of assisted routes", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "chat");
+      const prompt = buildAgentSystemPrompt(null, "vi", "chat");
       expect(prompt).toContain("生产型动作");
       expect(prompt).toContain("fanfic_init");
       expect(prompt).toContain("continuation_import");
@@ -66,11 +66,11 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("keeps pure style analysis conversational and maps actual imitation to production", () => {
-      const zhPrompt = buildAgentSystemPrompt(null, "zh", "chat");
+      const viPrompt = buildAgentSystemPrompt(null, "vi", "chat");
       const enPrompt = buildAgentSystemPrompt(null, "en", "chat");
-      expect(zhPrompt).toContain("纯粹询问或分析文风时直接回答");
-      expect(zhPrompt).toContain("参考文风创作全新故事=style_imitation");
-      expect(zhPrompt).toContain("创建同人/续写/番外/仿写作品时调用 propose_action");
+      expect(viPrompt).toContain("When purely asking or analyzing style, answer directly");
+      expect(viPrompt).toContain("Creating a new story in the style of the reference = style_imitation");
+      expect(viPrompt).toContain("When creating fanfic/continuation/spinoff/imitation, call propose_action");
       expect(enPrompt).toContain("Answer pure style-analysis questions directly");
       expect(enPrompt).toContain("an original story that learns prose style from a reference=style_imitation");
       expect(enPrompt).toContain("create fanfiction / continuation / side-story / style-imitation work");
@@ -89,7 +89,7 @@ describe("buildAgentSystemPrompt", () => {
         requestedSkills: ["detective-play"],
       });
 
-      const prompt = buildAgentSystemPrompt(null, "zh", "chat", { skills });
+      const prompt = buildAgentSystemPrompt(null, "vi", "chat", { skills });
 
       expect(prompt).toContain("## Skill 指导");
       expect(prompt).toContain("detective-play (强制)");
@@ -166,7 +166,7 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("book-create mode", () => {
     it("gates long-form creation behind a confirmation proposal", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "book-create");
+      const prompt = buildAgentSystemPrompt(null, "vi", "book-create");
       expect(prompt).toContain("建书助手");
       expect(prompt).toContain("确认是否创建");
       expect(prompt).toContain("分阶段");
@@ -188,7 +188,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("runs architect only after book creation is confirmed", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "book-create", {
+      const prompt = buildAgentSystemPrompt(null, "vi", "book-create", {
         actionSource: "button",
         requestedIntent: "create_book",
       });
@@ -211,7 +211,7 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("short mode", () => {
     it("gates short-fiction and cover production behind a confirmation proposal", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "short");
+      const prompt = buildAgentSystemPrompt(null, "vi", "short");
       expect(prompt).toContain("Castor Short 助手");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("short_run");
@@ -225,7 +225,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("runs short_fiction_run only after short production is confirmed", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "short", {
+      const prompt = buildAgentSystemPrompt(null, "vi", "short", {
         actionSource: "button",
         requestedIntent: "short_run",
       });
@@ -236,7 +236,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("runs generate_cover only after cover generation is confirmed", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "short", {
+      const prompt = buildAgentSystemPrompt(null, "vi", "short", {
         actionSource: "button",
         requestedIntent: "generate_cover",
       });
@@ -257,11 +257,11 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("fills shortRun.language from the user's requested output language instead of hardcoding the session language", () => {
-      const zhPrompt = buildAgentSystemPrompt(null, "zh", "short");
-      expect(zhPrompt).not.toContain("language=zh、chapters");
-      expect(zhPrompt).toContain("language 填用户要求的产出语言");
-      expect(zhPrompt).toContain("900-1200");
-      expect(zhPrompt).toContain("600-800");
+      const viPrompt = buildAgentSystemPrompt(null, "vi", "short");
+      expect(viPrompt).not.toContain("language=zh、chapters");
+      expect(viPrompt).toContain("language is the output language requested by the user");
+      expect(viPrompt).toContain("900-1200");
+      expect(viPrompt).toContain("600-800");
 
       const enPrompt = buildAgentSystemPrompt(null, "en", "short");
       expect(enPrompt).not.toContain("language=en, chapters");
@@ -273,7 +273,7 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("script and storyboard modes", () => {
     it("gates script creation behind a confirmation proposal", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "script");
+      const prompt = buildAgentSystemPrompt(null, "vi", "script");
       expect(prompt).toContain("剧本创作助手");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("script_create");
@@ -290,7 +290,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("runs script_create only after script creation is confirmed", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "script", {
+      const prompt = buildAgentSystemPrompt(null, "vi", "script", {
         actionSource: "button",
         requestedIntent: "script_create",
       });
@@ -303,7 +303,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("gates storyboard creation behind a confirmation proposal", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "storyboard");
+      const prompt = buildAgentSystemPrompt(null, "vi", "storyboard");
       expect(prompt).toContain("分镜创作助手");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("storyboard_create");
@@ -319,7 +319,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("runs storyboard_create only after storyboard creation is confirmed", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "storyboard", {
+      const prompt = buildAgentSystemPrompt(null, "vi", "storyboard", {
         actionSource: "button",
         requestedIntent: "storyboard_create",
       });
@@ -332,7 +332,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("gates interactive-film creation behind a confirmation proposal", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "interactive-film");
+      const prompt = buildAgentSystemPrompt(null, "vi", "interactive-film");
       expect(prompt).toContain("互动影游创作助手");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("interactive_film_create");
@@ -349,7 +349,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("runs interactive_film_create only after interactive-film creation is confirmed", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "interactive-film", {
+      const prompt = buildAgentSystemPrompt(null, "vi", "interactive-film", {
         actionSource: "button",
         requestedIntent: "interactive_film_create",
       });
@@ -366,7 +366,7 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("play mode", () => {
     it("gates new world start behind a confirmation proposal before a world exists", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "play", { playWorldExists: false });
+      const prompt = buildAgentSystemPrompt(null, "vi", "play", { playWorldExists: false });
       expect(prompt).toContain("Castor Play 助手");
       expect(prompt).toContain("propose_action");
       expect(prompt).toContain("play_start");
@@ -388,7 +388,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("exposes play_step, play_revise, and play_edit after a world exists", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "play", { playWorldExists: true });
+      const prompt = buildAgentSystemPrompt(null, "vi", "play", { playWorldExists: true });
       expect(prompt).toContain("Castor Play 助手");
       expect(prompt).toContain("play_step");
       expect(prompt).toContain("play_revise");
@@ -408,7 +408,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("runs play_start only after world start is confirmed", () => {
-      const prompt = buildAgentSystemPrompt(null, "zh", "play", {
+      const prompt = buildAgentSystemPrompt(null, "vi", "play", {
         actionSource: "button",
         requestedIntent: "play_start",
       });
@@ -424,7 +424,7 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("book mode", () => {
     it("keeps structural action boundaries without duplicating tool schemas", () => {
-      const prompt = buildAgentSystemPrompt("my-book", "zh", "book");
+      const prompt = buildAgentSystemPrompt("my-book", "vi", "book");
       expect(prompt).toContain("my-book");
       expect(prompt).toContain("sub_agent");
       expect(prompt).toContain("writer");
@@ -444,7 +444,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("steers chapter rewrite to reviser instead of writer", () => {
-      const prompt = buildAgentSystemPrompt("my-book", "zh", "book");
+      const prompt = buildAgentSystemPrompt("my-book", "vi", "book");
       expect(prompt).toContain("续写新的下一章用 writer");
       expect(prompt).toContain("修改、重写或重修已有章节用 reviser");
       expect(prompt).toContain("三者不可互换");
@@ -453,7 +453,7 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     it("forbids answering chapter-writing requests with raw chapter prose in chat", () => {
-      const prompt = buildAgentSystemPrompt("my-book", "zh", "book");
+      const prompt = buildAgentSystemPrompt("my-book", "vi", "book");
       expect(prompt).toContain("不要在聊天正文里输出章节来冒充完成");
       expect(prompt).toContain("sub_agent 成功后结束本轮");
       expect(prompt).toContain("完成态只以成功工具结果为准");
@@ -472,7 +472,7 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("edit mode", () => {
     it("contains deterministic edit tools but no production tools", () => {
-      const prompt = buildAgentSystemPrompt("my-book", "zh", "edit");
+      const prompt = buildAgentSystemPrompt("my-book", "vi", "edit");
       expect(prompt).toContain("外部编辑助手");
       expect(prompt).toContain("read");
       expect(prompt).toContain("write_truth_file");
@@ -489,7 +489,7 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("interactive-film authoring mode", () => {
     it("uses the graph-aware authoring harness instead of generic chat", () => {
-      const prompt = buildAgentSystemPrompt("storm-radio", "zh", "interactive-film-authoring");
+      const prompt = buildAgentSystemPrompt("storm-radio", "vi", "interactive-film-authoring");
 
       expect(prompt).toContain("互动影游创作向导");
       expect(prompt).toContain("storm-radio");
@@ -518,18 +518,18 @@ describe("buildAgentSystemPrompt", () => {
 
   describe("global output rules", () => {
     it("forbids emoji in Chinese and English prompts", () => {
-      expect(buildAgentSystemPrompt(null, "zh", "chat")).toContain("不要使用表情符号");
+      expect(buildAgentSystemPrompt(null, "vi", "chat")).toContain("Do not use emoji");
       expect(buildAgentSystemPrompt(null, "en", "chat")).toContain("Do not use emoji");
     });
 
     it("forbids claiming side effects without successful tool execution", () => {
-      expect(buildAgentSystemPrompt(null, "zh", "chat")).toContain("不要虚报工具执行结果");
+      expect(buildAgentSystemPrompt(null, "vi", "chat")).toContain("Do not fabricate tool results");
       expect(buildAgentSystemPrompt(null, "en", "chat")).toContain("do not claim side effects without successful tool results");
     });
 
     it("treats tool calls as the answer instead of encouraging filler before tools", () => {
-      expect(buildAgentSystemPrompt(null, "zh", "play", { playWorldExists: false })).toContain("工具调用本身就是回答");
-      expect(buildAgentSystemPrompt(null, "zh", "play", { playWorldExists: false })).toContain("不要先写寒暄");
+      expect(buildAgentSystemPrompt(null, "vi", "play", { playWorldExists: false })).toContain("Tool invocation itself is the answer");
+      expect(buildAgentSystemPrompt(null, "vi", "play", { playWorldExists: false })).toContain("Do not write small talk first");
       expect(buildAgentSystemPrompt(null, "en", "play", { playWorldExists: false })).toContain("the tool call itself is the answer");
       expect(buildAgentSystemPrompt(null, "en", "play", { playWorldExists: false })).toContain("do not add filler");
     });

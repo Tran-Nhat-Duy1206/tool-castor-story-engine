@@ -180,7 +180,7 @@ describe("Phase 4 Final Confirm remains the sole Canon/consumption boundary", ()
       const canon = await readStoryCanon(fixture.bookDir);
       const reviewId = "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa";
       await publishActiveProposal(fixture.bookDir, {
-        schemaVersion: 1, status: "active", reviewId, sourceChapter: 2, effectiveChapter: 2, language: "zh", createdAt: "2026-08-27T00:00:00.000Z", proseRevision: computeProseRevision(prose), baseCanonRevision: canon.revision, reviewRevision: 1,
+        schemaVersion: 1, status: "active", reviewId, sourceChapter: 2, effectiveChapter: 2, language: "vi", createdAt: "2026-08-27T00:00:00.000Z", proseRevision: computeProseRevision(prose), baseCanonRevision: canon.revision, reviewRevision: 1,
         items: [{ id: "identity-fact", kind: "current-state-fact", origin: "ai", title: "Identity reveal", proposal: { type: "fact", change: { action: "set", subject: "主角", predicate: "当前位置", object: "北岸灯塔" } }, evidence: { claimedLevel: "explicit", verifiedLevel: "explicit", quote: "公开真实身份" }, decision: "accepted" }],
       });
       expect((await loadAuthorization(fixture.bookDir, active.authorizationId))?.lifecycle).toBe("active");

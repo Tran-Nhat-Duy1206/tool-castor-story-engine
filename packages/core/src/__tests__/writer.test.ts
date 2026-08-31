@@ -98,7 +98,7 @@ describe("WriterAgent", () => {
         updatedCharacterMatrix: "# 角色矩阵\n",
         postWriteErrors: [],
         postWriteWarnings: [],
-      }, false, "zh");
+      }, false, "vi");
 
       expect(await readFile(join(bookDir, "chapters", "0002_雨夜对账.md"), "utf-8"))
         .toContain("林秋在雨夜重新核对账本");
@@ -234,7 +234,7 @@ describe("WriterAgent", () => {
           readonly activeOverrides: readonly [];
         };
         readonly lengthSpec: ReturnType<typeof buildLengthSpec>;
-        readonly language?: "zh" | "en";
+        readonly language?: "vi" | "en";
         readonly externalContext?: string;
       }): string;
     }).buildGovernedUserPrompt({
@@ -253,8 +253,8 @@ describe("WriterAgent", () => {
         overrideEdges: [],
         activeOverrides: [],
       },
-      lengthSpec: buildLengthSpec(1200, "zh"),
-      language: "zh",
+      lengthSpec: buildLengthSpec(1200, "vi"),
+      language: "vi",
       externalContext: "本章标题：雨夜账本\n必须围绕账本失窃后的当面对质展开。",
     });
 
@@ -449,7 +449,7 @@ describe("WriterAgent", () => {
           overrideEdges: [],
           activeOverrides: [],
         },
-        lengthSpec: buildLengthSpec(220, "zh"),
+        lengthSpec: buildLengthSpec(220, "vi"),
       });
 
       const settlePrompt = (chatSpy.mock.calls[2]?.[0] as ReadonlyArray<{ content: string }> | undefined)?.[1]?.content ?? "";
@@ -1103,14 +1103,14 @@ describe("WriterAgent", () => {
           status: "active",
           targetChapters: 120,
           chapterWordCount: 2200,
-          language: "zh",
+          language: "vi",
           createdAt: "2026-03-23T00:00:00.000Z",
           updatedAt: "2026-03-23T00:00:00.000Z",
         },
         bookDir,
         chapterNumber: 1,
         ...createGovernedWriterInput(1),
-        lengthSpec: buildLengthSpec(220, "zh"),
+        lengthSpec: buildLengthSpec(220, "vi"),
       });
 
       expect(infos).toEqual(expect.arrayContaining([

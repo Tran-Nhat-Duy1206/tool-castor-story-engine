@@ -1,64 +1,64 @@
 ---
-name: 玄幻
+name: Huyền Ảo
 id: xuanhuan
-chapterTypes: ["战斗章", "布局章", "过渡章", "回收章"]
-fatigueWords: ["冷笑", "蝼蚁", "倒吸凉气", "瞳孔骤缩", "不可置信", "轰然炸裂", "满场死寂", "难以置信", "仿佛", "不禁", "宛如", "竟然"]
+chapterTypes: ["Chương Chiến Đấu", "Chương Bố Cục", "Chương Quá Độ", "Chương Thu Hoạch"]
+fatigueWords: ["cười lạnh", "kiến cỏ", "hít khí lạnh", "đồng tử co rút", "không thể tin nổi", "nổ tung ầm ầm", "cả hội trường chết lặng", "khó tin", "dường như", "không kìm được", "như thể", "vậy mà"]
 numericalSystem: true
 powerScaling: true
 eraResearch: false
-pacingRule: "三章内必有明确反馈：打脸、收益兑现、信息反转、地位变化"
-satisfactionTypes: ["打脸", "升级突破", "收益兑现", "智斗碾压", "身份揭示", "底牌亮出"]
+pacingRule: "Trong ba chương phải có phản hồi rõ rệt: vả mặt, thu hoạch lợi ích, đảo chiều thông tin hoặc thay đổi địa vị"
+satisfactionTypes: ["Vả mặt", "Thăng cấp đột phá", "Thu hoạch lợi ích", "Áp đảo trí đấu", "Lộ diện thân phận", "Lật bài tẩy"]
 auditDimensions: [1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,24,25,26]
 ---
 
-## 题材禁忌
+## Điều cấm kỵ của thể loại
 
-- 主角为推剧情突然仁慈、犯蠢、讲武德
-- 同质资源不写衰减默认全额结算
-- 用"暴涨""海量"跳过数值结算
-- 无铺垫的能力觉醒
-- 反派像木桩一样排队送死
-- 无铺垫强行让退场角色回归
-- 在没有铺垫的情况下突然塞入新体系、新地图、新外挂解决问题
-- 把所有章节都写成高爆裂战斗章
-- 拆解知识库反向污染正文，写成"似曾相识"的拼装文
-- 风格混入都市腔、科幻腔、游戏系统播报腔、轻小说吐槽腔
+- Nhân vật chính vì thúc đẩy cốt truyện mà đột nhiên nhân từ, phạm sai lầm ngu ngốc hoặc giảng đạo đức
+- Tài nguyên đồng chất không viết hao hụt, mặc định quyết toán toàn phần
+- Dùng "tăng vọt", "khổng lồ" để bỏ qua quyết toán số liệu
+- Thức tỉnh năng lực không có铺垫
+- Phản diện như cọc gỗ xếp hàng chờ chết
+- Ép nhân vật đã rời sân khấu quay lại khi chưa có铺垫
+- Khi chưa có铺垫 đã đột ngột nhét hệ thống, bản đồ mới, ngoại掛 mới để giải quyết vấn đề
+- Viết mọi chương thành chương chiến đấu bùng nổ cao trào
+- Tháo rời kho tri thức rồi làm ô nhiễm ngược văn bản, viết thành văn lắp ghép "dường như đã từng thấy"
+- Phong cách lẫn giọng đô thị, giọng khoa học viễn tưởng, giọng thông báo hệ thống trò chơi, giọng cà khịa tiểu thuyết nhẹ
 
-## 数值规则
+## Quy tắc số liệu
 
-- 设定不可吃书：前文确立的设定数值后文不可无升级过程地随意改变
-- 金手指四维约束：
-  - 能力上限：必须设定明确的能力天花板，不可无限升级
-  - 附加代价：使用伴随代价（寿命、体力、副作用），权衡利弊增强冲突
-  - 触发条件：激活与特定场景/事件关联，不可随时随地无条件使用
-  - 成长路径：随主角经历同步升级，解锁过程与剧情节点绑定
-- 同质资源重复吞噬必须写明衰减，不得默认全额结算
-- 同质吞噬衰减公式：收益 = 基础值 × max(0.3, 1 - 0.15×(N-1))
-- 不要用"暴涨""海量""难以估量"跳过数值结算
-- 期初值从账本取（不凭记忆），增量逐笔列出并注明来源
-- 消耗逐笔列出并注明用途，期末 = 期初 + 增量 - 消耗，不得跳步
-- 正文中出现的系统提示（如【气血值+X】）必须与POST_SETTLEMENT一致
-- 若正文写了"比A还高"这类比较句，必须数值验证后再保留
-- 数值连续性必须可追溯：同层级、同类型样本的增量不得无说明跨越一个数量级
+- Thiết lập không được ăn sách: giá trị, số liệu đã xác lập ở phần trước không được tùy ý thay đổi ở phần sau nếu chưa trải qua quá trình thăng cấp
+- Ràng buộc bốn chiều của ngón tay vàng:
+  - Giới hạn năng lực: phải đặt trần năng lực rõ ràng, không thể thăng cấp vô hạn
+  - Cái giá kèm theo: sử dụng đi kèm cái giá (tuổi thọ, thể lực, tác dụng phụ), cân nhắc lợi hại để tăng xung đột
+  - Điều kiện kích hoạt: kích hoạt gắn với cảnh/ sự kiện cụ thể, không thể sử dụng vô điều kiện mọi lúc mọi nơi
+  - Lộ trình trưởng thành: thăng cấp đồng bộ với trải nghiệm của nhân vật chính, quá trình mở khóa gắn với nút thắt cốt truyện
+- Tài nguyên đồng chất nuốt lặp lại phải ghi rõ hao hụt, không được mặc định quyết toán toàn phần
+- Công thức hao hụt khi nuốt đồng chất: lợi ích = giá trị cơ sở × max(0.3, 1 - 0.15×(N-1))
+- Không dùng "tăng vọt", "khổng lồ", "khó ước lượng" để bỏ qua quyết toán số liệu
+- Giá trị đầu kỳ lấy từ sổ sách (không dựa vào trí nhớ), tăng thêm liệt kê từng khoản và ghi rõ nguồn
+- Tiêu hao liệt kê từng khoản và ghi rõ mục đích, cuối kỳ = đầu kỳ + tăng thêm - tiêu hao, không được nhảy bước
+- Lời nhắc hệ thống xuất hiện trong văn bản (như 【giá trị khí huyết+X】) phải khớp với POST_SETTLEMENT
+- Nếu trong văn bản viết câu so sánh như "cao hơn A", phải xác minh bằng số liệu rồi mới giữ lại
+- Tính liên tục của số liệu phải truy vết được: mức tăng của mẫu cùng tầng, cùng loại không được vượt một bậc độ lớn mà không có giải thích
 
-## 语言铁律
+## Quy tắc ngôn ngữ
 
-- 力量体系的量级感用体感传达，不用抽象数字。✗"他的火元从12缕增加到24缕" → ✓"手臂比先前有力了，握拳时指骨发紧"
-- 同一高潮段（如吞火/突破/觉醒）中，同一意象域的渲染不超过两轮，第三轮必须切入新信息或新动作
-- 搜尸/清点/装备段落禁止清单式列举，必须带入角色判断或取舍：✗"他翻出粗盐、水囊、黑面饼" → ✓"水囊最值钱，剩下那点水比命轻不了多少"
+- Cảm giác về cấp độ của hệ thống sức mạnh truyền qua cảm nhận cơ thể, không dùng con số trừu tượng. ✗"hỏa nguyên của hắn tăng từ 12 sợi lên 24 sợi" → ✓"cánh tay mạnh hơn trước, khi nắm tay đốt ngón tay căng chặt"
+- Trong cùng một đoạn cao trào (nuốt lửa/đột phá/thức tỉnh), cùng một miền hình ảnh không渲染 quá hai lượt, lượt thứ ba phải chuyển sang thông tin mới hoặc hành động mới
+- Đoạn lục soát thi thể / kiểm kê / trang bị cấm liệt kê dạng danh sách, phải kèm phán đoán hoặc取舍 của nhân vật: ✗"hắn lục ra muối thô, túi nước, bánh mì đen" → ✓"túi nước đáng giá nhất, chỗ nước còn lại nhẹ không kém mạng người"
 
-## 叙事指导
+## Chỉ dẫn tự sự
 
-以战斗和资源获取驱动剧情。主角行为由利益驱动，杀伐果断。
-金手指/能力系统必须有限制：使用频率、范围限制或使用代价。
-设定不可吃书：前文确立的数值后文不可无升级过程地随意改变。
+Lấy chiến đấu và thu hoạch tài nguyên làm động lực thúc đẩy cốt truyện. Hành vi của nhân vật chính do lợi ích chi phối, sát phạt quyết đoán.
+Ngón tay vàng / hệ thống năng lực phải có hạn chế: tần suất sử dụng, giới hạn phạm vi hoặc cái giá phải trả.
+Thiết lập không được ăn sách: số liệu đã xác lập ở phần trước không được tùy ý thay đổi ở phần sau nếu chưa trải qua quá trình thăng cấp.
 
-三章内应有明确反馈，但反馈可以是打脸、收益兑现、信息反转、地位变化，不限于杀人。
-涉及吞噬时，收益必须同时落到资源说明与具体增量，不能只写抽象提升。
-小冲突尽快兑现反馈；不要把爽点无限后置。
+Trong ba chương nên có phản hồi rõ rệt, nhưng phản hồi có thể là vả mặt, thu hoạch lợi ích, đảo chiều thông tin, thay đổi địa vị, không chỉ giới hạn ở giết người.
+Khi liên quan đến thôn phệ, lợi ích phải rơi đồng thời vào mô tả tài nguyên và mức tăng cụ thể, không chỉ viết提升 trừu tượng.
+Xung đột nhỏ兑现 phản hồi càng sớm càng tốt; đừng trì hoãn vô hạn điểm sướng.
 
-核心对手必须有脑子，有试探、有误判、有反扑。
-可以留人、钓鱼、示弱、借刀杀人，但前提只能是利益更大，绝不能是心软。
+Đối thủ cốt lõi phải có đầu óc, có thăm dò, có phán đoán sai, có phản công.
+Có thể giữ người, thả câu,示弱, mượn dao giết người, nhưng tiền đề chỉ có thể là lợi ích lớn hơn, tuyệt đối không được vì mềm lòng.
 
-用动作、伤势、声音、重量、冲击、温度来落地"强"，少用空泛判断。
-每个场景至少推进一项：信息、地位、资源、伤亡、仇恨、境界。
+Dùng hành động, thương thế, âm thanh, trọng lượng, xung kích, nhiệt độ để làm rõ "mạnh", ít dùng phán đoán空泛.
+Mỗi cảnh ít nhất thúc đẩy một mục: thông tin, địa vị, tài nguyên, thương vong, thù hận, cảnh giới.

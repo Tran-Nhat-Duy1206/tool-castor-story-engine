@@ -19,15 +19,15 @@ export interface AITellResult {
   readonly issues: ReadonlyArray<AITellIssue>;
 }
 
-type AITellLanguage = "zh" | "en";
+type AITellLanguage = "vi" | "en";
 
 const HEDGE_WORDS: Record<AITellLanguage, ReadonlyArray<string>> = {
-  zh: ["似乎", "可能", "或许", "大概", "某种程度上", "一定程度上", "在某种意义上"],
+  vi: ["có vẻ", "có lẽ", "có thể", "dường như", "ở một mức độ nào đó", "ở một khía cạnh nào đó", "theo một nghĩa nào đó"],
   en: ["seems", "seemed", "perhaps", "maybe", "apparently", "in some ways", "to some extent"],
 };
 
 const TRANSITION_WORDS: Record<AITellLanguage, ReadonlyArray<string>> = {
-  zh: ["然而", "不过", "与此同时", "另一方面", "尽管如此", "话虽如此", "但值得注意的是"],
+  vi: ["tuy nhiên", "thế nhưng", "trong khi đó", "mặt khác", "dù vậy", "dù thế", "nhưng đáng chú ý là"],
   en: ["however", "meanwhile", "on the other hand", "nevertheless", "even so", "still"],
 };
 
@@ -35,7 +35,7 @@ const TRANSITION_WORDS: Record<AITellLanguage, ReadonlyArray<string>> = {
  * Analyze text content for structural AI-tell patterns.
  * Returns issues that can be merged into audit results.
  */
-export function analyzeAITells(content: string, language: AITellLanguage = "zh"): AITellResult {
+export function analyzeAITells(content: string, language: AITellLanguage = "vi"): AITellResult {
   const issues: AITellIssue[] = [];
   const isEnglish = language === "en";
   const joiner = isEnglish ? ", " : "、";

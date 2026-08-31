@@ -1,6 +1,6 @@
 # Changelog
 
-[中文](CHANGELOG.md) | English
+[Tiếng Việt](CHANGELOG.md) | English
 
 ## v1.8.0
 
@@ -275,7 +275,7 @@ Book-creation platform hotfix: fixes the `sub_agent.platform` parameter possibly
 ### Bug Fixes
 
 - Fixed tool calls during book creation failing with `Validation failed for tool "sub_agent": - platform: must be equal to constant`, which prevented book files from being generated
-- Unified platform alias normalization across the Studio, CLI, TUI, and agent create-book chains; inputs like `番茄` / `fanqie` / `番茄小说` now resolve to a legal enum value
+- Unified platform alias normalization across the Studio, CLI, TUI, and agent create-book chains; inputs like `番茄` (Cà Chua) / `fanqie` / `番茄小说` (Cà Chua Tiểu Thuyết) now resolve to a legal enum value
 - Unknown platform values degrade to `other`, preventing a wrong platform id from being written into the book config and affecting later flows
 - Updated the README WeChat group QR code to group 13
 

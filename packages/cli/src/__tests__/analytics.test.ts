@@ -29,7 +29,7 @@ describe("computeAnalytics", () => {
   it("calculates audit pass rate excluding un-audited statuses", () => {
     const chapters = [
       { number: 1, status: "approved", wordCount: 3000, auditIssues: [] },
-      { number: 2, status: "audit-failed", wordCount: 3000, auditIssues: ["[critical] 连续性：角色位置矛盾"] },
+      { number: 2, status: "audit-failed", wordCount: 3000, auditIssues: ["[critical] Tính Liên Tục: mâu thuẫn vị trí nhân vật"] },
       { number: 3, status: "drafted", wordCount: 3000, auditIssues: [] }, // not audited
       { number: 4, status: "ready-for-review", wordCount: 3000, auditIssues: [] },
     ];
@@ -62,9 +62,9 @@ describe("computeAnalytics", () => {
         status: "audit-failed",
         wordCount: 3000,
         auditIssues: [
-          "[critical] 连续性：角色位置矛盾",
-          "[warning] 数值错误：灵石数量不一致",
-          "[critical] 连续性：时间线冲突",
+          "[critical] Tính Liên Tục: mâu thuẫn vị trí nhân vật",
+          "[warning] Lỗi Số Liệu: số lượng linh thạch không nhất quán",
+          "[critical] Tính Liên Tục: xung đột dòng thời gian",
         ],
       },
       {
@@ -72,18 +72,18 @@ describe("computeAnalytics", () => {
         status: "audit-failed",
         wordCount: 2900,
         auditIssues: [
-          "[warning] 数值错误：修炼速度超标",
+          "[warning] Lỗi Số Liệu: tốc độ tu luyện vượt ngưỡng",
         ],
       },
     ];
     const result = computeAnalytics("book-c", chapters);
     expect(result.topIssueCategories).toEqual([
-      { category: "连续性", count: 2 },
-      { category: "数值错误", count: 2 },
+      { category: "Tính Liên Tục", count: 2 },
+      { category: "Lỗi Số Liệu", count: 2 },
     ]);
   });
 
-  it("falls back to 未分类 for unstructured issues", () => {
+  it("falls back to Chưa Phân Loại for unstructured issues", () => {
     const chapters = [
       {
         number: 1,
@@ -94,7 +94,7 @@ describe("computeAnalytics", () => {
     ];
     const result = computeAnalytics("book-d", chapters);
     expect(result.topIssueCategories).toEqual([
-      { category: "未分类", count: 1 },
+      { category: "Chưa Phân Loại", count: 1 },
     ]);
   });
 

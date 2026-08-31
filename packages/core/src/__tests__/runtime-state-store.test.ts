@@ -291,7 +291,7 @@ describe("runtime-state-store memory helpers", () => {
     await Promise.all([
       writeFile(join(stateDir, "manifest.json"), JSON.stringify({
         schemaVersion: 2,
-        language: "zh",
+        language: "vi",
         lastAppliedChapter: 12,
         projectionVersion: 1,
         migrationWarnings: [],
@@ -362,7 +362,7 @@ describe("runtime-state-store memory helpers", () => {
       ),
       writeFile(join(stateDir, "manifest.json"), JSON.stringify({
         schemaVersion: 2,
-        language: "zh",
+        language: "vi",
         lastAppliedChapter: 5,
         projectionVersion: 1,
         migrationWarnings: [],

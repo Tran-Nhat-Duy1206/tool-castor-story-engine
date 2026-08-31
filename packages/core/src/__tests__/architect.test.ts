@@ -174,7 +174,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 60,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-04-03T00:00:00.000Z",
       updatedAt: "2026-04-03T00:00:00.000Z",
     };
@@ -239,7 +239,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 60,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-04-03T00:00:00.000Z",
       updatedAt: "2026-04-03T00:00:00.000Z",
     };
@@ -305,7 +305,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 50,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-03-24T00:00:00.000Z",
       updatedAt: "2026-03-24T00:00:00.000Z",
     };
@@ -374,7 +374,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 80,
       chapterWordCount: 2000,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-03-25T00:00:00.000Z",
       updatedAt: "2026-03-25T00:00:00.000Z",
     };
@@ -434,7 +434,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 80,
       chapterWordCount: 2000,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-03-25T00:00:00.000Z",
       updatedAt: "2026-03-25T00:00:00.000Z",
     };
@@ -500,7 +500,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 20,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-04-01T00:00:00.000Z",
       updatedAt: "2026-04-01T00:00:00.000Z",
     };
@@ -564,7 +564,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 20,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-03-29T00:00:00.000Z",
       updatedAt: "2026-03-29T00:00:00.000Z",
     };
@@ -615,7 +615,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 20,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-03-29T00:00:00.000Z",
       updatedAt: "2026-03-29T00:00:00.000Z",
     };
@@ -677,7 +677,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 20,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-03-29T00:00:00.000Z",
       updatedAt: "2026-03-29T00:00:00.000Z",
     };
@@ -739,7 +739,7 @@ describe("ArchitectAgent", () => {
       status: "active",
       targetChapters: 20,
       chapterWordCount: 2200,
-      language: "zh",
+      language: "vi",
       createdAt: "2026-03-29T00:00:00.000Z",
       updatedAt: "2026-03-29T00:00:00.000Z",
     };
@@ -801,7 +801,7 @@ describe("ArchitectAgent", () => {
     status: "active",
     targetChapters: 50,
     chapterWordCount: 3000,
-    language: "zh",
+    language: "vi",
     createdAt: "2026-04-19T00:00:00.000Z",
     updatedAt: "2026-04-19T00:00:00.000Z",
   });
@@ -883,7 +883,7 @@ describe("ArchitectAgent", () => {
           { tier: "major", name: "林辞", content: "主角描写" },
           { tier: "minor", name: "配角A", content: "配角描写" },
         ],
-      }, false, "zh");
+      }, false, "vi");
 
       await expect(access(join(tmpDir, "story", "outline", "story_frame.md"))).resolves.not.toThrow();
       await expect(access(join(tmpDir, "story", "outline", "volume_map.md"))).resolves.not.toThrow();
@@ -912,7 +912,7 @@ describe("ArchitectAgent", () => {
         bookRules: "# Legacy Book Rules\n",
         currentState: "# Current State\n",
         pendingHooks: "| hook_id |\n",
-      }, false, "zh");
+      }, false, "vi");
 
       const storyBible = await readFile(join(tmpDir, "story", "story_bible.md"), "utf-8");
       expect(storyBible).toContain("Legacy Story Bible");

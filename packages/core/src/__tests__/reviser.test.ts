@@ -210,7 +210,7 @@ describe("ReviserAgent", () => {
         "spot-fix",
         "xuanhuan",
         {
-          lengthSpec: buildLengthSpec(220, "zh"),
+          lengthSpec: buildLengthSpec(220, "vi"),
         },
       );
 
@@ -691,7 +691,7 @@ describe("ReviserAgent", () => {
             overrideEdges: [],
             activeOverrides: [],
           },
-          lengthSpec: buildLengthSpec(220, "zh"),
+          lengthSpec: buildLengthSpec(220, "vi"),
         },
       );
 

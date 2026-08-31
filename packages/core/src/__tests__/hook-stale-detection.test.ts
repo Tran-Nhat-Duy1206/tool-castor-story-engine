@@ -113,7 +113,7 @@ describe("computeHookDiagnostics — Phase 7 stale / blocked detection", () => {
       halfLife: 10,
       blockedDistance: 7,
     } as const;
-    expect(renderHookDiagnosticMarker(diag, "zh")).toBe(
+    expect(renderHookDiagnosticMarker(diag, "vi")).toBe(
       "过期 (距=20/半衰=10); 受阻于 H-up (已阻 7 章)",
     );
     expect(renderHookDiagnosticMarker(diag, "en")).toBe(
@@ -130,7 +130,7 @@ describe("computeHookDiagnostics — Phase 7 stale / blocked detection", () => {
       halfLife: 10,
       blockedDistance: 0,
     } as const;
-    expect(renderHookDiagnosticMarker(diag, "zh")).toBe("");
+    expect(renderHookDiagnosticMarker(diag, "vi")).toBe("");
     expect(renderHookDiagnosticMarker(diag, "en")).toBe("");
   });
 });

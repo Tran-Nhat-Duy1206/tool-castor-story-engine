@@ -1,53 +1,53 @@
 ---
-name: 都市
+name: Đô Thị
 id: urban
-chapterTypes: ["商战章", "社交章", "布局章", "过渡章", "回收章"]
-fatigueWords: ["冷笑", "不可思议", "震惊", "难以置信", "深吸一口气", "眼中闪过一丝", "仿佛", "不禁", "宛如", "竟然", "核心动机", "信息边界"]
+chapterTypes: ["Chương Thương Chiến", "Chương Xã Giao", "Chương Bố Cục", "Chương Quá Độ", "Chương Thu Hoạch"]
+fatigueWords: ["cười lạnh", "không thể tin nổi", "chấn kinh", "khó tin", "hít sâu một hơi", "trong mắt lóe lên", "dường như", "không kìm được", "như thể", "vậy mà", "động cơ cốt lõi", "ranh giới thông tin"]
 numericalSystem: false
 powerScaling: false
 eraResearch: true
-pacingRule: "每2-3章一个小回报：商业收益、人脉拓展、对手受挫、信息优势"
-satisfactionTypes: ["商战碾压", "身份揭示", "人脉兑现", "对手打脸", "资源收割", "地位跃升"]
+pacingRule: "Mỗi 2–3 chương một hồi báo nhỏ: lợi ích thương mại, mở rộng nhân mạch, đối thủ chịu thiệt, ưu thế thông tin"
+satisfactionTypes: ["Áp đảo thương chiến", "Lộ diện thân phận", "兑现 nhân mạch", "Vả mặt đối thủ", "Thu hoạch tài nguyên", "Thăng tiến địa vị"]
 auditDimensions: [1,2,3,6,7,8,9,10,11,12,13,14,15,16,17,18,19,24,25,26]
 ---
 
-## 题材禁忌
+## Điều cấm kỵ của thể loại
 
-- 无逻辑的商业奇迹（没有铺垫的暴富）
-- 反派降智配合主角表演
-- 无视现实法律和商业规则
-- 用"一个电话搞定"跳过具体操作过程
-- 女性角色沦为花瓶或奖励
-- 混入玄幻/仙侠战力体系
+- Kỳ tích thương mại vô logic (暴富 không có铺垫)
+- Phản diện hạ trí để phối hợp cho nhân vật chính biểu diễn
+- Phớt lờ pháp luật hiện thực và quy tắc thương mại
+- Dùng "một cuộc điện thoại giải quyết xong" để bỏ qua quá trình thao tác cụ thể
+- Nhân vật nữ bị biến thành bình hoa hoặc phần thưởng
+- Lẫn hệ thống chiến lực huyền huyễn / tiên hiệp
 
-## 年代与现实约束
+## Ràng buộc thời đại và hiện thực
 
-- 涉及法律、政策、商业规则必须符合设定年代
-- 金融操作、公司运营必须有基本可信度
-- 人物身份、职位、权限不能超出现实合理范围
-- 地名、机构名、行业术语必须准确
-- 物价、收入、生活水平符合时代设定
+- Liên quan đến pháp luật, chính sách, quy tắc thương mại phải phù hợp với niên đại đã đặt
+- Thao tác tài chính, vận hành công ty phải có độ tin cậy cơ bản
+- Thân phận, chức vụ, quyền hạn của nhân vật không được vượt quá phạm vi hợp lý của hiện thực
+- Địa danh, tên cơ quan, thuật ngữ ngành phải chính xác
+- Giá cả, thu nhập, mức sống phù hợp với bối cảnh thời đại
 
-## 语言铁律
+## Quy tắc sắt về ngôn ngữ
 
-- 人物内心独白必须口语化、直觉化，禁止商业分析/博弈论术语渗入叙事
-- ✗"他迅速分析了当前的债务状况" → ✓"他把那叠皱巴巴的白条翻了三遍"
-- ✗"信息落差就在这儿" → ✓"他们不知道的，他知道"
-- ✗"以这种人的性格，这时候不会撕破脸" → ✓直接写对方的行为反应
-- 法律/商业术语必须匹配设定年代的真实语感：2003年民间借条不会写"逾期处置授权"，而是"到期没还，房子归乙方处理"
-- 主角的判断通过行动和对话体现，不通过上帝视角的分析段落
+- Độc thoại nội tâm của nhân vật phải口语 hóa, trực giác hóa, cấm thuật ngữ phân tích thương mại / lý thuyết博弈 thấm vào tự sự
+- ✗"hắn nhanh chóng phân tích tình trạng nợ hiện tại" → ✓"hắn lật xấp giấy nợ nhăn nhúm kia ba lần"
+- ✗"sự chênh lệch thông tin nằm ở chỗ này" → ✓"điều họ không biết, hắn biết"
+- ✗"với tính cách của loại người này, lúc này sẽ không xé rách mặt" → ✓viết trực tiếp phản ứng hành vi của đối phương
+- Thuật ngữ pháp luật / thương mại phải khớp với cảm giác ngôn ngữ thực của niên đại đã đặt: giấy nợ dân gian năm 2003 sẽ không viết "ủy quyền xử lý quá hạn", mà là "đến hạn không trả, nhà归 bên B xử lý"
+- Phán đoán của nhân vật chính thể hiện qua hành động và đối thoại, không qua đoạn phân tích góc nhìn thượng đế
 
-## 叙事指导
+## Chỉ dẫn tự sự
 
-以商战、社交博弈和信息差驱动剧情。
-权力来自人脉、资本、信息和制度位置，不来自武力。
-冲突解决靠谈判、交易、威慑、法律手段和利益交换。
+Lấy thương chiến,博弈 xã giao và chênh lệch thông tin làm động lực thúc đẩy cốt truyện.
+Quyền lực đến từ nhân mạch, vốn, thông tin và vị trí thể chế, không đến từ vũ lực.
+Giải quyết xung đột靠 đàm phán, giao dịch,威慑, thủ đoạn pháp luật và trao đổi lợi ích.
 
-钱权必须落地，通过物、势、地位变化和小人物反应兑现爽点。
-人物关系网是核心资产，每次社交互动都应有利益计算。
-主角需要保留非功能性时刻：思考、犹豫、社交润滑。
-主角不是全知全能，必须在前5章内至少出现一次判断失误或信息偏差。
+Tiền quyền phải落 đất,兑现 điểm sướng qua vật, thế, biến đổi địa vị và phản ứng của tiểu nhân vật.
+Mạng lưới quan hệ nhân vật là tài sản cốt lõi, mỗi tương tác xã giao đều nên có tính toán lợi ích.
+Nhân vật chính cần giữ khoảnh khắc phi chức năng: suy nghĩ, do dự, bôi trơn xã giao.
+Nhân vật chính không phải toàn tri toàn năng, trong 5 chương đầu ít nhất phải xuất hiện một lần phán đoán sai hoặc偏差 thông tin.
 
-时代厚重感、人情债与制度摩擦是都市文的灵魂。
-用场面、气味、动作、交易、压迫感切入，不要历史课件式开头。
-嵌入1-2个时代锚点（物价、新闻事件、流行用语）增强年代沉浸感。
+Cảm giác dày dặn của thời đại, món nợ nhân tình và ma sát thể chế là linh hồn của văn đô thị.
+Dùng trường diện, mùi vị, động tác, giao dịch, cảm giác áp bức để切入, đừng mở đầu kiểu giáo trình lịch sử.
+Nhúng 1–2 điểm neo thời đại (giá cả, sự kiện tin tức, cách nói thịnh hành) để tăng cảm giác沉浸 của niên đại.

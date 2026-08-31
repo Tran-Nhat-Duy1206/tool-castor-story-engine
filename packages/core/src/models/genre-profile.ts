@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 export const GenreProfileSchema = z.object({
   name: z.string(),
   id: z.string(),
-  language: z.enum(["zh", "en"]).default("zh"),
+  language: z.enum(["vi", "en"]).default("vi"),
   chapterTypes: z.array(z.string()),
   fatigueWords: z.array(z.string()),
   numericalSystem: z.boolean().default(false),

@@ -21,7 +21,7 @@ import type {
  */
 export const CANON_FIXTURE_MANIFEST: StateManifest = {
   schemaVersion: 2,
-  language: "zh",
+  language: "vi",
   lastAppliedChapter: 12,
   projectionVersion: 3,
   migrationWarnings: [],
@@ -201,7 +201,7 @@ export async function createCanonBook(options: CreateCanonBookOptions = {}): Pro
       id: "demo-canon-book",
       title: "回声协议",
       genre: "urban",
-      language: "zh",
+      language: "vi",
       platform: "other",
       createdAt: "2026-01-01T00:00:00.000Z",
       updatedAt: "2026-01-02T00:00:00.000Z",
@@ -230,17 +230,17 @@ export async function createCanonBook(options: CreateCanonBookOptions = {}): Pro
   // Derived projections are always present — they are views over the same data.
   await writeFile(
     join(storyDir, "current_state.md"),
-    renderCurrentStateProjection(docs.currentState, "zh"),
+    renderCurrentStateProjection(docs.currentState, "vi"),
     "utf-8",
   );
   await writeFile(
     join(storyDir, "pending_hooks.md"),
-    renderHooksProjection(docs.hooks, "zh", { currentChapter: chapterCount }),
+    renderHooksProjection(docs.hooks, "vi", { currentChapter: chapterCount }),
     "utf-8",
   );
   await writeFile(
     join(storyDir, "chapter_summaries.md"),
-    renderChapterSummariesProjection(docs.summaries, "zh"),
+    renderChapterSummariesProjection(docs.summaries, "vi"),
     "utf-8",
   );
 

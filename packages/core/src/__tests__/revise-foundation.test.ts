@@ -24,7 +24,7 @@ const buildArchitect = (): ArchitectAgent =>
 
 const testBook = (): BookConfig => ({
   id: "test-book", title: "测试书", platform: "qidian", genre: "xuanhuan",
-  status: "active", targetChapters: 50, chapterWordCount: 3000, language: "zh",
+  status: "active", targetChapters: 50, chapterWordCount: 3000, language: "vi",
   createdAt: "2026-04-19T00:00:00.000Z", updatedAt: "2026-04-19T00:00:00.000Z",
 });
 
@@ -125,7 +125,7 @@ describe("pipeline.reviseFoundation", () => {
       await writeFile(join(bookDir, "story", "character_matrix.md"), "## 角色\n林辞 - 主角", "utf-8");
       await writeFile(join(bookDir, "book.json"), JSON.stringify({
         id: "legacy-book", title: "旧书", platform: "qidian", genre: "xuanhuan",
-        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "zh",
+        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "vi",
         createdAt: "2026-04-01T00:00:00.000Z", updatedAt: "2026-04-01T00:00:00.000Z",
       }), "utf-8");
 
@@ -198,7 +198,7 @@ describe("pipeline.reviseFoundation", () => {
       await writeFile(join(bookDir, "story", "emotional_arcs.md"), "# 情感弧线\n\n| 林辞 | 15 | 愤怒 | 发现背叛 | 8 | 上升 |", "utf-8");
       await writeFile(join(bookDir, "book.json"), JSON.stringify({
         id: "live-book", title: "写了 20 章的书", platform: "qidian", genre: "xuanhuan",
-        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "zh",
+        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "vi",
         createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-04-01T00:00:00.000Z",
       }), "utf-8");
 
@@ -283,7 +283,7 @@ describe("pipeline.reviseFoundation", () => {
       await writeFile(join(bookDir, "story", "volume_outline.md"), "## 卷一 shim", "utf-8");
       await writeFile(join(bookDir, "book.json"), JSON.stringify({
         id: "phase5-book", title: "Phase 5 书", platform: "qidian", genre: "xuanhuan",
-        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "zh",
+        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "vi",
         createdAt: "2026-04-01T00:00:00.000Z", updatedAt: "2026-04-10T00:00:00.000Z",
       }), "utf-8");
 
@@ -348,7 +348,7 @@ describe("pipeline.reviseFoundation", () => {
       await writeFile(join(bookDir, "story", "volume_outline.md"), "", "utf-8");
       await writeFile(join(bookDir, "book.json"), JSON.stringify({
         id: "ghost-book", title: "测试", platform: "qidian", genre: "xuanhuan",
-        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "zh",
+        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "vi",
         createdAt: "2026-04-01T00:00:00.000Z", updatedAt: "2026-04-10T00:00:00.000Z",
       }), "utf-8");
 
@@ -410,7 +410,7 @@ describe("pipeline.reviseFoundation", () => {
       await writeFile(join(bookDir, "story", "book_rules.md"), "", "utf-8");
       await writeFile(join(bookDir, "book.json"), JSON.stringify({
         id: "safe-book", title: "t", platform: "qidian", genre: "xuanhuan",
-        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "zh",
+        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "vi",
         createdAt: "2026-04-01T00:00:00.000Z", updatedAt: "2026-04-10T00:00:00.000Z",
       }), "utf-8");
 
@@ -478,7 +478,7 @@ describe("pipeline.reviseFoundation", () => {
       await writeFile(join(bookDir, "story", "volume_outline.md"), "", "utf-8");
       await writeFile(join(bookDir, "book.json"), JSON.stringify({
         id: "p5", title: "t", platform: "qidian", genre: "xuanhuan",
-        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "zh",
+        status: "active", targetChapters: 50, chapterWordCount: 3000, language: "vi",
         createdAt: "2026-04-01T00:00:00.000Z", updatedAt: "2026-04-10T00:00:00.000Z",
       }), "utf-8");
 

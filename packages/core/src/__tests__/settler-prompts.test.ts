@@ -18,7 +18,7 @@ const BOOK: BookConfig = {
 const GENRE: GenreProfile = {
   id: "mystery",
   name: "悬疑",
-  language: "zh",
+  language: "vi",
   chapterTypes: ["调查"],
   fatigueWords: [],
   numericalSystem: false,
@@ -31,7 +31,7 @@ const GENRE: GenreProfile = {
 
 describe("settler hook identity contract", () => {
   it("assigns semantic identity to the settler and keeps host admission structural", () => {
-    const prompt = buildSettlerSystemPrompt(BOOK, GENRE, null, "zh");
+    const prompt = buildSettlerSystemPrompt(BOOK, GENRE, null, "vi");
 
     expect(prompt).toContain("语义相关的休眠种子");
     expect(prompt).toContain("必须复用它已有的 hookId");

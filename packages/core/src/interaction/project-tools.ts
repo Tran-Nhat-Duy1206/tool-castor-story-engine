@@ -87,7 +87,7 @@ function buildBookConfig(input: {
   readonly title: string;
   readonly genre?: string;
   readonly platform?: string;
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
   readonly chapterWordCount?: number;
   readonly targetChapters?: number;
 }): BookConfig {
@@ -99,7 +99,7 @@ function buildBookConfig(input: {
     genre: input.genre ?? "other",
     status: "outlining",
     targetChapters: input.targetChapters ?? 200,
-    chapterWordCount: input.chapterWordCount ?? defaultChapterLength(input.language === "en" ? "en" : "zh"),
+    chapterWordCount: input.chapterWordCount ?? defaultChapterLength(input.language === "en" ? "en" : "vi"),
     ...(input.language ? { language: input.language } : {}),
     createdAt: now,
     updatedAt: now,

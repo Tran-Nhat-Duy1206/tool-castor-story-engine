@@ -128,7 +128,7 @@ const activeReview = (items: ReviewItem[], overrides: Partial<ActiveStateReviewA
   schemaVersion: 1,
   sourceChapter: 16,
   createdAt: "2026-08-24T00:00:00.000Z",
-  language: "zh",
+  language: "vi",
   reviewId: "3f2504e0-4f89-41d3-9a0c-0305e82c3303",
   effectiveChapter: 26,
   proseRevision: "0123456789abcdef",
@@ -411,7 +411,7 @@ describe("banner selectors", () => {
       schemaVersion: 1,
       sourceChapter: 13,
       createdAt: "2026-08-24T00:00:00.000Z",
-      language: "zh",
+      language: "vi",
       reason: "injected analyzer outage",
     });
     expect(view.reason).toBe("injected analyzer outage");
@@ -426,11 +426,11 @@ describe("lifecycleOf + receipt chips", () => {
     expect(lifecycleOf(activeReview([], { status: "stale" } as never))).toBe("stale");
     expect(lifecycleOf({
       status: "rebuild_required", schemaVersion: 1, sourceChapter: 13,
-      createdAt: "2026-08-24T00:00:00.000Z", language: "zh", reason: "",
+      createdAt: "2026-08-24T00:00:00.000Z", language: "vi", reason: "",
     })).toBe("rebuild_required");
     expect(lifecycleOf({
       status: "rebuild_failed", schemaVersion: 1, sourceChapter: 13,
-      createdAt: "2026-08-24T00:00:00.000Z", language: "zh", reason: "x",
+      createdAt: "2026-08-24T00:00:00.000Z", language: "vi", reason: "x",
     })).toBe("rebuild_failed");
   });
 

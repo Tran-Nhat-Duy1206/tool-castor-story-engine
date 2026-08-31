@@ -26,7 +26,7 @@ export interface ForecastContextSections {
 export interface ForecastContext {
   readonly bookId: string;
   readonly bookTitle: string;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly baseChapter: number;
   readonly contextFingerprint: string;
   readonly sections: ForecastContextSections;
@@ -173,7 +173,7 @@ async function readIfExists(path: string): Promise<string | null> {
 }
 
 export function renderForecastContextMarkdown(context: ForecastContext): string {
-  const zh = context.language === "zh";
+  const zh = context.language === "vi";
   const sectionList: ReadonlyArray<readonly [string, string]> = [
     [zh ? "作者意图" : "Author intent", context.sections.authorIntent],
     [zh ? "当前聚焦" : "Current focus", context.sections.currentFocus],
@@ -197,16 +197,16 @@ export function renderForecastContextMarkdown(context: ForecastContext): string 
   return blocks.join("\n\n");
 }
 
-async function readBookConfig(bookDir: string): Promise<{ readonly title: string; readonly language: "zh" | "en" }> {
+async function readBookConfig(bookDir: string): Promise<{ readonly title: string; readonly language: "vi" | "en" }> {
   try {
     const raw = await readFile(join(bookDir, "book.json"), "utf-8");
     const parsed = JSON.parse(raw) as { title?: unknown; language?: unknown };
     return {
       title: typeof parsed.title === "string" ? parsed.title : "",
-      language: parsed.language === "en" ? "en" : "zh",
+      language: parsed.language === "en" ? "en" : "vi",
     };
   } catch {
-    return { title: "", language: "zh" };
+    return { title: "", language: "vi" };
   }
 }
 

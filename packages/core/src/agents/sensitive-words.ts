@@ -18,7 +18,7 @@ export interface SensitiveWordResult {
   readonly found: ReadonlyArray<SensitiveWordMatch>;
 }
 
-type SensitiveWordLanguage = "zh" | "en";
+type SensitiveWordLanguage = "vi" | "en";
 
 // Political terms — severity "block"
 const POLITICAL_WORDS: ReadonlyArray<string> = [
@@ -69,7 +69,7 @@ const WORD_LISTS: ReadonlyArray<WordListEntry> = [
 export function analyzeSensitiveWords(
   content: string,
   customWords?: ReadonlyArray<string>,
-  language: SensitiveWordLanguage = "zh",
+  language: SensitiveWordLanguage = "vi",
 ): SensitiveWordResult {
   const found: SensitiveWordMatch[] = [];
   const issues: AuditIssue[] = [];

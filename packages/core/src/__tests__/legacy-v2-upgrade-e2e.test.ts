@@ -23,7 +23,7 @@ async function setupLegacyBook() {
   await mkdir(join(bookDir, "story", "state"), { recursive: true });
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await mkdir(join(bookDir, "story", "foundation-v2"), { recursive: true });
-  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: bookId, title: "Legacy", platform: "qidian", genre: "xuanhuan", status: "active", targetChapters: 10, chapterWordCount: 1200, language: "zh", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), governance: { foundation: "legacy", planning: "legacy" } }, null, 2));
+  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: bookId, title: "Legacy", platform: "qidian", genre: "xuanhuan", status: "active", targetChapters: 10, chapterWordCount: 1200, language: "vi", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), governance: { foundation: "legacy", planning: "legacy" } }, null, 2));
   await writeFile(join(bookDir, "story", "story_bible.md"), "# Bible legacy\n\ncontent");
   await writeFile(join(bookDir, "story", "book_rules.md"), "# Rules legacy\n\nrules");
   const proseA = "World setting description.\nAtmosphere details.\n";
@@ -31,7 +31,7 @@ async function setupLegacyBook() {
   await writeUnitManifest(bookDir, { unitId: "sf-world-setting", kind: "story_frame", importance: "required", status: "draft", locator: { contentKind: "whole_file", sourceRelPath: "story/outline/sf-world-setting.md" }, contentHash: governedContentHash(proseA), contentRevision: 1, dependencies: [] });
   await writeFile(join(bookDir, "chapters", "0001_第一章.md"), "# 第一章\n\nlegacy prose chapter 1");
   await writeFile(join(bookDir, "chapters", "0002_第二章.md"), "# 第二章\n\nlegacy prose chapter 2");
-  await writeFile(join(bookDir, "story", "state", "manifest.json"), JSON.stringify({ schemaVersion: 2, language: "zh", lastAppliedChapter: 2, projectionVersion: 1, migrationWarnings: [] }, null, 2));
+  await writeFile(join(bookDir, "story", "state", "manifest.json"), JSON.stringify({ schemaVersion: 2, language: "vi", lastAppliedChapter: 2, projectionVersion: 1, migrationWarnings: [] }, null, 2));
   await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ chapter: 2, facts: [{ subject: "hero", predicate: "alive", object: "true", validFromChapter: 1, validUntilChapter: null, sourceChapter: 1 }] }, null, 2));
 }
 

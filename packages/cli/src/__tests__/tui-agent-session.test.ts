@@ -69,7 +69,7 @@ describe("tui agent session bridge", () => {
         apiFormat: "chat",
         stream: false,
       },
-      language: "zh",
+      language: "vi",
     });
     buildPipelineConfigMock.mockReturnValue({});
   });
@@ -321,9 +321,9 @@ describe("tui agent session bridge", () => {
 
   it("passes explicit slash write-next as a requested intent to the unified agent session", async () => {
     runAgentSessionMock.mockResolvedValue({
-      responseText: "已为 night-harbor 完成下一章。",
+      responseText: "Đã hoàn thành chương tiếp theo cho night-harbor.",
       messages: [
-        { role: "assistant", content: "已为 night-harbor 完成下一章。" },
+        { role: "assistant", content: "Đã hoàn thành chương tiếp theo cho night-harbor." },
       ],
     });
     const { processTuiAgentInput } = await import("../tui/agent-input.js");
@@ -345,7 +345,7 @@ describe("tui agent session bridge", () => {
         actionSource: "slash",
         requestedIntent: "write_next",
       }),
-      "写下一章",
+      "Viết chương tiếp theo",
       [],
     );
     expect(result.responseText).toContain("完成下一章");

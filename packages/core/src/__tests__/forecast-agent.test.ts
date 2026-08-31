@@ -40,7 +40,7 @@ const INPUT = {
   branchCount: 2,
   horizon: 5,
   baseChapter: 12,
-  language: "zh" as const,
+  language: "vi" as const,
 };
 
 afterEach(() => {

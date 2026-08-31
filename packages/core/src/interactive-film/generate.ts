@@ -24,12 +24,12 @@ export async function generateStoryGraph(
   input: GenerateStoryGraphInput,
   options?: {
     readonly maxTokens?: number;
-    readonly language?: "zh" | "en";
+    readonly language?: "vi" | "en";
     readonly activatedSkills?: ReadonlyArray<ActivatedSkillGuidance>;
     readonly signal?: AbortSignal;
   },
 ): Promise<StoryGraph> {
-  const language = options?.language ?? "zh";
+  const language = options?.language ?? "vi";
   const systemPrompt = language === "en" ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT_ZH;
   const userPrompt = language === "en"
     ? `Title: ${input.title}\nPremise: ${input.premise}`

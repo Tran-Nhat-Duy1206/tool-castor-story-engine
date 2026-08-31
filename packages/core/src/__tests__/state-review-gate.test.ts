@@ -46,7 +46,7 @@ function shellArtifact(sourceChapter: number, status: "rebuild_required" | "rebu
     status,
     sourceChapter,
     createdAt: CREATED_AT,
-    language: "zh",
+    language: "vi",
     ...(status === "rebuild_required" ? {} : { reason: "analyzer crashed" }),
   });
 }
@@ -63,7 +63,7 @@ function activeArtifact(sourceChapter: number, effectiveChapter: number, status:
     reviewRevision: 1,
     items: [],
     createdAt: CREATED_AT,
-    language: "zh",
+    language: "vi",
   });
 }
 

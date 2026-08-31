@@ -6,7 +6,7 @@ import { countChapterLength } from "../utils/length-metrics.js";
 const defaultGenreProfile: GenreProfile = {
   name: "测试",
   id: "test",
-  language: "zh",
+  language: "vi",
   chapterTypes: [],
   fatigueWords: [],
   numericalSystem: true,

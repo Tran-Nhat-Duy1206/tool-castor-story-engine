@@ -1,17 +1,16 @@
-export type WritingLanguage = "zh" | "en";
+export type WritingLanguage = "vi" | "en";
 
 /**
- * Infer the writing language from a free-text brief/premise when the user did not set one explicitly.
+ * Suy luận ngôn ngữ viết từ brief/premise khi người dùng không chỉ định rõ.
  *
- * Conservative by design: defaults to "zh" (preserving prior behaviour for Chinese users) and only
- * returns "en" when the text is clearly Latin-dominant. A Chinese brief that mentions an English name
- * or term still resolves to "zh"; incidental CJK inside an otherwise English brief resolves to "en".
+ * Thiết kế bảo thủ: mặc định là "vi" (tiếng Việt) và chỉ trả về "en" khi văn bản
+ * rõ ràng là Latin thuần túy. Văn bản có dấu tiếng Việt luôn được nhận diện là "vi".
  */
 export function inferLanguage(text?: string | null): WritingLanguage {
   const t = text ?? "";
-  const cjk = (t.match(/[一-鿿]/g) ?? []).length;
+  const hasVietnameseDiacritics = /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ]/.test(t);
+  if (hasVietnameseDiacritics) return "vi";
   const latin = (t.match(/[A-Za-z]/g) ?? []).length;
-  if (cjk === 0 && latin > 0) return "en";
-  if (latin > 0 && cjk * 4 < latin) return "en";
-  return "zh";
+  if (latin > 0) return "en";
+  return "vi";
 }

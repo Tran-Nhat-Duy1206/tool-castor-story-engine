@@ -104,7 +104,7 @@ describe("shared current-state slot vocabulary (characterization)", () => {
     currentConflict: "被码头帮盯上",
   };
 
-  it.each(["zh", "en"] as const)("reducer and describeCurrentStateSlot agree for every slot (%s)", (language) => {
+  it.each(["vi", "en"] as const)("reducer and describeCurrentStateSlot agree for every slot (%s)", (language) => {
     for (const def of CURRENT_STATE_SLOT_DEFS) {
       const described = describeCurrentStateSlot(def.key, language);
       expect(described.subject).toBe("protagonist");
@@ -124,7 +124,7 @@ describe("shared current-state slot vocabulary (characterization)", () => {
   });
 
   it("pins the exact language-first predicates for representative slots", () => {
-    expect(describeCurrentStateSlot("currentLocation", "zh")).toEqual({
+    expect(describeCurrentStateSlot("currentLocation", "vi")).toEqual({
       subject: "protagonist",
       predicate: "当前位置",
     });
@@ -132,16 +132,16 @@ describe("shared current-state slot vocabulary (characterization)", () => {
       subject: "protagonist",
       predicate: "Current Location",
     });
-    expect(describeCurrentStateSlot("currentAlliances", "zh").predicate).toBe("当前敌我");
+    expect(describeCurrentStateSlot("currentAlliances", "vi").predicate).toBe("当前敌我");
     expect(describeCurrentStateSlot("currentAlliances", "en").predicate).toBe("Current Alliances");
-    expect(describeCurrentStateSlot("protagonistState", "zh").predicate).toBe("主角状态");
+    expect(describeCurrentStateSlot("protagonistState", "vi").predicate).toBe("主角状态");
     expect(describeCurrentStateSlot("currentConflict", "en").predicate).toBe("Current Conflict");
   });
 
   it("preserves alias-set removal matching across language boundaries", () => {
     // zh book carrying a legacy EN-labelled fact: the patch must STILL remove it.
     const result = applyRuntimeStateDelta({
-      snapshot: minimalSnapshot("zh", [
+      snapshot: minimalSnapshot("vi", [
         { predicate: "Current Location", object: "老码头" },
       ]),
       delta: zhDelta({ currentLocation: "东城公寓" }),
@@ -168,7 +168,7 @@ describe("buildStateReviewItems", () => {
   it("returns zero items for an empty delta", () => {
     const items = buildStateReviewItems(RuntimeStateDeltaSchema.parse({ chapter: 13 }), {
       chapterContent: ZH_PROSE,
-      language: "zh",
+      language: "vi",
     });
     expect(items).toEqual([]);
   });
@@ -176,14 +176,14 @@ describe("buildStateReviewItems", () => {
   it("maps one patch slot to exactly one ai-origin undecided current-state-fact using the SHARED vocabulary", () => {
     const items = buildStateReviewItems(zhDelta({ currentLocation: "东城公寓" }), {
       chapterContent: ZH_PROSE,
-      language: "zh",
+      language: "vi",
     });
     expect(items).toHaveLength(1);
     const item = items[0]!;
     expect(item.kind).toBe("current-state-fact");
     expect(item.origin).toBe("ai");
     expect(item.decision).toBe("undecided");
-    const described = describeCurrentStateSlot("currentLocation", "zh");
+    const described = describeCurrentStateSlot("currentLocation", "vi");
     expect(item.proposal).toEqual({
       type: "fact",
       change: { action: "set", subject: described.subject, predicate: described.predicate, object: "东城公寓" },
@@ -197,7 +197,7 @@ describe("buildStateReviewItems", () => {
         currentLocation: "东城公寓",
         currentGoal: "追查旧账",
       }),
-      { chapterContent: "", language: "zh" },
+      { chapterContent: "", language: "vi" },
     );
     expect(items).toHaveLength(3);
     expect(items.every((item) => item.kind === "current-state-fact")).toBe(true);
@@ -232,7 +232,7 @@ describe("buildStateReviewItems", () => {
   it("maps hookOps.mention to a hook-mention hook-op item without fabricated evidence", () => {
     const items = buildStateReviewItems(
       RuntimeStateDeltaSchema.parse({ chapter: 13, hookOps: { mention: ["mentor-debt"] } }),
-      { chapterContent: ZH_PROSE, language: "zh" },
+      { chapterContent: ZH_PROSE, language: "vi" },
     );
     expect(kinds(items)).toEqual(["hook-mention"]);
     expect(items[0]!.proposal).toEqual({ type: "hook-op", op: "mention", hookId: "mentor-debt" });
@@ -242,7 +242,7 @@ describe("buildStateReviewItems", () => {
   it("maps hookOps.resolve to a hook-resolve item", () => {
     const items = buildStateReviewItems(
       RuntimeStateDeltaSchema.parse({ chapter: 13, hookOps: { resolve: ["mentor-debt"] } }),
-      { chapterContent: "", language: "zh" },
+      { chapterContent: "", language: "vi" },
     );
     expect(kinds(items)).toEqual(["hook-resolve"]);
     expect(items[0]!.proposal).toEqual({ type: "hook-op", op: "resolve", hookId: "mentor-debt" });
@@ -251,7 +251,7 @@ describe("buildStateReviewItems", () => {
   it("maps hookOps.defer to a hook-defer item", () => {
     const items = buildStateReviewItems(
       RuntimeStateDeltaSchema.parse({ chapter: 13, hookOps: { defer: ["mentor-debt"] } }),
-      { chapterContent: "", language: "zh" },
+      { chapterContent: "", language: "vi" },
     );
     expect(kinds(items)).toEqual(["hook-defer"]);
     expect(items[0]!.proposal).toEqual({ type: "hook-op", op: "defer", hookId: "mentor-debt" });
@@ -318,7 +318,7 @@ describe("buildStateReviewItems", () => {
         characterMatrixOps: [{ op: "update", pair: ["林越", "陈探长"] }],
         notes: ["Settler flagged an ambiguous alliance label."],
       }),
-      { chapterContent: "", language: "zh" },
+      { chapterContent: "", language: "vi" },
     );
     expect(items).toHaveLength(9);
     expect([...kinds(items)].sort()).toEqual([
@@ -343,7 +343,7 @@ describe("buildStateReviewItems", () => {
         characterMatrixOps: [],
         notes: ["free-form note one", "free-form note two"],
       }),
-      { chapterContent: "", language: "zh" },
+      { chapterContent: "", language: "vi" },
     );
     expect(kinds(items)).toEqual(["note"]);
     const note = items[0]!;
@@ -369,7 +369,7 @@ describe("buildStateReviewItems", () => {
         characterMatrixOps: [],
         notes: [],
       }),
-      { chapterContent: "", language: "zh" },
+      { chapterContent: "", language: "vi" },
     );
     expect(kinds(items)).toEqual(["hook-mention"]);
   });
@@ -392,7 +392,7 @@ describe("buildStateReviewItems", () => {
       },
       notes: ["loose"],
     });
-    const ctx = { chapterContent: ZH_PROSE, language: "zh" } as const;
+    const ctx = { chapterContent: ZH_PROSE, language: "vi" } as const;
     const first = buildStateReviewItems(delta, ctx);
     const second = buildStateReviewItems(delta, ctx);
     expect(second.map((item) => item.id)).toEqual(first.map((item) => item.id));
@@ -402,11 +402,11 @@ describe("buildStateReviewItems", () => {
   it("makes ids payload-sensitive: changing one semantic value changes that item's id", () => {
     const before = buildStateReviewItems(zhDelta({ currentGoal: "追查旧账" }), {
       chapterContent: "",
-      language: "zh",
+      language: "vi",
     });
     const after = buildStateReviewItems(zhDelta({ currentGoal: "守护旧账" }), {
       chapterContent: "",
-      language: "zh",
+      language: "vi",
     });
     expect(before[0]!.id).not.toBe(after[0]!.id);
 
@@ -427,7 +427,7 @@ describe("buildStateReviewItems", () => {
   it("marks truly-present semantic text as explicit with a bounded quote", () => {
     const items = buildStateReviewItems(zhDelta({ currentGoal: LONG_VALUE }), {
       chapterContent: `${ZH_PROSE}\n${LONG_VALUE}`,
-      language: "zh",
+      language: "vi",
     });
     const evidence = items[0]!.evidence;
     expect(evidence?.claimedLevel).toBe("explicit");
@@ -440,7 +440,7 @@ describe("buildStateReviewItems", () => {
   it("marks absent semantic text as inferred WITHOUT fabricating a quote", () => {
     const items = buildStateReviewItems(zhDelta({ currentGoal: "这句话绝不在正文里出现" }), {
       chapterContent: ZH_PROSE,
-      language: "zh",
+      language: "vi",
     });
     expect(items[0]!.evidence).toEqual({
       claimedLevel: "inferred",
@@ -452,7 +452,7 @@ describe("buildStateReviewItems", () => {
   it("verifies contiguous CJK phrases in prose", () => {
     const items = buildStateReviewItems(zhDelta({ currentLocation: "走进了东城公寓" }), {
       chapterContent: ZH_PROSE,
-      language: "zh",
+      language: "vi",
     });
     expect(items[0]!.evidence?.verifiedLevel).toBe("explicit");
     expect(items[0]!.evidence?.quote).toBe("走进了东城公寓");
@@ -474,7 +474,7 @@ describe("buildStateReviewItems", () => {
   it("does NOT fake-match CJK values with internal spacing against contiguous prose", () => {
     const items = buildStateReviewItems(zhDelta({ currentLocation: "东城 公寓" }), {
       chapterContent: ZH_PROSE,
-      language: "zh",
+      language: "vi",
     });
     expect(items[0]!.evidence).toEqual({ claimedLevel: "inferred", verifiedLevel: "inferred" });
   });

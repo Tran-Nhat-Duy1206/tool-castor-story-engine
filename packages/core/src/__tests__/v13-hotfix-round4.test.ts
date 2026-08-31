@@ -202,7 +202,7 @@ describe("Issue 2 — per-chapter promotion persists to pending_hooks.md", () =>
     ];
     const storyDir = join(bookDir, "story");
     const ledgerPath = join(storyDir, "pending_hooks.md");
-    await writeFile(ledgerPath, renderHookSnapshot(hooks, "zh"), "utf-8");
+    await writeFile(ledgerPath, renderHookSnapshot(hooks, "vi"), "utf-8");
 
     // Simulate chapter_summaries with H05 mentioned in 2 chapters
     await writeFile(join(storyDir, "chapter_summaries.md"), [
@@ -220,7 +220,7 @@ describe("Issue 2 — per-chapter promotion persists to pending_hooks.md", () =>
 
     expect(result.updated).toBe(true);
     // Write back
-    await writeFile(ledgerPath, renderHookSnapshot([...result.hooks], "zh"), "utf-8");
+    await writeFile(ledgerPath, renderHookSnapshot([...result.hooks], "vi"), "utf-8");
 
     // Verify the file on disk
     const updated = parsePendingHooksMarkdown(await readFile(ledgerPath, "utf-8"));

@@ -77,7 +77,7 @@ function baseBook(): BookConfig {
     status: "active",
     targetChapters: 60,
     chapterWordCount: 2200,
-    language: "zh",
+    language: "vi",
     createdAt: "2026-04-15T00:00:00.000Z",
     updatedAt: "2026-04-15T00:00:00.000Z",
   };
@@ -314,7 +314,7 @@ describe("Phase 5 consolidation — parser accepts 5-section output (current_sta
       .mockResolvedValue({ content: CONSOLIDATED_RESPONSE, usage: ZERO_USAGE });
 
     const out = await agent.generateFoundation(baseBook());
-    await agent.writeFoundationFiles(bookDir, out, false, "zh");
+    await agent.writeFoundationFiles(bookDir, out, false, "vi");
 
     // Architect output has empty currentState — there's no section to parse.
     expect(out.currentState.trim()).toBe("");
@@ -470,7 +470,7 @@ describe("Phase 5 consolidation — readCurrentStateWithFallback derives initial
       .mockResolvedValue({ content: CONSOLIDATED_RESPONSE, usage: ZERO_USAGE });
 
     const out = await agent.generateFoundation(baseBook());
-    await agent.writeFoundationFiles(bookDir, out, false, "zh");
+    await agent.writeFoundationFiles(bookDir, out, false, "vi");
 
     const derived = await readCurrentStateWithFallback(bookDir, "(missing)");
     // Derived block should mention the role names and their Current_State text.

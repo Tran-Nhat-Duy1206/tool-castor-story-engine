@@ -14,7 +14,7 @@ async function writeFixtureBook(bookDir: string): Promise<void> {
   await mkdir(join(bookDir, "story", "outline"), { recursive: true });
   await mkdir(join(bookDir, "story", "roles", "主要角色"), { recursive: true });
 
-  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: "demo", title: "示例书", language: "zh" }), "utf-8");
+  await writeFile(join(bookDir, "book.json"), JSON.stringify({ id: "demo", title: "示例书", language: "vi" }), "utf-8");
   await writeFile(join(bookDir, "chapters", "0001_开局.md"), "第一章正文", "utf-8");
   await writeFile(join(bookDir, "chapters", "0002_升级.md"), "第二章正文", "utf-8");
   await writeFile(join(bookDir, "story", "state", "current_state.json"), JSON.stringify({ facts: ["主角在东城"] }), "utf-8");
@@ -54,7 +54,7 @@ describe("buildForecastContext", () => {
     const context = await buildForecastContext({ bookDir, bookId: "demo" });
 
     expect(context.baseChapter).toBe(2);
-    expect(context.language).toBe("zh");
+    expect(context.language).toBe("vi");
     expect(context.bookTitle).toBe("示例书");
     expect(context.sections.authorIntent).toContain("复仇主线");
     expect(context.sections.currentFocus).toContain("推进证据链");

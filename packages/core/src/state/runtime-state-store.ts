@@ -56,7 +56,7 @@ export async function loadRuntimeStateSnapshot(bookDir: string): Promise<Runtime
 export async function loadRuntimeStateSnapshotAtChapter(params: {
   readonly bookDir: string;
   readonly chapterNumber: number;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
 }): Promise<RuntimeStateSnapshot> {
   const snapshotDir = join(
     params.bookDir,
@@ -114,7 +114,7 @@ export async function loadRuntimeStateSnapshotAtChapter(params: {
 export async function buildRuntimeStateArtifacts(params: {
   readonly bookDir: string;
   readonly delta: RuntimeStateDelta;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly allowReapply?: boolean;
   readonly allowNewHooks?: boolean;
 }): Promise<RuntimeStateArtifacts> {
@@ -131,7 +131,7 @@ export async function buildRuntimeStateArtifacts(params: {
 export function buildRuntimeStateArtifactsFromSnapshot(params: {
   readonly snapshot: RuntimeStateSnapshot;
   readonly delta: RuntimeStateDelta;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly allowReapply?: boolean;
   readonly allowNewHooks?: boolean;
 }): RuntimeStateArtifacts {

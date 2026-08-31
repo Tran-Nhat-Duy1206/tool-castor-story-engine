@@ -70,7 +70,7 @@ export async function processProjectInteractionRequest(params: {
 
 function attachRequestLanguage(
   request: InteractionRequest,
-  language: "zh" | "en" | undefined,
+  language: "vi" | "en" | undefined,
 ): InteractionRequest {
   if (request.language || !language) {
     return request;
@@ -82,11 +82,11 @@ function attachRequestLanguage(
   };
 }
 
-async function detectProjectInteractionLanguage(projectRoot: string): Promise<"zh" | "en" | undefined> {
+async function detectProjectInteractionLanguage(projectRoot: string): Promise<"vi" | "en" | undefined> {
   try {
     const { loadProjectConfigFile } = await import("../config/project-config-file.js");
     const parsed = (await loadProjectConfigFile(projectRoot)).config as { language?: string };
-    return parsed.language === "en" ? "en" : parsed.language === "zh" ? "zh" : undefined;
+    return parsed.language === "en" ? "en" : parsed.language === "vi" ? "vi" : undefined;
   } catch {
     return undefined;
   }

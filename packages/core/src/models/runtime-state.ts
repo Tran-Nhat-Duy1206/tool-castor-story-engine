@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const RuntimeStateLanguageSchema = z.enum(["zh", "en"]);
+export const RuntimeStateLanguageSchema = z.enum(["vi", "en"]);
 export type RuntimeStateLanguage = z.infer<typeof RuntimeStateLanguageSchema>;
 
 export const StateManifestSchema = z.object({

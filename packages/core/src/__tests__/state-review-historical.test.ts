@@ -536,13 +536,13 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
 
     await saveStateReviewShell(bookDir, {
       schemaVersion: 1, status: "rebuild_required",
-      sourceChapter: SOURCE, createdAt: CREATED_AT, language: "zh", reason: "",
+      sourceChapter: SOURCE, createdAt: CREATED_AT, language: "vi", reason: "",
     });
     await expect(assertCanAdvanceStory(bookDir, EFFECTIVE)).rejects.toThrow(/Rebuild required/i);
 
     await saveStateReviewShell(bookDir, {
       schemaVersion: 1, status: "rebuild_failed",
-      sourceChapter: SOURCE, createdAt: CREATED_AT, language: "zh", reason: "analyzer crashed",
+      sourceChapter: SOURCE, createdAt: CREATED_AT, language: "vi", reason: "analyzer crashed",
     });
     await expect(assertCanAdvanceStory(bookDir, EFFECTIVE)).rejects.toThrow(/Rebuild failed/i);
 
@@ -553,7 +553,7 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       schemaVersion: 1,
       sourceChapter: SOURCE,
       createdAt: CREATED_AT,
-      language: "zh",
+      language: "vi",
       reviewId: "11111111-2222-4333-8444-555555555555",
       effectiveChapter: EFFECTIVE,
       proseRevision: computeProseRevision(P16_OLD),
@@ -606,7 +606,7 @@ describe("state-review HISTORICAL correction end-to-end (Task 13)", () => {
       schemaVersion: 1,
       sourceChapter: SOURCE,
       createdAt: CREATED_AT,
-      language: "zh",
+      language: "vi",
       reviewId: "99999999-8888-4777-8666-555555555555",
       effectiveChapter: EFFECTIVE,
       proseRevision: computeProseRevision(P16_OLD),

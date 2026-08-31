@@ -1,51 +1,51 @@
 ---
-name: 恐怖
+name: Kinh Dị
 id: horror
-chapterTypes: ["氛围章", "事件章", "揭示章", "过渡章", "回收章"]
-fatigueWords: ["毛骨悚然", "不寒而栗", "浑身发冷", "头皮发麻", "鸡皮疙瘩", "心跳加速", "仿佛", "不禁", "宛如", "竟然"]
+chapterTypes: ["Chương Bầu Không Khí", "Chương Sự Kiện", "Chương Vén Màn", "Chương Quá Độ", "Chương Thu Hoạch"]
+fatigueWords: ["sởn gai ốc", "lạnh sống lưng", "toàn thân phát lạnh", "da đầu tê dại", "nổi da gà", "tim đập nhanh", "dường như", "không kìm được", "như thể", "vậy mà"]
 numericalSystem: false
 powerScaling: false
 eraResearch: false
-pacingRule: "氛围递进：安全感→微妙不适→确认异常→恐惧升级→高潮→喘息，循环推进"
-satisfactionTypes: ["真相揭示", "成功逃脱", "反杀怪物", "谜团解开", "同伴获救", "规则发现"]
+pacingRule: "Bầu không khí递进: cảm giác an toàn → khó chịu vi tế → xác nhận dị thường →恐惧升级 → cao trào → nhịp thở,循环推进"
+satisfactionTypes: ["Vén màn sự thật", "Thoát thân thành công", "Phản sát quái vật", "Giải mã bí ẩn", "Cứu được đồng bạn", "Phát hiện quy tắc"]
 auditDimensions: [1,2,3,6,7,8,9,10,13,14,15,16,17,18,19,24,25,26]
 ---
 
-## 题材禁忌
+## Điều cấm kỵ của thể loại
 
-- 恐怖源头过早完全暴露（未知才恐怖）
-- 主角无脑刚正面解决一切
-- 用打脸/升级等爽文套路替代恐怖氛围
-- 恐怖元素与日常场景割裂（好的恐怖来自日常的扭曲）
-- 角色面对恐怖事件完全不害怕
-- 用大量血腥描写替代心理恐惧
+- Nguồn gốc恐怖暴露 hoàn toàn quá sớm (chưa biết mới khủng bố)
+- Nhân vật chính vô não刚正面 giải quyết tất cả
+- Dùng套路爽 văn như vả mặt / thăng cấp thay cho bầu không khí恐怖
+- Yếu tố恐怖割裂 với cảnh thường ngày (恐怖 hay đến từ sự扭曲 của thường ngày)
+- Nhân vật đối mặt sự kiện恐怖 hoàn toàn không sợ hãi
+- Dùng lượng lớn miêu tả血腥 thay cho恐惧 tâm lý
 
-## 恐惧层级
+## Cấp độ恐惧
 
-- 第一层：不适感（微妙的错位、违和）
-- 第二层：不安（确认有异常，但看不清全貌）
-- 第三层：恐惧（威胁明确化，逃生本能启动）
-- 第四层：绝望（规则被打破，安全感彻底崩塌）
-- 不要跳过层级直达高潮，递进才有力量
+- Tầng một: cảm giác khó chịu (lệch lạc vi tế,違和)
+- Tầng hai: bất an (xác nhận có dị thường, nhưng chưa thấy rõ toàn貌)
+- Tầng ba:恐惧 (mối đe dọa rõ ràng hóa, bản năng逃生 khởi động)
+- Tầng bốn: tuyệt vọng (quy tắc bị phá vỡ, cảm giác an toàn sụp đổ hoàn toàn)
+- Đừng nhảy cấp直达 cao trào,递进 mới có sức mạnh
 
-## 语言铁律
+## Quy tắc sắt về ngôn ngữ
 
-- 恐怖用事实传达，不用情绪标签。✗"他感到一阵恐惧" → ✓"他后颈的汗毛一根根立起来"
-- 禁止过度解释恐怖。异常现象只需呈现，不需叙述者出来总结"这一切都太不正常了"
-- 克制叙事：越恐怖越冷静。句子随恐惧升级而变短，但叙述者语气始终平稳
-- 被淘汰/伤害的配角必须有至少一个暗示其个人故事的细节（书包里的补习班收据、手机壳上的贴纸），让淘汰有重量
+-恐怖 dùng sự thật truyền đạt, không dùng nhãn cảm xúc. ✗"hắn cảm thấy một trận恐惧" → ✓"gáy hắn từng sợi lông tơ dựng đứng"
+- Cấm giải thích quá mức恐怖. Hiện tượng dị thường chỉ cần呈现, không cần người kể chuyện ra tổng kết "tất cả điều này quá không bình thường"
+- Tự sự tiết chế: càng恐怖 càng bình tĩnh. Câu随恐惧升级 mà ngắn lại, nhưng giọng người kể chuyện始终平稳
+- Vai phụ bị淘汰 / tổn thương phải có ít nhất một chi tiết ám chỉ câu chuyện cá nhân của họ (biên lai lớp học thêm trong cặp sách, sticker trên ốp điện thoại), để淘汰 có trọng lượng
 
-## 叙事指导
+## Chỉ dẫn tự sự
 
-氛围是第一生产力。用五感细节（声音、气味、温度、触感）建立不安。
-恐怖来自对未知的恐惧，信息揭示要克制。
-"看不见的"永远比"看见的"更可怕。
+Bầu không khí là lực sản xuất số một. Dùng chi tiết năm giác quan (âm thanh, mùi vị, nhiệt độ, xúc giác) để dựng bất an.
+恐怖 đến từ恐惧 đối với chưa biết, việc hé lộ thông tin phải tiết chế.
+"Cái không nhìn thấy" mãi mãi đáng sợ hơn "cái đã nhìn thấy".
 
-角色的恐惧反应必须真实：颤抖、口干、思维混乱、判断力下降。
-求生本能驱动行为，不是英雄主义。
-每个安全区都是暂时的，喘息之后是更深的恐惧。
+Phản ứng恐惧 của nhân vật phải chân thực: run rẩy, khô miệng,思维 hỗn loạn, năng lực phán đoán giảm sút.
+Bản năng求生 thúc đẩy hành vi, không phải chủ nghĩa anh hùng.
+Mỗi khu vực an toàn都是 tạm thời, sau nhịp thở là恐惧 càng sâu hơn.
 
-规则感：恐怖世界有自己的规则，发现规则是生存的关键。
-信息管理：读者知道的和角色知道的之间的差距制造悬念。
-日常的扭曲比凭空出现的怪物更恐怖。
-每3章必须打破一次已建立的模式（规则矛盾、可信来源说谎、安全区失效），避免机械重复。
+Cảm giác quy tắc: thế giới恐怖 có quy tắc của riêng nó, phát hiện quy tắc là then chốt để sinh tồn.
+Quản lý thông tin: khoảng cách giữa điều độc giả biết và điều nhân vật biết tạo悬念.
+Sự扭曲 của thường ngày đáng sợ hơn quái vật xuất hiện凭空.
+Mỗi 3 chương phải phá vỡ một lần模式 đã thiết lập (mâu thuẫn quy tắc, nguồn đáng tin nói dối, khu vực an toàn mất hiệu lực), tránh lặp lại máy móc.

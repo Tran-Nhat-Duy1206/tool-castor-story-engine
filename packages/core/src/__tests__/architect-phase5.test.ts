@@ -39,7 +39,7 @@ function baseBook(): BookConfig {
     status: "active",
     targetChapters: 60,
     chapterWordCount: 2200,
-    language: "zh",
+    language: "vi",
     createdAt: "2026-04-15T00:00:00.000Z",
     updatedAt: "2026-04-15T00:00:00.000Z",
   };
@@ -214,7 +214,7 @@ describe("ArchitectAgent — Phase 5 prose output", () => {
       .mockResolvedValue({ content: SAMPLE_RESPONSE, usage: ZERO_USAGE });
 
     const result = await agent.generateFoundation(baseBook());
-    await agent.writeFoundationFiles(bookDir, result, false, "zh");
+    await agent.writeFoundationFiles(bookDir, result, false, "vi");
 
     const storyDir = join(bookDir, "story");
     const storyFrame = await readFile(join(storyDir, "outline/story_frame.md"), "utf-8");
@@ -443,7 +443,7 @@ describe("writeFoundationFiles — rhythm file is skipped when rhythmPrinciples 
     const out = await agent.generateFoundation(baseBook());
     expect((out.rhythmPrinciples ?? "").trim()).toBe("");
 
-    await agent.writeFoundationFiles(bookDir, out, false, "zh");
+    await agent.writeFoundationFiles(bookDir, out, false, "vi");
 
     // No standalone rhythm file on disk — rhythm content lives in
     // volume_map's closing paragraph.
@@ -471,7 +471,7 @@ describe("writeFoundationFiles — rhythm file is skipped when rhythmPrinciples 
     const out = await agent.generateFoundation(baseBook());
     expect((out.rhythmPrinciples ?? "").trim().length).toBeGreaterThan(0);
 
-    await agent.writeFoundationFiles(bookDir, out, false, "zh");
+    await agent.writeFoundationFiles(bookDir, out, false, "vi");
 
     const rhythm = await readFile(
       join(bookDir, "story/outline/节奏原则.md"),

@@ -165,7 +165,7 @@ export class ConsolidatorAgent extends BaseAgent {
     const hooks = parsePendingHooksMarkdown(raw);
     if (hooks.length === 0) return 0;
 
-    const language: "zh" | "en" = /[\u4e00-\u9fff]/.test(raw) ? "zh" : "en";
+    const language: "vi" | "en" = /[\u4e00-\u9fff]/.test(raw) ? "vi" : "en";
     const summariesRaw = await readFile(join(storyDir, "chapter_summaries.md"), "utf-8").catch(() => "");
 
     const { rerunPromotionPass } = await import("../utils/hook-promotion.js");

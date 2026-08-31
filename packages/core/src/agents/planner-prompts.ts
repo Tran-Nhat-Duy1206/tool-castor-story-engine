@@ -263,11 +263,11 @@ Produce the memo for chapter {{chapterNumber}}. Strictly emit the plain Markdown
  * Defaults to zh for backward compatibility — explicit "en" required for
  * the English variant.
  */
-export function getPlannerMemoSystemPrompt(language: "zh" | "en" = "zh"): string {
+export function getPlannerMemoSystemPrompt(language: "vi" | "en" = "vi"): string {
   return language === "en" ? PLANNER_MEMO_SYSTEM_PROMPT_EN : PLANNER_MEMO_SYSTEM_PROMPT;
 }
 
-export function getPlannerMemoUserTemplate(language: "zh" | "en" = "zh"): string {
+export function getPlannerMemoUserTemplate(language: "vi" | "en" = "vi"): string {
   return language === "en" ? PLANNER_MEMO_USER_TEMPLATE_EN : PLANNER_MEMO_USER_TEMPLATE;
 }
 
@@ -330,11 +330,11 @@ export interface PlannerUserMessageInput {
   };
   readonly brief?: string;
   readonly chapterContext?: string;
-  readonly language?: "zh" | "en";
+  readonly language?: "vi" | "en";
 }
 
 export function buildPlannerUserMessage(input: PlannerUserMessageInput): string {
-  const language = input.language ?? "zh";
+  const language = input.language ?? "vi";
   const template = getPlannerMemoUserTemplate(language);
   const yesText = language === "en" ? "yes" : "是";
   const noText = language === "en" ? "no" : "否";
@@ -374,7 +374,7 @@ export function buildPlannerUserMessage(input: PlannerUserMessageInput): string 
  *
  * Returns "" when no brief exists (legacy books without brief.md).
  */
-function buildBriefBlock(brief: string, language: "zh" | "en"): string {
+function buildBriefBlock(brief: string, language: "vi" | "en"): string {
   const trimmed = brief.trim();
   if (!trimmed) return "";
   if (language === "en") {
@@ -389,7 +389,7 @@ ${trimmed}
 brief 是用户的直接指令。本章规划时，必须优先兑现 brief 里写明的核心设定（主角设定、世界前提、开场机制、样本章回钩子等）。如果 brief 里指定了内容比例、双主线权重或某条关系线必须占比，本章 memo 要把它拆成可见场面，而不是只在总结里提一句。**不要把 brief 里的核心设定推迟到后面的章节**——该在前几章落地的必须落地。`;
 }
 
-function buildChapterContextBlock(chapterContext: string, language: "zh" | "en"): string {
+function buildChapterContextBlock(chapterContext: string, language: "vi" | "en"): string {
   const trimmed = chapterContext.trim();
   if (!trimmed) return "";
   if (language === "en") {
@@ -412,7 +412,7 @@ ${trimmed}
 
 export function buildGoldenOpeningGuidance(
   chapterNumber: number,
-  language: "zh" | "en" = "zh",
+  language: "vi" | "en" = "vi",
 ): string {
   if (chapterNumber > 3) return "";
 

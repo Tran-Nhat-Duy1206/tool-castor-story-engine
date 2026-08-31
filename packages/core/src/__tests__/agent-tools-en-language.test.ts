@@ -213,7 +213,7 @@ describe("agent tools language wiring (en parity)", () => {
   });
 
   it("lets an explicit shortRun.language=en override the zh session default in the confirmation payload", async () => {
-    const result = await createProposeActionTool("zh").execute("propose-short-zh-en", {
+    const result = await createProposeActionTool("vi").execute("propose-short-zh-en", {
       action: "short_run",
       instruction: "用户在中文对话里要求写一篇英文办公室悬疑短篇",
       shortRun: {
@@ -238,7 +238,7 @@ describe("agent tools language wiring (en parity)", () => {
   });
 
   it("does not inject a zh charsPerChapter default when a zh session confirms an en short", async () => {
-    const result = await createProposeActionTool("zh").execute("propose-short-zh-en-no-length", {
+    const result = await createProposeActionTool("vi").execute("propose-short-zh-en-no-length", {
       action: "short_run",
       instruction: "用户在中文对话里要求写一篇英文短篇，未指定每章字数",
       shortRun: {
@@ -255,7 +255,7 @@ describe("agent tools language wiring (en parity)", () => {
 
     const pipeline = contextPipeline({ createAgentContext: vi.fn(() => ({})) });
     const tool = createShortFictionRunTool(pipeline as never, root, {
-      language: "zh",
+      language: "vi",
       actionPayload: { shortRun } as any,
     });
     await tool.execute("short-zh-en-no-length", { direction: "fallback direction" } as any);
@@ -266,7 +266,7 @@ describe("agent tools language wiring (en parity)", () => {
   });
 
   it("documents in the shortRun.language schema that the output language may differ from the conversation language", () => {
-    const parameters = createProposeActionTool("zh").parameters as any;
+    const parameters = createProposeActionTool("vi").parameters as any;
     const description = parameters.properties.shortRun.properties.language.description as string;
     expect(description).toMatch(/output language/i);
     expect(description).toMatch(/differ from the conversation language/i);
@@ -275,7 +275,7 @@ describe("agent tools language wiring (en parity)", () => {
   it("lets the confirmed short payload override the project language", async () => {
     const pipeline = contextPipeline({ createAgentContext: vi.fn(() => ({})) });
     const tool = createShortFictionRunTool(pipeline as never, root, {
-      language: "zh",
+      language: "vi",
       actionPayload: {
         shortRun: {
           direction: "an English office thriller",

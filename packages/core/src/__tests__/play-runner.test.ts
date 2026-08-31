@@ -287,7 +287,7 @@ describe("PlayRunner", () => {
       id: "opening-seed",
       title: "雨夜档案",
       premise: "玩家是县医院档案室临时工，暴雨夜寻找二十年前的手术记录。",
-      language: "zh",
+      language: "vi",
     });
     await store.ensureRun("opening-seed", "main");
     await store.writeProjection("opening-seed", "main", "projections/scene.md", "档案柜里只有一张无名婴儿照片。\n");
@@ -352,7 +352,7 @@ describe("PlayRunner", () => {
       id: "opening-reconcile",
       title: "零点十七分的隧道",
       premise: "玩家是公交司机，对车上十名乘客负责。一个哮喘儿童由母亲抱着，老人要回去拿胰岛素。",
-      language: "zh",
+      language: "vi",
     });
     await store.ensureRun("opening-reconcile", "main");
 
@@ -418,7 +418,7 @@ describe("PlayRunner", () => {
       id: "opening-held-object",
       title: "雨季合租屋",
       premise: "玩家是刚搬来的住户，开场手里拿着房东给的备用钥匙。",
-      language: "zh",
+      language: "vi",
     });
     await store.ensureRun("opening-held-object", "main");
     await store.writeProjection("opening-held-object", "main", "projections/scene.md", "你站在门口，手里攥着备用钥匙。\n");
@@ -531,7 +531,7 @@ describe("PlayRunner", () => {
       id: "rain-teahouse",
       title: "雨夜茶馆",
       premise: "玩家扮演阿福，雨夜茶馆跑堂，被一笔镖队旧账拖进江湖纠纷。",
-      language: "zh",
+      language: "vi",
       worldContract: "时间是世界同步轴：问话可能只过几分钟，赶路可能过半天，闭关可能跨年；老陈和铁手镖队会在同一段时间里按自己的目标行动，不能只等玩家触发。",
       visualContract: "旧账和镖队信物的重量通过纸张磨损、光线压迫和旁人反应体现，不要游戏 UI。",
     });
@@ -778,7 +778,7 @@ describe("PlayRunner", () => {
       id: "regenerate-turn",
       title: "雨夜车站",
       premise: "玩家在末班车站台追查一张旧车票。",
-      language: "zh",
+      language: "vi",
     });
     await store.ensureRun("regenerate-turn", "main");
     await store.writeProjection("regenerate-turn", "main", "projections/scene.md", "末班车还没进站。\n");
@@ -879,7 +879,7 @@ describe("PlayRunner", () => {
       id: "close-self-db",
       title: "收摊测试",
       premise: "验证 runner 自建数据库连接会被关闭。",
-      language: "zh",
+      language: "vi",
       mode: "open",
     });
     await store.ensureRun("close-self-db", "main");

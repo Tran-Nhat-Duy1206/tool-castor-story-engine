@@ -5,7 +5,7 @@ import type { ForecastBranch, NarrativeForecast } from "./schema.js";
 // call and tests stay clock-free.
 
 export function renderForecastComparisonMarkdown(forecast: NarrativeForecast): string {
-  const zh = forecast.language === "zh";
+  const zh = forecast.language === "vi";
   const header = zh
     ? [
         `# 叙事推演对比：${forecast.divergence}`,
@@ -48,7 +48,7 @@ export function renderSelectedBranchPlanMarkdown(input: {
   readonly stale: boolean;
 }): string {
   const { forecast, branch } = input;
-  const zh = forecast.language === "zh";
+  const zh = forecast.language === "vi";
 
   const staleWarning = input.stale
     ? (zh

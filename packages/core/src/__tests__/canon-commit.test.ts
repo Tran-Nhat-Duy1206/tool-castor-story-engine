@@ -92,7 +92,7 @@ describe("commitCanonEdits (single atomic integrity transaction)", () => {
     // Projection regenerated and byte-equal to renderer output.
     const liveMd = await readText("story/current_state.md");
     expect(liveMd).toContain("北塔");
-    expect(liveMd).toBe(renderCurrentStateProjection(live, "zh"));
+    expect(liveMd).toBe(renderCurrentStateProjection(live, "vi"));
 
     // Snapshot N mirrors BOTH files.
     expect(await readText("story/snapshots/12/state/current_state.json")).toBe(liveJson);

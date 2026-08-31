@@ -90,7 +90,7 @@ describe("validateRuntimeState", () => {
     const issues = validateRuntimeState({
       manifest: {
         schemaVersion: 2,
-        language: "zh",
+        language: "vi",
         lastAppliedChapter: 30,
         projectionVersion: 1,
         migrationWarnings: [],

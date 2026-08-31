@@ -90,8 +90,10 @@ export async function listBookBackups(
     ...(await listDir(bookBackupsDir(root, bookId))),
     ...(await listDir(join(root, ".castor", "backups", bookId))),
   ];
+  // Dedupe by id (canonical and legacy point to same dir after rename)
+  const deduped = [...new Map(backups.map((b) => [b.id, b])).values()];
   // Backup ids start with a UTC timestamp, so a descending id sort is newest-first.
-  return backups.sort((a, b) => b.id.localeCompare(a.id));
+  return deduped.sort((a, b) => b.id.localeCompare(a.id));
 }
 
 export async function restoreBookBackup(

@@ -55,7 +55,7 @@ export interface ContextBudget {
 export interface CompressibleContextCompileRequest {
   readonly chapterNumber: number;
   readonly goal: string;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly maxInputTokens: number;
   readonly protectedEntries: ContextPackage["selectedContext"];
   readonly compressibleEntries: ContextPackage["selectedContext"];
@@ -69,7 +69,7 @@ export interface OutlineSectionSelectionRequest {
   readonly chapterNumber: number;
   readonly goal: string;
   readonly outlineNode: string;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly candidates: ReadonlyArray<{
     readonly source: string;
     readonly heading: string;
@@ -96,7 +96,7 @@ export async function composeGovernedChapter(input: ComposeChapterInput): Promis
   const baseContext = await collectSelectedContext(
     storyDir,
     input.plan,
-    input.book.language ?? "zh",
+    input.book.language ?? "vi",
     input.outlineSectionSelector,
     input.memorySemanticSelector,
   );
@@ -110,7 +110,7 @@ export async function composeGovernedChapter(input: ComposeChapterInput): Promis
     contextPackage: initialContextPackage,
     chapterNumber: input.chapterNumber,
     goal: input.plan.intent.goal,
-    language: input.book.language ?? "zh",
+    language: input.book.language ?? "vi",
     contextBudget: input.contextBudget,
     compiler: input.compressibleContextCompiler,
     onContextCompression: input.onContextCompression,
@@ -160,7 +160,7 @@ async function applyContextBudgetIfNeeded(params: {
   readonly contextPackage: ContextPackage;
   readonly chapterNumber: number;
   readonly goal: string;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly contextBudget?: ContextBudget;
   readonly compiler?: CompressibleContextCompiler;
   readonly onContextCompression?: ContextCompressionCallback;
@@ -551,7 +551,7 @@ async function loadReferenceContext(input: ComposeChapterInput): Promise<BookRef
       goal: input.plan.intent.goal,
       outlineNode: input.plan.intent.outlineNode ?? "",
       mustKeep: input.plan.intent.mustKeep,
-      language: input.book.language ?? "zh",
+      language: input.book.language ?? "vi",
     });
   } catch {
     return { entries: [], notes: ["book-reference-context-unavailable"] };
@@ -572,7 +572,7 @@ export function contextBudgetFromClient(client: LLMClient): ContextBudget | unde
 async function collectSelectedContext(
   storyDir: string,
   plan: PlanChapterOutput,
-  language: "zh" | "en",
+  language: "vi" | "en",
   outlineSectionSelector?: OutlineSectionSelector,
   memorySemanticSelector?: MemorySemanticSelector,
 ): Promise<{
@@ -822,7 +822,7 @@ async function buildHookDebtEntries(
       readonly payoffTiming?: string;
       readonly notes: string;
     }>,
-  language: "zh" | "en",
+  language: "vi" | "en",
 ): Promise<ContextPackage["selectedContext"]> {
     const targetHookIds = [...new Set(plan.memo.threadRefs)];
     if (targetHookIds.length === 0) {
@@ -911,7 +911,7 @@ async function maybeOutlineSectionSources(
   reason: string,
   plan: PlanChapterOutput,
   kind: "story-frame" | "volume-map",
-  language: "zh" | "en",
+  language: "vi" | "en",
   outlineSectionSelector?: OutlineSectionSelector,
 ): Promise<ContextPackage["selectedContext"]> {
     const path = join(storyDir, fileName);
@@ -950,7 +950,7 @@ async function selectOutlineSectionEntries(params: {
   readonly reason: string;
   readonly plan: PlanChapterOutput;
   readonly kind: "story-frame" | "volume-map";
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly outlineSectionSelector?: OutlineSectionSelector;
 }): Promise<ContextPackage["selectedContext"]> {
     const sections = splitMarkdownSections(params.content);

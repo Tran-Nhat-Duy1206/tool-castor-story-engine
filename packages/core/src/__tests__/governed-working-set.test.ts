@@ -28,7 +28,7 @@ describe("governed-working-set", () => {
         ],
       },
       chapterNumber: 1,
-      language: "zh",
+      language: "vi",
     });
 
     expect(filtered).toContain("opening-call");

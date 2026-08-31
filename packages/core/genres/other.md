@@ -1,24 +1,24 @@
 ---
-name: 通用
+name: Tổng Hợp
 id: other
-chapterTypes: ["推进章", "布局章", "过渡章", "回收章"]
-fatigueWords: ["震惊", "不可思议", "难以置信", "深吸一口气", "仿佛", "不禁", "宛如", "竟然"]
+chapterTypes: ["Chương Thúc Đẩy", "Chương Bố Cục", "Chương Quá Độ", "Chương Thu Hoạch"]
+fatigueWords: ["chấn kinh", "không thể tin nổi", "khó tin", "hít sâu một hơi", "dường như", "không kìm được", "như thể", "vậy mà"]
 numericalSystem: false
 powerScaling: false
 eraResearch: false
-pacingRule: "每2-3章有一个明确的进展或反馈"
-satisfactionTypes: ["目标达成", "困难克服", "真相揭示", "关系转变"]
+pacingRule: "Mỗi 2–3 chương có một tiến triển hoặc phản hồi rõ rệt"
+satisfactionTypes: ["Đạt được mục tiêu", "Vượt qua khó khăn", "Vén màn sự thật", "Chuyển biến quan hệ"]
 auditDimensions: [1,2,3,6,7,8,9,10,13,14,15,16,17,18,19,24,25,26]
 ---
 
-## 题材禁忌
+## Điều cấm kỵ của thể loại
 
-- 无逻辑的巧合推进剧情
-- 配角降智配合主角
-- 无铺垫的高潮
+- Trùng hợp vô logic thúc đẩy cốt truyện
+- Vai phụ hạ trí phối hợp với nhân vật chính
+- Cao trào không có铺垫
 
-## 叙事指导
+## Chỉ dẫn tự sự
 
-根据具体题材调整叙事重心。
-保持因果逻辑链完整。
-人物行为由动机驱动，不由剧情需要驱动。
+Căn cứ thể loại cụ thể để điều chỉnh trọng tâm tự sự.
+Giữ chuỗi logic nhân quả完整.
+Hành vi nhân vật do động cơ thúc đẩy, không do nhu cầu cốt truyện thúc đẩy.

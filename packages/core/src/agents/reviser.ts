@@ -166,7 +166,7 @@ export class ReviserAgent extends BaseAgent {
       : (legacyRulesBody || "(无文风指南)");
 
     const isEnglish = (bookLanguage ?? gp.language) === "en";
-    const resolvedLanguage = isEnglish ? "en" : "zh";
+    const resolvedLanguage = isEnglish ? "en" : "vi";
 
     const issueList = mode === "auto"
       ? buildTieredIssueList(issues, isEnglish)
@@ -388,7 +388,7 @@ ${chapterContent}`;
     protagonistBlock: string;
     numericalRule: string;
     lengthGuardrail: string;
-    resolvedLanguage: "zh" | "en";
+    resolvedLanguage: "vi" | "en";
     lengthSpec?: LengthSpec;
     autoOutputMode: AutoOutputMode;
   }): string {
@@ -506,7 +506,7 @@ REPLACEMENT_TEXT:
     numericalRule: string;
     lengthGuardrail: string;
     mode: ReviseMode;
-    resolvedLanguage: "zh" | "en";
+    resolvedLanguage: "vi" | "en";
   }): string {
     const { langPrefix, gp, protagonistBlock, numericalRule, lengthGuardrail, mode } = params;
     const modeDesc = MODE_DESCRIPTIONS[mode];
@@ -569,7 +569,7 @@ ${outputFormat}`;
     contextPackage: ContextPackage,
     ruleStack: RuleStack,
   ): string {
-    const selectedContext = renderNarrativeSelectedContext(contextPackage.selectedContext, "zh")
+    const selectedContext = renderNarrativeSelectedContext(contextPackage.selectedContext, "vi")
       .replace(/^### /gm, "- ");
     const overrides = ruleStack.activeOverrides.length > 0
       ? ruleStack.activeOverrides
@@ -578,9 +578,9 @@ ${outputFormat}`;
       : "- none";
     // Prefer memo-based narrative block; fall back to legacy intent markdown
     const narrativeBlock = memo
-      ? renderMemoAsNarrativeBlock(memo, intent, "zh")
+      ? renderMemoAsNarrativeBlock(memo, intent, "vi")
       : chapterIntent
-        ? buildNarrativeIntentBrief(chapterIntent, "zh")
+        ? buildNarrativeIntentBrief(chapterIntent, "vi")
         : "(无)";
 
     return `\n## 本章控制输入（由 Planner/Composer 编译）

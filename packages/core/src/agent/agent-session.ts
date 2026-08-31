@@ -796,7 +796,7 @@ function createAgentToolsForMode(params: CreateAgentToolsForModeParams) {
 }
 
 function createModeTools(params: CreateAgentToolsForModeParams) {
-  const lang = params.language === "en" ? "en" : "zh";
+  const lang = params.language === "en" ? "en" : "vi";
   const subAgentTool = createSubAgentTool(params.pipeline, params.bookId, params.projectRoot, {
     actionPayload: params.actionPayload,
     language: lang,

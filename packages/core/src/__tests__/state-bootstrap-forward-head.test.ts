@@ -38,7 +38,7 @@ async function seedBook(root: string, options: SeedOptions): Promise<string> {
   await mkdir(join(bookDir, "chapters"), { recursive: true });
   await mkdir(join(storyDir, "state"), { recursive: true });
   await writeIf(join(bookDir, "book.json"), JSON.stringify({
-    id: "demo-canon-book", title: "回声协议", genre: "urban", language: "zh",
+    id: "demo-canon-book", title: "回声协议", genre: "urban", language: "vi",
     platform: "other", createdAt: CREATED, updatedAt: CREATED,
   }));
   const index = Array.from({ length: options.prefixThrough }, (_, i) => i + 1).map((number) => ({
@@ -59,7 +59,7 @@ async function seedBook(root: string, options: SeedOptions): Promise<string> {
   if (options.manifestHead !== undefined) {
     await writeIf(join(storyDir, "state", "manifest.json"), JSON.stringify({
       schemaVersion: 2,
-      language: "zh",
+      language: "vi",
       lastAppliedChapter: options.manifestHead,
       projectionVersion: 3,
       migrationWarnings: [],
@@ -162,7 +162,7 @@ describe("state-bootstrap forward-head authority matrix (Task 13 follow-up)", ()
     const bookDir = join(root, "books", "empty-book");
     await mkdir(join(bookDir), { recursive: true });
     await writeIf(join(bookDir, "book.json"), JSON.stringify({
-      id: "empty-book", title: "空", genre: "urban", language: "zh",
+      id: "empty-book", title: "空", genre: "urban", language: "vi",
       platform: "other", createdAt: CREATED, updatedAt: CREATED,
     }));
     const result = await bootstrapStructuredStateFromMarkdown({ bookDir });

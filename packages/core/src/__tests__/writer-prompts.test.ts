@@ -20,7 +20,7 @@ const BOOK: BookConfig = {
 const GENRE: GenreProfile = {
   id: "other",
   name: "综合",
-  language: "zh",
+  language: "vi",
   chapterTypes: ["setup", "conflict"],
   fatigueWords: [],
   numericalSystem: false,
@@ -44,7 +44,7 @@ describe("buildWriterSystemPrompt", () => {
       3,
       "creative",
       undefined,
-      "zh",
+      "vi",
       "governed",
     );
 
@@ -59,7 +59,7 @@ describe("buildWriterSystemPrompt", () => {
     const firstPerson = BookRulesSchema.parse({ narrativePerson: "first" });
     const promptFirst = buildWriterSystemPrompt(
       BOOK, GENRE, firstPerson, "# Book Rules", "# Genre Body", "# Style Guide",
-      undefined, 3, "creative", undefined, "zh", "governed",
+      undefined, 3, "creative", undefined, "vi", "governed",
     );
     expect(promptFirst).toContain("叙事人称（硬约束）");
     expect(promptFirst).toContain("第一人称");
@@ -68,7 +68,7 @@ describe("buildWriterSystemPrompt", () => {
     const noPerson = BookRulesSchema.parse({});
     const promptNone = buildWriterSystemPrompt(
       BOOK, GENRE, noPerson, "# Book Rules", "# Genre Body", "# Style Guide",
-      undefined, 3, "creative", undefined, "zh", "governed",
+      undefined, 3, "creative", undefined, "vi", "governed",
     );
     expect(promptNone).not.toContain("叙事人称（硬约束）");
   });
@@ -99,7 +99,7 @@ describe("buildWriterSystemPrompt", () => {
       3,
       "creative",
       undefined,
-      "zh",
+      "vi",
       "governed",
       lengthSpec,
     );
@@ -121,7 +121,7 @@ describe("buildWriterSystemPrompt", () => {
       3,
       "creative",
       undefined,
-      "zh",
+      "vi",
       "governed",
     );
 
@@ -142,7 +142,7 @@ describe("buildWriterSystemPrompt", () => {
         ch,
         "creative",
         undefined,
-        "zh",
+        "vi",
         "governed",
       );
       expect(prompt).toContain("黄金三章写作纪律");
@@ -174,7 +174,7 @@ describe("buildWriterSystemPrompt", () => {
   it("omits golden opening discipline for ch>=4 in both languages", () => {
     const zh = buildWriterSystemPrompt(
       BOOK, GENRE, null, "# Book Rules", "# Genre Body", "# Style Guide",
-      undefined, 4, "creative", undefined, "zh", "governed",
+      undefined, 4, "creative", undefined, "vi", "governed",
     );
     expect(zh).not.toContain("黄金三章写作纪律");
 
@@ -187,7 +187,7 @@ describe("buildWriterSystemPrompt", () => {
   });
 
   it("renders golden opening discipline as cohesive prose, not a checklist", () => {
-    const out = buildGoldenOpeningDiscipline(1, "zh");
+    const out = buildGoldenOpeningDiscipline(1, "vi");
     // Header line is allowed; body must not contain enumerated/bulleted lines.
     expect(out).not.toMatch(/^\s*1\.\s/m);
     expect(out).not.toMatch(/^\s*-\s/m);
@@ -200,9 +200,9 @@ describe("buildWriterSystemPrompt", () => {
   });
 
   it("buildGoldenOpeningDiscipline returns empty string for ch>=4 / undefined", () => {
-    expect(buildGoldenOpeningDiscipline(4, "zh")).toBe("");
+    expect(buildGoldenOpeningDiscipline(4, "vi")).toBe("");
     expect(buildGoldenOpeningDiscipline(99, "en")).toBe("");
-    expect(buildGoldenOpeningDiscipline(undefined, "zh")).toBe("");
+    expect(buildGoldenOpeningDiscipline(undefined, "vi")).toBe("");
   });
 
   it("tells governed English prompts to obey variance briefs and include resistance-bearing exchanges", () => {

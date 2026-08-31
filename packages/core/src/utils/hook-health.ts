@@ -5,7 +5,7 @@ import { describeHookLifecycle, localizeHookPayoffTiming, normalizeStoredHookSta
 import { HOOK_HEALTH_DEFAULTS } from "./hook-policy.js";
 
 export function analyzeHookHealth(params: {
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly chapterNumber: number;
   readonly targetChapters?: number;
   readonly hooks: ReadonlyArray<HookRecord>;
@@ -132,7 +132,7 @@ export function analyzeHookHealth(params: {
 }
 
 function buildPressureDescription(params: {
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
   readonly entries: ReadonlyArray<{
     readonly hook: HookRecord;
     readonly lifecycle: ReturnType<typeof describeHookLifecycle>;
@@ -167,7 +167,7 @@ function buildPressureDescription(params: {
 
 function localizePressureLabel(
   lifecycle: ReturnType<typeof describeHookLifecycle>,
-  language: "zh" | "en",
+  language: "vi" | "en",
 ): string {
   if (lifecycle.overdue) {
     return language === "en" ? "overdue" : "已逾期";
@@ -179,7 +179,7 @@ function localizePressureLabel(
 }
 
 function warning(
-  language: "zh" | "en",
+  language: "vi" | "en",
   description: string,
   suggestion: string,
 ): AuditIssue {

@@ -117,7 +117,7 @@ describe("buildPlannerUserMessage", () => {
 
 describe("buildGoldenOpeningGuidance", () => {
   it("emits zh slot prose for chapter 1 (confront core conflict)", () => {
-    const out = buildGoldenOpeningGuidance(1, "zh");
+    const out = buildGoldenOpeningGuidance(1, "vi");
     expect(out).toContain("黄金三章规划指引");
     expect(out).toContain("第 1 章");
     // Ch1 slot: throw protagonist into core conflict
@@ -131,7 +131,7 @@ describe("buildGoldenOpeningGuidance", () => {
   });
 
   it("emits zh slot prose for chapter 2 (demonstrate the edge)", () => {
-    const out = buildGoldenOpeningGuidance(2, "zh");
+    const out = buildGoldenOpeningGuidance(2, "vi");
     expect(out).toContain("第 2 章");
     expect(out).toContain("金手指");
     // Must demand a concrete event, not narration
@@ -139,7 +139,7 @@ describe("buildGoldenOpeningGuidance", () => {
   });
 
   it("emits zh slot prose for chapter 3 (lock the short-term goal)", () => {
-    const out = buildGoldenOpeningGuidance(3, "zh");
+    const out = buildGoldenOpeningGuidance(3, "vi");
     expect(out).toContain("第 3 章");
     expect(out).toContain("短期目标");
     expect(out).toContain("3-10 章");
@@ -155,14 +155,14 @@ describe("buildGoldenOpeningGuidance", () => {
   });
 
   it("returns empty string for ch>=4 in both languages", () => {
-    expect(buildGoldenOpeningGuidance(4, "zh")).toBe("");
-    expect(buildGoldenOpeningGuidance(5, "zh")).toBe("");
+    expect(buildGoldenOpeningGuidance(4, "vi")).toBe("");
+    expect(buildGoldenOpeningGuidance(5, "vi")).toBe("");
     expect(buildGoldenOpeningGuidance(4, "en")).toBe("");
     expect(buildGoldenOpeningGuidance(99, "en")).toBe("");
   });
 
   it("renders as cohesive prose, not a numbered or bulleted checklist", () => {
-    const zh = buildGoldenOpeningGuidance(1, "zh");
+    const zh = buildGoldenOpeningGuidance(1, "vi");
     // Heading is allowed; body must not contain enumerated lines.
     expect(zh).not.toMatch(/^\s*1\.\s/m);
     expect(zh).not.toMatch(/^\s*-\s/m);

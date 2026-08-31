@@ -65,7 +65,7 @@ describe("state projections", () => {
           chapterType: "主线推进",
         },
       ],
-    }, "zh");
+    }, "vi");
 
     expect(markdown).toBe([
       "# 章节摘要",

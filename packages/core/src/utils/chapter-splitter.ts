@@ -4,22 +4,21 @@ export interface SplitChapter {
 }
 
 /**
- * Split a single text file into chapters by matching title lines.
+ * Tách một tệp văn bản thành các chương dựa trên dòng tiêu đề.
  *
- * Default pattern matches:
- * - "第一章 xxxx" / "第1章 xxxx"
- * - "第一回 xxxx" / "第1回 xxxx"
- * - "# 第1章 xxxx" / "## 第23章 xxxx"
- * - "CHAPTER I." / "CHAPTER II."
+ * Mẫu mặc định khớp:
+ * - "Chương 1 xxxx" / "Chương I xxxx"
+ * - "# Chương 1 xxxx" / "## Chương 23 xxxx"
+ * - "Chapter 1" / "CHAPTER I." / "CHAPTER II."
  *
- * Each match marks the start of a new chapter. Content between matches
- * belongs to the preceding chapter.
+ * Mỗi lần khớp đánh dấu đầu một chương mới. Nội dung giữa các lần khớp
+ * thuộc về chương trước đó.
  */
 export function splitChapters(
   text: string,
   pattern?: string,
 ): ReadonlyArray<SplitChapter> {
-  const defaultPattern = /^#{0,2}\s*(?:第[零〇○Ｏ０一二三四五六七八九十百千万\d]+(?:章|回)(?:[:：]|\s+)?\s*(.*)|Chapter\s+(?:\d+|[IVXLCDM]+)(?:\.|:|\s+)?\s*(.*))/i;
+  const defaultPattern = /^#{0,2}\s*(?:Chương\s+(?:\d+|[IVXLCDM]+)(?:\.|:|\s+)?\s*(.*)|Chapter\s+(?:\d+|[IVXLCDM]+)(?:\.|:|\s+)?\s*(.*))/i;
   const regex = pattern ? new RegExp(pattern, "m") : defaultPattern;
 
   const lines = text.split("\n");
@@ -72,9 +71,9 @@ function inferFallbackTitle(headingLine: string, chapterNumber: number): string 
     return `Chapter ${chapterNumber}`;
   }
 
-  if (/第[零一二三四五六七八九十百千万\d]+回/.test(headingLine)) {
-    return `第${chapterNumber}回`;
+  if (/Chương\s+(?:\d+|[ivxlcdm]+)/i.test(headingLine)) {
+    return `Chương ${chapterNumber}`;
   }
 
-  return `第${chapterNumber}章`;
+  return `Chương ${chapterNumber}`;
 }

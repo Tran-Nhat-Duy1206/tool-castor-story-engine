@@ -111,7 +111,7 @@ describe("StateValidatorAgent", () => {
       "chat",
     ).mockResolvedValue({ content: "PASS", usage: ZERO_USAGE });
 
-    await agent.validate("Body.", 1, "old", "new state", "old hooks", "new hooks", "zh");
+    await agent.validate("Body.", 1, "old", "new state", "old hooks", "new hooks", "vi");
 
     const options = chatSpy.mock.calls[0]?.[1] as { maxTokens?: number } | undefined;
     // Must not hardcode a small value like 2048 that starves thinking models
@@ -147,7 +147,7 @@ describe("StateValidatorAgent", () => {
       "new state: 第一条规则已被批注",
       "old hooks",
       "new hooks",
-      "zh",
+      "vi",
       {
         storyFrame: "简介里写过：规则一：天黑后不准出宿舍。",
         bookRules: "硬规则：规则编号必须以前文正文确立版本为准。",
@@ -192,7 +192,7 @@ describe("StateValidatorAgent", () => {
       "new state",
       "old hooks",
       "new hooks",
-      "zh",
+      "vi",
       {
         storyFrame: `${"世界设定".repeat(4000)}\nSTORY_FRAME_TAIL_MARKER`,
         bookRules: `${"规则".repeat(3000)}\nBOOK_RULES_TAIL_MARKER`,

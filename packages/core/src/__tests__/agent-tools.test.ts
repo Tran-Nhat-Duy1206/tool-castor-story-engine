@@ -323,7 +323,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("localizes propose_action fallback copy", async () => {
-    const zhTool = createProposeActionTool("zh");
+    const zhTool = createProposeActionTool("vi");
     const enTool = createProposeActionTool("en");
 
     const zh = await zhTool.execute("proposal-zh", {
@@ -355,7 +355,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("marks in-surface confirmation proposals when requested", async () => {
-    const tool = createProposeActionTool("zh", { sameSession: true });
+    const tool = createProposeActionTool("vi", { sameSession: true });
 
     const result = await tool.execute("proposal-same-session", {
       action: "short_run",
@@ -373,7 +373,7 @@ describe("agent deterministic writing tools", () => {
 
   it("carries skills activated by the agent into the confirmed action", async () => {
     const activatedSkillIds = ["writer-distillation"];
-    const tool = createProposeActionTool("zh", {
+    const tool = createProposeActionTool("vi", {
       requestedSkillIds: () => activatedSkillIds,
     });
 
@@ -391,7 +391,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("requires a host-owned title and direction before proposing short production", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     await expect(tool.execute("proposal-missing-short-title", {
       action: "short_run",
@@ -401,7 +401,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("carries structured execution payloads in proposed actions", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const result = await tool.execute("proposal-book", {
       action: "create_book",
@@ -412,7 +412,7 @@ describe("agent deterministic writing tools", () => {
         platform: "tomato",
         targetChapters: 100,
         chapterWordCount: 2600,
-        language: "zh",
+        language: "vi",
       },
     });
 
@@ -426,14 +426,14 @@ describe("agent deterministic writing tools", () => {
           platform: "tomato",
           targetChapters: 100,
           chapterWordCount: 2600,
-          language: "zh",
+          language: "vi",
         },
       },
     });
   });
 
   it("preserves the model-proposed Play scene without semantic template filtering", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const result = await tool.execute("proposal-play", {
       action: "play_start",
@@ -457,7 +457,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("keeps play world and visual contracts in the structured confirmation payload", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const result = await tool.execute("proposal-play-contract", {
       action: "play_start",
@@ -486,7 +486,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("keeps script creation specs in the structured confirmation payload", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const result = await tool.execute("proposal-script", {
       action: "script_create",
@@ -516,7 +516,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("keeps storyboard specs in the structured confirmation payload", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const result = await tool.execute("proposal-storyboard", {
       action: "storyboard_create",
@@ -546,7 +546,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("keeps interactive-film specs in the structured confirmation payload", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const result = await tool.execute("proposal-interactive-film", {
       action: "interactive_film_create",
@@ -575,7 +575,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("declares executable proposal fields as required in the model-facing schema", () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
     const schema = tool.parameters as {
       properties?: Record<string, { required?: string[] }>;
     };
@@ -591,7 +591,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("drops non-positive placeholder counts from interactive-film confirmation payloads", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const result = await tool.execute("proposal-interactive-film-zero-count", {
       action: "interactive_film_create",
@@ -665,7 +665,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("does not emit a confirmation card when the proposed action payload is invalid", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     await expect(tool.execute("proposal-invalid", {
       action: "create_book",
@@ -679,7 +679,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("rejects Play confirmation cards without structured execution payload", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     await expect(tool.execute("proposal-play-missing-payload", {
       action: "play_start",
@@ -690,7 +690,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("proposes derivative production with structured payloads and no form route", async () => {
-    const tool = createProposeActionTool("zh");
+    const tool = createProposeActionTool("vi");
 
     const cases = [
       {
@@ -739,7 +739,7 @@ describe("agent deterministic writing tools", () => {
 
   it("uses the single host-provided attachment as the derivative source when the model omits its path", async () => {
     const attachmentPath = ".castor/uploads/session/style-source.md";
-    const tool = createProposeActionTool("zh", {
+    const tool = createProposeActionTool("vi", {
       attachmentPaths: () => [attachmentPath],
     });
 
@@ -767,7 +767,7 @@ describe("agent deterministic writing tools", () => {
 
   it("replaces a truncated uploaded-file path with the single host-provided attachment", async () => {
     const attachmentPath = ".castor/uploads/session/style-source.md";
-    const tool = createProposeActionTool("zh", {
+    const tool = createProposeActionTool("vi", {
       attachmentPaths: () => [attachmentPath],
     });
 
@@ -791,7 +791,7 @@ describe("agent deterministic writing tools", () => {
   });
 
   it("does not guess among multiple attachment paths", async () => {
-    const tool = createProposeActionTool("zh", {
+    const tool = createProposeActionTool("vi", {
       attachmentPaths: () => [
         ".castor/uploads/session/one.md",
         ".castor/uploads/session/two.md",
@@ -842,7 +842,7 @@ describe("agent deterministic writing tools", () => {
           platform: "tomato",
           targetChapters: 100,
           chapterWordCount: 2600,
-          language: "zh",
+          language: "vi",
         },
       },
     });

@@ -108,7 +108,7 @@ describe("applyRuntimeStateDelta", () => {
         snapshot: {
           manifest: {
             schemaVersion: 2,
-            language: "zh",
+            language: "vi",
             lastAppliedChapter: 11,
             projectionVersion: 1,
             migrationWarnings: [],
@@ -163,7 +163,7 @@ describe("applyRuntimeStateDelta", () => {
       snapshot: {
         manifest: {
           schemaVersion: 2,
-          language: "zh",
+          language: "vi",
           lastAppliedChapter: 12,
           projectionVersion: 1,
           migrationWarnings: [],
@@ -315,7 +315,7 @@ describe("applyRuntimeStateDelta", () => {
       snapshot: {
         manifest: {
           schemaVersion: 2,
-          language: "zh",
+          language: "vi",
           lastAppliedChapter: 2,
           projectionVersion: 1,
           migrationWarnings: [],
@@ -377,7 +377,7 @@ describe("applyRuntimeStateDelta", () => {
       snapshot: {
         manifest: {
           schemaVersion: 2,
-          language: "zh",
+          language: "vi",
           lastAppliedChapter: 8,
           projectionVersion: 1,
           migrationWarnings: [],

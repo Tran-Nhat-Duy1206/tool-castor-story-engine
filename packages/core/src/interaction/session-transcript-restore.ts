@@ -136,7 +136,7 @@ export function appendRestoredHistoryBoundary(
   return [
     ...messages,
     systemMessage(
-      language === "zh" ? RESTORED_HISTORY_BOUNDARY_ZH : RESTORED_HISTORY_BOUNDARY_EN,
+      language === "vi" ? RESTORED_HISTORY_BOUNDARY_ZH : RESTORED_HISTORY_BOUNDARY_EN,
       timestamp + 1,
     ),
   ];

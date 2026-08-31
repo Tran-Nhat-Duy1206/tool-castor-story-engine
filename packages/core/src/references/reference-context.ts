@@ -8,7 +8,7 @@ export interface BookReferenceSelectionTask {
   readonly goal: string;
   readonly outlineNode: string;
   readonly mustKeep: ReadonlyArray<string>;
-  readonly language: "zh" | "en";
+  readonly language: "vi" | "en";
 }
 
 export interface ReferenceSectionCandidate {

@@ -59,7 +59,7 @@ describe("SubAgentParams schema", () => {
       title: "夜港账本",
       genre: "urban",
       platform: "番茄小说",
-      language: "zh",
+      language: "vi",
     });
 
     expect(prepared).toMatchObject({ platform: "tomato" });
@@ -74,7 +74,7 @@ describe("SubAgentParams schema", () => {
       title: "空平台测试",
       genre: "urban",
       platform: "",
-      language: "zh",
+      language: "vi",
     });
 
     expect(blankPlatform).not.toHaveProperty("platform");
@@ -102,7 +102,7 @@ describe("architect agent — BookConfig construction", () => {
       title: "天道独行",
       genre: "xuanhuan",
       platform: "tomato",
-      language: "zh",
+      language: "vi",
       targetChapters: 100,
       chapterWordCount: 4000,
     });
@@ -111,7 +111,7 @@ describe("architect agent — BookConfig construction", () => {
     expect(bookConfig.title).toBe("天道独行");
     expect(bookConfig.genre).toBe("xuanhuan");
     expect(bookConfig.platform).toBe("tomato");
-    expect(bookConfig.language).toBe("zh");
+    expect(bookConfig.language).toBe("vi");
     expect(bookConfig.targetChapters).toBe(100);
     expect(bookConfig.chapterWordCount).toBe(4000);
     expect(bookConfig.status).toBe("outlining");
@@ -132,7 +132,7 @@ describe("architect agent — BookConfig construction", () => {
   it("infers zh and its native chapter length from a Chinese brief", async () => {
     await tool.execute("tc2b", { agent: "architect", instruction: "写一本都市重生爽文", title: "回到二零零八" });
     const [bookConfig] = initBookMock.mock.calls[0];
-    expect(bookConfig.language).toBe("zh");
+    expect(bookConfig.language).toBe("vi");
     expect(bookConfig.chapterWordCount).toBe(3000);
   });
 

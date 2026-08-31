@@ -412,7 +412,7 @@ async function runExactReview(params: {
   const raw = await params.reviewer.review({
     foundation,
     mode: reviewMode,
-    language: params.book.language === "en" ? "en" : "zh",
+    language: params.book.language === "en" ? "en" : "vi",
     targetChapters: params.book.targetChapters,
     structuredFindings: true,
   }) as PipelineReviewResult;

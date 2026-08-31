@@ -46,7 +46,7 @@ describe("short_run charsPerChapter validation (envelope layer)", () => {
   it("rejects a Chinese charsPerChapter in the en word range (zh+650)", () => {
     const parsed = ShortRunActionPayloadSchema.safeParse({
       direction: "女频短篇 婚姻背叛 证据反杀",
-      language: "zh",
+      language: "vi",
       charsPerChapter: 650,
     });
     expect(parsed.success).toBe(false);
@@ -61,7 +61,7 @@ describe("short_run charsPerChapter validation (envelope layer)", () => {
     }).success).toBe(true);
     expect(ShortRunActionPayloadSchema.safeParse({
       direction: "女频短篇 婚姻背叛 证据反杀",
-      language: "zh",
+      language: "vi",
       charsPerChapter: 1000,
     }).success).toBe(true);
   });
@@ -86,7 +86,7 @@ describe("short_run charsPerChapter validation (envelope layer)", () => {
 
 describe("short_run charsPerChapter validation (propose_action)", () => {
   it("rejects en+1100 when the model proposes the confirmation card", async () => {
-    await expect(createProposeActionTool("zh").execute("propose-short-en-1100", {
+    await expect(createProposeActionTool("vi").execute("propose-short-en-1100", {
       action: "short_run",
       instruction: "用户要求写一篇英文短篇，每章 1100",
       shortRun: {
@@ -115,7 +115,7 @@ describe("short_run charsPerChapter validation (tool layer, before pipeline star
   it("throws before starting the pipeline when a zh session confirms en+1100", async () => {
     const pipeline = createPipelineStub();
     const tool = createShortFictionRunTool(pipeline as never, root, {
-      language: "zh",
+      language: "vi",
       actionPayload: {
         shortRun: {
           direction: "an English office suspense story",
@@ -145,7 +145,7 @@ describe("short_run charsPerChapter validation (tool layer, before pipeline star
   it("keeps the en no-length behavior: runner receives undefined and applies its own 650 default", async () => {
     const pipeline = createPipelineStub();
     const tool = createShortFictionRunTool(pipeline as never, root, {
-      language: "zh",
+      language: "vi",
       actionPayload: {
         shortRun: {
           direction: "an English office suspense story",

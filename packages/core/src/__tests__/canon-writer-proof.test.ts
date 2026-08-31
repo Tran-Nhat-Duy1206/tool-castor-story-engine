@@ -108,7 +108,7 @@ describe("P3A deterministic writer contract (LLM-free integration proof)", () =>
     const manifestAfter = JSON.parse(
       await import("node:fs/promises").then((m) => m.readFile(join(bookDir, "story", "state", "manifest.json"), "utf-8")),
     );
-    expect(manifestAfter).toMatchObject({ schemaVersion: 2, language: "zh", lastAppliedChapter: 15 });
+    expect(manifestAfter).toMatchObject({ schemaVersion: 2, language: "vi", lastAppliedChapter: 15 });
 
     // (5) head snapshot mirrors refreshed INSIDE the same transaction.
     expect(metaOf(afterMeta, "story/snapshots/15/state/current_state.json").sha256)
@@ -140,7 +140,7 @@ describe("P3A deterministic writer contract (LLM-free integration proof)", () =>
     const liveJsonText = await readFixtureFile(join(bookDir, "story", "state", "current_state.json"), "utf-8");
     const liveState = JSON.parse(liveJsonText);
     const persistedProjection = await readFixtureFile(join(bookDir, "story", "current_state.md"), "utf-8");
-    expect(persistedProjection).toBe(renderCurrentStateProjection(liveState, "zh"));
+    expect(persistedProjection).toBe(renderCurrentStateProjection(liveState, "vi"));
     expect(persistedProjection).toContain("23");
     expect(persistedProjection).not.toContain("22");
 
@@ -167,7 +167,7 @@ describe("P3A deterministic writer contract (LLM-free integration proof)", () =>
       reason: "Relevant current-state fact retrieved for the current chapter goal.",
       excerpt: `${ageFact!.predicate} | ${ageFact!.object}`,
     };
-    const writerEvidence = renderNarrativeSelectedContext([ageEntry], "zh");
+    const writerEvidence = renderNarrativeSelectedContext([ageEntry], "vi");
     expect(writerEvidence).toContain("23");
     expect(writerEvidence).not.toContain("22");
 

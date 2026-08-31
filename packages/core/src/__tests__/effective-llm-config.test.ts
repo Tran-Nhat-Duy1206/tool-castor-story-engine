@@ -17,7 +17,7 @@ describe("resolveEffectiveLLMConfig", () => {
     await writeFile(join(root, "castor.json"), JSON.stringify({
       name: "effective-project",
       version: "0.1.0",
-      language: "zh",
+      language: "vi",
       llm,
       notify: [],
     }, null, 2), "utf-8");

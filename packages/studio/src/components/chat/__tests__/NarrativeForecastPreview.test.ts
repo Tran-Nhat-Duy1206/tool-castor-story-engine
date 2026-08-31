@@ -15,7 +15,7 @@ const forecast: NarrativeForecast = {
   forecastId: "fc-20260715-120234",
   bookId: "雨账簿",
   createdAt: "2026-07-15T12:02:34.979Z",
-  language: "zh",
+  language: "vi",
   divergence: "主角是否立刻公开第三章发现的关键证据",
   horizon: 3,
   baseChapter: 3,

@@ -85,7 +85,7 @@ function snapshotFromRaw(raw: {
 }
 
 const BASE_RAW = {
-  manifest: { schemaVersion: 2, language: "zh", lastAppliedChapter: 15, projectionVersion: 3, migrationWarnings: [] },
+  manifest: { schemaVersion: 2, language: "vi", lastAppliedChapter: 15, projectionVersion: 3, migrationWarnings: [] },
   currentState: {
     chapter: 15,
     facts: [
@@ -113,7 +113,7 @@ describe("computeCanonRevision (deterministic fingerprint)", () => {
         ],
         chapter: 15,
       },
-      manifest: { migrationWarnings: [], projectionVersion: 3, lastAppliedChapter: 15, language: "zh", schemaVersion: 2 },
+      manifest: { migrationWarnings: [], projectionVersion: 3, lastAppliedChapter: 15, language: "vi", schemaVersion: 2 },
     }));
     const b = snapshotFromRaw(reordered);
 
